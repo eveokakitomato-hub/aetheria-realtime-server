@@ -151,6 +151,25 @@ function bearerToken(req) {
 }
 
 async function handleApi(req, res, url) {
+  if (url === '/api/diag' && req.method === 'GET') {
+    // 接続診断: Supabase へ読み取りだけ試し、失敗理由 (HTTP状態と応答本文) を返す。
+    // 鍵そのものは返さない。種類の推定に使う接頭辞と長さだけを返す。
+    const keyKind = SUPABASE_SERVICE_KEY.startsWith('sb_secret_') ? 'sb_secret'
+      : SUPABASE_SERVICE_KEY.startsWith('sb_publishable_') ? 'sb_publishable'
+      : SUPABASE_SERVICE_KEY.startsWith('eyJ') ? 'legacy_jwt' : 'unknown';
+    const info = {
+      enabled: ACCOUNTS_ENABLED,
+      urlHost: SUPABASE_URL.replace(/^https?:\/\//, ''),
+      keyKind, keyLen: SUPABASE_SERVICE_KEY.length,
+    };
+    if (!ACCOUNTS_ENABLED) return sendJson(res, 200, { ...info, ok: false, error: 'accounts_not_configured' });
+    try {
+      await sb('accounts?select=id&limit=1');
+      return sendJson(res, 200, { ...info, ok: true });
+    } catch (err) {
+      return sendJson(res, 200, { ...info, ok: false, error: String(err.message).slice(0, 300) });
+    }
+  }
   if (!ACCOUNTS_ENABLED) {
     return sendJson(res, 503, { ok: false, error: 'accounts_not_configured' });
   }
