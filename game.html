@@ -59,8 +59,8 @@ canvas{display:block}
 .icon-btn{width:38px;height:38px;border:1px solid var(--line2);background:rgba(10,14,12,.85);color:var(--paper);border-radius:6px;display:grid;place-items:center;font-size:16px}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold)}
 
-/* ===== PLAYER HUD (bottom-left on desktop, top on mobile flow) ===== */
-#hud{position:absolute;left:12px;bottom:12px;width:340px;max-width:calc(100vw - 24px);z-index:20}
+/* ===== PLAYER HUD (top-left) ===== */
+#hud{position:absolute;left:12px;top:66px;width:340px;max-width:calc(100vw - 24px);z-index:20}
 .char-card{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;backdrop-filter:blur(8px)}
 .char-top{display:flex;gap:10px;align-items:center}
 .avatar{width:46px;height:46px;border-radius:6px;border:2px solid var(--gold2);display:grid;place-items:center;font-size:24px;flex-shrink:0;background:#223128}
@@ -80,7 +80,7 @@ canvas{display:block}
 .gold-row b{color:var(--gold)}
 
 /* ===== QUEST ===== */
-#quest{position:absolute;right:12px;top:64px;width:262px;z-index:19;background:rgba(10,15,13,.88);border:1px solid var(--line2);border-left:3px solid var(--gold);border-radius:6px;padding:11px 13px;backdrop-filter:blur(8px)}
+#quest{position:relative;width:262px;max-width:100%;z-index:19;background:rgba(10,15,13,.88);border:1px solid var(--line2);border-left:3px solid var(--gold);border-radius:6px;padding:11px 13px;backdrop-filter:blur(8px)}
 #quest h3{margin:0 0 2px;font-size:11px;letter-spacing:.14em;color:var(--gold)}
 #questTitle{font-weight:900;font-size:14px}
 #questDesc{font-size:12px;color:var(--muted);line-height:1.55;margin-top:3px}
@@ -91,11 +91,12 @@ canvas{display:block}
 #questReward{font-size:11px;color:#8fd0a8;margin-top:5px}
 
 /* ===== MINIMAP + PLAYERS ===== */
-#rightPanel{position:absolute;right:12px;bottom:12px;width:196px;z-index:19;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+#rightPanel{position:absolute;right:12px;top:66px;width:262px;max-width:calc(100vw - 24px);z-index:19;display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-height:calc(100% - 78px);overflow-y:auto;overflow-x:hidden;padding-bottom:2px}
+#rightPanel::-webkit-scrollbar{width:0;height:0}
 #minimapWrap{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:6px}
 #minimap{width:182px;height:182px;border-radius:4px;background:#16241a}
 #minimapLabel{font-size:10px;letter-spacing:.12em;color:var(--muted);text-align:center;padding:4px 0 2px}
-#playerList{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;width:196px}
+#playerList{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;width:262px;max-width:100%}
 #playerList h4{margin:0 0 7px;font-size:11px;letter-spacing:.1em;color:var(--muted)}
 .p-row{display:flex;align-items:center;gap:7px;font-size:12px;padding:4px 0;border-top:1px solid rgba(255,255,255,.05)}
 .p-row:first-of-type{border-top:0}
@@ -104,7 +105,7 @@ canvas{display:block}
 .p-row small{margin-left:auto;color:var(--dim)}
 
 /* ===== CHAT ===== */
-#chat{position:absolute;left:12px;bottom:176px;width:380px;max-width:calc(100vw - 24px);z-index:18;display:flex;flex-direction:column}
+#chat{position:absolute;left:12px;bottom:12px;width:380px;max-width:calc(100vw - 24px);z-index:18;display:flex;flex-direction:column}
 #chatLog{background:rgba(8,12,10,.78);border:1px solid rgba(61,82,71,.7);border-radius:8px 8px 0 0;padding:8px 10px;height:132px;overflow-y:auto;font-size:12px;line-height:1.65;backdrop-filter:blur(6px)}
 #chatLog::-webkit-scrollbar{width:5px}#chatLog::-webkit-scrollbar-thumb{background:#3d5247;border-radius:99px}
 .msg b{font-weight:700}
@@ -127,9 +128,9 @@ canvas{display:block}
 #attackBtn{width:72px;height:72px;border-radius:50%!important;background:radial-gradient(circle at 35% 30%,#f3d27a,var(--gold2))!important;color:#231a02!important;font-size:28px!important;border:2px solid #ffe9a8!important;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 
 /* ===== JOYSTICK (mobile) ===== */
-#joystick{position:absolute;left:18px;bottom:190px;width:118px;height:118px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);z-index:23;display:none;touch-action:none}
+#joystick{position:absolute;left:18px;bottom:196px;width:118px;height:118px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);z-index:23;display:none;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.5);transform:translate(-50%,-50%)}
-#targetInfo{position:absolute;left:50%;transform:translateX(-50%);top:64px;z-index:18;background:rgba(10,14,12,.85);border:1px solid var(--line2);border-radius:6px;padding:7px 14px;font-size:12px;display:none;text-align:center;min-width:210px}
+#targetInfo{position:absolute;left:50%;transform:translateX(-50%);top:70px;z-index:18;background:rgba(10,14,12,.85);border:1px solid var(--line2);border-radius:6px;padding:7px 14px;font-size:12px;display:none;text-align:center;min-width:210px}
 #targetInfo .tbar{height:8px;background:#0a0f0d;border-radius:99px;overflow:hidden;margin-top:5px}
 #targetInfo .tbar i{display:block;height:100%;background:var(--red)}
 
@@ -302,15 +303,27 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 @media(max-width:900px){.news-grid{grid-template-columns:1fr}.official-nav{display:none}.start-wrap{padding:12px 12px 4px}.news-grid,.official-foot{padding-left:12px;padding-right:12px}}
 
 @media(max-width:900px){
-  #quest{display:none}#rightPanel{display:none}#chat{bottom:auto;top:108px}#chatLog{height:86px}
-  #hud{bottom:auto;top:56px;left:10px;width:270px}
-  #actionbar{bottom:14px;left:auto;right:10px;transform:none}
+  #hud{top:58px;left:10px;width:min(248px,56vw)}
+  #hud .char-card{padding:8px 9px}
+  #hud .avatar{width:38px;height:38px;font-size:20px}
+  #hud .save-status{display:none}
+  #rightPanel{top:58px;right:10px;width:150px;max-height:calc(100% - 300px)}
+  #minimapWrap{padding:4px}
+  #minimap{width:140px;height:140px}
+  #minimapLabel{font-size:8px}
+  #quest{width:150px;padding:8px 9px}
+  #questDesc{font-size:11px}
+  #playerList{display:none}
+  #chatLog{height:64px}
+  #chat{left:10px;bottom:10px;width:calc(100vw - 20px)}
+  #actionbar{bottom:118px;left:auto;right:10px;transform:none}
   .skill{width:50px}.skill button{width:50px;height:50px;font-size:20px}
   .skill.atk-skill{width:64px}
   #attackBtn{width:64px;height:64px}
-  #joystick{display:block;bottom:104px;width:104px;height:104px}
+  #joystick{display:block;bottom:118px;left:10px;width:104px;height:104px}
   .srv-sep,.srv-name{display:none}
-  #chat{left:10px;top:228px;width:min(320px,72vw)}
+  #targetInfo{top:58px;min-width:0;max-width:44vw}
+  #camHint{display:none}
   .start-card{grid-template-columns:1fr}
   .start-visual{min-height:210px}
   .brand span{display:none}
@@ -453,15 +466,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="targetInfo"><b id="targetName">スライム Lv.1</b><div class="tbar"><i id="targetHp"></i></div></div>
     <div id="toast"></div>
 
-    <!-- QUEST -->
-    <aside id="quest">
-      <h3>◆ メインクエスト</h3>
-      <div id="questTitle">スライム討伐</div>
-      <div id="questDesc">始まりの草原のスライムを倒そう。町の北側が草原だよ。</div>
-      <div id="questProg"><div class="track"><i id="questBar" style="width:0%"></i></div><span id="questCount">0 / 5</span></div>
-      <div id="questReward">報酬: 80 EXP / 50 G</div>
-    </aside>
-
     <!-- HUD -->
     <div id="hud">
       <div class="char-card">
@@ -486,10 +490,17 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <form id="chatForm"><input id="chatInput" placeholder="Enterでチャット… みんなに話しかけてみよう" maxlength="80" autocomplete="off"/><button type="submit">送信</button></form>
     </div>
 
-    <!-- RIGHT -->
+    <!-- RIGHT: minimap (top-right) / quest under it / nearby real players -->
     <div id="rightPanel">
-      <div id="playerList"><h4>近くにいる冒険者</h4><div id="playerRows"></div></div>
       <div id="minimapWrap"><canvas id="minimap" width="182" height="182"></canvas><div id="minimapLabel">AETHERIA — ルミナス地方</div></div>
+      <aside id="quest">
+        <h3>◆ メインクエスト</h3>
+        <div id="questTitle">スライム討伐</div>
+        <div id="questDesc">始まりの草原のスライムを倒そう。町の北側が草原だよ。</div>
+        <div id="questProg"><div class="track"><i id="questBar" style="width:0%"></i></div><span id="questCount">0 / 5</span></div>
+        <div id="questReward">報酬: 80 EXP / 50 G</div>
+      </aside>
+      <div id="playerList"><h4>近くにいる冒険者</h4><div id="playerRows"></div></div>
     </div>
 
     <!-- ACTION BAR -->
@@ -518,7 +529,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キー（または右上の ☰ ボタン）でメニューを開きます。設定・バッグ・セーブ・遊び方・ログアウトを選べます</td></tr>
         <tr><td>設定</td><td>右上の ⚙ ボタンで、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
         <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
-        <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はNPC冒険者と遊ぶモードになります</td></tr>
+        <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はソロプレイになります</td></tr>
         <tr><td>セーブ</td><td>アカウントでログイン中は<b>自動保存</b>されます（操作不要）。右上の 💾 は手動同期と、バックアップ用のファイル書き出しです</td></tr>
         <tr><td>クエスト</td><td>右上のクエストを進めると報酬GET。最終目標は北東の森のボス討伐！</td></tr>
         <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）</td></tr>
@@ -676,7 +687,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <button id="continueBtn" type="button">📂 &nbsp;つづきから — セーブデータを読み込む</button>
             <div class="online-box">
               <div class="ob-head"><span class="net-dot busy" id="siteNetDot"></span><b>オンライン接続</b><span id="siteServerStatus">同期サーバーの応答を確認中…</span></div>
-              <p>同期サーバー（<code>wss://aetheria-realtime-server.onrender.com</code>）に接続すると、このリンクを開いた実プレイヤー同士の位置とチャットがリアルタイムに同期し、相手は <b style="color:#7ef0d4">◆マーク</b> で世界に現れます。サーバーが眠っているときは自動でNPCモードになり、そのまま遊べます（無料枠は復帰まで最大1分ほどかかることがあります）。</p>
+              <p>同期サーバー（<code>wss://aetheria-realtime-server.onrender.com</code>）に接続すると、このリンクを開いた実プレイヤー同士の位置とチャットがリアルタイムに同期し、相手は <b style="color:#7ef0d4">◆マーク</b> で世界に現れます。サーバーが眠っているときはオフライン（ソロ）モードでそのまま遊べます（無料枠は復帰まで最大1分ほどかかることがあります）。</p>
               <div class="ob-row">
                 <button type="button" id="healthBtn">接続テスト</button>
                 <button type="button" class="primary" id="heroPlayBtn">▶ すぐ遊ぶ（キャラ作成へ）</button>
@@ -707,7 +718,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         </section>
         <section class="world-panel" aria-label="世界の数字">
           <h2>ルミナス地方へようこそ</h2>
-          <p>噴水の広場を中心に家々が並ぶルミナスの町。北にはスライムの跳ねる草原、東には獣の潜む深い森、そして北東の丘には守護者ゴーレムの眠る古代遺跡。5人のNPC冒険者も同じ世界を歩いています。</p>
+          <p>噴水の広場を中心に家々が並ぶルミナスの町。北にはスライムの跳ねる草原、東には獣の潜む深い森、そして北東の丘には守護者ゴーレムの眠る古代遺跡が待っています。</p>
           <div class="world-stats">
             <div><b>5</b><span>エリア</span></div>
             <div><b>3</b><span>クラス</span></div>
@@ -736,7 +747,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <div class="zone-card"><b>🌲 ささやきの森</b><p>町の東に広がる深い森。ゴブリン、フォレストウルフ、オークが巣くう。レベルを上げてから挑もう。</p></div>
             <div class="zone-card"><b>💧 月影湖</b><p>南西にたたずむ静かな湖。世界のほころびを感じる、不思議な場所。</p></div>
             <div class="zone-card"><b>🏛️ 古代遺跡</b><p>北東の丘に眠る古代の遺跡。守護者ゴーレム（Lv.10）と、宙に浮かぶ蒼いクリスタルが待つ。</p></div>
-            <div class="zone-card"><b>🧑‍🤝‍🧑 冒険者たち</b><p>ユナ、カイト、ミオ、レン、ハナ——同じ世界を歩くNPC冒険者たち。リンクを開いた実プレイヤーも ◆ マークでこの世界に加わります。</p></div>
+            <div class="zone-card"><b>◆ 実プレイヤー</b><p>リンクを開いた実プレイヤーが ◆ マークでこの世界に加わります。町の広場で落ち合って、一緒に冒険しよう。</p></div>
           </div>
         </section>
 
@@ -826,12 +837,6 @@ var QUESTS=[
   {title:"遺跡の守護者",desc:"北東の遺跡に眠るボス「守護者ゴーレム」を討伐せよ！",target:"boss",need:1,exp:800,gold:600},
   {title:"伝説の冒険者",desc:"すべてのクエストを達成！自由に世界を冒険しよう。ボスは復活するので周回もできるよ。",target:"none",need:1,exp:0,gold:0,done:true}
 ];
-var BOT_DEFS=[
-  {name:"ユナ",cls:"mage",lv:4},{name:"カイト",cls:"warrior",lv:6},{name:"ミオ",cls:"archer",lv:3},
-  {name:"レン",cls:"warrior",lv:8},{name:"ハナ",cls:"mage",lv:5}
-];
-var BOT_CHATS=["草原のスライム、ぷにぷにしてて可愛い…でも倒す！","誰か森のパーティー組みませんかー？","ポーション安かったから買いだめした","ゴーレム強すぎない？昨日全滅したんだけどw","レベル上がったー！次は遺跡行くぞ","町の噴水前で待ってるね","今日のクエストもう終わった人いる？","新スキルのエフェクトかっこよすぎる","狩り効率なら東の森がおすすめだよ","こんにちはー！いい天気だね"];
-var BOT_REPLIES=["いいね！一緒に頑張ろう","おー、よろしく！","それ分かるw","草原で狩りしてるよー、来る？","クエスト進んだ？","こんにちは！よろしくね","強い装備ほしいよね…","あとでパーティー組もうよ！"];
 
 /* ================= STATE ================= */
 var W=2600,H=2600;
@@ -843,7 +848,7 @@ var cam={x:0,y:0};
 var viewW=960, viewH=640;
 /* 3D camera state (first-person) */
 var camYaw=0, camPitch=0.02, camDist=560, camFov=70, atkAnimT=-9999;
-var player=null, enemies=[], bots=[], projectiles=[], particles=[], dmgTexts=[], drops=[];
+var player=null, enemies=[], projectiles=[], particles=[], dmgTexts=[], drops=[];
 var questIdx=0, questCount=0, target=null, lastAttack=0, potionCd=0;
 var skillCd={s1:0,s2:0,s3:0};
 var selectedClass='warrior';
@@ -983,7 +988,7 @@ function doLogout(){
 /* ================= REALTIME SYNC (public server) =================
    Protocol 2 client for the deployed sync server. Positions are sent in
    tile coordinates (world is 64x64 tiles over W x H pixels). When the
-   server is unreachable or asleep, the game runs in NPC mode. */
+   server is unreachable or asleep, the game runs offline (solo). */
 var NET_URL='wss://aetheria-realtime-server.onrender.com';
 var NET_HEALTH_URL='https://aetheria-realtime-server.onrender.com/health';
 var netWs=null, netStatus='idle', netMyId=null, netRetry=0, netClosed=false, netRetryTimer=null, netLastPosSent=0;
@@ -992,7 +997,7 @@ function pxToTile(v){return v/(W/64);}
 function tileToPx(v){return v*(W/64);}
 function netSetStatus(s){
   netStatus=s;
-  var label={idle:'NPCモード',connecting:'同期サーバーへ接続中…',online:'オンライン',reconnecting:'再接続中…',error:'NPCモード（サーバー応答なし）'}[s]||s;
+  var label={idle:'オフライン',connecting:'同期サーバーへ接続中…',online:'オンライン',reconnecting:'再接続中…',error:'オフライン（サーバー応答なし）'}[s]||s;
   var srv=$('srvName'); if(srv) srv.textContent='公開サーバー: ルミナス ／ '+label;
   var dot=$('netDot'); if(dot) dot.style.background=(s==='online')?'#43d17c':(s==='connecting'||s==='reconnecting')?'#e8913a':'#8a97a0';
   updateOnlinePill();
@@ -1000,9 +1005,9 @@ function netSetStatus(s){
 function netOnlineCount(){return netStatus==='online'?(remotes.length+1):0;}
 function updateOnlinePill(){
   var el=$('onlineCount'); if(!el||!player) return;
-  if(netStatus==='online') el.textContent='実プレイヤー '+netOnlineCount()+'人 オンライン（+NPC '+bots.length+'人）';
-  else if(netStatus==='connecting'||netStatus==='reconnecting') el.textContent='同期サーバーへ接続中…（NPC '+bots.length+'人と冒険中）';
-  else el.textContent='NPCモード — 冒険者 '+(bots.length+1)+'人';
+  if(netStatus==='online') el.textContent='実プレイヤー '+netOnlineCount()+'人 オンライン';
+  else if(netStatus==='connecting'||netStatus==='reconnecting') el.textContent='同期サーバーへ接続中…';
+  else el.textContent='オフライン — ソロプレイ中';
 }
 function netConnect(){
   if(!player) return;
@@ -1166,13 +1171,6 @@ function populate(){
   for(var i=0;i<7;i++) spawnEnemy('wolf',1700+Math.random()*700,700+Math.random()*700);
   for(var i=0;i<5;i++) spawnEnemy('orc',1850+Math.random()*600,1100+Math.random()*800);
   spawnEnemy('boss',2220,420);
-}
-function makeBots(){
-  bots=BOT_DEFS.map(function(d,i){
-    var c=CLASSES[d.cls];
-    return {name:d.name,cls:d.cls,lv:d.lv,x:1150+Math.random()*320,y:1150+Math.random()*320,r:15,dir:1,walk:Math.random()*6,
-      tx:1300,ty:1300,wt:Math.random()*3000,chatT:4000+i*7000+Math.random()*8000,hp:100,maxHp:100,fightT:0,emoji:c.icon,color:c.color};
-  });
 }
 
 /* ================= UI HELPERS ================= */
@@ -1596,7 +1594,7 @@ function applySaveData(data){
 }
 function startFromSave(source){
   setupSkillUI(player.cls);
-  genWorld();populate();makeBots();
+  genWorld();populate();
   // genWorld rebuilt obstacles; if saved position now collides, fall back to town
   if(collide(player.x,player.y,player.r)){player.x=1300;player.y=1470;lastSavedKey=progressKey();}
   started=true;
@@ -1635,10 +1633,6 @@ function updatePlayerList(){
   var rows=remotes.map(function(r){
     var d=Math.round(Math.hypot(r.x-player.x,r.y-player.y)/10);
     return '<div class="p-row"><span class="pdot" style="background:#2fbfa5"></span><span style="color:#7ef0d4">◆ '+escHtml(r.name)+'</span><small>Lv.'+r.lv+' ・ '+d+'m</small></div>';
-  }).join('');
-  rows+=bots.map(function(b){
-    var d=Math.round(Math.hypot(b.x-player.x,b.y-player.y)/10);
-    return '<div class="p-row"><span class="pdot'+(b.fightT>performance.now()?' fight':'')+'"></span><span>'+b.emoji+' '+b.name+'</span><small>Lv.'+b.lv+' ・ '+d+'m</small></div>';
   }).join('');
   rows+='<div class="p-row"><span class="pdot"></span><span>'+CLASSES[player.cls].icon+' '+player.name+'（あなた）</span><small>Lv.'+player.lv+'</small></div>';
   $('playerRows').innerHTML=rows;
@@ -1710,21 +1704,6 @@ function update(dt,now){
       if(e.state==='return'){e.hp=Math.min(e.maxHp,e.hp+dt*0.02);}
     }
     if(inSafe){e.x+=(e.x-1300)*0.02;e.y+=(e.y-1300)*0.02;} // push out of town
-  });
-  // bots AI
-  bots.forEach(function(b){
-    b.wt-=dt;
-    if(b.wt<=0){
-      b.wt=2600+Math.random()*3000;
-      var roll=Math.random();
-      if(roll<0.45){b.tx=500+Math.random()*1500;b.ty=300+Math.random()*650;b.fightT=now+5000;} // go hunt in meadow
-      else{b.tx=1080+Math.random()*440;b.ty=1080+Math.random()*440;}
-    }
-    var d=Math.hypot(b.tx-b.x,b.ty-b.y);
-    if(d>6){var sp=2.1;b.x+=(b.tx-b.x)/d*sp;b.y+=(b.ty-b.y)/d*sp;b.dir=(b.tx-b.x)>0?1:-1;b.walk+=dt*0.018;}
-    if(now>b.chatT){b.chatT=now+14000+Math.random()*18000;
-      chat('<b class="who-'+(b.cls==='warrior'?'war':b.cls==='mage'?'mag':'arc')+'">'+b.name+'</b>: '+BOT_CHATS[Math.floor(Math.random()*BOT_CHATS.length)]);
-    }
   });
   // projectiles
   projectiles=projectiles.filter(function(p){
@@ -1799,7 +1778,6 @@ function draw(){
   var ents=[];
   enemies.forEach(function(e){if(!e.dead)ents.push({y:e.y,k:'e',o:e});});
   remotes.forEach(function(r){ents.push({y:r.y,k:'b',o:r});});
-  bots.forEach(function(b){ents.push({y:b.y,k:'b',o:b});});
   if(player)ents.push({y:player.y,k:'p',o:player});
   ents.sort(function(a,b){return a.y-b.y;});
   ents.forEach(function(en){
@@ -1858,7 +1836,6 @@ function drawMini(){
   mctx.fillStyle='#3a5c38';mctx.fillRect(1550*s,600*s,1050*s,1400*s);
   enemies.forEach(function(e){if(e.dead)return;mctx.fillStyle=e.boss?'#ff3b30':'#e5484d';mctx.fillRect(e.x*s-2,e.y*s-2,e.boss?6:3,e.boss?6:3);});
   remotes.forEach(function(r){mctx.fillStyle='#2fbfa5';mctx.fillRect(r.x*s-2,r.y*s-2,4,4);});
-  bots.forEach(function(b){mctx.fillStyle='#62b6f5';mctx.fillRect(b.x*s-2,b.y*s-2,3,3);});
   if(player){mctx.fillStyle='#ffd34d';mctx.beginPath();mctx.arc(player.x*s,player.y*s,4,0,7);mctx.fill();mctx.strokeStyle='#fff';mctx.stroke();}
 }
 
@@ -2190,7 +2167,6 @@ function render3D(now){
   var seen={};
   /* first-person: the player's own body is not rendered (camera sits at eye level) */
   remotes.forEach(function(r){ if(r.angle!==undefined) r._face=Math.atan2(-Math.sin(r.angle),-Math.cos(r.angle)); syncEntity(r,'r',now); seen[r._eid]=1; });
-  bots.forEach(function(b){syncEntity(b,'b',now);seen[b._eid]=1;});
   enemies.forEach(function(e){if(!e.dead){syncEntity(e,'e',now);seen[e._eid]=1;}});
   for(var id in entRegistry){
     if(!seen[id]){var r=entRegistry[id];dynGroup.remove(r.mesh);if(r.label&&r.label.parentNode)r.label.parentNode.removeChild(r.label);delete entRegistry[id];}
@@ -2360,8 +2336,8 @@ function drawPreview(){
   g.fillText('⚔️',250+Math.sin(t)*16,400);g.fillText('🔮',330,385+Math.sin(t*1.3)*5);g.fillText('🏹',370+Math.cos(t)*10,420);
   g.fillText('🟢',140,440+Math.sin(t*2)*4);g.fillText('🟢',470,460);g.fillText('👺',500,120);
   g.font='700 12px "Noto Sans JP"';g.fillStyle='rgba(0,0,0,.55)';
-  g.fillRect(196,352,86,17);g.fillRect(292,332,76,17);g.fillRect(96,408,74,17);
-  g.fillStyle='#ffd873';g.fillText('Lv.1 ソラ',239,364);g.fillStyle='#cfe6ff';g.fillText('Lv.4 ユナ',330,344);g.fillStyle='#fff';g.fillText('スライム',133,420);
+  g.fillRect(196,352,86,17);g.fillRect(96,408,74,17);
+  g.fillStyle='#ffd873';g.fillText('Lv.1 ソラ',239,364);g.fillStyle='#fff';g.fillText('スライム',133,420);
   if(!started)requestAnimationFrame(drawPreview);
 }
 
@@ -2526,13 +2502,7 @@ $('chatForm').addEventListener('submit',function(e){
   var v=$('chatInput').value.trim();if(!v||!player)return;
   $('chatInput').value='';$('chatInput').blur();
   chat('<b>'+player.name+'</b>: '+v.replace(/</g,'&lt;'),'me');
-  var sentOnline=netChat(v);
-  if(!sentOnline){
-    setTimeout(function(){
-      if(Math.random()<0.85){var b=bots[Math.floor(Math.random()*bots.length)];
-        chat('<b class="who-'+(b.cls==='warrior'?'war':b.cls==='mage'?'mag':'arc')+'">'+b.name+'</b>: '+BOT_REPLIES[Math.floor(Math.random()*BOT_REPLIES.length)]);}
-    },700+Math.random()*900);
-  }
+  netChat(v);
 });
 /* class select — guest grid + per-account first-time picker (synced).
    Once an account has a saved character, setSelectedClass() is a no-op
@@ -2561,7 +2531,7 @@ $('startBtn').addEventListener('click',function(){
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
   setupSkillUI(selectedClass);
-  genWorld();populate();makeBots();
+  genWorld();populate();
   started=true;
   $('startScreen').style.display='none';
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
@@ -2569,8 +2539,6 @@ $('startBtn').addEventListener('click',function(){
   chat('— AETHERIA ONLINE にログインしました —','sys');
   chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、攻撃は Space、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで右上の 💾 からセーブできます。'),'world');
   if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
-  setTimeout(function(){chat('<b class="who-mag">ユナ</b>: あ、新しい人だ！よろしくね〜');},1600);
-  setTimeout(function(){chat('<b class="who-war">カイト</b>: 草原なら俺も今から行くところだよ');},3400);
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
 });
 
