@@ -1,0 +1,1 @@
+{"dependencies":{"ws":"^8.18.0"},"description":"AETHERIA ONLINE - authoritative realtime sync server (movement + chat, phase 1)","engines":{"node":">=20"},"main":"server.js","name":"aetheria-realtime-server","private":true,"scripts":{"dev":"node --watch server.js","start":"node server.js","test:client":"node test-client.js"},"type":"commonjs","version":"0.1.0"}
