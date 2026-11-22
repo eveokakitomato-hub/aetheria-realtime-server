@@ -1018,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>ルミナスの町並みを写真に寄せて整えました。</b>川は滝壺・中央の池・東の池の区間で川の水面そのものが池の幅いっぱいに広がり、池ごとの円盤の水面は無くして、滝から南東の水門まで一枚の水面でつながる一本の流れになりました。東の池はもっと東へ移して横長に。家は曲がった通りに沿って向き・大きさ・間隔にばらつきを持たせて並べ直し、北西〜西の城壁の内側も家で埋めました。高台の円形広場は礼拝堂と城のちょうど中間へ移し（両方の建物・前広場と重ならない位置で、半径は小さめに）、町の中には家の周りの庭・街路の木・草地と花を点在させました（石畳の通りと広場は石畳のまま）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>城壁の町ルミナスが再建されました。</b>新しい町の絵をもとに実測して再配置：丸い城壁と南門・南西門、北の岩山から3段に落ちる滝、滝から南下して中央の池に入り東へ曲がって東の池を通り南東の水門へ抜ける川、滝の下と広場の東のアーチ橋、噴水広場と周りの露店、南門から広場へのまっすぐな大通り、西・南西の住宅街を巡る曲がった通り、広場から北東の高台へ上がる大階段とテラスの道（礼拝堂・城へ）、西の住宅街の時計塔まで、道・階段・川・滝の構造ごと完全再現しました。スポーンは噴水広場の南、町の中は安全地帯です。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">ワールド</span><span><b>ルミナスの町が平原になりました。</b>城壁・門・家・時計塔・礼拝堂・城・噴水広場・露店・テラスと大階段・川と池と滝・北の岩山まで、町の要素をすべて取り払い、跡地はなだらかな「ルミナス平原」になりました。スポーン地点は今まで通りの場所で、その周りだけが小さな安全地帯です。家・石壁・アーチ橋・噴水などの建物の見た目は、地形エディターの配置パレットに今まで通り残っています。西の月影湖や他のエリアに変更はありません。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">ワールド</span><span><b>世界が256×256タイルへ拡大！</b>世界の果てが東と南へ大きく広がり、東の草原・東の森、南の草原・南の丘陵、そして南東の辺境（森・丘陵・辺境の湖）が新たに開放されました。既存のエリアは今まで通りの場所にあり、新しい土地にもモンスターが出現します。探索マップと地形エディターの範囲も世界全体に広がりました。</span></li>
@@ -1790,11 +1791,13 @@ function regionAt(x,y){
      bare rock to the north-east.
    - a waterfall in three broad tiers off a crag at north-centre
      (measured at (54.3%, 15.5%)), feeding a
-     river — drawn as ONE continuous flowing channel at a constant
-     width, with banks, rapids below the falls and a slow current
+     river — drawn as ONE continuous flowing channel whose single
+     ribbon surface swells to each pond's full width as it passes
+     through, with banks, rapids below the falls and a slow current
      through the ponds — that runs south to the CENTRAL POND (due north
      of the plaza, stretched along the flow), turns south-east to the
-     larger EAST POND, then leaves through a water
+     larger EAST POND (pushed east, stretched wide E-W), then leaves
+     through a water
      gate in the south-east wall. Cambered stone arch bridges cross it
      at the central pond's inlet, at the east pond's inlet, and over the east
      pond's outlet.
@@ -1816,12 +1819,19 @@ function regionAt(x,y){
      built tread by tread with parapet walls, landings and lamps, and
      the terrain carved to the same profile so it walks smoothly.
    - houses cluster densely in the west and south-west (around the
-     clock tower), south of the plaza and along the east pond's
-     south shore;
+     clock tower) — the north-west and west blocks now fill right up
+     to the wall — south of the plaza and along the east pond's
+     south shore; they stand at hand-nudged, irregular intervals along
+     gently bent lanes, each at its own angle and size, with garden
+     patches, shade trees and flower tufts greening the gaps between
+     them;
      each one faces its street / the plaza / the water, built as a stone
      ground floor under a timber-framed white upper floor, with a
      brown-to-orange roof, chimney, dormers and — on the shopfronts —
      coloured awnings like the market stalls.
+   - on the high terrace the chapel and the castle stand apart, with
+     a small round paved plaza (and two lamps) of their own between
+     them at the stair fork.
    The whole walled interior is the safe zone: no mob spawns inside, mobs
    found inside are removed by the despawn sweep, and players inside
    slowly heal (isSafe). */
@@ -1829,10 +1839,12 @@ var TOWN_CX=1420, TOWN_CY=1820, TOWN_RX=920, TOWN_RY=810; /* EXPANDED SITE: the 
 var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
 var PLAZA={x:1361,y:2132};          /* the fountain plaza: measured in the new photo at (50.3%, 65.8%) of the frame — just west of the town's centre line and well south of its middle. The fountain is its centre. Everything plaza-linked (spawn, stalls, corner lamps, the grand staircase's foot, the plaza streets, townsfolk waypoints) is placed relative to this point */
 var POND_C={x:1354,y:1671,r:150};   /* central pond: round, measured at (50.0%, 43.2%) — the falls, this pond and the plaza stand in almost one north–south line (x≈1323→1247→1253), its south shore just north of the plaza */
-var POND_E={x:1778,y:2010,r:215};   /* the east pond: stretched E-W (terrain carve squashes x by 0.72), measured at (69.3%, 59.8%) — at almost the plaza's latitude, east of it, houses along its south shore — ringed by a cleared shore (see the tree filter in genWorld) so it opens up and reads as one big sheet of bright water from the air */
+var POND_E={x:1885,y:2005,r:208};   /* the east pond: pushed EAST and stretched much wider E-W (terrain carve squashes x by POND_E_Q) — at almost the plaza's latitude but well clear of the plaza's rim, houses along its south shore — ringed by a cleared shore (see the tree filter in genWorld) so it opens up and reads as one long lake, the river's lower reach, from the air */
+var POND_E_Q=0.56;                  /* the east pond's E-W squash: its water spans x ±r/Q (≈±371) against y ±r — a long horizontal lake, not a round one */
 var POOL={x:1449,y:1258,r:88};      /* plunge pool under the falls (the falls measured at (54.3%, 15.5%)) */
-var RIVER=[[1449,1258],[1460,1460],[1354,1671],[1530,1768],[1660,1892],[1778,2010],[1980,2055],[2168,2155],[2276,2292],[2380,2418]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall) — the river runs south from the falls into the central pond, turns east through the east pond and leaves by the south-east water gate, exactly as the photo shows */
-var BRIDGES=[{x:1460,y:1460,rot:1.0},{x:1726,y:1958,rot:0.95},{x:2168,y:2155,rot:0.45}]; /* arched bridge below the falls, between the plunge pool and the central pond / bridge over the river east of the plaza, at the east pond's inlet just east of the grand ramp's causeway (the ramp itself crosses the bend on its causeway, as in the photo) / bridge over the east pond's outlet */
+var TERRACE_PLAZA={x:1932,y:1182,r:100}; /* the round plaza BETWEEN the chapel and the castle: the EXACT midpoint of the two landmarks (chapel 1699,1139 / castle 2164,1225 → 1931.5,1182), kept small (r 100) on the high terrace. It clears both footprints (chapel east wall 1795 / castle west wall 2074) and both forecourt aprons — the chapel's apron (1699,1262,r 92): centres 246 apart > 100+92; the castle's forecourt (2164,1410,r 138): 327 apart > 100+138. townTerrain() flattens its disc to the terrace level so it truly sits there (see there) */
+var RIVER=[[1449,1258],[1460,1460],[1354,1671],[1545,1775],[1700,1900],[1885,2005],[2060,2065],[2168,2155],[2276,2292],[2380,2418]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall) — the river runs south from the falls into the central pond, turns east through the east pond and leaves by the south-east water gate, exactly as the photo shows */
+var BRIDGES=[{x:1460,y:1460,rot:1.0},{x:1745,y:1942,rot:0.95},{x:2168,y:2155,rot:0.45}]; /* arched bridge below the falls, between the plunge pool and the central pond / bridge over the river east of the plaza, at the east pond's inlet just east of the grand ramp's causeway (the ramp itself crosses the bend on its causeway, as in the photo) / bridge over the east pond's outlet */
 /* --- the town's streets: stone-paved lanes (t:'s') through the housing
    blocks and dirt lanes (t:'d') elsewhere. They thread the GAPS between
    the house rows (never a house footprint, the plaza disc or the water),
@@ -1841,17 +1853,34 @@ var BRIDGES=[{x:1460,y:1460,rot:1.0},{x:1726,y:1958,rot:0.95},{x:2168,y:2155,rot
    vertices along them, so the town floor reads as streets, not lawn. --- */
 var STREETS=[
   {x1:1361,y1:2222,x2:1304,y2:2655,w:36,t:'s'},  /* the great boulevard: plaza → south gate, one straight run (the gate sits just west of due south, as measured) */
-  {x1:605,y1:1445,x2:1185,y2:1445,w:28,t:'s'},   /* west housing blocks: stone lanes threading the rows */
-  {x1:605,y1:1645,x2:1175,y2:1645,w:28,t:'s'},
+  {x1:605,y1:1445,x2:900,y2:1424,w:28,t:'s'},   /* west housing blocks: stone lanes threading the rows — gently bent, as the photo's lanes are, not ruled straight */
+  {x1:900,y1:1424,x2:1185,y2:1445,w:28,t:'s'},
+  {x1:605,y1:1645,x2:890,y2:1664,w:28,t:'s'},
+  {x1:890,y1:1664,x2:1175,y2:1645,w:28,t:'s'},
   {x1:625,y1:1280,x2:1175,y2:1280,w:24,t:'d'},
+  {x1:700,y1:1268,x2:905,y2:1216,w:22,t:'d'},    /* the NW arc lane, curving through the north-west block under the wall */
+  {x1:905,y1:1216,x2:1108,y2:1282,w:22,t:'d'},   /* …and bending back south to join the straight dirt lane */
   {x1:630,y1:1308,x2:630,y2:2195,w:28,t:'s'},    /* the west vertical lane, inside the pine row */
   {x1:610,y1:1832,x2:970,y2:1832,w:24,t:'d'},    /* lane north of the clock-tower block */
   {x1:610,y1:2020,x2:1265,y2:2020,w:26,t:'s'},   /* the clock tower's south street, running east to the plaza's west rim */
   {x1:670,y1:2220,x2:1265,y2:2220,w:24,t:'d'},
   {x1:758,y1:2426,x2:1032,y2:2326,w:24,t:'d'},    /* the curved SW lanes, bending through the south-west blocks toward the boulevard */
   {x1:1032,y1:2326,x2:1270,y2:2222,w:24,t:'d'},
-  {x1:926,y1:2432,x2:1976,y2:2432,w:28,t:'s'},   /* the south street, behind the plaza's south house row */
+  {x1:926,y1:2432,x2:1450,y2:2416,w:28,t:'s'},   /* the south street, behind the plaza's south house row — sagging gently south at its middle */
+  {x1:1450,y1:2416,x2:1976,y2:2432,w:28,t:'s'},
   {x1:1795,y1:2245,x2:1920,y2:2245,w:26,t:'d'}   /* a short shore lane along the east pond's south shore */
+];
+/* --- the town's greenery: kept-lawn garden patches tucked between the
+   houses and along the lanes (the photo's town is stone at its heart
+   but green at its edges — gardens behind the rows, verges along the
+   lanes, a lawn on the mid-terrace shoulder). The ground tint paints
+   them lawn-green (streets / plaza / banks still draw over their
+   edges) and the ground scatter sows grass tufts and flowers ONLY
+   inside them, so the stone town stays stone where it should. --- */
+var TOWN_GREENERY=[
+  [806,1466,58],[962,1470,54],[812,1678,52],[1150,1470,60],
+  [672,1330,48],[1015,1290,56],[1248,2472,62],[1620,2300,60],
+  [2052,2258,66],[1852,1598,74],[1005,2262,48]
 ];
 var SPAWN_X=1361, SPAWN_Y=2355;     /* south side of the fountain plaza, on the boulevard (moved south with the plaza; clear of the stalls and the south house row) */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
@@ -1990,29 +2019,36 @@ function buildTownData(){
      house stands on a flattened pad (see TOWN_PADS below), so the
      rows sit level instead of tangling with the bowl slope. --- */
   var HOUSES=[
-    [726,1192,78,70,0],[889,1186,82,72,5],[1051,1195,78,70,-5],
-    [726,1360,78,70,0],[889,1354,82,72,5],[1051,1362,78,70,-5],
-    [726,1548,78,70,180],[889,1541,82,72,175],[1051,1550,78,70,185],
-    [726,1751,78,70,180],[889,1758,82,72,175],[1051,1751,78,70,185],
-    [758,1939,78,70,90],[985,2075,82,72,180],[758,2101,78,70,180],
-    [895,2139,82,72,-5],[726,2320,78,70,180],[876,2308,82,72,175],
-    [1220,1482,74,66,95],[1140,1830,74,66,95],[1100,2380,82,72,180],
-    [1600,2380,86,74,175],[1739,2320,82,72,185],[1170,2532,82,72,180],
-    [1570,2535,86,74,175],[1745,2530,78,72,185],[900,2500,82,72,175],
+    [726,1192,78,70,0],[905,1178,82,72,5],[1040,1206,78,70,-5],
+    [714,1372,78,70,0],[880,1344,82,72,5],[1038,1350,78,70,-5],
+    [737,1559,78,70,180],[901,1552,82,72,175],[1063,1538,78,70,185],
+    [715,1740,78,70,180],[876,1766,82,72,175],[1062,1762,78,70,185],
+    [770,1950,78,70,90],[996,2086,82,72,180],[747,2090,78,70,180],
+    [902,2128,82,72,-5],[738,2332,78,70,180],[864,2318,82,72,175],
+    [1220,1482,74,66,95],[1140,1830,74,66,95],[1106,2378,82,72,180],
+    [1600,2380,86,74,175],[1739,2320,82,72,185],[1158,2542,82,72,180],
+    [1570,2535,86,74,175],[1745,2530,78,72,185],[888,2488,82,72,175],
     [1908,2326,82,74,180],[2032,2370,78,72,185],[2150,2470,78,72,180],
     [2045,1620,74,66,-85],[2170,1520,74,66,-60],[807,1192,76,68,0],
     [970,1360,76,68,5],[807,1548,76,68,180],[970,1751,76,68,175],
-    [920,1939,78,68,180],[820,1140,78,68,0],[960,1085,80,70,5],
-    [1010,2320,76,68,180],[1830,2400,78,68,185]
+    [908,1928,78,68,180],[820,1140,78,68,0],[960,1085,80,70,5],
+    [1022,2330,76,68,180],[1830,2400,78,68,185],
+    /* the north-west and west wall filled in: houses under the NW arc
+       lane and down the west lane, where the blocks used to thin out
+       into empty ground */
+    [886,1114,60,54,12],[1085,1120,76,68,4],
+    [680,1486,72,64,-90],[682,1905,72,64,-90],[700,2168,74,66,-80],
+    [1470,2485,80,70,178]
   ];
   var ROOF_MULT=[0.42,0.36,0.50,0.44,0.38,0.54,0.40,0.48]; /* per-house roof pitch: ridges land anywhere from ≈7.4m to ≈9.5m, so no two rooftops read alike */
   HOUSES.forEach(function(hs,hi){
     /* per-house variation (seeded, so the town is identical on every
-       build): footprints breathe by ±14%, facings jitter by a few
-       degrees and heights by ±20% — the rows stop reading as copies of
-       one box while every centre stays on its confirmed position */
-    var vw=hs[2]*(0.88+rnd()*0.26), vd=hs[3]*(0.88+rnd()*0.26), hmul=0.88+rnd()*0.30;
-    var rot=(hs[4]||0)*Math.PI/180+(rnd()-0.5)*0.15, ca=Math.abs(Math.cos(rot)), sa=Math.abs(Math.sin(rot));
+       build): footprints breathe by −16%…+22%, facings wander by up to
+       ±16° and heights by −16%…+24%, on top of the hand-nudged centres
+       in HOUSES above — the rows stop reading as copies of one box
+       stamped along a ruler */
+    var vw=hs[2]*(0.84+rnd()*0.38), vd=hs[3]*(0.84+rnd()*0.38), hmul=0.84+rnd()*0.40;
+    var rot=(hs[4]||0)*Math.PI/180+(rnd()-0.5)*0.55, ca=Math.abs(Math.cos(rot)), sa=Math.abs(Math.sin(rot)); /* facings wander ±16° off their street, so no two neighbouring houses sit at quite the same angle — the blocks read as grown, not stamped out */
     var o=rect(hs[0],hs[1],vw*ca+vd*sa,vw*sa+vd*ca,{house:true,topKind:'house'}); /* collision = the rotated footprint's bounding box */
     o._cx=hs[0]; o._cy=hs[1]; o._rotY=rot; o._hw=vw/2; o._hd=vd/2; o._eave=Math.round(38*hmul); o._roofH=Math.round(vw*ROOF_MULT[hi%ROOF_MULT.length]*hmul); /* roof-top surface data for obstacleTopZAt() */
     var feat={kind:'house',x:hs[0],y:hs[1],w:vw,d:vd,rot:rot,seed:rnd(),roofH:Math.round(vw*ROOF_MULT[hi%ROOF_MULT.length]),hmul:hmul};
@@ -2030,8 +2066,17 @@ function buildTownData(){
   });
   /* --- landmarks --- */
   circ(1074,1932,42,{tower:true});  townFeatures.push({kind:'clocktower',x:1074,y:1932}); /* in the middle of the west housing block, at the measured (37.2%, 56.0%) */
-  rect(1699,1139,192,134,{chapel:true}); townFeatures.push({kind:'chapel',x:1699,y:1139}); townFeatures.push({kind:'terraceplaza',x:1699,y:1139+170,r:175}); /* high terrace, west end, close above the river — measured at (65.7%, 17.2%), the crystal cathedral, footprint matched to its enlarged nave */
-  rect(2164,1225,180,180,{castle:true}); townFeatures.push({kind:'castle',x:2164,y:1225}); townFeatures.push({kind:'terraceplaza',x:2164,y:1225+185,r:155}); /* the NE corner, hard against the wall and its rock — measured at (86.9%, 21.4%) */
+  rect(1699,1139,192,134,{chapel:true}); townFeatures.push({kind:'chapel',x:1699,y:1139}); townFeatures.push({kind:'terraceplaza',x:1699,y:1139+123,r:92}); /* high terrace, west end, close above the river — measured at (65.7%, 17.2%), the crystal cathedral, footprint matched to its enlarged nave. Its forecourt is a small apron (r 92) hugging the nave's south front: the big r 150 disc that used to sit due south of the chapel read as a stray plaza between the landmarks, so the between-landmarks round plaza now lives at their exact midpoint instead (TERRACE_PLAZA, just below) */
+  rect(2164,1225,180,180,{castle:true}); townFeatures.push({kind:'castle',x:2164,y:1225}); townFeatures.push({kind:'terraceplaza',x:2164,y:1225+185,r:138}); /* the NE corner, hard against the wall and its rock — measured at (86.9%, 21.4%) */
+  /* between the two landmarks, the small round plaza on the terrace
+     at their EXACT midpoint (TERRACE_PLAZA) — the chapel and the
+     castle stand APART with this paved circle (and its two lamps)
+     between them, instead of reading as one merged complex. It
+     overlaps neither building nor either forecourt apron (see the
+     TERRACE_PLAZA note), and townTerrain() levels its whole disc to
+     the terrace height so the castle rock cannot bury its east half */
+  townFeatures.push({kind:'terraceplaza',x:TERRACE_PLAZA.x,y:TERRACE_PLAZA.y,r:TERRACE_PLAZA.r});
+  [[1895,1115],[1969,1115]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
   circ(PLAZA.x,PLAZA.y,17,{pillar:true}); townFeatures.push({kind:'fountain',x:PLAZA.x,y:PLAZA.y});
   [[1161,1995],[1420,1939],[1102,2391],[1658,2395]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});}); /* the plaza's four corner lamps, moved with the plaza (the N pair re-seated on the open shore points between the central pond and the plaza, since the ponds now crowd the plaza's north and north-east rims) */
   /* --- market stalls around the plaza: a full ring of them on the
@@ -2084,13 +2129,15 @@ function buildTownData(){
   /* --- water: ponds & pools are 'lake' decorations (they drive
      waterDepthAt / swimming); the river is a chain of them --- */
   function lake(x,y,s,wz,extra){var d={x:x,y:y,kind:'lake',s:s,townWater:true};if(wz)d.wz=wz;if(extra)for(var ek in extra)d[ek]=extra[ek];decorations.push(d);}
-  /* the central pond: one round disc — it only drives depth/swimming
-     and the still pond surface; the river itself is drawn as one
-     continuous ribbon (buildRiver3D). The east pond is two overlapping
-     discs stretched E-W, matching its elongated terrain carve. */
-  lake(POND_C.x,POND_C.y,POND_C.r);
-  lake(1656,2010,215,0,{vivid:true}); lake(1899,2010,215,0,{vivid:true}); /* the east pond at its measured position: two big overlapping discs matching its wider carve, flagged vivid so its surface renders in the brightest blue */
-  lake(POOL.x,POOL.y,POOL.r);
+  /* the ponds' depth discs only — their SURFACES are drawn by the
+     river ribbon itself, which swells to each pond's full width as it
+     flows through (buildRiver3D), so channel and ponds read as one
+     continuous sheet of water instead of round discs sitting in a
+     stream. The east pond's depth is four discs in a row along its
+     long axis, matching its elongated terrain carve. */
+  lake(POND_C.x,POND_C.y,POND_C.r,0,{ribbon:true});
+  lake(1635,2005,160,0,{ribbon:true}); lake(1795,2005,160,0,{ribbon:true}); lake(1975,2005,160,0,{ribbon:true}); lake(2135,2005,160,0,{ribbon:true});
+  lake(POOL.x,POOL.y,POOL.r,0,{ribbon:true}); /* the plunge pool too is depth-only: NO separate disc surface anywhere on the river — the ribbon alone draws the whole chain from the falls to the water gate (the falls' top pool above the crag keeps its own small disc; it is not part of the river's sheet) */
   lake(1426,1026,50,107); /* the falls' top pool, sitting in the crag top */
   for(var i=0;i<RIVER.length-1;i++){
     var ax=RIVER[i][0],ay=RIVER[i][1],bx=RIVER[i+1][0],by=RIVER[i+1][1];
@@ -2098,7 +2145,7 @@ function buildTownData(){
     for(var j=0;j<=stp;j++){
       var px=ax+(bx-ax)*j/stp, py=ay+(by-ay)*j/stp;
       if(Math.hypot(px-POND_C.x,py-POND_C.y)<POND_C.r+62)continue;
-      if(Math.hypot((px-POND_E.x)*0.72,py-POND_E.y)<POND_E.r+30)continue;
+      if(Math.hypot((px-POND_E.x)*POND_E_Q,py-POND_E.y)<POND_E.r+30)continue;
       if(Math.hypot(px-POOL.x,py-POOL.y)<POOL.r+16)continue;
       var nearBridge=false; for(var bi=0;bi<BRIDGES.length;bi++){if(Math.hypot(px-BRIDGES[bi].x,py-BRIDGES[bi].y)<78)nearBridge=true;}
       if(nearBridge)continue;
@@ -2109,6 +2156,12 @@ function buildTownData(){
   /* --- trees & rocks that belong to the town and its mountain --- */
   function townTree(x,y,s,conifer){var d={x:x,y:y,kind:'tree',s:s||(22+rnd()*10),seed:rnd()*10};if(conifer)d.conifer=true;decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d,topKind:'tree',topH:treeTopH(d)});}
   [[570,1308],[568,1632],[572,1832],[570,1995]].forEach(function(p){townTree(p[0],p[1],24);}); /* pine row inside the west wall, just west of the west vertical lane */
+  /* broadleaf shade trees inside the town: in the garden gaps between
+     the houses, along the lanes, on the mid-terrace shoulder and up on
+     the high terrace around the new middle plaza — the green the photo
+     scatters through the town (each kept clear of footprints, lanes,
+     the water and the stair corridors) */
+  [[806,1466],[1150,1470],[672,1330],[700,2050],[1150,1905],[1852,1598],[2052,2258],[1248,2472],[1845,1065],[2044,1120],[1822,1052],[2052,1064]].forEach(function(p){townTree(p[0],p[1],21+rnd()*7);});
   [[858,1064],[1270,1008],[1570,970],[1920,976],[2358,995]].forEach(function(p){townTree(p[0],p[1],22+rnd()*8);});
   [[320,1332],[255,1545],[351,1770],[248,1995],[108,2020],[170,1720],[226,1145]].forEach(function(p){townTree(p[0],p[1],24+rnd()*8);}); /* conifer forest outside the west wall (the photo's wooded west) — the southernmost tree stands on the west lake's shore, clear of its water */
   [[1020,2745],[1332,2795],[1745,2732]].forEach(function(p){townTree(p[0],p[1],20+rnd()*8);}); /* lone pines on the south grassland */
@@ -2188,7 +2241,7 @@ function buildTownData(){
         var tt=0.25+rj*0.5, side=(rvi+rj)%2?1:-1;
         var px=ax+dx*dl*tt-dy*side*(148+rnd()*40), py=ay+dy*dl*tt+dx*side*(148+rnd()*40);
         if(Math.hypot(px-POND_C.x,py-POND_C.y)<POND_C.r+34)continue;
-        if(Math.hypot((px-POND_E.x)*0.72,py-POND_E.y)<POND_E.r+16)continue;
+        if(Math.hypot((px-POND_E.x)*POND_E_Q,py-POND_E.y)<POND_E.r+16)continue;
         if(Math.hypot(px-POOL.x,py-POOL.y)<POOL.r+26)continue;
         var nearB=false; for(var bi2=0;bi2<BRIDGES.length;bi2++){if(Math.hypot(px-BRIDGES[bi2].x,py-BRIDGES[bi2].y)<120)nearB=true;}
         if(nearB||stairProfileAt(px,py))continue;
@@ -4444,9 +4497,10 @@ function townTerrain(x,y,h){
   h=_lerpTo(h,168,_band(_rectD(x,y,1620,895,2382,1295),0,120)); /* high terrace: chapel (west) & castle (east) */
   h=_lerpTo(h,168,_band(Math.hypot(x-1699,y-1139),185,280));  /* the chapel's own terrace disc: the cathedral stands level even where the terrace's west edge blends toward the gorge */
   h=_lerpTo(h,215,_band(Math.hypot(x-2164,y-1225),140,235));  /* castle rock, at the NE corner against the wall (kept clear of the chapel terrace) */
+  h=_lerpTo(h,168,_band(Math.hypot(x-TERRACE_PLAZA.x,y-TERRACE_PLAZA.y),TERRACE_PLAZA.r,TERRACE_PLAZA.r+55)); /* the between-landmarks plaza's own terrace disc, levelled AFTER the castle rock: the rock's feather reaches to ~140 from the castle, which buried the plaza's east half (up to z 215 against the disc's 168) and shoved its visible centre toward the chapel — now the full r 100 disc sits flat at the terrace level, at the landmarks' exact midpoint */
   /* water carve */
   h=_lerpTo(h,-6,_band(Math.hypot(x-POND_C.x,y-POND_C.y),POND_C.r+20,POND_C.r+64)); /* central pond: round */
-  h=_lerpTo(h,-6,_band(Math.hypot((x-POND_E.x)*0.72,y-POND_E.y),POND_E.r-20,POND_E.r+25)); /* east pond: stretched E-W */
+  h=_lerpTo(h,-6,_band(Math.hypot((x-POND_E.x)*POND_E_Q,y-POND_E.y),POND_E.r-20,POND_E.r+25)); /* east pond: stretched wide E-W (see POND_E_Q) */
   h=_lerpTo(h,-5,_band(Math.hypot(x-POOL.x,y-POOL.y),POOL.r-18,POOL.r+22));
   h=_lerpTo(h,106,_band(Math.hypot(x-1426,y-1026),36,72));    /* falls top pool set into the crag */
   h=_lerpTo(h,-5,_band(Math.hypot(x-1464,y-1335),50,100));     /* falls outflow below the plunge pool */
@@ -5600,12 +5654,18 @@ function init3D(){
          on the river and pond banks */
       var tn2=townNorm(gx,gy);
       if(tn2<1.0){gt.setHex(nz>0.60?0x8a6f4d:0xa39a86); gc.lerp(gt,0.80);} /* inside the wall the ground is STONE AND PACKED EARTH, not lawn: pale cobble tones with dirt patches where the noise runs high — lawn survives only as traces outside the wall line */
+      /* the town's gardens: kept-lawn patches in the gaps between the
+         houses and along the lanes (see TOWN_GREENERY) — painted BEFORE
+         the plaza / street / bank tints below, so the stone heart of
+         the town stays stone and only the garden ground turns green;
+         dry ground only, never the carved pond beds */
+      if(tn2<1.0&&hh>8){for(var gp9=0;gp9<TOWN_GREENERY.length;gp9++){var gd9=Math.hypot(gx-TOWN_GREENERY[gp9][0],gy-TOWN_GREENERY[gp9][1]); if(gd9<TOWN_GREENERY[gp9][2]){gt.setHex(0x69b457); gc.lerp(gt,_sm01((TOWN_GREENERY[gp9][2]-gd9)/TOWN_GREENERY[gp9][2])*0.78); break;}}}
       else if(tn2<1.10){gt.setHex(0x6fae54); gc.lerp(gt,Math.min(0.30,(1.10-tn2)*0.6));}
       var pd2=Math.hypot(gx-PLAZA.x,gy-PLAZA.y);
       if(pd2<385){gt.setHex(0xa89a78); gc.lerp(gt,_sm01((385-pd2)/140)*0.6);}
       for(var st9=0;st9<STREETS.length;st9++){var ss9=STREETS[st9]; if(_segD(gx,gy,ss9.x1,ss9.y1,ss9.x2,ss9.y2)<ss9.w/2+16){gt.setHex(ss9.t==='s'?0x9a917e:0x8a6f4d); gc.lerp(gt,0.8); break;}}
       var rd9=1e9; for(var rv9=0;rv9<RIVER.length-1;rv9++){var sd9=_segD(gx,gy,RIVER[rv9][0],RIVER[rv9][1],RIVER[rv9+1][0],RIVER[rv9+1][1]); if(sd9<rd9)rd9=sd9;}
-      var pcd=Math.hypot(gx-POND_C.x,gy-POND_C.y)-POND_C.r, ped=Math.hypot((gx-POND_E.x)*0.72,gy-POND_E.y)-POND_E.r;
+      var pcd=Math.hypot(gx-POND_C.x,gy-POND_C.y)-POND_C.r, ped=Math.hypot((gx-POND_E.x)*POND_E_Q,gy-POND_E.y)-POND_E.r;
       var tbank=Math.min(rd9-132,pcd,ped);
       if(tbank<30&&hh<26){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((30-tbank)/30)*0.7);}
       var bankD=1e9;
@@ -6059,13 +6119,41 @@ function buildRiver3D(){
   var g=ensureWaterGroup(); if(!g)return;
   var pts=RIVER.map(function(p){return new THREE.Vector3(WX(p[0]),0,WZ(p[1]));});
   var curve=new THREE.CatmullRomCurve3(pts,false,'catmullrom',0.35);
-  var N=170, pos=[],uv=[],ph=[],rp=[],idx=[];
+  var N=200, pos=[],uv=[],ph=[],rp=[],idx=[];
   var phase=0, prev=null;
   function inPond(x,y){
     if(Math.hypot(x-POND_C.x,y-POND_C.y)<POND_C.r+24)return true;
-    if(Math.hypot((x-POND_E.x)*0.72,y-POND_E.y)<POND_E.r+6)return true;
+    if(Math.hypot((x-POND_E.x)*POND_E_Q,y-POND_E.y)<POND_E.r+6)return true;
     if(Math.hypot(x-POOL.x,y-POOL.y)<POOL.r+6)return true;
     return false;
+  }
+  /* how wide the ribbon swells at a point inside a pond: the EXACT
+     half-chord of the pond along the ribbon's own perpendicular
+     (nx,nz) through that point, plus a margin. The old formula used
+     sqrt(r² − d²) with d the point's full radial distance from the
+     pond centre, which UNDER-widens wherever the centreline bends or
+     passes off-centre (d then mixes the along-track and cross-track
+     offsets), leaving the pond's corners poking out of the strip as
+     separate-looking round water. Solving the chord properly — a
+     quadratic for the round ponds, the same quadratic in the east
+     pond's squashed (ellipse) space for it — makes the single ribbon
+     cover every pond completely at every cross-section, so the water
+     reads as ONE connected flow (falls → plunge pool → central pond
+     → east pond → water gate), never as discs linked by a stream */
+  function pondHW(gx,gy,nx,nz){
+    function chord(cx,cy,r,q){
+      var px=(gx-cx)*q, py=gy-cy, vx=nx*q, vz=nz;
+      var a=vx*vx+vz*vz; if(a<=0)return 0;
+      var b=px*vx+py*vz, c=px*px+py*py-r*r, disc=b*b-a*c;
+      if(disc<=0)return 0;
+      var sq=Math.sqrt(disc);
+      return Math.max(Math.abs((-b-sq)/a),Math.abs((-b+sq)/a));
+    }
+    var hw=0;
+    hw=Math.max(hw,chord(POND_C.x,POND_C.y,POND_C.r,1));
+    hw=Math.max(hw,chord(POND_E.x,POND_E.y,POND_E.r,POND_E_Q));
+    hw=Math.max(hw,chord(POOL.x,POOL.y,POOL.r,1));
+    return hw>0?hw+30:0;
   }
   for(var i=0;i<=N;i++){
     var t=i/N, p=curve.getPoint(t), tan=curve.getTangent(t);
@@ -6075,12 +6163,12 @@ function buildRiver3D(){
     var rapid=0;
     var dFalls=Math.hypot(gx-POOL.x,gy-POOL.y);
     if(dFalls<280)rapid=Math.max(rapid,1.0-dFalls/280);
-    if(Math.hypot(gx-1530,gy-1768)<110)rapid=Math.max(rapid,0.6); /* rocky narrows where the river leaves the central pond */
-    if(Math.hypot(gx-1660,gy-1892)<100)rapid=Math.max(rapid,0.5); /* the stony run past the grand ramp's causeway */
-    if(Math.hypot(gx-1980,gy-2055)<110)rapid=Math.max(rapid,0.55); /* the east pond's outflow */
+    if(Math.hypot(gx-1545,gy-1775)<110)rapid=Math.max(rapid,0.6); /* rocky narrows where the river leaves the central pond */
+    if(Math.hypot(gx-1700,gy-1900)<100)rapid=Math.max(rapid,0.5); /* the stony run past the grand ramp's causeway */
+    if(Math.hypot(gx-2060,gy-2065)<110)rapid=Math.max(rapid,0.55); /* the east pond's outflow */
     if(Math.hypot(gx-2276,gy-2292)<120)rapid=Math.max(rapid,0.5); /* the drop toward the water gate */
     if(inPond(gx,gy))rapid*=0.25;
-    var nx=-tan.z, nz=tan.x, hw=140;
+    var nx=-tan.z, nz=tan.x, hw=Math.max(156,pondHW(gx,gy,nx,nz)); /* the channel's constant width (156 tucks the ribbon's edges just under the carved wet channel's banks, ~152, so no mud seam shows), swelling to each pond's full width inside it */
     pos.push(p.x+nx*hw,2.8,p.z+nz*hw, p.x-nx*hw,2.8,p.z-nz*hw);
     uv.push(0,t*40, 1,t*40);
     ph.push(phase,phase); rp.push(rapid,rapid);
@@ -6102,10 +6190,11 @@ function buildRiver3D(){
   for(var si=2;si<N-1;si+=3){
     var tt=si/N, pp=curve.getPoint(tt), tn=curve.getTangent(tt);
     var bx=pp.x+W/2, by=pp.z+H/2;
+    if(inPond(bx,by))continue; /* no bank rocks inside the ponds: the ribbon is pond-wide there, so a rock at the channel's edge offset would strand mid-water */
     var nearBridge3=false; for(var nb=0;nb<BRIDGES.length;nb++){if(Math.hypot(bx-BRIDGES[nb].x,by-BRIDGES[nb].y)<95)nearBridge3=true;}
     if(nearBridge3)continue; /* keep the bridges clear */
     [-1,1].forEach(function(side){
-      var off=140+rnd()*18, px=bx+(-tn.z)*side*off, py=by+(tn.x)*side*off;
+      var off=164+rnd()*18, px=bx+(-tn.z)*side*off, py=by+(tn.x)*side*off;
       if(rnd()<0.78){
         var rs=3.5+rnd()*6;
         var rk=new THREE.Mesh(G('bankrock'+Math.round(rs*2),function(){return new THREE.DodecahedronGeometry(rs,0);}),M(stoneTones[Math.floor(rnd()*4)]));
@@ -6113,7 +6202,7 @@ function buildRiver3D(){
         rk.castShadow=true; rk.receiveShadow=true; staticGroup.add(rk);
       }
       if(rnd()<0.55){
-        var toff=156+rnd()*26, tx2=bx+(-tn.z)*side*toff, ty2=by+(tn.x)*side*toff;
+        var toff=184+rnd()*26, tx2=bx+(-tn.z)*side*toff, ty2=by+(tn.x)*side*toff;
         if(terrainH(tx2,ty2)>3){
           var tu=cone(4.5+rnd()*3,9+rnd()*7,greens[Math.floor(rnd()*4)],WX(tx2),terrainH(tx2,ty2)+4,WZ(ty2),staticGroup,6);
           tu.castShadow=false;
@@ -6137,7 +6226,7 @@ function buildTown3D(){
      world, so their per-disc uniforms and animation survive). Deleting
      a water body removes its decorations, so its surfaces vanish too. */
   decorations.forEach(function(d){
-    if(!d.townWater||d.river)return; /* river-chain discs are depth-only: the ribbon below draws that water */
+    if(!d.townWater||d.river||d.ribbon)return; /* river-chain AND pond discs are depth-only: the ribbon below draws that water, swelling through the ponds as one surface */
     var zz=(d.wz||2.4)+(d.pond!=null?d.pond*0.18:0); /* stacked pond discs step up a hair each so overlaps never z-fight */
     addWaterDisc(d.x,d.y,zz,d.s*1.03,Math.hypot(d.x-POOL.x,d.y-POOL.y)<4,d.vivid);
   });
@@ -6617,12 +6706,23 @@ function buildWorld3D(){
   function scatterPoint(townOnly){
     for(var tr=0;tr<24;tr++){
       var x,y;
-      if(townOnly){x=640+rnd()*1300;y=1100+rnd()*1280;}
+      if(townOnly){x=600+rnd()*1560;y=1020+rnd()*1420;}
       else{x=40+rnd()*(W-80);y=40+rnd()*(H-80);if(regionAt(x,y)!=='green')continue;}
       if(waterDepthAt(x,y)>0)continue;
       if(stairProfileAt(x,y))continue;                    /* not on the grand staircase */
       if(Math.hypot(x-PLAZA.x,y-PLAZA.y)<352)continue;      /* not on the plaza paving */
-      if(townNorm(x,y)<1.02)continue;                        /* not inside the wall at all: no grass tufts / flowers / pebbles scattered over the town's stone ground */
+      if(townOnly){
+        /* inside the wall, tufts and flowers grow ONLY in the garden
+           patches (TOWN_GREENERY) — and never on a street: the town's
+           stone ground stays clean, its gardens bloom */
+        var inG=false;
+        for(var gg2=0;gg2<TOWN_GREENERY.length;gg2++){if(Math.hypot(x-TOWN_GREENERY[gg2][0],y-TOWN_GREENERY[gg2][1])<TOWN_GREENERY[gg2][2]){inG=true;break;}}
+        if(!inG)continue;
+        var onSt=false;
+        for(var gs2=0;gs2<STREETS.length;gs2++){if(_segD(x,y,STREETS[gs2].x1,STREETS[gs2].y1,STREETS[gs2].x2,STREETS[gs2].y2)<STREETS[gs2].w/2+6){onSt=true;break;}}
+        if(onSt)continue;
+      }
+      else if(townNorm(x,y)<1.02)continue;                 /* not inside the wall at all: no grass tufts / flowers / pebbles scattered over the town's stone ground */
       if(collide(x,y,7))continue;                          /* not inside a building / wall */
       return [x,y];
     }
