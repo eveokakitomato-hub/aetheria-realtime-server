@@ -1430,7 +1430,7 @@ function genWorld(){
       if(hcx>POND.x-85&&hcx<POND.x+POND.w+85&&hcy>POND.y-85&&hcy<POND.y+POND.h+70) continue; // pond garden
       if(Math.hypot(hcx-MERCHANT.x,hcy-MERCHANT.y)<105) continue;
       obstacles.push({type:'rect',x:hx,y:hy,w:hw,h:hh,c:WALL_HEX[Math.floor(trnd()*WALL_HEX.length)],house:true,
-        rc:ROOF_C[Math.floor(trnd()*ROOF_C.length)],hh:58+Math.floor(trnd()*58)+(Math.hypot(hcx-1300,hcy-1300)<560?22:0),chim:trnd()<0.45});
+        rc:ROOF_C[Math.floor(trnd()*ROOF_C.length)],hh:96+Math.floor(trnd()*76)+(Math.hypot(hcx-1300,hcy-1300)<560?36:0),chim:trnd()<0.45});
     }
   }
   // ---- city wall: segments with gates at N (y=510) / S (y=2090) / E (x=2090);
@@ -2718,7 +2718,7 @@ function cyl(rt,rb,h,color,x,y,z,parent,seg){
   m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;(parent||dynGroup).add(m);return m;
 }
 function sph(r,color,x,y,z,parent,opts){
-  var m=new THREE.Mesh(G('s'+r,function(){return new THREE.SphereGeometry(r,14,12);}),M(color,opts));
+  var m=new THREE.Mesh(G('s'+r,function(){return new THREE.SphereGeometry(r,12,10);}),M(color,opts));
   m.position.set(x,y,z);m.castShadow=true;(parent||dynGroup).add(m);return m;
 }
 function cone(r,h,color,x,y,z,parent,seg){
@@ -2856,20 +2856,22 @@ function init3D(){
   var holder=document.getElementById('game3d');
   renderer=new THREE.WebGLRenderer({antialias:true});
   if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;}
-  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  renderer.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   holder.appendChild(renderer.domElement);
   canvas.style.display='none';
   scene=new THREE.Scene();
   scene.background=new THREE.Color(0x8ec3e8);
-  scene.fog=new THREE.Fog(0x9ec7e8,1000,2400);
-  camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.1,5000);
+  scene.fog=new THREE.Fog(0x9ec7e8,850,2000);
+  // near 0.3 / far 3200 (was 0.1 / 5000): a tighter depth range gives the
+  // depth buffer far more precision, which stops distant surfaces shimmering
+  camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,3200);
   scene.add(camera3d);
   buildViewModel();
   var hemi=new THREE.HemisphereLight(0xcfe8ff,0x3d5a34,0.95);scene.add(hemi);
   sunLight=new THREE.DirectionalLight(0xfff2d8,1.15);
   sunLight.castShadow=true;
-  sunLight.shadow.mapSize.set(2048,2048);
+  sunLight.shadow.mapSize.set(1536,1536);
   sunLight.shadow.camera.left=-520;sunLight.shadow.camera.right=520;
   sunLight.shadow.camera.top=520;sunLight.shadow.camera.bottom=-520;
   sunLight.shadow.camera.far=2200;sunLight.shadow.bias=-0.0006;
@@ -2900,10 +2902,12 @@ function init3D(){
 function buildWorld3D(){
   if(!THREE_OK||!staticGroup)return;
   // clear previous static meshes except ground (child 0)
-  while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);}
-  function flat(w,d,color,x,y2d,z,y){
+  while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);if(c.userData&&c.userData._merged&&c.geometry)c.geometry.dispose();}
+  function flat(w,d,color,x,y2d,z,lift){
     var m=new THREE.Mesh(G('f'+w+'_'+d,function(){return new THREE.BoxGeometry(w,4,d);}),M(color));
-    m.position.set(WX(x),(y===undefined?terrainH(x,y2d)+2:y),WZ(y2d));m.receiveShadow=true;staticGroup.add(m);return m;
+    // overlapping pads get a small `lift` each so their top faces are never
+    // coplanar — equal-height overlaps z-fight and shimmer ("描画ブレ")
+    m.position.set(WX(x),terrainH(x,y2d)+2+(lift||0),WZ(y2d));m.receiveShadow=true;staticGroup.add(m);return m;
   }
   // grass patches (stable pseudo-random)
   var seed=12345;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
@@ -2921,14 +2925,14 @@ function buildWorld3D(){
   flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
   // Luminas — city ground, grand avenues, plaza disc, pond garden lawn
   flat(1580,1580,0x8d8574,1300,1300);                       // city ground inside the walls
-  flat(164,1550,0xb3a888,1300,1305);                        // grand avenue (cathedral ↔ south gate)
-  flat(1550,164,0xb3a888,1305,1300);                        // cross avenue (west wall ↔ east gate)
+  flat(164,1550,0xb3a888,1300,1305,0,1.0);                  // grand avenue (cathedral ↔ south gate)
+  flat(1550,164,0xb3a888,1305,1300,0,1.0);                  // cross avenue (west wall ↔ east gate)
   (function(){var pd=new THREE.Mesh(G('plazaDisc',function(){return new THREE.CircleGeometry(PLAZA_R+36,40);}),M(0xa89c80));
-    pd.rotation.x=-Math.PI/2;pd.position.set(WX(1300),2.6,WZ(1300));pd.receiveShadow=true;staticGroup.add(pd);})();
-  flat(POND.w+150,POND.h+140,0x5d8148,POND.x+POND.w/2,POND.y+POND.h/2); // garden lawn
-  flat(56,510,0x7d6b4d,1300,255);           // north road (from the north gate)
-  flat(3110,56,0x7d6b4d,3645,1300);         // east road (from the east gate to the new lands)
-  flat(56,3110,0x7d6b4d,1300,3645);         // south road (from the south gate)
+    pd.rotation.x=-Math.PI/2;pd.position.set(WX(1300),5.4,WZ(1300));pd.receiveShadow=true;staticGroup.add(pd);})();
+  flat(POND.w+150,POND.h+140,0x5d8148,POND.x+POND.w/2,POND.y+POND.h/2,0,0.5); // garden lawn
+  flat(56,510,0x7d6b4d,1300,255,0,0.7);     // north road (from the north gate)
+  flat(3110,56,0x7d6b4d,3645,1300,0,0.7);   // east road (from the east gate to the new lands)
+  flat(56,3110,0x7d6b4d,1300,3645,0,0.7);   // south road (from the south gate)
   // ruins floors
   flat(620,560,0x5d5a68,2290,460);
   flat(850,850,0x6a6455,3075,575);
@@ -2965,19 +2969,36 @@ function buildWorld3D(){
   // circular plaza colonnade ring + avenue lamps + pond garden hedges
   (function(){
     var pg=new THREE.Group();pg.position.set(WX(1300),terrainH(1300,1300),WZ(1300));staticGroup.add(pg);
-    var beam=new THREE.Mesh(new THREE.TorusGeometry(PLAZA_R,8,8,56),M(0xcbbfa4));
-    beam.rotation.x=Math.PI/2;beam.position.y=64;beam.castShadow=true;pg.add(beam);
-    var trim=new THREE.Mesh(new THREE.TorusGeometry(PLAZA_R,3.4,6,56),M(0xb8912f));
-    trim.rotation.x=Math.PI/2;trim.position.y=55;pg.add(trim);
-    var step=new THREE.Mesh(new THREE.TorusGeometry(PLAZA_R,5,6,56),M(0x8a8272));
-    step.rotation.x=Math.PI/2;step.position.y=2;step.scale.z=0.4;pg.add(step);
+    // flat stone ring on the plaza floor under the colonnade (no tube geometry)
+    var step=new THREE.Mesh(G('plazaRing',function(){return new THREE.RingGeometry(PLAZA_R-15,PLAZA_R+17,56);}),M(0x8a8272));
+    step.rotation.x=-Math.PI/2;step.position.y=5.55;step.receiveShadow=true;pg.add(step);
+    // Segmented entablature: straight beams spanning pillar to pillar, seated
+    // on the capitals at y≈99–110 (well above eye height). The previous build
+    // used two full torus rings at y=64 / y=55 — right at eye level (54) and
+    // floating past the pillar tops — which rendered as two endless pipes
+    // cutting across the whole screen and through the buildings behind.
+    var kept=[];
+    for(var pa2=0;pa2<24;pa2++){
+      var ang2=pa2/24*Math.PI*2, rem2=((ang2%(Math.PI/2))+Math.PI/2)%(Math.PI/2);
+      kept.push(!(rem2<0.30||rem2>Math.PI/2-0.30));   // same skip rule as genWorld's pillars
+    }
+    for(var pb=0;pb<24;pb++){
+      var nb=(pb+1)%24;
+      if(!kept[pb]||!kept[nb])continue;               // no beam across the avenue openings
+      var a1=pb/24*Math.PI*2, a2=(pb+1)/24*Math.PI*2, am=(a1+a2)/2;
+      var chord=2*PLAZA_R*Math.sin((a2-a1)/2);
+      var bm=box(chord+26,11,17,0xcbbfa4,Math.cos(am)*PLAZA_R,104.5,Math.sin(am)*PLAZA_R,pg);
+      bm.rotation.y=-am-Math.PI/2;
+      var band=box(chord+26.6,3.2,18.4,0xb8912f,Math.cos(am)*PLAZA_R,101.8,Math.sin(am)*PLAZA_R,pg);
+      band.rotation.y=-am-Math.PI/2;
+    }
     // lamp posts lining the grand avenue (warm globes)
     for(var ly=830;ly<=1990;ly+=232){
       [-104,104].forEach(function(off){
         if(Math.abs(ly-1300)<PLAZA_R+40)return;
         var lg=new THREE.Group();lg.position.set(WX(1300+off),terrainH(1300+off,ly),WZ(ly));staticGroup.add(lg);
-        cyl(2.2,3,52,0x3a3f45,0,26,0,lg,6);
-        var gl=sph(6,0xffd98a,0,56,0,lg,{emissive:0xcc8a2a});gl.castShadow=false;
+        cyl(2.2,3,66,0x3a3f45,0,33,0,lg,6);
+        var gl=sph(6,0xffd98a,0,70,0,lg,{emissive:0xcc8a2a});gl.castShadow=false;
       });
     }
     // pond garden: hedge ring + corner trees around the lawn
@@ -2998,40 +3019,42 @@ function buildWorld3D(){
         var g=new THREE.Group();g.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(g);
         var wallH=o.hh||70, wallCol=parseInt(String(o.c).slice(1),16), roofCol=o.rc?parseInt(String(o.rc).slice(1),16):0x8f3f2a;
         box(o.w,wallH,o.h,wallCol,0,wallH/2,0,g);
-        var roof=cone(Math.max(o.w,o.h)*0.74,Math.min(52,o.h*0.52),roofCol,0,wallH+Math.min(52,o.h*0.52)/2-2,0,g,4);roof.rotation.y=Math.PI/4;
-        if(o.chim)box(11,20,11,0x9a8a76,o.w*0.26,wallH+12,0,g);
+        var roofH=Math.min(78,o.h*0.62);
+        var roof=cone(Math.max(o.w,o.h)*0.74,roofH,roofCol,0,wallH+roofH/2-2,0,g,4);roof.rotation.y=Math.PI/4;
+        if(o.chim)box(11,26,11,0x9a8a76,o.w*0.26,wallH+15,0,g);
         box(20,36,4,0x4a3220,0,18,o.h/2+1,g);
         box(17,17,3,0xffe9a8,-o.w/2+24,wallH*0.58,o.h/2+1,g);
         box(17,17,3,0xffe9a8,o.w/2-24,wallH*0.58,o.h/2+1,g);
         box(17,17,3,0xf5e3b0,0,wallH*0.6,-o.h/2-1,g);
+        if(wallH>120){box(17,17,3,0xffe9a8,-o.w/2+24,wallH*0.3,o.h/2+1,g);box(17,17,3,0xf5e3b0,o.w/2-24,wallH*0.3,o.h/2+1,g);}
       }else if(o.wall){
         var wg=new THREE.Group();wg.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(wg);
-        box(o.w,104,o.h,0x9a958a,0,52,0,wg);
-        box(o.w,10,o.h+10,0x8a8578,0,107,0,wg);                       // parapet cap
+        box(o.w,156,o.h,0x9a958a,0,78,0,wg);
+        box(o.w,10,o.h+10,0x8a8578,0,161,0,wg);                       // parapet cap
         var horiz=o.w>=o.h, span=horiz?o.w:o.h;
         for(var ci2=26;ci2<span-10;ci2+=56){                          // crenellations
-          if(horiz)box(22,15,o.h+8,0x9a958a,-o.w/2+ci2,116,0,wg);
-          else box(o.w+8,15,22,0x9a958a,0,116,-o.h/2+ci2,wg);
+          if(horiz)box(22,20,o.h+8,0x9a958a,-o.w/2+ci2,173,0,wg);
+          else box(o.w+8,20,22,0x9a958a,0,173,-o.h/2+ci2,wg);
         }
       }else if(o.cathedral){
         var cg2=new THREE.Group();cg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(cg2);
-        box(o.w,120,o.h,0xe7dfca,0,60,0,cg2);                          // nave
+        box(o.w,178,o.h,0xe7dfca,0,89,0,cg2);                          // nave
         box(o.w+18,14,o.h+18,0xcfc4a8,0,7,0,cg2);                      // plinth
-        box(o.w*0.6,52,o.h*0.7,0xded3b8,0,146,0,cg2);                  // upper tier
-        cyl(74,80,34,0xcfc4a8,0,188,0,cg2,20);                          // dome drum
-        var dome=sph(76,0x7d94a6,0,196,0,cg2);dome.scale.y=0.92;        // the great dome
-        cyl(5,7,30,0xb8912f,0,268,0,cg2,8);
-        var orb2=sph(9,0xe8c268,0,288,0,cg2,{emissive:0x8a6a10});orb2.castShadow=false;
+        box(o.w*0.6,68,o.h*0.7,0xded3b8,0,212,0,cg2);                  // upper tier
+        cyl(76,84,42,0xcfc4a8,0,267,0,cg2,20);                          // dome drum
+        var dome=sph(82,0x7d94a6,0,288,0,cg2);dome.scale.y=0.92;        // the great dome
+        cyl(5,7,36,0xb8912f,0,372,0,cg2,8);
+        var orb2=sph(9,0xe8c268,0,396,0,cg2,{emissive:0x8a6a10});orb2.castShadow=false;
         [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(cn){            // corner spires
           var sx=cn[0]*(o.w/2-24), sz=cn[1]*(o.h/2-24);
-          cyl(15,18,168,0xe2d7bd,sx,84,sz,cg2,8);
-          cone(21,58,0xa34a32,sx,196,sz,cg2,8);
-          sph(4.5,0xe8c268,sx,230,sz,cg2);
+          cyl(15,19,252,0xe2d7bd,sx,126,sz,cg2,8);
+          cone(22,84,0xa34a32,sx,294,sz,cg2,8);
+          sph(4.5,0xe8c268,sx,344,sz,cg2);
         });
-        for(var pi2=-2;pi2<=2;pi2++)cyl(6,7,74,0xf2ead8,pi2*44,37,o.h/2+16,cg2,8); // portico columns
-        box(o.w*0.52,10,34,0xcfc4a8,0,80,o.h/2+16,cg2);                // portico roof
-        var rose=cyl(26,26,4,0x9fd4ff,0,88,o.h/2+2,cg2,20);rose.rotation.x=Math.PI/2; // rose window
-        box(24,44,4,0x4a3220,0,22,o.h/2+2,cg2);                        // great door
+        for(var pi2=-2;pi2<=2;pi2++)cyl(6,7,116,0xf2ead8,pi2*44,58,o.h/2+16,cg2,8); // portico columns
+        box(o.w*0.52,10,34,0xcfc4a8,0,122,o.h/2+16,cg2);               // portico roof
+        var rose=cyl(26,26,4,0x9fd4ff,0,138,o.h/2+2,cg2,20);rose.rotation.x=Math.PI/2; // rose window
+        box(26,66,4,0x4a3220,0,33,o.h/2+2,cg2);                        // great door
       }else if(o.pond){
         var pg2=new THREE.Group();pg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(pg2);
         box(o.w+16,10,o.h+16,0xaeb4ac,0,5,0,pg2);                      // stone rim
@@ -3048,22 +3071,24 @@ function buildWorld3D(){
       }
     }else if(o.tower){
       var tg3=new THREE.Group();tg3.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(tg3);
-      cyl(32,38,148,0x9a958a,0,74,0,tg3,12);
-      cyl(40,40,12,0x8a8578,0,152,0,tg3,12);
-      cone(46,62,0xa83c2a,0,188,0,tg3,12);                             // red roof (as in the photo)
-      sph(5.5,0xe8c268,0,224,0,tg3);
-      box(16,24,4,0xffe9a8,0,104,34,tg3);
+      cyl(32,40,220,0x9a958a,0,110,0,tg3,12);
+      cyl(41,41,14,0x8a8578,0,226,0,tg3,12);
+      cone(48,84,0xa83c2a,0,274,0,tg3,12);                             // red roof (as in the photo)
+      sph(5.5,0xe8c268,0,322,0,tg3);
+      box(16,24,4,0xffe9a8,0,150,34,tg3);
+      box(14,20,4,0xffe9a8,0,196,35,tg3);
     }else if(o.pillar){
       var plg=new THREE.Group();plg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(plg);
-      cyl(8,10,56,0xded5c2,0,28,0,plg,8);
-      box(22,8,22,0xcbbfa4,0,59,0,plg);
+      cyl(8,10,92,0xded5c2,0,46,0,plg,8);
+      box(22,8,22,0xcbbfa4,0,95,0,plg);
       box(24,7,24,0xcbbfa4,0,3,0,plg);
     }else if(o.fountain){
       var fg=new THREE.Group();fg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(fg);
       cyl(o.r,o.r+6,16,0x7d95a8,0,8,0,fg,20);
       cyl(o.r-10,o.r-10,6,0x4a90c2,0,15,0,fg,20);
-      cyl(7,10,44,0xaebfca,0,30,0,fg,10);
-      var orb=sph(9,0x9fd4ff,0,58,0,fg,{transparent:true,opacity:0.85});orb.castShadow=false;
+      cyl(7,11,58,0xaebfca,0,37,0,fg,10);
+      cyl(17,11,5,0x8fa8bc,0,50,0,fg,12);                       // mid bowl on the column
+      var orb=sph(9,0x9fd4ff,0,76,0,fg,{transparent:true,opacity:0.85});orb.castShadow=false;
     }
   });
   // decorations
@@ -3127,6 +3152,56 @@ function buildWorld3D(){
       cyl(1.2,1.2,9,0x3f7a3a,0,4,0,fg2,5);
       sph(4.5,Math.floor(d.seed)%2?0xffd34d:0xff8fb3,0,11,0,fg2);
     }
+  });
+  mergeStaticMeshes();
+}
+
+/* Merge the thousands of small static meshes (houses, walls, trees…) into a
+   handful of big ones, grouped by material × 650-unit spatial chunk so
+   frustum culling still skips off-screen chunks. This is the main frame-rate
+   fix for phones: draw calls drop from several thousand to a few dozen in
+   view, for both the colour pass and the shadow pass. Geometry/material
+   sharing (G()/M()) already kept memory low; the merge keeps the baked
+   world matrices, so nothing moves or changes shape. */
+function mergeStaticMeshes(){
+  if(!staticGroup||!THREE_OK)return;
+  staticGroup.updateMatrixWorld(true);
+  var CH=650, groups={}, order=[], meshes=[];
+  for(var ci=1;ci<staticGroup.children.length;ci++){
+    staticGroup.children[ci].traverse(function(m){if(m.isMesh)meshes.push(m);});
+  }
+  meshes.forEach(function(m){
+    if(!m.geometry||!m.material)return;
+    var gg=m.geometry.clone();
+    gg.applyMatrix4(m.matrixWorld);
+    var pa=gg.attributes.position; if(!pa){gg.dispose();return;}
+    var na=gg.attributes.normal, ua=gg.attributes.uv;
+    var e=m.matrixWorld.elements;
+    var key=m.material.uuid+'|'+(m.castShadow?1:0)+'|'+(m.receiveShadow?1:0)+'|'+Math.floor((e[12]+W/2)/CH)+'|'+Math.floor((e[14]+H/2)/CH);
+    var gr=groups[key];
+    if(!gr){gr=groups[key]={mat:m.material,cast:!!m.castShadow,recv:!!m.receiveShadow,pos:[],nor:[],uv:[],idx:[],vc:0};order.push(key);}
+    for(var i=0;i<pa.count;i++){
+      gr.pos.push(pa.getX(i),pa.getY(i),pa.getZ(i));
+      gr.nor.push(na?na.getX(i):0,na?na.getY(i):1,na?na.getZ(i):0);
+      gr.uv.push(ua?ua.getX(i):0,ua?ua.getY(i):0);
+    }
+    if(gg.index){var ia=gg.index.array;for(var j=0;j<ia.length;j++)gr.idx.push(ia[j]+gr.vc);}
+    else{for(var j2=0;j2<pa.count;j2++)gr.idx.push(j2+gr.vc);}
+    gr.vc+=pa.count;
+    gg.dispose();
+  });
+  while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);if(c.userData&&c.userData._merged&&c.geometry)c.geometry.dispose();}
+  order.forEach(function(key){
+    var gr=groups[key]; if(!gr.vc)return;
+    var geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(gr.pos,3));
+    geo.setAttribute('normal',new THREE.Float32BufferAttribute(gr.nor,3));
+    geo.setAttribute('uv',new THREE.Float32BufferAttribute(gr.uv,2));
+    geo.setIndex(gr.idx);
+    geo.computeBoundingSphere();
+    var mesh=new THREE.Mesh(geo,gr.mat);
+    mesh.castShadow=gr.cast; mesh.receiveShadow=gr.recv; mesh.userData._merged=true;
+    staticGroup.add(mesh);
   });
 }
 
