@@ -3,7 +3,7 @@ services:
     name: aetheria-realtime-server
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter # 常時起動 (無料枠はスリープするため本番では starter 以上)
+    plan: free # 常時起動 (無料枠はスリープするため本番では starter 以上)
     healthCheckPath: /health
     envVars:
       - key: PORT
