@@ -379,7 +379,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .bag-slot:hover{border-color:var(--gold)}
 .bag-slot .bs-ico{font-size:24px;line-height:1.1}
 .bag-slot .bs-name{font-size:10px;line-height:1.25;text-align:center;color:var(--muted)}
-.bag-slot .bs-price{font-size:9px;color:var(--gold);font-weight:700;line-height:1.2}
+.bag-slot .bs-cat{font-size:9px;color:var(--muted);font-weight:700;line-height:1.2}
 #bagDetail{margin:6px 0 2px;padding:9px 11px;background:rgba(255,255,255,.045);border:1px solid var(--line2);border-radius:8px;font-size:11.5px;line-height:1.65;color:#dfe9e1;display:none;text-align:left}
 #bagDetail .bd-cat{color:var(--muted);font-size:10.5px}
 #bagDetail .bd-price{color:var(--gold);font-weight:900}
@@ -1562,8 +1562,8 @@ function refreshBagUI(){
   if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
   var html='';
   items.forEach(function(it){
-    var title=it.drop?(' title="'+escHtml(it.drop.cat+'｜売値 '+it.drop.price+' G｜'+it.drop.desc)+'"'):'';
-    html+='<button type="button" draggable="true" class="bag-slot'+(it.dim?' dim':'')+(bagAssignMode&&bagSelAct===it.act?' sel':'')+'" data-act="'+it.act+'"'+title+'><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.tag?'<span class="bs-tag">'+it.tag+'</span>':'<span class="bs-count">'+it.cnt+'</span>')+(it.drop?'<span class="bs-price">売値 '+it.drop.price+' G</span>':'')+'</button>';
+    var title=it.drop?(' title="'+escHtml(it.drop.cat+'｜'+it.drop.desc)+'"'):'';
+    html+='<button type="button" draggable="true" class="bag-slot'+(it.dim?' dim':'')+(bagAssignMode&&bagSelAct===it.act?' sel':'')+'" data-act="'+it.act+'"'+title+'><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.tag?'<span class="bs-tag">'+it.tag+'</span>':'<span class="bs-count">'+it.cnt+'</span>')+(it.drop?'<span class="bs-cat">'+escHtml(it.drop.cat)+'</span>':'')+'</button>';
   });
   for(var i=items.length;i<BAG_CAPACITY;i++)html+='<div class="bag-slot empty"></div>';
   grid.innerHTML=html;
