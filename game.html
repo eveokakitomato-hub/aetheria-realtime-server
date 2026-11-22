@@ -1041,11 +1041,11 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 "use strict";
 /* ================= DATA ================= */
 var CLASSES={
-  warrior:{name:"ウォーリアー",icon:"⚔️",hp:150,mp:50,atk:16,def:6,range:58,speed:3.4,ranged:false,color:"#e06666",
+  warrior:{name:"ウォーリアー",icon:"⚔️",hp:150,mp:50,atk:16,def:6,range:58,speed:1.11,ranged:false,color:"#e06666",
     s1:{name:"強撃",ico:"💥",mp:8,cd:4000,mult:2.2},s2:{name:"旋風斬",ico:"🌀",mp:14,cd:7000,aoe:95,mult:1.5},s3:{name:"天覇断空斬",ico:"✦",mp:25,cd:14000,mult:3.6}},
-  mage:{name:"メイジ",icon:"🔮",hp:95,mp:110,atk:20,def:2,range:230,speed:3.2,ranged:true,color:"#62b6f5",proj:"🔥",
+  mage:{name:"メイジ",icon:"🔮",hp:95,mp:110,atk:20,def:2,range:230,speed:1.05,ranged:true,color:"#62b6f5",proj:"🔥",
     s1:{name:"フレイムバースト",ico:"🔥",mp:12,cd:4000,mult:2.2},s2:{name:"ブリザード",ico:"❄️",mp:20,cd:8000,aoe:105,mult:1.5},s3:{name:"メテオ",ico:"☄️",mp:35,cd:15000,mult:3.8}},
-  archer:{name:"アーチャー",icon:"🏹",hp:115,mp:70,atk:17,def:3,range:250,speed:3.7,ranged:true,color:"#8fd07a",proj:"➤",
+  archer:{name:"アーチャー",icon:"🏹",hp:115,mp:70,atk:17,def:3,range:250,speed:1.21,ranged:true,color:"#8fd07a",proj:"➤",
     s1:{name:"狙撃",ico:"🎯",mp:9,cd:3500,mult:2.4},s2:{name:"アローレイン",ico:"🌧️",mp:16,cd:8000,aoe:100,mult:1.4},s3:{name:"穿ちの矢",ico:"✦",mp:24,cd:13000,mult:3.6}}
 };
 var ETYPES={
@@ -1080,6 +1080,12 @@ var mini=document.getElementById('minimap'),mctx=mini.getContext('2d');
 var started=false, soundOn=true, audioCtx=null;
 var keys={}, joyVec={x:0,y:0};
 var jumpY=0, jumpVY=0; // jump height above terrain / vertical velocity (Space)
+/* PLAYER BODY SCALE: the player is a 1.7m person in a world where
+   10 units = 1m — body height 17 units, eyes at 1.6m, collision radius
+   3.5 units (0.7m across, see makePlayer). Class speeds, the jump
+   impulse, the step-up tolerance in collide() and SWIM_DEPTH are all
+   tuned to this body; buildings and terrain keep the world scale. */
+var EYE_H=16; // eye height above the feet (1.6m on a 1.7m body)
 var topLift=0; // extra ground height while standing ON TOP of a wall / rock / house roof (0 = on the terrain)
 var hovering=false, hoverTapT=0; // float mode (gamemaster only): gravity stopped mid-air
 var hoverPressT=0, hoverPressWasSecond=false; // current Space press while floating: its start time + whether it began soon after a short tap
@@ -1529,7 +1535,7 @@ function netRefreshRemotes(now){
     var x=tr.prev.x+(tr.curr.x-tr.prev.x)*t;
     var y=tr.prev.y+(tr.curr.y-tr.prev.y)*t;
     if(!tr.view){
-      tr.view={id:id,r:15,emoji:'⚔️',color:'#2fbfa5',walk:0,dir:1,_remote:true,hitFlash:0};
+      tr.view={id:id,r:3.5,emoji:'⚔️',color:'#2fbfa5',walk:0,dir:1,_remote:true,hitFlash:0};
     }
     var v=tr.view;
     var moved=Math.hypot(x-v.x||0,y-v.y||0);
@@ -1790,7 +1796,7 @@ function collide(nx,ny,r,feetZ){
          (small step tolerance so the player can walk up a roof slope
          and along a wall top) passes over instead of hitting air */
       var tz=obstacleTopZAt(o,nx,ny,r+4);
-      if(tz>-Infinity&&feetZ>=tz-8) continue;
+      if(tz>-Infinity&&feetZ>=tz-3) continue; /* step-up tolerance 3 units (0.3m): what a 1.7m leg can step onto without jumping */
     }
     if(o.type==='circle'){if(Math.hypot(nx-o.x,ny-o.y)<r+o.r) return true;}
     else if(nx+r>o.x&&nx-r<o.x+o.w&&ny+r>o.y&&ny-r<o.y+o.h) return true;
@@ -1967,7 +1973,7 @@ function beep(f,d,type,v){
 /* ================= ENTITIES ================= */
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
-  return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:16,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
+  return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
     lv:1,exp:0,gold:120,potions:3,arrows:(clsKey==='archer'?30:0),kills:0,dir:1,walk:0,dead:false};
 }
 function expNeed(lv){return 80+lv*55;}
@@ -2257,7 +2263,7 @@ function fireArrow(power,mult,full){
   player.arrows--; atkAnimT=performance.now();
   var spd=8.5+power*11.5, cp2=Math.cos(camPitch);   // 8.5 (tap) → 20 (full draw): range grows with draw
   projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
-    z:playerGroundZ()+54+jumpY,vz:Math.sin(camPitch)*spd,
+    z:playerGroundZ()+15+jumpY,vz:Math.sin(camPitch)*spd, /* arrows leave at shoulder height (1.5m) */
     dmg:Math.round(player.atk*(mult||1)*(full?1.15:1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:Math.round(50+power*95)});
   beep(full?980:640+power*260,0.07,'sawtooth',0.03);
   if(full)flashCrosshair(null);
@@ -2707,7 +2713,7 @@ function updateSkillUI(now){
    paddle, MP drains the whole time, and at 0 MP the player starts
    drowning (HP drains) until they get back to shallow water. The swim
    banner above the status panel shows which state you are in. */
-var SWIM_DEPTH=30, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
+var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5; /* 11 units = 1.1m: chest height on the 1.7m body — deeper than that and the feet can no longer wade */
 function waterDepthAt(x,y){
   var d=0;
   for(var i=0;i<decorations.length;i++){var o=decorations[i];
@@ -2766,7 +2772,7 @@ function handleJumpKey(){
     jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_TAP_NUDGE);
     return;
   }
-  if(jumpY<=0&&jumpVY===0){jumpVY=0.17;return;} /* grounded: normal jump for everyone */
+  if(jumpY<=0&&jumpVY===0){jumpVY=0.070;return;} /* grounded: normal jump for everyone — impulse tuned so the apex is ~5.4 units (0.54m), a 1.7m person's jump */
   if(!isGameMaster())return; /* mid-air press: only gamemaster can float */
   hovering=true;jumpVY=0;hoverTapT=0;clearHoverPress();
   toast('🕊 浮遊モード — Space長押しで上昇／短く2回押すと解除',3600);
@@ -3525,8 +3531,8 @@ function refreshGroundAll(){
 /* ---- aim: ray-march the centre crosshair onto the terrain ---- */
 function computeEditorAim(){
   if(!player)return null;
-  var eyeY=playerGroundZ()+54+jumpY;
-  if(player.swimming)eyeY=terrainH(player.x,player.y)+30;
+  var eyeY=playerGroundZ()+EYE_H+jumpY;
+  if(player.swimming)eyeY=terrainH(player.x,player.y)+Math.max(1,(player.swimDepth||SWIM_DEPTH)-1);
   var cp=Math.cos(camPitch);
   var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
   var px=player.x, py=player.y, pz=eyeY;
@@ -4829,7 +4835,14 @@ function humanoid(clsKey){
     bow.position.set(19,38,0);bow.rotation.z=-Math.PI/2;bow.castShadow=true;g.add(bow);
     cone(12,10,0x4a6b35,0,62,0,g,10);               // hood
   }
-  g.userData.groundOff=-10;
+  /* body scale: the parts above are authored for a ~52-unit-tall
+     figure (head top at y=62, feet at y=10, hats/hoods above that).
+     Scale the whole group down to a 1.7m person (17 units), hats
+     included. groundOff is added UNSCALED by syncEntity(), so it is
+     pre-scaled by the same factor here. */
+  var HS=17/52;
+  g.scale.setScalar(HS);
+  g.userData.groundOff=-10*HS;
   return g;
 }
 function enemyModel(type){
@@ -4962,7 +4975,7 @@ function syncEntity(ent,kind,now){
   var dx=ent.x-(ent._px||ent.x),dy=ent.y-(ent._py||ent.y);
   if(Math.abs(dx)+Math.abs(dy)>0.05){ent._face=Math.atan2(dx,dy);ent._px=ent.x;ent._py=ent.y;}
   else if(kind!=='e'&&ent.dir){/* keep last facing */}
-  var bob=(kind==='e'&&ent.type==='slime')?Math.abs(Math.sin(now/280+ent.walk))*4:Math.abs(Math.sin(ent.walk||0))*2.2;
+  var bob=(kind==='e'&&ent.type==='slime')?Math.abs(Math.sin(now/280+ent.walk))*4:Math.abs(Math.sin(ent.walk||0))*(kind==='e'?2.2:0.7); /* player bob scaled to the 1.7m body */
   var groundY=terrainH(ent.x,ent.y);
   mesh.position.set(WX(ent.x),groundY+bob+(mesh.userData.groundOff||0),WZ(ent.y));
   if(ent._face!==undefined)mesh.rotation.y=ent._face;
@@ -4972,7 +4985,7 @@ function syncEntity(ent,kind,now){
     mesh.traverse(function(c){if(c.userData._m)c.material=c.userData._m;});rec._flash=false;}
   // label — for enemies, name/level/HP are revealed ONLY while the center
   // crosshair captures them (aimTarget). All other enemies stay anonymous.
-  var hgt=(kind==='e')?(ent.boss?165:ent.r*2.6+44):86;
+  var hgt=(kind==='e')?(ent.boss?165:ent.r*2.6+44):25; /* players: just above the 1.7m head / hat (top ≈ 21.6) */
   var identified=(kind!=='e')||(aimTarget===ent);
   var sp=identified?projectToScreen(WX(ent.x),groundY+hgt,WZ(ent.y),_pv):null;
   if(sp){rec.label.style.display='block';rec.label.style.transform='translate(-50%,-100%) translate('+sp.x.toFixed(1)+'px,'+sp.y.toFixed(1)+'px)';}
@@ -5033,7 +5046,7 @@ function render3D(now){
       _pv.set(WX(p.x)+p.vx,p.z+p.vz,WZ(p.y)+p.vy);
       m.lookAt(_pv);
     }else{
-      m.position.set(WX(p.x),terrainH(p.x,p.y)+26,WZ(p.y));
+      m.position.set(WX(p.x),terrainH(p.x,p.y)+14,WZ(p.y)); /* bolts fly at the caster's chest height (1.4m) */
     }
   });
   for(var k in projMeshes){if(!pSeen[k]){dynGroup.remove(projMeshes[k]);delete projMeshes[k];}}
@@ -5085,9 +5098,9 @@ function render3D(now){
   }else if(render3D._ring)render3D._ring.visible=false;
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
-  var eyeY=playerGroundZ()+54+jumpY;
+  var eyeY=playerGroundZ()+EYE_H+jumpY;
   /* swimming: the eyes ride low at the water surface with a gentle bob */
-  if(player.swimming)eyeY=terrainH(player.x,player.y)+30+Math.sin(now/300)*1.8;
+  if(player.swimming)eyeY=terrainH(player.x,player.y)+Math.max(1,player.swimDepth-1)+Math.sin(now/300)*0.6;
   var cp=Math.cos(camPitch);
   camera3d.position.set(tx,eyeY,tz);
   camera3d.lookAt(tx-Math.sin(camYaw)*cp,eyeY+Math.sin(camPitch),tz-Math.cos(camYaw)*cp);
