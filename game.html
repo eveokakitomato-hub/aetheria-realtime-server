@@ -222,8 +222,18 @@ body.bag-open #hotbar,body.bag-open #itemHotbar{z-index:65} /* while the bag is 
 #itemPicker .ip-btn:hover{border-color:var(--gold)}
 #itemPicker .ip-btn small{margin-left:auto;color:var(--gold);font-weight:900}
 .bag-slot.sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(232,194,104,.55)}
-#bagAssignBtn{background:rgba(255,255,255,.06);border:1px solid var(--line2);border-radius:6px;color:var(--paper);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer;width:100%}
-#bagAssignBtn.on{border-color:var(--gold);color:var(--gold)}
+/* hotbar strip shown at the top-centre of the bag screen: drag a bag
+   item onto one of its slots to register it on the item hotbar */
+#bagHotbar{margin:10px auto 4px;text-align:center}
+#bagHotbar .bh-title{font-size:11px;font-weight:900;color:var(--gold);letter-spacing:.06em;margin-bottom:6px}
+#bagHotbar .bh-row{display:flex;gap:8px;justify-content:center}
+.bh-slot{width:58px;text-align:center}
+.bh-slot button{width:58px;height:58px;border-radius:8px;border:1px solid var(--line2);background:rgba(12,18,15,.92);color:#fff;font-size:24px;position:relative;display:grid;place-items:center;cursor:default}
+.bh-slot button.empty{opacity:.55;border-style:dashed}
+.bh-slot button.drop-hi{border-color:var(--gold);box-shadow:0 0 0 2px rgba(232,194,104,.6)}
+.bh-slot .cnt{position:absolute;top:3px;right:4px;font-size:10px;font-weight:900;color:#ffd98a;background:rgba(0,0,0,.55);border-radius:99px;padding:1px 5px;line-height:1.35}
+.bh-slot .key{position:absolute;top:3px;left:5px;font-size:9px;color:var(--gold);font-weight:900}
+.bh-slot small{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.2}
 .skill .cnt{position:absolute;top:3px;right:4px;font-size:10px;font-weight:900;color:#ffd98a;background:rgba(0,0,0,.55);border-radius:99px;padding:1px 5px;line-height:1.35}
 
 /* ===== JOYSTICK (mobile) ===== */
@@ -799,10 +809,17 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="bagModal"><div class="bag-card">
       <h2>🎒 バッグ</h2>
       <p class="sub" id="bagSub">持ち物</p>
+      <div id="bagHotbar" aria-label="アイテムホットバー（バッグ表示用）">
+        <div class="bh-title">🎯 アイテムホットバー — 下のアイテムをドラッグして登録</div>
+        <div class="bh-row">
+          <div class="bh-slot"><button type="button" id="bh1"><span class="key">5</span><span class="ih-ico">＋</span><span class="cnt"></span></button><small class="ih-name">空き</small></div>
+          <div class="bh-slot"><button type="button" id="bh2"><span class="key">6</span><span class="ih-ico">＋</span><span class="cnt"></span></button><small class="ih-name">空き</small></div>
+          <div class="bh-slot"><button type="button" id="bh3"><span class="key">7</span><span class="ih-ico">＋</span><span class="cnt"></span></button><small class="ih-name">空き</small></div>
+          <div class="bh-slot"><button type="button" id="bh4"><span class="key">8</span><span class="ih-ico">＋</span><span class="cnt"></span></button><small class="ih-name">空き</small></div>
+        </div>
+      </div>
       <div id="bagGrid" class="bag-grid" aria-label="アイテム欄（最大26種類・スクロール）"></div>
       <p class="sub" id="bagStats"></p>
-      <button id="bagAssignBtn" type="button">🎯 ホットバー登録モード：OFF</button>
-      <p class="sub" id="bagAssignHint" style="display:none">アイテムをクリックで選んでから、ホットバーのマス（右下の4マス／左下の4マス目）をクリックすると登録できます。アイテムをマスへドラッグ＆ドロップしても登録できます。</p>
       <div class="bag-actions"><button id="closeBagBtn" type="button">閉じる</button></div>
     </div></div>
 
@@ -1129,7 +1146,7 @@ var CLASSES={
     s1:{name:"狙撃",ico:"🎯",mp:9,cd:3500,mult:2.4},s2:{name:"アローレイン",ico:"🌧️",mp:16,cd:8000,aoe:100,mult:1.4},s3:{name:"穿ちの矢",ico:"✦",mp:24,cd:13000,mult:3.6}}
 };
 var ETYPES={
-  slime:{name:"スライム",emoji:"🟢",hp:38,atk:6,exp:22,gold:9,lv:1,speed:1.1,size:17,color:"#6fce62"},
+  slime:{name:"スライム",emoji:"🟢",hp:38,atk:6,exp:22,gold:9,lv:1,speed:1.1,size:13,color:"#6fce62"},
   goblin:{name:"ゴブリン",emoji:"👺",hp:62,atk:9,exp:42,gold:18,lv:3,speed:1.55,size:19,color:"#8a9a3a",fam:"gob"},
   goblinArcher:{name:"ゴブリンアーチャー",emoji:"🏹",hp:55,atk:9,exp:50,gold:22,lv:3,speed:1.6,size:18,color:"#7a8a34",fam:"gob",ranged:330,keep:190},
   goblinShaman:{name:"ゴブリンシャーマン",emoji:"🔮",hp:58,atk:12,exp:62,gold:26,lv:4,speed:1.35,size:18,color:"#4a8a72",fam:"gob",ranged:300,keep:210,healer:true},
@@ -1142,7 +1159,7 @@ var ETYPES={
   scorpion:{name:"デザートスコーピオン",emoji:"🦂",hp:210,atk:25,exp:120,gold:52,lv:8,speed:1.9,size:20,color:"#c98a3a"},
   sandworm:{name:"サンドワーム",emoji:"🪱",hp:260,atk:28,exp:150,gold:60,lv:9,speed:1.6,size:26,color:"#d8b36a"},
   treant:{name:"古木のトレント",emoji:"🌲",hp:320,atk:27,exp:175,gold:66,lv:9,speed:1.1,size:30,color:"#4a7a3a"},
-  magma:{name:"マグマスライム",emoji:"🔥",hp:240,atk:30,exp:160,gold:64,lv:10,speed:1.3,size:22,color:"#ff7a3c"},
+  magma:{name:"マグマスライム",emoji:"🔥",hp:240,atk:30,exp:160,gold:64,lv:10,speed:1.3,size:17,color:"#ff7a3c"},
   lavagolem:{name:"ラーヴァゴーレム",emoji:"🌋",hp:420,atk:34,exp:240,gold:95,lv:12,speed:1.15,size:32,color:"#a03a2a"},
   ifrit:{name:"火山の炎魔イフリート",emoji:"👿",hp:1250,atk:38,exp:1000,gold:900,lv:14,speed:1.35,size:40,color:"#e5484d",boss:true}
 };
@@ -1529,13 +1546,14 @@ function refreshBagUI(){
     {ico:weapon[0],name:weapon[1],act:'weapon',tag:bowEquipped()?'装備中':'外し中',dim:!bowEquipped()},
     {ico:'💰',name:'ゴールド',cnt:player.gold+' G',act:'gold'}
   ];
-  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備／ホットバーへはドラッグ＆ドロップ）';
+  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
   var html='';
   items.forEach(function(it){
     html+='<button type="button" draggable="true" class="bag-slot'+(it.dim?' dim':'')+(bagAssignMode&&bagSelAct===it.act?' sel':'')+'" data-act="'+it.act+'"><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.tag?'<span class="bs-tag">'+it.tag+'</span>':'<span class="bs-count">'+it.cnt+'</span>')+'</button>';
   });
   for(var i=items.length;i<BAG_CAPACITY;i++)html+='<div class="bag-slot empty"></div>';
   grid.innerHTML=html;
+  syncBagHotbar();
   if(stats)stats.textContent='🏅 討伐記録：これまでに倒したモンスター '+player.kills+' 体';
 }
 function refreshPlayersUI(){
@@ -2475,7 +2493,7 @@ function beep(f,d,type,v){
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
   return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
-    lv:1,exp:0,gold:120,potions:3,arrows:(clsKey==='archer'?30:0),kills:0,dir:1,walk:0,dead:false};
+    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,dir:1,walk:0,dead:false}; /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0) */
 }
 function expNeed(lv){return 80+lv*55;}
 /* ============ MOB POPULATION CONTROL (lag fix) ============
@@ -2966,6 +2984,19 @@ function refreshItemBars(){
   if(pi)pi.textContent=ld.ico;
   if(pn)pn.textContent=ld.name;
   if(pc)pc.textContent=itemCountTxt(leftSlotItem);
+  syncBagHotbar();
+}
+/* mirror the item hotbar into the strip at the top of the bag screen;
+   dropping a bag item on one of those slots registers it (assignToSlot) */
+function syncBagHotbar(){
+  if(!player)return;
+  for(var i=0;i<4;i++){
+    var btn=$('bh'+(i+1)); if(!btn)continue;
+    var act=itemBar[i], ico=btn.querySelector('.ih-ico'), cnt=btn.querySelector('.cnt'), nm=btn.parentNode.querySelector('.ih-name');
+    if(!ico||!cnt||!nm)continue;
+    if(act){var d=itemDef(act); ico.textContent=d.ico; cnt.style.display=''; cnt.textContent=itemCountTxt(act); nm.textContent=d.name; btn.classList.remove('empty');}
+    else{ico.textContent='＋'; cnt.style.display='none'; nm.textContent='空き'; btn.classList.add('empty');}
+  }
 }
 /* register an item onto a hotbar slot: {kind:'bar',i:0..3} or {kind:'left'} */
 function assignToSlot(target,act){
@@ -3272,6 +3303,7 @@ function applySaveData(data){
   np.lv=Math.floor(num(p.lv,1,1,99));np.exp=num(p.exp,0,0,99999);
   np.gold=Math.floor(num(p.gold,0,0,999999));np.potions=Math.floor(num(p.potions,0,0,999));np.kills=Math.floor(num(p.kills,0,0,999999));
   np.arrows=Math.floor(num(p.arrows,(p.cls==='archer'?30:0),0,9999));
+  if(isGameMaster())np.arrows=1000; /* gamemaster account: every game start (incl. loading a saved/server character) begins with 1000 arrows */
   exploredFromString(data.explored);
   np.x=num(p.x,SPAWN_X,40,W-40);np.y=num(p.y,SPAWN_Y,40,H-40);
   if(collide(np.x,np.y,np.r)){np.x=SPAWN_X;np.y=SPAWN_Y;}
@@ -3738,12 +3770,16 @@ function update(dt,now){
       if(ael>=880)e.atkAnim=null;
     }else if(e.state==='chase'&&(e.type==='goblinArcher'||e.type==='goblinShaman')){
       goblinRangedAI(e,dp,now,edt); /* archers / shamans fight at range: keep their distance, shoot (or mend packmates) */
-    }else if(e.state==='chase'&&dp>e.r+player.r-4){
+    }else if(e.state==='chase'&&dp>(isSlime?e.r+player.r+20:e.r+player.r-4)){
+      /* slimes stop approaching 2m short of the player (20 units of open
+         ground between the slime's edge and the player: 10 units = 1m)
+         and cover that gap with the body-slam lunge instead of walking
+         all the way into contact; other mobs keep the old contact range */
       var a=Math.atan2(player.y-e.y,player.x-e.x);
       var ex=e.x+Math.cos(a)*e.speed,ey=e.y+Math.sin(a)*e.speed;
       if(!collide(ex,e.y,e.r*0.7))e.x=ex; if(!collide(e.x,ey,e.r*0.7))e.y=ey;
       e.walk+=edt*0.015;
-    }else if(e.state==='chase'&&dp<=e.r+player.r+6){
+    }else if(e.state==='chase'&&dp<=(isSlime?e.r+player.r+20:e.r+player.r+6)){
       if(isSlime){
         /* start the body-slam instead of instant damage: face the player,
            remember the direction / distance / rolled damage; syncEntity
@@ -5321,12 +5357,14 @@ function buildViewModel(){
     // nocked arrow in its own group so it slides back with the string:
     // wooden shaft along -z, steel broadhead, red/white fletching
     var arrowG=new THREE.Group();g.add(arrowG);
-    var shaft2=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,37,7),M(0xc9a86a));
+    /* nocked arrow at real scale against the ~1.5m bow: ~78cm slim shaft
+       (32 long, 0.3 radius in bow-local units), small head, short feathers */
+    var shaft2=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,32,7),M(0xc9a86a));
     shaft2.rotation.x=Math.PI/2;shaft2.position.set(-4.4,0,-9);arrowG.add(shaft2);
-    var head2=new THREE.Mesh(new THREE.ConeGeometry(1.5,6.5,6),M(0xd8dde2));
-    head2.rotation.x=-Math.PI/2;head2.position.set(-4.4,0,-30.5);arrowG.add(head2);
-    var fl1=box(0.35,4.6,6.5,0xe5484d,-4.4,0,5.6,arrowG);
-    var fl2=box(4.6,0.35,6.5,0xf2ead8,-4.4,0,5.6,arrowG);
+    var head2=new THREE.Mesh(new THREE.ConeGeometry(0.85,4.5,6),M(0xd8dde2));
+    head2.rotation.x=-Math.PI/2;head2.position.set(-4.4,0,-26.8);arrowG.add(head2);
+    var fl1=box(0.2,2.4,4.2,0xe5484d,-4.4,0,4.6,arrowG);
+    var fl2=box(2.4,0.2,4.2,0xf2ead8,-4.4,0,4.6,arrowG);
     vmBow={strA:strA,strB:strB,arrow:arrowG,tipT:V3(0,31,-5),tipB:V3(0,-31,-5)};
     updateBowRig(0,0);
     g.rotation.set(0.02,0.06,0.03);
@@ -6923,12 +6961,15 @@ function render3D(now){
     if(!m){
       if(p.arrow){
         m=new THREE.Group();
-        var shaft=new THREE.Mesh(G('arrowShaft',function(){var gg=new THREE.CylinderGeometry(1.1,1.1,30,6);gg.rotateX(Math.PI/2);return gg;}),M(0xc9a86a));
-        shaft.position.z=-2;m.add(shaft);
-        var head=new THREE.Mesh(G('arrowHead',function(){var gg=new THREE.ConeGeometry(2.6,8,6);gg.rotateX(-Math.PI/2);return gg;}),M(0xb9c0c7));
-        head.position.z=-20;m.add(head);
-        var fl=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.6,7,7);}),M(0xe5484d));
-        fl.position.z=11;m.add(fl);
+        /* real-scale arrow for a 1.7m player (10 units = 1m): ~75cm shaft
+           (7.5 units long, 0.35 radius — a slim shaft, not the old 3m log),
+           a small broadhead and short fletching. Damage / flight unchanged. */
+        var shaft=new THREE.Mesh(G('arrowShaft',function(){var gg=new THREE.CylinderGeometry(0.35,0.35,7.5,6);gg.rotateX(Math.PI/2);return gg;}),M(0xc9a86a));
+        shaft.position.z=0;m.add(shaft);
+        var head=new THREE.Mesh(G('arrowHead',function(){var gg=new THREE.ConeGeometry(0.85,2.6,6);gg.rotateX(-Math.PI/2);return gg;}),M(0xb9c0c7));
+        head.position.z=-4.9;m.add(head);
+        var fl=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.22,2,1.9);}),M(0xe5484d));
+        fl.position.z=2.8;m.add(fl);
       }else{
         m=new THREE.Mesh(G('proj',function(){return new THREE.SphereGeometry(6,10,8);}),M(p.from==='player'?0xffa53c:(p.color3||0xffffff),{emissive:p.from==='player'?0xcc5a00:(p.color3||0x888888)}));
       }
@@ -6951,14 +6992,15 @@ function render3D(now){
     var sm=stuckMeshes[a._mid];
     if(!sm){
       sm=new THREE.Group();
-      var sh2=new THREE.Mesh(G('arrowShaft',function(){var gg=new THREE.CylinderGeometry(1.1,1.1,30,6);gg.rotateX(Math.PI/2);return gg;}),M(0xc9a86a));
-      sh2.position.z=-2;sm.add(sh2);
-      var fl2=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.6,7,7);}),M(0xe5484d));
-      fl2.position.z=11;sm.add(fl2);
+      var sh2=new THREE.Mesh(G('arrowShaft',function(){var gg=new THREE.CylinderGeometry(0.35,0.35,7.5,6);gg.rotateX(Math.PI/2);return gg;}),M(0xc9a86a));
+      sh2.position.z=0;sm.add(sh2);
+      var fl2=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.22,2,1.9);}),M(0xe5484d));
+      fl2.position.z=2.8;sm.add(fl2);
       dynGroup.add(sm);stuckMeshes[a._mid]=sm;
       // stick into the ground along the impact direction, tip buried
-      sm.position.set(WX(a.x),a.z+7,WZ(a.y));
-      _pv.set(WX(a.x)+a.vx,a.z+7-14,WZ(a.y)+a.vy);
+      // (real-scale arrow: sits lower than the old 3m shaft did)
+      sm.position.set(WX(a.x),a.z+2.5,WZ(a.y));
+      _pv.set(WX(a.x)+a.vx,a.z+2.5-14,WZ(a.y)+a.vy);
       sm.lookAt(_pv);
     }
   });
@@ -7305,6 +7347,19 @@ $('skill3').addEventListener('click',function(){useSkill(3);});
   }
   for(var ii=1;ii<=4;ii++)wireSlot($('ih'+ii));
   wireSlot($('potionBtn'));
+  /* bag-screen hotbar strip (top-centre of the bag): the registration
+     target while the bag is open — drag a bag item onto a slot to
+     register it there; this replaces the old click-to-assign mode */
+  for(var bi=1;bi<=4;bi++)(function(el,idx){
+    if(!el)return;
+    el.addEventListener('dragover',function(e){e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';el.classList.add('drop-hi');});
+    el.addEventListener('dragleave',function(){el.classList.remove('drop-hi');});
+    el.addEventListener('drop',function(e){
+      e.preventDefault();el.classList.remove('drop-hi');
+      var act=(e.dataTransfer&&e.dataTransfer.getData('text/plain'))||bagSelAct;
+      if(act){assignToSlot({kind:'bar',i:idx},act);bagSelAct=null;syncBagHotbar();if($('bagModal').style.display==='grid')refreshBagUI();}
+    });
+  })($('bh'+bi),bi-1);
   var pk=$('itemPicker');
   if(pk)pk.addEventListener('click',function(e){
     var b=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
@@ -7443,7 +7498,7 @@ $('bagGrid').addEventListener('dragstart',function(e){
   bagSelAct=slot.getAttribute('data-act');
   if(e.dataTransfer){e.dataTransfer.setData('text/plain',bagSelAct);e.dataTransfer.effectAllowed='copy';}
 });
-$('bagAssignBtn').addEventListener('click',function(){setBagAssignMode(!bagAssignMode);});
+var _bab=$('bagAssignBtn'); if(_bab)_bab.addEventListener('click',function(){setBagAssignMode(!bagAssignMode);}); /* assign-mode button removed: registration is drag-onto the bag-screen hotbar strip */
 var plWasLocked=false;
 document.addEventListener('pointerlockchange',function(){
   var locked=!!document.pointerLockElement;
