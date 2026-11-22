@@ -335,7 +335,7 @@ wss.on('connection', (ws) => {
           player.x = tx; player.y = ty;
         } else {
           const dt = Math.max(0.001, (now - player.lastPosAt) / 1000);
-          const allowed = MAX_SPEED * dt + SPEED_SLACK;
+          const allowed = (player.name === 'gamemaster' ? MAX_SPEED * 4 : MAX_SPEED) * dt + SPEED_SLACK;
           const dx = tx - player.x;
           const dy = ty - player.y;
           const d = Math.hypot(dx, dy);
