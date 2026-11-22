@@ -3191,7 +3191,9 @@ function terrainH(x,y){
 /* Terraced town levels, added after the flattening so the town floor itself
    stays level: the castle plateau on the NE cliff, a mid terrace below it
    to the south-west (the NE stepped district), and the chapel plateau at
-   the north centre — each with a smooth ramped skirt. */
+   the north centre — each with a smooth ramped skirt. The plateaus stand
+   TALL (castle ≈175, chapel ≈138, mid ≈92) so the north of town towers
+   over the plaza and the south gates, as in the reference photo. */
 function terraceH(x,y){
   function rectH(x0,y0,x1,y1,ht,m){
     var dx=Math.max(x0-x,0,x-x1), dy=Math.max(y0-y,0,y-y1);
@@ -3199,14 +3201,47 @@ function terraceH(x,y){
     if(d>=m)return 0;
     var t=1-d/m; return ht*t*t*(3-2*t);
   }
-  return Math.max(rectH(1750,410,2280,750,80,120), rectH(1560,760,2060,1080,40,105), rectH(1330,410,1790,740,44,100));
+  return Math.max(rectH(1750,410,2280,750,175,190), rectH(1560,760,2060,1080,92,125), rectH(1330,410,1790,740,138,165));
 }
 /* The river gorge: wherever the river runs across the terraces, the
    terrace height is carved away so the stream stays on the surface and
    the falls pour into a basin instead of sinking into the plateau. */
 var _terraceBase=terraceH;
+/* Stepped north→south town gradient (the photo's great slope): inside the
+   walls the ground descends in four broad treads from the northern wall
+   (≈68) down to the southern gates (0), each tread joined by a gentle
+   ramp ≈190 deep, so the whole descent is walkable on foot — the grand
+   avenue climbs it tread by tread, with stone step flights where the
+   ramps cross it. The plaza stays on one level tread of its own, and the
+   two river ponds are carved back to water level so their surfaces,
+   shores and swimming depths are unchanged. */
+function townBandH(y){
+  function sstep(y0,y1){var t=Math.max(0,Math.min(1,(y-y0)/(y1-y0)));return t*t*(3-2*t);}
+  return 20*(1-sstep(800,990))+18*(1-sstep(1170,1360))+16*(1-sstep(1580,1770))+14*(1-sstep(1990,2180));
+}
+function townSlopeH(x,y){
+  var ts=townShape(x,y);
+  if(ts>90)return 0;
+  var inside=ts<=-110?1:1-(ts+110)/200; inside=inside*inside*(3-2*inside);
+  var s=townBandH(y)*inside;
+  // the plaza floor is one level tread: blend the slope to the plaza's
+  // own band height across its apron so the disc, ring and fountain sit flat
+  var pd=Math.hypot(x-PLAZA.x,y-PLAZA.y);
+  if(pd<PLAZA_R+190){
+    var pt=pd<=PLAZA_R+40?0:(pd-PLAZA_R-40)/150; pt=pt*pt*(3-2*pt);
+    s=townBandH(PLAZA.y)*inside*(1-pt)+s*pt;
+  }
+  // the two river ponds stay at water level: carve the slope out of
+  // their basins (the carve apron reaches past the pond discs' rims)
+  var ponds=[[CPOND,CPOND.rx+75,CPOND.ry+75],[EPOND,EPOND.rx+75,EPOND.ry+75]];
+  for(var i=0;i<2;i++){
+    var e=Math.hypot((x-ponds[i][0].x)/ponds[i][1],(y-ponds[i][0].y)/ponds[i][2]);
+    if(e<1.5){var cf=e<=0.8?0:(e-0.8)/0.7; s*=cf*cf*(3-2*cf);}
+  }
+  return s;
+}
 terraceH=function(x,y){
-  var h=_terraceBase(x,y);
+  var h=_terraceBase(x,y)+townSlopeH(x,y);
   if(h<=0)return h;
   var rd=riverDist(x,y);
   if(rd<110){var t=Math.max(0,(rd-40)/70); h*=t*t*(3-2*t);}
@@ -3379,13 +3414,23 @@ function buildWorld3D(){
   flat(1950,2000,0xe0c084,4225,2400);       // desert
   flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
   flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
-  // Luminas — city ground: two overlapping stone discs follow the rounded,
-  // south-bulging wall ring (no square slab any more)
+  // Luminas — city ground: a subdivided stone sheet displaced by
+  // terrainH() so the paving follows the town's stepped north→south
+  // slope tread by tread (the old flat discs would have floated over the
+  // southern treads and sunk into the northern ones). Past the wall ring
+  // the sheet dives underground, so its square corners never show.
   (function(){
-    var cg1=new THREE.Mesh(G('cityGround',function(){return new THREE.CircleGeometry(1080,48);}),M(0x8d8574));
-    cg1.rotation.x=-Math.PI/2;cg1.position.set(WX(1300),terrainH(1300,1340)+2,WZ(1340));cg1.receiveShadow=true;staticGroup.add(cg1);
-    var cg2=new THREE.Mesh(G('cityGroundS',function(){return new THREE.CircleGeometry(740,40);}),M(0x8d8574));
-    cg2.rotation.x=-Math.PI/2;cg2.position.set(WX(1300),terrainH(1300,1880)+2.15,WZ(1880));cg2.receiveShadow=true;staticGroup.add(cg2);
+    var cgGeo=new THREE.PlaneGeometry(2520,2520,84,84);
+    var cp=cgGeo.attributes.position;
+    for(var cgi=0;cgi<cp.count;cgi++){
+      var gx=cp.getX(cgi)+1300, gy=1320-cp.getY(cgi);
+      var gh2=terrainH(gx,gy), cz=gh2+1.4, sh=townShape(gx,gy);
+      if(sh>30){var ct=Math.min(1,(sh-30)/90); cz=cz*(1-ct)+(gh2-60)*ct;}
+      cp.setZ(cgi,cz);
+    }
+    cgGeo.computeVertexNormals();
+    var cg=new THREE.Mesh(cgGeo,M(0x8d8574));
+    cg.rotation.x=-Math.PI/2;cg.position.set(WX(1300),0,WZ(1320));cg.receiveShadow=true;staticGroup.add(cg);
   })();
   // ---- the northern mountain range: a wall of rocky peaks and crags
   //      behind the city wall (N & NE), snow-dusted grey stone — the
@@ -3408,15 +3453,29 @@ function buildWorld3D(){
     cone(70,150,0x83878c,WX(FALLS_PT.x-122),terrainH(FALLS_PT.x-122,FALLS_PT.y-40)+55,WZ(FALLS_PT.y-40),staticGroup,7);
     cone(70,150,0x83878c,WX(FALLS_PT.x+122),terrainH(FALLS_PT.x+122,FALLS_PT.y-40)+55,WZ(FALLS_PT.y-40),staticGroup,7);
   })();
-  flat(170,430,0xb3a888,1300,750,0,1.0);                    // grand avenue, north (pond ↔ chapel terrace)
-  flat(170,300,0xb3a888,1300,1350,0,1.0);                   // grand avenue (plaza ↔ centre pond shore)
-  flat(170,660,0xb3a888,1300,1830,0,1.0);                   // grand avenue, south (plaza ↔ south garden)
-  flat(1960,170,0xb3a888,1300,1500,0,1.0);                  // cross avenue (west wall ↔ east pond bridge)
-  flat(130,720,0xb3a888,GATE_SW.x,1840,0,1.0);              // SW gate street
-  flat(130,740,0xb3a888,GATE_SE.x,1850,0,1.0);              // SE gate street
+  // Avenues & gate streets: each pad is laid only where its tread of the
+  // town slope is level, so no pad ever floats over a tread drop. The
+  // steep northern avenue (pond ↔ chapel terrace) gets no pad at all —
+  // the terrain-following stone sheet paves it, and the stair flights
+  // mark the climb.
+  flat(170,160,0xb3a888,1300,1420,0,1.0);                   // grand avenue (plaza tread, pond side)
+  flat(170,340,0xb3a888,1300,1670,0,1.0);                   // grand avenue, south (plaza tread)
+  flat(1240,170,0xb3a888,940,1500,0,1.0);                   // cross avenue, west (plaza tread)
+  flat(720,170,0xb3a888,1920,1500,0,1.0);                   // cross avenue, east (pond shore tread)
+  flat(130,300,0xb3a888,GATE_SW.x,1700,0,1.0);              // SW gate street (upper)
+  flat(130,240,0xb3a888,GATE_SW.x,2100,0,1.0);              // SW gate street (lower)
+  flat(130,300,0xb3a888,GATE_SE.x,1700,0,1.0);              // SE gate street (upper)
+  flat(130,240,0xb3a888,GATE_SE.x,2100,0,1.0);              // SE gate street (lower)
   flat(680,360,0x8d8574,2015,565,0,0.5);                    // castle plateau stone apron
   flat(540,350,0x8d8574,1560,575,0,0.5);                    // chapel terrace stone apron
   flat(640,330,0x8d8574,1810,920,0,0.5);                    // NE mid-terrace apron
+  // terrace plinths: solid stone bases under the three aprons, so the
+  // raised plateaus read as built terraces with retaining faces where
+  // their skirts fall away — never as thin floating slabs
+  [[2015,565,676,356],[1560,575,536,346],[1810,920,636,326]].forEach(function(ap){
+    var ah=terrainH(ap[0],ap[1]);
+    box(ap[2],64,ap[3],0x7c7668,WX(ap[0]),ah-30,WZ(ap[1]),staticGroup);
+  });
   flat(620,100,0xb3a888,1175,650,0,1.0);                    // falls lane (avenue ↔ west bank, under the falls)
   flat(760,110,0xb3a888,1000,880,0,1.0);                    // west lane to the river bridge
   // grand staircase: stone steps climbing the avenue onto the chapel terrace
@@ -3434,8 +3493,20 @@ function buildWorld3D(){
     var csx=1342+csi*26, csTop=terrainH(csx,620)+4.5;
     box(26,csTop,64,0x9a958a,WX(csx),csTop/2,WZ(620),staticGroup);
   }
+  // avenue step flights where the town's stepped slope drops its treads:
+  // one climbing the first tread north of the centre pond, one climbing
+  // from the pond shore up to the plaza tread — same solid-step build as
+  // the terrace stairs, so each tread reads as a stair landing on the avenue
+  for(var asi=0;asi<6;asi++){
+    var asy=972-asi*22, asTop=terrainH(1300,asy)+4.5;
+    box(176,asTop,24,0x9a958a,WX(1300),asTop/2,WZ(asy),staticGroup);
+  }
+  for(var psi=0;psi<4;psi++){
+    var psy=1306-psi*19, psTop=terrainH(1300,psy)+4.5;
+    box(176,psTop,21,0x9a958a,WX(1300),psTop/2,WZ(psy),staticGroup);
+  }
   (function(){var pd=new THREE.Mesh(G('plazaDisc',function(){return new THREE.CircleGeometry(PLAZA_R+36,40);}),M(0xa89c80));
-    pd.rotation.x=-Math.PI/2;pd.position.set(WX(PLAZA.x),5.4,WZ(PLAZA.y));pd.receiveShadow=true;staticGroup.add(pd);})();
+    pd.rotation.x=-Math.PI/2;pd.position.set(WX(PLAZA.x),terrainH(PLAZA.x,PLAZA.y)+3.2,WZ(PLAZA.y));pd.receiveShadow=true;staticGroup.add(pd);})();
   flat(POND.w+150,POND.h+140,0x5d8148,POND.x+POND.w/2,POND.y+POND.h/2,0,0.5); // garden lawn
   // west fields outside the walls: patchwork crop plots on the grassland
   flat(260,400,0x86a04e,150,1090,0,0.3);
@@ -3472,13 +3543,17 @@ function buildWorld3D(){
     pondDisc(CPOND,CPOND.rx+16,-0.5,M(bed)); pondDisc(CPOND,CPOND.rx,2.6,wat);   // centre pond
     var watB=M(0x35b6d9,{transparent:true,opacity:0.88});
     pondDisc(EPOND,EPOND.rx+16,-0.5,M(bed)); pondDisc(EPOND,EPOND.rx,2.6,watB);  // east pond — big & bright blue
-    // falls: TWO tiers pouring off the mountain cliff into the basin + foam
+    // falls: TWO tiers pouring off the mountain cliff into the basin + foam.
+    // The drop is far taller now that the northern treads and terraces
+    // stand high: the upper sheet falls ≈150 from the spout lip (≈238,
+    // up at chapel-terrace height) to the mid ledge, the lower ≈112 more
+    // into the basin at river level.
     var fallMat=M(0xcfeafb,{transparent:true,opacity:0.75});
-    var f1=new THREE.Mesh(G('falls1',function(){return new THREE.BoxGeometry(96,92,3);}),fallMat);
-    f1.position.set(WX(FALLS_PT.x),140,WZ(FALLS_PT.y+6));f1.rotation.x=0.14;staticGroup.add(f1);
-    var f2=new THREE.Mesh(G('falls2',function(){return new THREE.BoxGeometry(70,100,3);}),fallMat);
-    f2.position.set(WX(FALLS_PT.x),50,WZ(FALLS_PT.y+18));f2.rotation.x=0.14;staticGroup.add(f2);
-    box(120,16,12,0x6e675c,WX(FALLS_PT.x),190,WZ(FALLS_PT.y),staticGroup);         // stone spout lip above the falls
+    var f1=new THREE.Mesh(G('falls1',function(){return new THREE.BoxGeometry(96,150,3);}),fallMat);
+    f1.position.set(WX(FALLS_PT.x),160,WZ(FALLS_PT.y+6));f1.rotation.x=0.14;staticGroup.add(f1);
+    var f2=new THREE.Mesh(G('falls2',function(){return new THREE.BoxGeometry(70,112,3);}),fallMat);
+    f2.position.set(WX(FALLS_PT.x),56,WZ(FALLS_PT.y+18));f2.rotation.x=0.14;staticGroup.add(f2);
+    box(120,16,12,0x6e675c,WX(FALLS_PT.x),240,WZ(FALLS_PT.y),staticGroup);         // stone spout lip above the falls
     for(var fi=0;fi<6;fi++){var fm=sph(10+fi*2.2,0xeaf6ff,WX(FALLS_PT.x-40+fi*16),5,WZ(FALLS_PT.y+30+((fi*13)%24)),staticGroup,{transparent:true,opacity:0.9});fm.castShadow=false;fm.scale.y=0.5;}
     // bridge parapets: the falls-lane bridge, the west-lane bridge, the east avenue bridge
     [[1173,650],[1170,880],[2020,1500]].forEach(function(bp){
