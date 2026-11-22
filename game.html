@@ -1574,34 +1574,59 @@ function regionAt(x,y){
   if(x<1500&&y>3250) return 'deepforest';
   return 'green';
 }
-/* ===== THE TOWN OF LUMINAS (rebuilt life-size from the reference paintings) =====
-   One town, seen in the paintings from several angles, rebuilt at full
-   walking scale on the cleared land:
-   - a rounded stone wall (ellipse, bulging south) with a walkway rim and
-     merlons; the only gates are SOUTH-WEST and SOUTH-EAST, each a gatehouse
-     with twin towers, an arch beam, open wooden doors and ivy.
-   - north behind the wall: a rocky mountain ridge with conifer slopes.
-   - a waterfall in two tiers off a crag at north-centre-west, feeding a
+/* ===== THE TOWN OF LUMINAS (rebuilt to match the diorama photograph) =====
+   The town exactly as the overhead diorama photo shows it, at full
+   walking scale (10 units = 1m; the player is 1.7m / 17 units tall and
+   every building is sized against that — house eaves ≈3.8m, ridges
+   7.4–8.6m, wall ≈9–10m, gate arch ≈5.3m, clock tower ≈23m, the chapel
+   and castle larger still):
+   - a stone wall whose outline is a SQUARISH superellipse (rounded
+     corners, long straight runs) with a walkway rim, merlons and square
+     towers implied by the merlon rhythm; the only gates are SOUTH
+     (centre) and SOUTH-WEST, each a gatehouse with twin towers, an arch
+     beam, open wooden doors and ivy. A dirt road leaves each gate; by
+     the SW gate stand a wooden watchtower and camp tents.
+   - north behind the wall: a rocky mountain ridge with conifer slopes;
+     outside the west wall a conifer forest, south of it grassland, and
+     bare rock to the north-east.
+   - a waterfall in two tiers off a crag at north-centre, feeding a
      river that runs south to the CENTRAL POND (just north of the plaza),
-     turns east to the larger EAST POND, then leaves through a water gate
-     in the south-east wall. Stone fords + wooden bridges cross it twice.
-   - the FOUNTAIN PLAZA sits centre-south; spawn is on its south edge.
-   - the CLOCK TOWER stands west among the timber-framed houses.
+     turns south-east to the larger EAST POND by the east wall, then
+     leaves through a water gate in the south-east wall. An arched stone
+     bridge crosses the river west of the central pond, a ford bridge
+     links the ponds, and a small bridge crosses the east pond's outlet.
+   - the FOUNTAIN PLAZA sits centre-south: a big circular stone-paved
+     plaza with the fountain at its centre; spawn is on its south edge.
+   - the CLOCK TOWER stands west-centre among the timber-framed houses.
    - the blue-glowing CHAPEL stands on the high NE terrace, the CASTLE
-     further north-east on its own rock; broad stone steps climb the
-     terraces on the north-east side.
+     east of it on its own rock terrace; a broad diagonal stone ramp /
+     stair climbs from the plaza's NE side up to those terraces.
+   - houses cluster west (around the clock tower), on the river's west
+     bank to the north, south of the plaza and around the east pond;
+     each one faces its street / the plaza / the water, built as a stone
+     ground floor under a timber-framed white upper floor, with a
+     brown-to-orange roof, chimney, dormers and — on the shopfronts —
+     coloured awnings like the market stalls.
    The whole walled interior is the safe zone: no mob spawns inside, mobs
    found inside are removed by the despawn sweep, and players inside
    slowly heal (isSafe). */
 var TOWN_CX=1300, TOWN_CY=1680, TOWN_RX=660, TOWN_RY=610;
+var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
 var POND_C={x:1250,y:1460,r:125};   /* central pond, just north of the plaza */
-var POND_E={x:1700,y:1580,r:150};   /* the larger east pond */
+var POND_E={x:1700,y:1580,r:150};   /* the larger east pond, by the east wall */
 var POOL={x:1168,y:1290,r:72};      /* plunge pool under the falls */
-var RIVER=[[1168,1290],[1180,1352],[1215,1362],[1240,1420],[1250,1460],[1400,1470],[1470,1468],[1600,1500],[1700,1580],[1740,1720],[1790,1900],[1830,2060],[1870,2240]];
-var BRIDGES=[{x:1215,y:1362,rot:0},{x:1470,y:1468,rot:Math.PI/2}]; /* stone fords with wooden decks */
+var RIVER=[[1168,1290],[1180,1352],[1215,1362],[1240,1420],[1250,1460],[1400,1470],[1470,1468],[1600,1500],[1700,1580],[1740,1720],[1800,1880],[1845,2010],[1901,2111],[2000,2185]]; /* the [1901,2111] point sits exactly on the wall: the SE water gate */
+var BRIDGES=[{x:1215,y:1362,rot:0},{x:1470,y:1468,rot:Math.PI/2},{x:1740,y:1705,rot:0.4}]; /* arched bridge W of the central pond / ford between the ponds / small bridge over the east pond's outlet */
 var SPAWN_X=1300, SPAWN_Y=1870;     /* south edge of the fountain plaza */
 var SAFE_R=170;
-function townNorm(x,y){var dx=(x-TOWN_CX)/TOWN_RX, dy=(y-TOWN_CY)/TOWN_RY; return Math.sqrt(dx*dx+dy*dy);}
+function townNorm(x,y){var dx=Math.abs((x-TOWN_CX)/TOWN_RX), dy=Math.abs((y-TOWN_CY)/TOWN_RY); return Math.pow(Math.pow(dx,TOWN_P)+Math.pow(dy,TOWN_P),1/TOWN_P);}
+/* point on the wall outline in ray direction t (radians, game plane):
+   the ray from the town centre meets the superellipse at norm 1 */
+function townWallPoint(t){
+  var c=Math.cos(t), s=Math.sin(t);
+  var r=1/Math.pow(Math.pow(Math.abs(c)/TOWN_RX,TOWN_P)+Math.pow(Math.abs(s)/TOWN_RY,TOWN_P),1/TOWN_P);
+  return {x:TOWN_CX+c*r, y:TOWN_CY+s*r};
+}
 function inTown(x,y){return townNorm(x,y)<=1.0;}
 function inNoSpawn(x,y){return townNorm(x,y)<=1.07||Math.hypot(x-SPAWN_X,y-SPAWN_Y)<=SAFE_R;}
 var townFeatures=[]; /* render instructions for buildTown3D(), filled by buildTownData() */
@@ -1613,38 +1638,74 @@ function buildTownData(){
   var seed=777001;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
   function rect(cx,cy,w,h,flags){var o={type:'rect',x:cx-w/2,y:cy-h/2,w:w,h:h,c:"#8a8172",town:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
   function circ(x,y,r,flags){var o={type:'circle',x:x,y:y,r:r,town:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
-  /* --- city wall: stone segments following the rounded outline, with gaps
-     at the two gates and at the river's water gate --- */
-  var gateA=[55*Math.PI/180,125*Math.PI/180];
-  var riverA=Math.atan2((2060-TOWN_CY)/TOWN_RY,(1830-TOWN_CX)/TOWN_RX);
-  for(var t=0;t<Math.PI*2;t+=0.052){
+  /* --- city wall: stone segments following the rounded-square outline,
+     with gaps at the two gates and at the river's water gate --- */
+  var gateA=[94*Math.PI/180,136*Math.PI/180]; /* south-centre gate, then the south-west gate */
+  var riverA=Math.atan2(RIVER[RIVER.length-2][1]-TOWN_CY,RIVER[RIVER.length-2][0]-TOWN_CX); /* direction of the river's wall crossing (its water-gate point) */
+  function wallTan(a){var p1=townWallPoint(a-0.02), p2=townWallPoint(a+0.02); var dx=p2.x-p1.x, dy=p2.y-p1.y, l=Math.hypot(dx,dy)||1; return {x:dx/l,y:dy/l};}
+  for(var t=0;t<Math.PI*2;t+=0.048){
     var da=Math.min(Math.abs(t-gateA[0]),Math.abs(t-gateA[1]),Math.abs(t-riverA));
     da=Math.min(da,Math.PI*2-da);
-    if(da<0.10)continue;
-    var wx=TOWN_CX+Math.cos(t)*TOWN_RX, wy=TOWN_CY+Math.sin(t)*TOWN_RY;
-    rect(wx,wy,58,58,{wall:true,topKind:'wall',topH:100}); /* topH = the wall walkway's visible top (cap slab) above the terrain: collision ends there */
-    townFeatures.push({kind:'wall',x:wx,y:wy,seed:rnd()});
+    if(da<0.09)continue;
+    var wp=townWallPoint(t);
+    rect(wp.x,wp.y,58,58,{wall:true,topKind:'wall',topH:90}); /* topH = the wall walkway's visible top (cap slab, ≈9m) above the terrain: collision ends there */
+    townFeatures.push({kind:'wall',x:wp.x,y:wp.y,seed:rnd()});
   }
-  /* --- gates (SW & SE): twin towers flanking the opening --- */
+  /* --- gates (south-centre & SW): twin towers flanking the opening --- */
+  var gatePts=[];
   gateA.forEach(function(ga){
-    var gx=TOWN_CX+Math.cos(ga)*TOWN_RX, gy=TOWN_CY+Math.sin(ga)*TOWN_RY;
-    var tx=-Math.sin(ga)*TOWN_RY, ty=Math.cos(ga)*TOWN_RX, tl=Math.hypot(tx,ty); tx/=tl; ty/=tl;
-    circ(gx+tx*62,gy+ty*62,34,{tower:true});
-    circ(gx-tx*62,gy-ty*62,34,{tower:true});
+    var gp=townWallPoint(ga), gx=gp.x, gy=gp.y;
+    var tn=wallTan(ga), tx=tn.x, ty=tn.y;
+    circ(gx+tx*58,gy+ty*58,30,{tower:true});
+    circ(gx-tx*58,gy-ty*58,30,{tower:true});
     townFeatures.push({kind:'gate',x:gx,y:gy,tx:tx,ty:ty,seed:rnd()});
+    gatePts.push({x:gx,y:gy,tx:tx,ty:ty});
   });
   /* --- water gate (SE): stub towers + an iron grate over the river --- */
-  var rxp=TOWN_CX+Math.cos(riverA)*TOWN_RX, ryp=TOWN_CY+Math.sin(riverA)*TOWN_RY;
-  var rtx=-Math.sin(riverA)*TOWN_RY, rty=Math.cos(riverA)*TOWN_RX, rl=Math.hypot(rtx,rty); rtx/=rl; rty/=rl;
-  circ(rxp+rtx*66,ryp+rty*66,26,{tower:true});
-  circ(rxp-rtx*66,ryp-rty*66,26,{tower:true});
+  var rwp=townWallPoint(riverA), rxp=rwp.x, ryp=rwp.y;
+  var rtn=wallTan(riverA), rtx=rtn.x, rty=rtn.y;
+  circ(rxp+rtx*62,ryp+rty*62,24,{tower:true});
+  circ(rxp-rtx*62,ryp-rty*62,24,{tower:true});
   townFeatures.push({kind:'watergate',x:rxp,y:ryp,tx:rtx,ty:rty});
+  /* --- outside the gates: a dirt road leaves each one; by the SW gate
+     (the photo's little outpost) stand a wooden watchtower and tents --- */
+  gatePts.forEach(function(gp){
+    var ox=gp.x-TOWN_CX, oy=gp.y-TOWN_CY, ol=Math.hypot(ox,oy)||1; ox/=ol; oy/=ol;
+    townFeatures.push({kind:'road',x:gp.x,y:gp.y,dx:ox,dy:oy,n:5});
+  });
+  (function(){
+    var gp=gatePts[1]; if(!gp)return; /* the SW gate */
+    var ox=gp.x-TOWN_CX, oy=gp.y-TOWN_CY, ol=Math.hypot(ox,oy)||1; ox/=ol; oy/=ol;
+    var wtx=gp.x+ox*235, wty=gp.y+oy*235;
+    circ(wtx,wty,20,{tower:true});
+    townFeatures.push({kind:'watchtower',x:wtx,y:wty});
+    [[175,78],[185,-82]].forEach(function(off,i){
+      var ex=gp.x+ox*off[0]+(-oy)*off[1], ey=gp.y+oy*off[0]+ox*off[1];
+      rect(ex,ey,48,42,{stall:true});
+      townFeatures.push({kind:'tent',x:ex,y:ey,rot:i*0.7-0.3,seed:rnd()});
+    });
+  })();
   /* --- houses: timber-framed, clustered along the west streets, south of
      the plaza, around the east pond and on the terraces --- */
-  var HOUSES=[[880,1420,110,95],[860,1700,120,100],[900,1880,105,90],[1040,1960,115,95],[800,1540,100,90],[760,1800,110,100],[975,1250,95,85],
-    [1055,1350,95,85],[1070,1510,90,80],[1120,1620,90,80],[900,2070,105,90],[1080,2070,110,95],[1260,2070,115,95],[1440,2070,110,95],[1680,2060,105,90],
-    [1850,1720,110,95],[1620,1830,115,100],[1540,1420,100,85],[1480,1700,105,90],[1660,1930,110,95],[1600,1700,90,80],[1400,1325,95,85],[1330,1180,90,80]];
-  HOUSES.forEach(function(hs){rect(hs[0],hs[1],hs[2],hs[3],{house:true,topKind:'house'});townFeatures.push({kind:'house',x:hs[0],y:hs[1],w:hs[2],d:hs[3],seed:rnd()});});
+  /* --- houses: [x, y, w, d, facing°] — the facing is the direction the
+     front (door / shop awning) looks, in game-plane degrees where the
+     front vector is (sin°, cos°): each house faces its street, the
+     plaza or the water, and each block sits at its own angle, exactly
+     as the photo's streets are laid out. Clusters: west around the
+     clock tower / the river's west bank to the north / south of the
+     plaza / around the east pond / the terraces. --- */
+  var HOUSES=[
+    [880,1420,110,95,95],[800,1540,100,90,80],[860,1700,120,100,100],[745,1825,110,100,85],[900,1880,105,90,65],[745,1975,100,90,105],
+    [975,1250,95,85,95],[1065,1365,95,85,85],[1070,1510,90,80,100],[1120,1620,90,80,115],
+    [900,2070,105,90,175],[1080,2070,110,95,185],[1260,2070,115,95,180],[1440,2070,110,95,170],[1035,1945,115,95,160],
+    [1850,1720,110,95,-95],[1620,1830,115,100,-125],[1675,1955,110,95,-160],[1690,2075,105,90,180],[1540,1420,100,85,120],[1480,1700,105,90,115],
+    [1400,1325,95,85,-48],[1330,1180,90,80,5]];
+  HOUSES.forEach(function(hs){
+    var rot=(hs[4]||0)*Math.PI/180, ca=Math.abs(Math.cos(rot)), sa=Math.abs(Math.sin(rot));
+    var o=rect(hs[0],hs[1],hs[2]*ca+hs[3]*sa,hs[2]*sa+hs[3]*ca,{house:true,topKind:'house'}); /* collision = the rotated footprint's bounding box */
+    o._cx=hs[0]; o._cy=hs[1]; o._rotY=rot; o._hw=hs[2]/2; o._hd=hs[3]/2; o._eave=38; o._roofH=Math.round(hs[2]*0.42); /* roof-top surface data for obstacleTopZAt() */
+    townFeatures.push({kind:'house',x:hs[0],y:hs[1],w:hs[2],d:hs[3],rot:rot,seed:rnd()});
+  });
   /* --- landmarks --- */
   circ(950,1560,42,{tower:true});  townFeatures.push({kind:'clocktower',x:950,y:1560});
   rect(1520,1240,170,120,{chapel:true}); townFeatures.push({kind:'chapel',x:1520,y:1240});
@@ -1657,6 +1718,11 @@ function buildTownData(){
   BRIDGES.forEach(function(b){townFeatures.push({kind:'bridge',x:b.x,y:b.y,rot:b.rot});});
   townFeatures.push({kind:'steps',x:1398,y:1450,dx:-1,dy:0.15,n:9});
   townFeatures.push({kind:'steps',x:1500,y:1352,dx:0.1,dy:1,n:10});
+  /* the photo's broad diagonal ramp: a wide stone stair climbing from
+     the plaza's NE side up to the mid terrace, and a second wide flight
+     from there up to the chapel / castle terrace */
+  townFeatures.push({kind:'steps',x:1462,y:1572,dx:0.5,dy:-0.866,n:13,w:150});
+  townFeatures.push({kind:'steps',x:1560,y:1400,dx:0.35,dy:-0.94,n:8,w:120});
   townFeatures.push({kind:'skirt',x0:1460,y0:1392,x1:1970,y1:1392});
   townFeatures.push({kind:'skirt',x0:1448,y0:1070,x1:1448,y1:1380});
   townFeatures.push({kind:'skirt',x0:1390,y0:1340,x1:1390,y1:1560});
@@ -1683,6 +1749,8 @@ function buildTownData(){
   function townTree(x,y,s){var d={x:x,y:y,kind:'tree',s:s||(22+rnd()*10),seed:rnd()*10};decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});}
   [[735,1470],[728,1600],[738,1730],[730,1860]].forEach(function(p){townTree(p[0],p[1],24);}); /* pine row inside the west wall */
   [[880,1170],[1260,1090],[1470,1130],[1900,1150],[1660,1090]].forEach(function(p){townTree(p[0],p[1],22+rnd()*8);});
+  [[520,1350],[468,1520],[545,1700],[462,1880],[560,2010],[385,1660],[430,1200]].forEach(function(p){townTree(p[0],p[1],24+rnd()*8);}); /* conifer forest outside the west wall (the photo's wooded west) */
+  [[980,2480],[1230,2520],[1560,2470]].forEach(function(p){townTree(p[0],p[1],20+rnd()*8);}); /* lone pines on the south grassland */
   for(var mi=0;mi<46;mi++){ /* conifers on the north mountain slopes */
     var mx2=430+rnd()*1560, my2=560+rnd()*430;
     if(Math.hypot(mx2-1150,my2-1120)<200)continue;
@@ -1693,6 +1761,7 @@ function buildTownData(){
   for(var ri=0;ri<26;ri++){townRock(400+rnd()*1650,520+rnd()*430,16+rnd()*30);}
   townRock(1095,1170,26); townRock(1215,1150,22); townRock(1105,1240,20); townRock(1225,1230,18);
   townRock(1690,1090,40); townRock(1860,1330,36); townRock(1560,1095,30);
+  townRock(2180,1080,34); townRock(2290,1250,26); townRock(2060,940,30); /* bare rock outside the NE wall, as in the photo */
 }
 function genWorld(){
   obstacles=[];decorations=[];
@@ -1769,11 +1838,20 @@ function obstacleTopZAt(o,x,y,margin){
       var t=Math.max(0,1-Math.abs(u)/(66*sc));
       return terrainH(o._cx,o._cy)-1+sc*(58+55*t);
     }
-    /* town house: axis-aligned, ridge along game Y, slope across X */
+    /* town house: rotated to face its street / plaza / river — the ridge
+       runs along local Z, the roof slope falls across local X, and the
+       top height follows the visible roof (eaves 3.8m, ridge 7.4–8.6m) */
+    if(o._rotY!==undefined){
+      var dx2=x-o._cx, dy2=y-o._cy, cr=Math.cos(o._rotY), sr2=Math.sin(o._rotY);
+      var lx=dx2*cr-dy2*sr2, lz=dx2*sr2+dy2*cr;
+      if(Math.abs(lx)>o._hw+mg||Math.abs(lz)>o._hd+mg)return -Infinity;
+      var t3=Math.max(0,1-Math.abs(lx)/(o._hw+11));
+      return terrainH(o._cx,o._cy)-2+(o._eave||38)+(o._roofH||40)*t3;
+    }
     var hx=o.x+o.w/2, hy=o.y+o.h/2;
     if(x<o.x-mg||x>o.x+o.w+mg||y<o.y-mg||y>o.y+o.h+mg)return -Infinity;
     var t2=Math.max(0,1-Math.abs(x-hx)/((o.w+22)/2));
-    return terrainH(hx,hy)-2+58+(o.w*0.5)*t2;
+    return terrainH(hx,hy)-2+38+(o.w*0.42)*t2;
   }
   return -Infinity;
 }
@@ -3141,8 +3219,9 @@ function drawMini(){
   patch(1950,150,2650,770,'#5d5a68');        // ruins
   patch(2650,150,3500,1000,'#5d5a68');       // forgotten ruins
   // the town of Luminas: wall ring, plaza disc and the NE terraces (under the water)
-  mctx.fillStyle='#6a6255';mctx.beginPath();mctx.ellipse(MX(TOWN_CX),MY(TOWN_CY),TOWN_RX*s,TOWN_RY*s,0,0,7);mctx.fill();
-  mctx.fillStyle='#3a5c38';mctx.beginPath();mctx.ellipse(MX(TOWN_CX),MY(TOWN_CY),(TOWN_RX-26)*s,(TOWN_RY-26)*s,0,0,7);mctx.fill();
+  function townPath(scale){mctx.beginPath();for(var mt=0;mt<=Math.PI*2+0.01;mt+=0.12){var mp=townWallPoint(mt);var px=MX(TOWN_CX+(mp.x-TOWN_CX)*scale),py=MY(TOWN_CY+(mp.y-TOWN_CY)*scale);if(mt===0)mctx.moveTo(px,py);else mctx.lineTo(px,py);}mctx.closePath();}
+  mctx.fillStyle='#6a6255';townPath(1);mctx.fill();
+  mctx.fillStyle='#3a5c38';townPath(0.955);mctx.fill();
   mctx.fillStyle='#7d7466';mctx.fillRect(MX(1440),MY(1055),(1990-1440)*s,(1385-1055)*s);
   mctx.fillStyle='#9a917e';mctx.beginPath();mctx.ellipse(MX(1300),MY(1760),165*s,165*s,0,0,7);mctx.fill();
   // lakes
@@ -3845,9 +3924,9 @@ function nearestPlaced(x,y,maxD){
    also removes its water surface and its swimming depth. Only the
    retaining skirts and the waterfall sheets stay fixed — the terrain
    itself depends on them. */
-var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1,bridge:1,steps:1};
-var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱',bridge:'橋',steps:'石段',water:'川・池の水'};
-var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:105,castle:125,fountain:55,lamp:26,stall:48,ruin:62,bridge:85,steps:78};
+var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1,bridge:1,steps:1,watchtower:1,tent:1};
+var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱',bridge:'橋',steps:'石段',water:'川・池の水',watchtower:'見張り塔',tent:'テント'};
+var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:105,castle:125,fountain:55,lamp:26,stall:48,ruin:62,bridge:85,steps:78,watchtower:48,tent:44};
 function builtinBid(kind,x,y){return kind+'@'+Math.round(x)+','+Math.round(y);}
 function builtinTargets(){
   var out=[];
@@ -4520,91 +4599,111 @@ function buildTown3D(){
   townFeatures.forEach(function(f){
     var gh=terrainH(f.x,f.y);
     if(f.kind==='wall'){
-      box(58,96,58,STONE,WX(f.x),gh+44,WZ(f.y),staticGroup);
-      box(64,10,64,STONE_D,WX(f.x),gh+95,WZ(f.y),staticGroup);
-      if(f.seed>0.45)box(15,13,15,STONE,WX(f.x)-14,gh+105,WZ(f.y),staticGroup);
-      if(f.seed<0.78)box(15,13,15,STONE,WX(f.x)+14,gh+105,WZ(f.y),staticGroup);
+      box(58,84,58,STONE,WX(f.x),gh+40,WZ(f.y),staticGroup);        /* curtain wall ≈8.4m, walkway cap on top */
+      box(64,9,64,STONE_D,WX(f.x),gh+84,WZ(f.y),staticGroup);
+      if(f.seed>0.45)box(14,12,14,STONE,WX(f.x)-14,gh+93,WZ(f.y),staticGroup); /* merlons: total height ≈9.9m */
+      if(f.seed<0.78)box(14,12,14,STONE,WX(f.x)+14,gh+93,WZ(f.y),staticGroup);
     }else if(f.kind==='gate'||f.kind==='watergate'){
       var g=new THREE.Group(); g.position.set(WX(f.x),gh-4,WZ(f.y)); g.rotation.y=Math.atan2(-f.ty,f.tx); staticGroup.add(g);
-      var tw=f.kind==='gate'?62:66, tr=f.kind==='gate'?30:26, th=f.kind==='gate'?150:104;
+      var tw=f.kind==='gate'?58:62, tr=f.kind==='gate'?27:24, th=f.kind==='gate'?118:94; /* gate towers ≈11.8m, just proud of the wall */
       cyl(tr,tr+5,th,STONE,-tw,th/2,0,g,10); cyl(tr,tr+5,th,STONE,tw,th/2,0,g,10);
       cyl(tr+7,tr+7,12,STONE_D,-tw,th+4,0,g,10); cyl(tr+7,tr+7,12,STONE_D,tw,th+4,0,g,10);
-      box(tw*2+30,24,44,STONE,0,th-26,0,g);
       if(f.kind==='gate'){
-        rbox(5,86,46,WOOD_D,-27,43,8,g,0.55); rbox(5,86,46,WOOD_D,27,43,8,g,-0.55); /* wooden doors, standing open */
+        box(tw*2+34,22,46,STONE,0,64,0,g);                          /* arch beam: its underside leaves a ≈5.3m opening */
+        box(tw*2+20,10,38,STONE_D,0,80,0,g);                        /* parapet over the arch */
+        rbox(5,52,42,WOOD_D,-26,26,8,g,0.55); rbox(5,52,42,WOOD_D,26,26,8,g,-0.55); /* wooden doors, standing open */
         var ivy=[0x3e7a3e,0x2c5a30,0x477d43];
         for(var ii=0;ii<6;ii++){
-          var iv=sph(9+((ii*7)%6),ivy[ii%3],(ii<3?-tw-16:tw+16),26+ii*15,(ii%2?14:-14),g,{flatShading:true});
+          var iv=sph(8+((ii*7)%5),ivy[ii%3],(ii<3?-tw-14:tw+14),16+ii*10,(ii%2?13:-13),g,{flatShading:true});
           iv.scale.set(0.55,1,0.55);
         }
       }else{
-        for(var gb=-2;gb<=2;gb++) box(4,62,4,0x2e2a26,gb*19,th-58,0,g); /* iron grate over the river */
+        box(tw*2+30,20,44,STONE,0,58,0,g);
+        for(var gb=-2;gb<=2;gb++) box(4,55,4,0x2e2a26,gb*19,30,0,g); /* iron grate hanging into the river */
       }
     }else if(f.kind==='house'){
-      var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(hg);
-      var roofs=[0x7a4a30,0x8a5a34,0x55677c,0x6e4a2f,0x7d5a38];
+      var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); hg.rotation.y=f.rot||0; staticGroup.add(hg);
+      var roofs=[0x8a4a28,0x9c5a2c,0x7c4023,0xa86834,0x93522a,0x845030]; /* the photo's brown-to-orange roofs */
       var rc=roofs[Math.floor(f.seed*roofs.length)%roofs.length];
-      box(f.w,58,f.d,CREAM,0,29,0,hg);
-      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(9,58,9,WOOD_D,c[0]*(f.w/2-4),29,c[1]*(f.d/2-4),hg);});
-      box(f.w+4,9,f.d+4,WOOD_D,0,55,0,hg);
-      box(f.w+2,7,7,WOOD_D,0,34,f.d/2+1,hg);
-      var roof=prism(f.w+22,f.w*0.5,f.d+20,rc); roof.position.y=58; hg.add(roof);
-      box(13,26,13,STONE_D,f.w*0.28,58+f.w*0.30,-f.d*0.18,hg);
-      box(17,32,5,WOOD_D,0,16,f.d/2+2,hg);
-      box(13,13,4,0xffd98a,-f.w*0.28,36,f.d/2+2,hg);
-      box(13,13,4,0xffd98a,f.w*0.30,36,-f.d/2-2,hg);
+      var roofH=Math.round(f.w*0.42);                                  /* ridge lands at 7.4–8.6m over a 3.8m eave */
+      box(f.w+3,19,f.d+3,STONE_D,0,9.5,0,hg);                          /* stone ground floor (≈1.9m of rusticated stone) */
+      box(f.w,19,f.d,CREAM,0,28.5,0,hg);                               /* timber-framed white upper floor */
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(8,38,8,WOOD_D,c[0]*(f.w/2-3),19,c[1]*(f.d/2-3),hg);}); /* corner timbers */
+      box(7,19,7,WOOD_D,0,28.5,f.d/2-3,hg); box(7,19,7,WOOD_D,0,28.5,-f.d/2+3,hg); /* front posts */
+      box(f.w+4,7,f.d+4,WOOD_D,0,36,0,hg);                             /* eaves beam */
+      var roof=prism(f.w+22,roofH,f.d+20,rc); roof.position.y=38; hg.add(roof);
+      box(12,30,12,STONE_D,f.w*0.26,38+roofH*0.45,-f.d*0.18,hg);       /* chimney */
+      box(15,5,15,STONE_D,f.w*0.26,38+roofH*0.45+16,-f.d*0.18,hg);
+      if(f.seed>0.45){ /* dormer window poking out of the roof slope */
+        var dside=f.seed>0.72?1:-1;
+        box(15,12,13,CREAM,dside*f.w*0.27,38+roofH*0.30,-f.d*0.12,hg);
+        var droof=prism(19,8,16,rc); droof.position.set(dside*f.w*0.27,38+roofH*0.30+6,-f.d*0.12); hg.add(droof);
+        box(3,8,8,0xffd98a,dside*(f.w*0.27+8),38+roofH*0.30,-f.d*0.12,hg);
+      }
+      box(15,20,4,WOOD_D,0,10,f.d/2+2,hg);                             /* door, 2m tall */
+      box(11,11,3,0xffd98a,-f.w*0.28,11,f.d/2+2,hg);
+      box(11,11,3,0xffd98a,f.w*0.28,11,-f.d/2-2,hg);
+      box(11,12,3,0xffd98a,-f.w*0.28,29,f.d/2+2,hg);
+      box(11,12,3,0xffd98a,f.w*0.30,29,-f.d/2-2,hg);
+      if(f.seed>0.55){ /* coloured shop awning over the front, like the photo's storefronts */
+        var awnCols=[0xb03a30,0x3a7a5a,0x3a6bd5,0xc9862b];
+        rbox(46,3,26,awnCols[Math.floor(f.seed*4)%4],0,17,f.d/2+13,hg,0,0.32,0);
+        cyl(1.8,1.8,15,WOOD_D,-20,8,f.d/2+22,hg,5); cyl(1.8,1.8,15,WOOD_D,20,8,f.d/2+22,hg,5);
+        box(13,10,13,0xc9a86a,-14,5,f.d/2+10,hg);
+      }
     }else if(f.kind==='clocktower'){
       var cg=new THREE.Group(); cg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(cg);
-      box(78,42,78,STONE_D,0,21,0,cg);
-      box(58,180,58,STONE,0,132,0,cg);
-      box(66,10,66,STONE_D,0,226,0,cg);
-      box(70,62,70,CREAM,0,262,0,cg);
+      box(74,24,74,STONE_D,0,12,0,cg);                                 /* squat stone base */
+      box(52,96,52,STONE,0,72,0,cg);                                   /* shaft: top at 12m */
+      box(62,9,62,STONE_D,0,124,0,cg);                                 /* balcony slab */
+      box(64,42,64,CREAM,0,149,0,cg);                                  /* clock chamber */
       for(var fi=0;fi<4;fi++){
         var fg=new THREE.Group(); fg.rotation.y=fi*Math.PI/2; cg.add(fg);
-        var fc=new THREE.Mesh(G('clkf',function(){return new THREE.CylinderGeometry(21,21,4,20);}),M(0xf2ead8));
-        fc.rotation.x=Math.PI/2; fc.position.set(0,262,36); fg.add(fc);
-        var rim=new THREE.Mesh(G('clkr',function(){return new THREE.TorusGeometry(21,2.4,6,20);}),M(0xe8c268));
-        rim.position.set(0,262,38); fg.add(rim);
-        box(3.4,15,1.4,0x2a2a2a,0,266,38.6,fg,false);
-        box(11,3.4,1.4,0x2a2a2a,3,262,38.6,fg,false);
+        var fc=new THREE.Mesh(G('clkf',function(){return new THREE.CylinderGeometry(16,16,4,20);}),M(0xf2ead8));
+        fc.rotation.x=Math.PI/2; fc.position.set(0,149,33); fg.add(fc);
+        var rim=new THREE.Mesh(G('clkr',function(){return new THREE.TorusGeometry(16,2,6,20);}),M(0xe8c268));
+        rim.position.set(0,149,35); fg.add(rim);
+        box(3,11,1.4,0x2a2a2a,0,152,35.6,fg,false);
+        box(8.5,3,1.4,0x2a2a2a,2.5,149,35.6,fg,false);
       }
-      box(52,34,52,STONE,0,310,0,cg);
-      cone(38,86,0x46586a,0,370,0,cg,4);
-      sph(5,0xe8c268,0,418,0,cg);
+      box(48,22,48,STONE,0,181,0,cg);
+      cone(36,40,0x46586a,0,212,0,cg,4);                               /* spire: total ≈23.2m, the town's landmark over the west houses */
+      sph(4.5,0xe8c268,0,236,0,cg);
     }else if(f.kind==='chapel'){
       var kg=new THREE.Group(); kg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(kg);
-      box(170,84,120,STONE_L,0,42,0,kg);
-      var kroof=prism(190,88,138,0x3f6fb5); kroof.position.y=84; kg.add(kroof);
-      box(30,128,30,STONE_L,0,64,46,kg);                       /* front spire tower, facing the upper plaza */
-      cone(26,64,0x3f6fb5,0,160,46,kg,4);
-      var crys=sph(9,0xbfe6ff,0,200,46,kg,{emissive:0x4a9be0}); crys.castShadow=false;
-      var glow=sph(30,0x7ec3ff,0,200,46,kg,{transparent:true,opacity:0.26,emissive:0x3a7bd5}); glow.castShadow=false;
-      var rose=new THREE.Mesh(G('rose',function(){return new THREE.CylinderGeometry(24,24,4,20);}),M(0x86c9ff,{emissive:0x2a6bd5}));
-      rose.rotation.x=Math.PI/2; rose.position.set(0,56,61.5); kg.add(rose);
-      box(22,38,5,WOOD_D,0,19,61,kg);
-      box(28,8,6,STONE_D,0,42,61,kg);
-      [-38,38].forEach(function(sx){ [-30,12].forEach(function(sz){ box(4,30,13,0x86c9ff,sx>0?86:-86,48,sz,kg); }); });
-      box(13,26,4,0x86c9ff,-30,50,61,kg); box(13,26,4,0x86c9ff,30,50,61,kg);
+      box(170,72,120,STONE_L,0,36,0,kg);                               /* nave walls ≈7.2m */
+      var kroof=prism(190,62,138,0x3f6fb5); kroof.position.y=72; kg.add(kroof); /* blue crystal roof: ridge ≈13.4m */
+      box(30,108,30,STONE_L,0,54,46,kg);                       /* front spire tower, facing the upper plaza */
+      cone(25,50,0x3f6fb5,0,133,46,kg,4);
+      var crys=sph(8,0xbfe6ff,0,164,46,kg,{emissive:0x4a9be0}); crys.castShadow=false; /* glowing crystal finial ≈16.4m */
+      var glow=sph(26,0x7ec3ff,0,164,46,kg,{transparent:true,opacity:0.26,emissive:0x3a7bd5}); glow.castShadow=false;
+      var rose=new THREE.Mesh(G('rose',function(){return new THREE.CylinderGeometry(20,20,4,20);}),M(0x86c9ff,{emissive:0x2a6bd5}));
+      rose.rotation.x=Math.PI/2; rose.position.set(0,50,61.5); kg.add(rose);
+      box(20,34,5,WOOD_D,0,17,61,kg);
+      box(26,7,6,STONE_D,0,38,61,kg);
+      [-38,38].forEach(function(sx){ [-30,12].forEach(function(sz){ box(4,26,13,0x86c9ff,sx>0?86:-86,42,sz,kg); }); });
+      box(12,24,4,0x86c9ff,-30,46,61,kg); box(12,24,4,0x86c9ff,30,46,61,kg);
     }else if(f.kind==='castle'){
       var sg=new THREE.Group(); sg.position.set(WX(f.x),gh-6,WZ(f.y)); staticGroup.add(sg);
       [[-70,40,44],[60,60,52],[0,-70,40],[-40,-50,30]].forEach(function(r){
         var rk=new THREE.Mesh(G('rk'+r[2],function(){return new THREE.DodecahedronGeometry(r[2],0);}),M(0x7d7466));
         rk.position.set(r[0],4,r[1]); rk.rotation.set(r[2],r[2]*2,0); rk.castShadow=true; rk.receiveShadow=true; sg.add(rk);
       });
-      box(150,120,150,0x8f887a,0,60,0,sg);
+      box(150,100,150,0x8f887a,0,50,0,sg);                             /* keep walls ≈10m */
       [[-78,-78],[78,-78],[-78,78],[78,78]].forEach(function(c){
-        cyl(23,27,190,0x8f887a,c[0],95,c[1],sg,10);
-        cone(31,72,0x46586a,c[0],226,c[1],sg,10);
+        cyl(22,26,160,0x8f887a,c[0],80,c[1],sg,10);
+        cone(30,58,0x46586a,c[0],189,c[1],sg,10);                       /* corner spires ≈21.8m */
       });
-      cyl(32,38,250,0x978f7d,0,125,0,sg,12);
-      cone(44,100,0x46586a,0,300,0,sg,12);
-      sph(6,0xe8c268,0,356,0,sg);
-      box(120,64,20,0x8f887a,0,32,86,sg);
-      box(16,44,2,0x3a6bd5,-30,118,77,sg,false);
-      box(16,44,2,0x3a6bd5,30,118,77,sg,false);
-      box(11,15,3,0xffca7a,-40,150,76,sg,false); box(11,15,3,0xffca7a,40,168,76,sg,false); box(11,15,3,0xffca7a,0,196,20,sg,false);
+      cyl(31,37,205,0x978f7d,0,102,0,sg,12);
+      cone(42,78,0x46586a,0,244,0,sg,12);                              /* great central spire ≈28.3m over its rock */
+      sph(6,0xe8c268,0,288,0,sg);
+      box(120,56,20,0x8f887a,0,28,86,sg);
+      box(14,36,2,0x3a6bd5,-30,30,97,sg,false);                        /* blue banners on the annex front */
+      box(14,36,2,0x3a6bd5,30,30,97,sg,false);
+      box(11,14,3,0xffca7a,-40,68,76,sg,false); box(11,14,3,0xffca7a,40,68,76,sg,false); box(11,14,3,0xffca7a,0,150,36,sg,false);
     }else if(f.kind==='fountain'){
       var pg=new THREE.Group(); pg.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(pg);
+      cyl(216,216,2.2,STONE_D,0,0.6,0,pg,40);        /* outer plaza pavement: the photo's big circular stone plaza (≈43m across) */
       cyl(172,172,3,STONE_L,0,1,0,pg,36);            /* plaza stone pavement */
       cyl(120,120,3.6,STONE,0,1.2,0,pg,32);          /* inner ring */
       cyl(54,60,15,STONE,0,9,0,pg,20);               /* basin */
@@ -4628,6 +4727,8 @@ function buildTown3D(){
       var bg=new THREE.Group(); bg.position.set(WX(f.x),0,WZ(f.y)); bg.rotation.y=f.rot; staticGroup.add(bg);
       box(18,34,72,STONE,-64,gh-8,0,bg);
       box(18,34,72,STONE,64,gh-8,0,bg);
+      var arch=new THREE.Mesh(new THREE.TorusGeometry(50,9,8,20,Math.PI),M(STONE)); /* the photo's stone arch under the deck */
+      arch.position.set(0,gh-47,0); arch.castShadow=true; arch.receiveShadow=true; bg.add(arch);
       box(150,7,66,0x8a6a44,0,gh+7,0,bg);
       box(150,5,5,WOOD_D,0,gh+21,30,bg);
       box(150,5,5,WOOD_D,0,gh+21,-30,bg);
@@ -4636,7 +4737,7 @@ function buildTown3D(){
       var dl=Math.hypot(f.dx,f.dy), ux=f.dx/dl, uy=f.dy/dl;
       for(var si=0;si<f.n;si++){
         var sx2=f.x+ux*si*19, sy2=f.y+uy*si*19;
-        rbox(96,9,24,STONE_D,WX(sx2),terrainH(sx2,sy2)+2,WZ(sy2),staticGroup,Math.atan2(-ux,-uy));
+        rbox(f.w||96,9,24,STONE_D,WX(sx2),terrainH(sx2,sy2)+2,WZ(sy2),staticGroup,Math.atan2(-ux,-uy));
       }
     }else if(f.kind==='skirt'){
       var sdx=f.x1-f.x0, sdy=f.y1-f.y0, sl=Math.hypot(sdx,sdy), sn=Math.max(1,Math.floor(sl/88));
@@ -4644,6 +4745,22 @@ function buildTown3D(){
         var kx=f.x0+sdx*ki/sn, ky=f.y0+sdy*ki/sn;
         rbox(96,120,22,STONE,WX(kx),terrainH(kx,ky)-8,WZ(ky),staticGroup,Math.atan2(-sdy/sl,sdx/sl));
       }
+    }else if(f.kind==='road'){
+      for(var rdi=0;rdi<f.n;rdi++){ /* dirt road segments trailing out of the gate, each lifted a hair so overlaps never z-fight */
+        var rx2=f.x+f.dx*(30+rdi*54), ry2=f.y+f.dy*(30+rdi*54);
+        rbox(70,3,60,0x9a7f56,WX(rx2),terrainH(rx2,ry2)+1.2+rdi*0.15,WZ(ry2),staticGroup,Math.atan2(-f.dx,-f.dy));
+      }
+    }else if(f.kind==='watchtower'){
+      var wg=new THREE.Group(); wg.position.set(WX(f.x),gh-1,WZ(f.y)); staticGroup.add(wg);
+      [[-13,-13],[13,-13],[-13,13],[13,13]].forEach(function(c){cyl(3,4.4,46,WOOD_D,c[0],23,c[1],wg,6);});
+      box(46,6,46,WOOD,0,48,0,wg);
+      box(32,20,32,CREAM,0,61,0,wg);
+      cone(30,22,0x7c4023,0,82,0,wg,4);                               /* little wooden watchtower outside the SW gate, ≈9.3m */
+    }else if(f.kind==='tent'){
+      var ng=new THREE.Group(); ng.position.set(WX(f.x),gh-1,WZ(f.y)); ng.rotation.y=f.rot||0; staticGroup.add(ng);
+      box(44,5,54,WOOD_D,0,2.5,0,ng);
+      var tentRoof=prism(48,26,58,f.seed>0.5?0xc9862b:0x3a7a5a); tentRoof.position.y=5; ng.add(tentRoof);
+      cyl(1.6,1.6,34,WOOD_D,0,17,29,ng,5);
     }
   });
 }
