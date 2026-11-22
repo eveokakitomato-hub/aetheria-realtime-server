@@ -1624,7 +1624,7 @@ var TOWN_CX=1300, TOWN_CY=1740, TOWN_RX=790, TOWN_RY=695;
 var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
 var PLAZA={x:1300,y:1700};          /* the fountain plaza: at the town's centre, a touch north — the fountain is its centre */
 var POND_C={x:1280,y:1328,r:118};   /* central pond: round, its south shore touching the plaza's north edge */
-var POND_E={x:1775,y:1620,r:134};   /* the east pond: stretched E-W (terrain carve squashes x by 0.72), shifted SE, houses along its south shore */
+var POND_E={x:1775,y:1620,r:158};   /* the east pond: stretched E-W (terrain carve squashes x by 0.72), shifted SE, houses along its south shore — enlarged and given the brightest water in town so it reads from the air */
 var POOL={x:1168,y:1290,r:72};      /* plunge pool under the falls */
 var RIVER=[[1168,1290],[1218,1312],[1280,1328],[1362,1370],[1470,1452],[1548,1532],[1632,1592],[1775,1620],[1902,1662],[1988,1762],[2038,1902],[2075,2085]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall) */
 var BRIDGES=[{x:1218,y:1312,rot:1.16},{x:1590,y:1562,rot:0.95},{x:1988,y:1762,rot:0.34}]; /* arched bridge over the inlet between the plunge pool and the central pond / bridge over the river east of the grand ramp's causeway / bridge over the east pond's outlet */
@@ -1795,11 +1795,11 @@ function buildTownData(){
     [730,1802,100,90,0],[855,1812,105,92,-5],[970,1800,100,90,5],
     [760,1908,105,92,180],[905,1918,100,90,175],
     [1064,1420,95,85,95],[1092,1560,95,85,85],[1080,1730,95,85,90],
-    [955,1195,95,85,60],[2010,1470,95,85,-60],
-    [905,2088,105,92,180],[1085,2088,110,95,185],[1265,2088,115,95,180],[1445,2088,110,95,170],
-    [1000,2202,105,92,180],[1200,2212,110,95,175],[1400,2198,105,92,185],
-    [1660,1802,100,95,180],[1770,1822,105,95,185],[1905,1798,105,92,175],
-    [1620,1948,115,100,-160],[1690,2072,105,90,180],
+    [955,1195,95,85,60],[2010,1470,95,85,-60],[845,1198,95,85,35],
+    [865,2088,105,92,180],[995,2086,110,95,185],[1235,2088,115,95,180],[1365,2086,110,95,170],[1470,2088,90,88,178],
+    [950,2215,105,92,180],[1210,2212,110,95,175],[1340,2215,105,92,185],[1470,2212,100,92,172],[1600,2210,100,92,180],
+    [1630,1802,100,95,180],[1745,1820,105,95,185],[1850,1840,105,92,190],
+    [1620,1948,115,100,-160],[1690,2072,105,90,180],[1790,2072,105,90,180],
     [1870,1442,100,85,-80],[1470,1860,105,90,105],
     [1060,1300,95,85,10],[1580,2092,100,92,175]];
   var ROOF_MULT=[0.42,0.36,0.50,0.44,0.38,0.54,0.40,0.48]; /* per-house roof pitch: ridges land anywhere from ≈7.4m to ≈9.5m, so no two rooftops read alike */
@@ -1835,7 +1835,7 @@ function buildTownData(){
      plaza's rim (kept clear of the spawn point, the streets, the grand
      staircase corridor and the pond) --- */
   [[1150,1895],[1455,1895],[1062,1648],[1525,1710],[1170,1525],
-   [1005,1705],[1588,1700],[1085,1940],[1515,1940],[1025,1490],[1680,1500],[1210,1965],[1395,1965]
+   [1005,1705],[1560,1835],[1085,1940],[1515,1940],[1025,1490],[1130,1470],[1210,1965],[1395,1965]
   ].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});});
   /* --- the streets (see STREETS): render features only — the ground
      tint along them is painted in init3D() --- */
@@ -1889,7 +1889,7 @@ function buildTownData(){
      continuous ribbon (buildRiver3D). The east pond is two overlapping
      discs stretched E-W, matching its elongated terrain carve. */
   lake(POND_C.x,POND_C.y,POND_C.r);
-  lake(1698,1620,120); lake(1852,1620,120);
+  lake(1678,1620,158,0,{vivid:true}); lake(1872,1620,158,0,{vivid:true}); /* the east pond, enlarged: two big overlapping discs matching its wider carve, flagged vivid so its surface renders in the brightest blue */
   lake(POOL.x,POOL.y,POOL.r);
   lake(1150,1105,40,107); /* the falls' top pool, sitting in the crag top */
   for(var i=0;i<RIVER.length-1;i++){
@@ -1903,7 +1903,7 @@ function buildTownData(){
       var nearBridge=false; for(var bi=0;bi<BRIDGES.length;bi++){if(Math.hypot(px-BRIDGES[bi].x,py-BRIDGES[bi].y)<78)nearBridge=true;}
       if(nearBridge)continue;
       if(stairProfileAt(px,py))continue; /* the grand staircase crosses the channel on its own causeway: no swimming depth under the ramp */
-      lake(px,py,90,0,{river:true}); /* depth only — the ribbon draws the surface (disc widened with the widened channel) */
+      lake(px,py,118,0,{river:true}); /* depth only — the ribbon draws the surface (disc widened with the widened channel) */
     }
   }
   /* --- trees & rocks that belong to the town and its mountain --- */
@@ -3741,7 +3741,7 @@ function townTerrain(x,y,h){
   /* river carve starts after the falls outflow segment (segment 0), so the
      channel never eats the falls shelf above it */
   var rd=1e9; for(var i=1;i<RIVER.length-1;i++){var sd=_segD(x,y,RIVER[i][0],RIVER[i][1],RIVER[i+1][0],RIVER[i+1][1]); if(sd<rd)rd=sd;}
-  h=_lerpTo(h,-6,_band(rd,82,124)); /* the river channel: one constant-width watercourse, not a chain of ponds (widened with the ribbon) */
+  h=_lerpTo(h,-6,_band(rd,108,154)); /* the river channel: one constant-width watercourse, not a chain of ponds — widened again so the river reads as the town's main artery from above */
   for(var bi=0;bi<BRIDGES.length;bi++){h=_lerpTo(h,16,_band(Math.hypot(x-BRIDGES[bi].x,y-BRIDGES[bi].y),26,50));} /* bridge fords: just the banks under each arch, so the channel stays wet right up to the bridges — and the ponds stay deep (a wider ford leaked into the central pond and the plunge pool) */
   /* the grand staircase: carve every flight's corridor to the stepped-
      smooth profile, so the ground itself climbs exactly like the drawn
@@ -4761,7 +4761,7 @@ function init3D(){
   if(!THREE_OK)return;
   var holder=document.getElementById('game3d');
   renderer=new THREE.WebGLRenderer({antialias:true});
-  if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.3;}
+  if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.24;}
   renderer.setPixelRatio(Math.max(0.3,Math.min(2,basePixelRatio()*currentRenderScale())));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   holder.appendChild(renderer.domElement);
@@ -4770,19 +4770,19 @@ function init3D(){
   /* gradient sky: warm at the horizon, deep blue overhead */
   var skyCv=document.createElement('canvas'); skyCv.width=4; skyCv.height=256;
   var sctx=skyCv.getContext('2d'); var sgr=sctx.createLinearGradient(0,0,0,256);
-  sgr.addColorStop(0,'#4a90d9'); sgr.addColorStop(0.45,'#93c4ec'); sgr.addColorStop(0.72,'#d6ecfa'); sgr.addColorStop(0.88,'#f7ecd2'); sgr.addColorStop(1,'#fdf3d4');
+  sgr.addColorStop(0,'#4573b4'); sgr.addColorStop(0.45,'#8fb0dc'); sgr.addColorStop(0.72,'#e8d2ac'); sgr.addColorStop(0.88,'#ffd9a0'); sgr.addColorStop(1,'#ffc384');
   sctx.fillStyle=sgr; sctx.fillRect(0,0,4,256);
   var skyTex=new THREE.CanvasTexture(skyCv);
   if(THREE.SRGBColorSpace!==undefined)skyTex.colorSpace=THREE.SRGBColorSpace;
   scene.background=skyTex;
-  scene.fog=new THREE.Fog(0xd8ecf7,1100,3100); /* light daytime haze: far ridges fade into the sky without dulling the town's colours */
+  scene.fog=new THREE.Fog(0xf2d7b4,1100,3100); /* warm evening haze: far ridges fade into the dusk sky without dulling the town's colours */
   // near 0.3 / far 3200 (was 0.1 / 5000): a tighter depth range gives the
   // depth buffer far more precision, which stops distant surfaces shimmering
   camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,3200);
   scene.add(camera3d);
   buildViewModel();
-  var hemi=new THREE.HemisphereLight(0xd6ecff,0x6d8152,1.18);scene.add(hemi); /* bright sky fill: shadows stay soft and colours stay vivid */
-  sunLight=new THREE.DirectionalLight(0xfff0cd,1.52); /* bright midday sun */
+  var hemi=new THREE.HemisphereLight(0xffe2bd,0x77683f,1.08);scene.add(hemi); /* warm dusk sky fill: shadows stay soft and colours stay vivid */
+  sunLight=new THREE.DirectionalLight(0xffbe78,1.38); /* low evening sun: warm amber light, longer shadows */
   sunLight.castShadow=true;
   if(sunLight.shadow.normalBias!==undefined)sunLight.shadow.normalBias=1.5; /* softens texture acne without peter-panning */
   sunLight.shadow.mapSize.set(1536,1536);
@@ -4828,7 +4828,7 @@ function init3D(){
          a patchwork of packed earth and worn stone covers most of it,
          so grass survives only in flecks between the paving (the photo's
          streets fill the whole town) */
-      if(reg==='green'&&townNorm(gx,gy)<1.0){gt.setHex(nz>0.52?0xa79b7e:0x9a855f); gc.lerp(gt,0.34+0.30*nz);}
+      if(reg==='green'&&townNorm(gx,gy)<1.0){gt.setHex(nz>0.52?0xa79b7e:0x9a855f); gc.lerp(gt,0.52+0.30*nz);}
       /* the town's streets: vertices near a stone lane turn cobble-grey,
          near a dirt lane packed-earth brown, so the ground itself is
          paved between the houses (the crisp strips are drawn separately
@@ -4836,14 +4836,14 @@ function init3D(){
       if(reg==='green'&&gx>420&&gx<2180&&gy>980&&gy<2560){
         var stD=1e9, stT='s';
         for(var sj=0;sj<STREETS.length;sj++){var ss2=STREETS[sj];var sd4=_segD(gx,gy,ss2.x1,ss2.y1,ss2.x2,ss2.y2)-ss2.w/2;if(sd4<stD){stD=sd4;stT=ss2.t;}}
-        if(stD<28){gt.setHex(stT==='s'?0xb0a892:0x9a855f); gc.lerp(gt,_sm01((28-stD)/28)*0.88);}
+        if(stD<36){gt.setHex(stT==='s'?0xb0a892:0x9a855f); gc.lerp(gt,_sm01((36-stD)/36)*0.9);}
       }
       var dp=Math.hypot(gx-PLAZA.x,gy-PLAZA.y);
       if(dp<390){gt.setHex(0xa39a86); gc.lerp(gt,_sm01((390-dp)/85)*0.85);}
       var bankD=1e9;
       if(gx>500&&gx<2400&&gy>900&&gy<2500){
         var rd2=1e9; for(var rj=0;rj<RIVER.length-1;rj++){var sd3=_segD(gx,gy,RIVER[rj][0],RIVER[rj][1],RIVER[rj+1][0],RIVER[rj+1][1]); if(sd3<rd2)rd2=sd3;}
-        bankD=Math.min(rd2-68,Math.hypot(gx-POND_C.x,gy-POND_C.y)-POND_C.r-6,Math.hypot((gx-POND_E.x)*0.72,gy-POND_E.y)-POND_E.r,Math.hypot(gx-POOL.x,gy-POOL.y)-POOL.r);
+        bankD=Math.min(rd2-94,Math.hypot(gx-POND_C.x,gy-POND_C.y)-POND_C.r-6,Math.hypot((gx-POND_E.x)*0.72,gy-POND_E.y)-POND_E.r,Math.hypot(gx-POOL.x,gy-POOL.y)-POOL.r);
       }
       for(var lk=0;lk<LAKES.length;lk++){var ld=Math.hypot(gx-LAKES[lk][0],gy-LAKES[lk][1])-LAKES[lk][2]; if(ld<bankD)bankD=ld;}
       if(bankD<26&&hh<26){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((26-bankD)/26)*0.75); if(bankD<7){gt.setHex(0x6e5b40); gc.lerp(gt,0.55);}}
@@ -4870,7 +4870,7 @@ function init3D(){
   for(var i=0;i<11;i++){
     var cl=new THREE.Group();
     var n=3+Math.floor(Math.random()*3);
-    for(var j=0;j<n;j++){var s=sph(26+Math.random()*30,0xffffff,(j-1.5)*44,Math.random()*8,(Math.random()-0.5)*30,cl,{transparent:true,opacity:0.92});s.castShadow=false;s.scale.y=0.45;}
+    for(var j=0;j<n;j++){var s=sph(26+Math.random()*30,0xfff1de,(j-1.5)*44,Math.random()*8,(Math.random()-0.5)*30,cl,{transparent:true,opacity:0.92});s.castShadow=false;s.scale.y=0.45;}
     cl.position.set((Math.random()-0.5)*10000,300+Math.random()*140,(Math.random()-0.5)*10000);
     scene.add(cl);clouds.push(cl);
   }
@@ -4907,7 +4907,7 @@ function rbox(w,h,d,color,x,y,z,parent,rotY,rotX,rotZ){
    radius the gradient and foam use. The waterfall sheets use a scrolling
    streak texture, and a small Points cloud adds spray at the plunge
    bases. Swimming / depth logic is untouched — this is looks only. */
-var waterGroup=null, waterTimeU={value:0}, WATER_MAT=null, WATER_MAT_PLUNGE=null, WATER_GEO_UNIT=null;
+var waterGroup=null, waterTimeU={value:0}, WATER_MAT=null, WATER_MAT_PLUNGE=null, WATER_MAT_VIVID=null, WATER_GEO_UNIT=null;
 var fallsMat=null, fallsSpray=null, sprayParts=null;
 function waterMats(){
   if(WATER_MAT)return;
@@ -4915,8 +4915,8 @@ function waterMats(){
     return new THREE.ShaderMaterial({
       transparent:true, depthWrite:false,
       uniforms:{ uTime:waterTimeU, uPlunge:{value:plunge?1:0},
-        uDeep:{value:new THREE.Color(0x2273b8)}, uShallow:{value:new THREE.Color(0x86e3f2)},
-        uSky:{value:new THREE.Color(0xe2f6ff)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
+        uDeep:{value:new THREE.Color(0x1c8cd4)}, uShallow:{value:new THREE.Color(0x9feaf8)},
+        uSky:{value:new THREE.Color(0xffe9c4)}, uSunDir:{value:new THREE.Vector3(0.74,0.53,0.42).normalize()} },
       vertexShader:'varying vec3 vW; varying vec2 vP;\nvoid main(){vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
       fragmentShader:[
         'uniform float uTime; uniform float uPlunge;',
@@ -4936,10 +4936,10 @@ function waterMats(){
         ' vec3 V=normalize(cameraPosition-vW);',
         ' float fres=pow(1.0-max(dot(N,V),0.0),3.0);',
         ' vec3 col=mix(uDeep,uShallow,smoothstep(0.45,1.0,r));',
-        ' col=mix(col,uSky,0.18+0.55*fres);',
+        ' col=mix(col,uSky,0.22+0.52*fres);',
         ' vec3 R=reflect(-V,N);',
         ' float sd=max(dot(R,uSunDir),0.0);',
-        ' col+=vec3(1.0,0.95,0.85)*(pow(sd,140.0)*1.5+pow(sd,36.0)*0.35*(0.6+0.4*n3));',
+        ' col+=vec3(1.0,0.84,0.58)*(pow(sd,140.0)*1.5+pow(sd,36.0)*0.35*(0.6+0.4*n3));',
         ' col+=vec3(1.0)*smoothstep(0.93,1.0,n3)*0.12;',
         ' float foamN=noise(p*6.0+vec2(t*0.25,0.0));',
         ' float foam=smoothstep(0.90,0.995,r+(foamN-0.5)*0.05)*(0.55+0.45*sin(t*1.7+r*40.0+foamN*6.0));',
@@ -4949,18 +4949,23 @@ function waterMats(){
         ' float alpha=mix(0.86,0.97,fres);',
         ' alpha=mix(alpha,0.98,clamp(foam,0.0,1.0));',
         ' float fogF=smoothstep(1100.0,3100.0,distance(cameraPosition,vW));',
-        ' col=mix(col,vec3(0.85,0.93,0.97),fogF);',
+        ' col=mix(col,vec3(0.96,0.87,0.72),fogF);',
         ' gl_FragColor=vec4(col,alpha);',
         '}'
       ].join('\n')
     });
   }
   WATER_MAT=make(false); WATER_MAT_PLUNGE=make(true);
+  /* the east pond's vivid variant: the same shader with a brighter,
+     more saturated blue, so the pond stands out from the air */
+  WATER_MAT_VIVID=make(false);
+  WATER_MAT_VIVID.uniforms.uDeep.value.setHex(0x0f9fe8);
+  WATER_MAT_VIVID.uniforms.uShallow.value.setHex(0xaef2ff);
 }
-function waterSurfaceMesh(r,plunge){
+function waterSurfaceMesh(r,plunge,vivid){
   waterMats();
   if(!WATER_GEO_UNIT)WATER_GEO_UNIT=new THREE.CircleGeometry(1,44);
-  var m=new THREE.Mesh(WATER_GEO_UNIT,plunge?WATER_MAT_PLUNGE:WATER_MAT);
+  var m=new THREE.Mesh(WATER_GEO_UNIT,vivid?WATER_MAT_VIVID:(plunge?WATER_MAT_PLUNGE:WATER_MAT));
   m.rotation.x=-Math.PI/2; m.scale.set(r,r,1); m.renderOrder=2;
   return m;
 }
@@ -4970,9 +4975,9 @@ function ensureWaterGroup(){
   return waterGroup;
 }
 function clearWaterGroup(){ if(waterGroup)while(waterGroup.children.length)waterGroup.remove(waterGroup.children[0]); }
-function addWaterDisc(x,y2d,z,r,plunge){
+function addWaterDisc(x,y2d,z,r,plunge,vivid){
   var g=ensureWaterGroup(); if(!g)return null;
-  var m=waterSurfaceMesh(r,plunge);
+  var m=waterSurfaceMesh(r,plunge,vivid);
   m.position.set(WX(x),z,WZ(y2d));
   g.add(m); return m;
 }
@@ -4983,7 +4988,7 @@ function fallsSheetMaterial(){
   if(fallsMat)return fallsMat;
   var cv=document.createElement('canvas'); cv.width=128; cv.height=256;
   var c2=cv.getContext('2d');
-  c2.fillStyle='rgba(205,235,250,0.55)'; c2.fillRect(0,0,128,256);
+  c2.fillStyle='rgba(216,242,255,0.62)'; c2.fillRect(0,0,128,256);
   var sd=999; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
   for(var i=0;i<70;i++){
     var x=srnd()*128, w=1+srnd()*3, l=40+srnd()*160, y=srnd()*256, a=0.12+srnd()*0.4;
@@ -4992,7 +4997,7 @@ function fallsSheetMaterial(){
   }
   var tex=new THREE.CanvasTexture(cv);
   tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(2,2);
-  fallsMat=new THREE.MeshLambertMaterial({color:0xcfeaf7,transparent:true,opacity:0.86,map:tex});
+  fallsMat=new THREE.MeshLambertMaterial({color:0xdcf3ff,transparent:true,opacity:0.9,map:tex});
   return fallsMat;
 }
 /* spray: ~460 soft points bursting out of the three plunge bases,
@@ -5005,7 +5010,7 @@ function buildFallsSpray(){
   var sd=4242; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
   for(var i=0;i<N;i++){
     var b=bases[i%3];
-    sprayParts.push({bx:b[0],by:b[1],bz:b[2],ph:srnd(),ang:srnd()*Math.PI*2,rad:10+srnd()*46,up:24+srnd()*34,sp:0.55+srnd()*0.6});
+    sprayParts.push({bx:b[0],by:b[1],bz:b[2],ph:srnd(),ang:srnd()*Math.PI*2,rad:14+srnd()*60,up:24+srnd()*34,sp:0.55+srnd()*0.6});
   }
   var geo=new THREE.BufferGeometry();
   geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
@@ -5034,7 +5039,7 @@ function buildFallsMist(){
   for(var i=0;i<spots.length;i++){
     var sm=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:0.16,depthWrite:false,color:0xf6fcff});
     var sp=new THREE.Sprite(sm);
-    var sc=92+(i%3)*36;
+    var sc=112+(i%3)*44;
     sp.scale.set(sc,sc*0.62,1);
     sp.position.set(WX(spots[i][0]),spots[i][2]+10,WZ(spots[i][1]));
     sp.renderOrder=4;
@@ -5062,7 +5067,7 @@ function updateWaterFx(now){
     var msc=mu.sc*(0.85+cyc*0.5); ms.scale.set(msc,msc*0.62,1);
   }
   for(var gi=0;gi<fallsRings.length;gi++){
-    var gr2=fallsRings[gi], age=(ft*0.30+gr2.userData.ph)%1, rr=10+age*52;
+    var gr2=fallsRings[gi], age=(ft*0.30+gr2.userData.ph)%1, rr=12+age*66;
     gr2.scale.set(rr,rr,1);
     gr2.material.opacity=0.42*(1-age);
   }
@@ -5073,6 +5078,121 @@ function updateWaterFx(now){
     pos.setXYZ(i,WX(p.bx)+Math.cos(p.ang)*rr,p.bz+Math.sin(age*Math.PI)*p.up,WZ(p.by)+Math.sin(p.ang)*rr);
   }
   pos.needsUpdate=true;
+}
+
+/* ============ CHIMNEY SMOKE — the town is lived in ============
+   One soft Points cloud for the whole town: six recycled puffs per
+   house chimney, rising, swelling and drifting east on the evening
+   breeze. Positions are rewritten per frame (a few hundred points —
+   negligible on a Chromebook). Rebuilt with the town, so editor house
+   deletions take their smoke with them. */
+var smokePts=null, smokeParts=[];
+function buildSmoke(){
+  if(!scene)return;
+  if(smokePts){scene.remove(smokePts);smokePts.geometry.dispose();smokePts=null;smokeParts=[];}
+  var tops=[];
+  townFeatures.forEach(function(f){
+    if(f.kind!=='house')return;
+    var gh=terrainH(f.x,f.y);
+    var lx=f.w*0.26, lz=-f.d*0.18, rot=f.rot||0;
+    var gx=f.x+lx*Math.cos(rot)+lz*Math.sin(rot);
+    var gy=f.y-lx*Math.sin(rot)+lz*Math.cos(rot);
+    var gz=gh-2+(38+(f.roofH||40)*0.45+24)*(f.hmul||1); /* the chimney pot's top, in the house group's own frame */
+    tops.push([gx,gy,gz]);
+  });
+  if(!tops.length)return;
+  var per=6, N=tops.length*per, pos=new Float32Array(N*3);
+  var sd=777; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
+  for(var i=0;i<N;i++){
+    var tp=tops[i%tops.length];
+    smokeParts.push({bx:tp[0],by:tp[1],bz:tp[2],ph:srnd(),drift:0.6+srnd()*0.7,sp:0.045+srnd()*0.035});
+  }
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  var cv=document.createElement('canvas'); cv.width=cv.height=64;
+  var c2=cv.getContext('2d'); var gr=c2.createRadialGradient(32,32,3,32,32,30);
+  gr.addColorStop(0,'rgba(255,252,248,0.85)'); gr.addColorStop(0.55,'rgba(240,236,230,0.35)'); gr.addColorStop(1,'rgba(240,236,230,0)');
+  c2.fillStyle=gr; c2.fillRect(0,0,64,64);
+  smokePts=new THREE.Points(geo,new THREE.PointsMaterial({size:17,map:new THREE.CanvasTexture(cv),transparent:true,opacity:0.32,color:0xe9e3d9,depthWrite:false,sizeAttenuation:true}));
+  smokePts.renderOrder=4; smokePts.frustumCulled=false;
+  scene.add(smokePts);
+}
+function updateSmoke(now){
+  if(!smokePts||!smokeParts.length)return;
+  var pos=smokePts.geometry.attributes.position, t=now/1000;
+  for(var i=0;i<smokeParts.length;i++){
+    var p=smokeParts[i], age=(t*p.sp+p.ph)%1;
+    pos.setXYZ(i,WX(p.bx)+age*age*48*p.drift+Math.sin(t*0.7+p.ph*20)*3,p.bz+age*54,WZ(p.by)+age*11*p.drift);
+  }
+  pos.needsUpdate=true;
+}
+
+/* ============ TOWNSFOLK — people going about their evening ============
+   A handful of villagers strolling the streets and the plaza: each
+   walks to a nearby waypoint (so their paths stay on the lanes), pauses
+   a while, then ambles on. They are pure townsfolk — no combat, no
+   labels — just the sense that Luminas is inhabited. Models are built
+   once and moved in render3D, like the remote players. */
+var FOLK_SPOTS=[[760,1467],[900,1620],[760,1747],[640,1620],[1030,1620],[1218,1620],[1150,1700],[1450,1700],[1300,1560],[1300,1860],[1300,1995],[1000,1995],[1098,2150],[1300,2150],[1700,1895],[1850,1895]];
+var townsfolk=[], folkLastT=0;
+function villagerModel(seed){
+  var g=new THREE.Group();
+  var tunics=[0x9a5a34,0x5a7350,0x746a8a,0xa8843c,0x7a4a52,0x4f6b7a,0x8a6a4a,0x66584a,0x845c30,0x546e46];
+  var col=tunics[seed%tunics.length];
+  cyl(8,10,26,col,0,30,0,g,10);                     // body in a coloured tunic
+  sph(10,0xf2c89b,0,52,0,g);                         // head
+  cyl(5,5,20,0x5d4a2c,-11,20,0,g,7);cyl(5,5,20,0x5d4a2c,11,20,0,g,7); // legs
+  cyl(4,4,20,col,-15,36,0,g,7);cyl(4,4,20,col,15,36,0,g,7);           // arms
+  if(seed%3===0)cone(11,9,0xc9a86a,0,63,0,g,10);     // straw hat
+  else if(seed%3===1){var hd=sph(10.5,0x6e5136,0,54,0,g);hd.scale.y=0.62;} // hair
+  else box(15,5,15,0xe8e2d2,0,60,0,g);               // a bundle / hood cloth on the head
+  var HS=17/52; g.scale.setScalar(HS); g.userData.groundOff=-10*HS; /* same 1.7m body scale as humanoid() */
+  return g;
+}
+function pickFolkTarget(f){
+  var cur=FOLK_SPOTS[f.spot], near=[];
+  for(var i=0;i<FOLK_SPOTS.length;i++){if(i!==f.spot)near.push([Math.hypot(FOLK_SPOTS[i][0]-cur[0],FOLK_SPOTS[i][1]-cur[1]),i]);}
+  near.sort(function(a,b){return a[0]-b[0];});
+  var pick=near[Math.floor(Math.random()*Math.min(4,near.length))];
+  f.spot=pick[1];
+  f.tx=FOLK_SPOTS[pick[1]][0]+(Math.random()-0.5)*36;
+  f.ty=FOLK_SPOTS[pick[1]][1]+(Math.random()-0.5)*36;
+}
+function ensureTownsfolk(){
+  if(townsfolk.length||!dynGroup)return;
+  var sd=31337; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
+  for(var i=0;i<10;i++){
+    var si=Math.floor(srnd()*FOLK_SPOTS.length);
+    var f={x:FOLK_SPOTS[si][0]+(srnd()-0.5)*30,y:FOLK_SPOTS[si][1]+(srnd()-0.5)*30,spot:si,tx:0,ty:0,wait:srnd()*2.5,walk:srnd()*6,face:srnd()*6.28,mesh:villagerModel(i)};
+    dynGroup.add(f.mesh);
+    pickFolkTarget(f);
+    townsfolk.push(f);
+  }
+}
+function updateTownsfolk(now){
+  ensureTownsfolk();
+  if(!townsfolk.length)return;
+  var dt=folkLastT?Math.min(0.05,(now-folkLastT)/1000):0.016; folkLastT=now;
+  for(var i=0;i<townsfolk.length;i++){
+    var f=townsfolk[i];
+    if(f.wait>0){f.wait-=dt;}
+    else{
+      var dx=f.tx-f.x, dy=f.ty-f.y, dist=Math.hypot(dx,dy);
+      if(dist<9){f.wait=1+Math.random()*3.5; pickFolkTarget(f);}
+      else{
+        var sp=17*dt, nx=f.x+dx/dist*sp, ny=f.y+dy/dist*sp;
+        if(!collide(nx,ny,7)){f.x=nx;f.y=ny;}
+        else if(!collide(nx,f.y,7)){f.x=nx;}
+        else if(!collide(f.x,ny,7)){f.y=ny;}
+        else{f.wait=0.6; pickFolkTarget(f);}
+        f.face=Math.atan2(dx,dy);
+        f.walk+=dt*7;
+      }
+    }
+    var bob=(f.wait>0)?0:Math.abs(Math.sin(f.walk))*0.7;
+    f.mesh.position.set(WX(f.x),terrainH(f.x,f.y)+bob+(f.mesh.userData.groundOff||0),WZ(f.y));
+    f.mesh.rotation.y=f.face;
+  }
 }
 
 /* ============ THE RIVER — one continuous flowing channel ============
@@ -5090,8 +5210,8 @@ function riverMats(){
   RIVER_MAT=new THREE.ShaderMaterial({
     transparent:true, depthWrite:false,
     uniforms:{ uTime:waterTimeU,
-      uDeep:{value:new THREE.Color(0x2273b8)}, uShallow:{value:new THREE.Color(0x86e3f2)},
-      uSky:{value:new THREE.Color(0xe2f6ff)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
+      uDeep:{value:new THREE.Color(0x1c8cd4)}, uShallow:{value:new THREE.Color(0x9feaf8)},
+      uSky:{value:new THREE.Color(0xffe9c4)}, uSunDir:{value:new THREE.Vector3(0.74,0.53,0.42).normalize()} },
     vertexShader:[
       'attribute float aPhase; attribute float aRapid;',
       'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp;',
@@ -5116,10 +5236,10 @@ function riverMats(){
       ' vec3 V=normalize(cameraPosition-vW);',
       ' float fres=pow(1.0-max(dot(N,V),0.0),3.0);',
       ' vec3 col=mix(uShallow,uDeep,smoothstep(0.15,0.95,1.0-abs(across)));',
-      ' col=mix(col,uSky,0.16+0.55*fres);',
+      ' col=mix(col,uSky,0.22+0.52*fres);',
       ' vec3 R=reflect(-V,N);',
       ' float sd=max(dot(R,uSunDir),0.0);',
-      ' col+=vec3(1.0,0.95,0.85)*(pow(sd,150.0)*1.6+pow(sd,36.0)*0.32*(0.6+0.4*n3));',
+      ' col+=vec3(1.0,0.84,0.58)*(pow(sd,150.0)*1.6+pow(sd,36.0)*0.32*(0.6+0.4*n3));',
       ' col+=vec3(1.0)*smoothstep(0.94,1.0,n3)*0.10;',
       ' float foamN=noise(vec2(vUv.x*9.0,flow*4.5));',
       ' float foam=smoothstep(0.90,0.995,abs(across)+(foamN-0.5)*0.07)*(0.5+0.5*sin(t*1.6+vPh*160.0+foamN*7.0));',
@@ -5128,7 +5248,7 @@ function riverMats(){
       ' foam=max(foam,vRp*smoothstep(0.40,0.70,streak*0.65+streak2*0.35)*(0.7+0.3*sin(t*5.0+vPh*300.0)));',
       ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.88);',
       ' float fogF=smoothstep(1100.0,3100.0,distance(cameraPosition,vW));',
-      ' col=mix(col,vec3(0.85,0.93,0.97),fogF);',
+      ' col=mix(col,vec3(0.96,0.87,0.72),fogF);',
       ' gl_FragColor=vec4(col,0.94);',
       '}'
     ].join('\n')
@@ -5160,7 +5280,7 @@ function buildRiver3D(){
     if(Math.hypot(gx-1902,gy-1662)<110)rapid=Math.max(rapid,0.55); /* the east pond's outflow */
     if(Math.hypot(gx-2038,gy-1902)<120)rapid=Math.max(rapid,0.5); /* the drop toward the water gate */
     if(inPond(gx,gy))rapid*=0.25;
-    var nx=-tan.z, nz=tan.x, hw=82;
+    var nx=-tan.z, nz=tan.x, hw=108;
     pos.push(p.x+nx*hw,2.8,p.z+nz*hw, p.x-nx*hw,2.8,p.z-nz*hw);
     uv.push(0,t*40, 1,t*40);
     ph.push(phase,phase); rp.push(rapid,rapid);
@@ -5184,7 +5304,7 @@ function buildRiver3D(){
     var bx=pp.x+W/2, by=pp.z+H/2;
     if(Math.hypot(bx-1218,by-1312)<95||Math.hypot(bx-1590,by-1562)<95||Math.hypot(bx-1988,by-1762)<95)continue; /* keep the bridges clear */
     [-1,1].forEach(function(side){
-      var off=90+rnd()*16, px=bx+(-tn.z)*side*off, py=by+(tn.x)*side*off;
+      var off=116+rnd()*18, px=bx+(-tn.z)*side*off, py=by+(tn.x)*side*off;
       if(rnd()<0.78){
         var rs=3.5+rnd()*6;
         var rk=new THREE.Mesh(G('bankrock'+Math.round(rs*2),function(){return new THREE.DodecahedronGeometry(rs,0);}),M(stoneTones[Math.floor(rnd()*4)]));
@@ -5192,7 +5312,7 @@ function buildRiver3D(){
         rk.castShadow=true; rk.receiveShadow=true; staticGroup.add(rk);
       }
       if(rnd()<0.55){
-        var toff=100+rnd()*24, tx2=bx+(-tn.z)*side*toff, ty2=by+(tn.x)*side*toff;
+        var toff=130+rnd()*26, tx2=bx+(-tn.z)*side*toff, ty2=by+(tn.x)*side*toff;
         if(terrainH(tx2,ty2)>3){
           var tu=cone(4.5+rnd()*3,9+rnd()*7,greens[Math.floor(rnd()*4)],WX(tx2),terrainH(tx2,ty2)+4,WZ(ty2),staticGroup,6);
           tu.castShadow=false;
@@ -5218,7 +5338,7 @@ function buildTown3D(){
   decorations.forEach(function(d){
     if(!d.townWater||d.river)return; /* river-chain discs are depth-only: the ribbon below draws that water */
     var zz=(d.wz||2.4)+(d.pond!=null?d.pond*0.18:0); /* stacked pond discs step up a hair each so overlaps never z-fight */
-    addWaterDisc(d.x,d.y,zz,d.s*1.03,Math.hypot(d.x-POOL.x,d.y-POOL.y)<4);
+    addWaterDisc(d.x,d.y,zz,d.s*1.03,Math.hypot(d.x-POOL.x,d.y-POOL.y)<4,d.vivid);
   });
   buildRiver3D(); /* one continuous flowing channel: falls → ponds → water gate */
   /* ---- waterfall: THREE broad tiers off the crag (top pool → upper
@@ -5235,13 +5355,14 @@ function buildTown3D(){
     var m=new THREE.Mesh(G('s'+r,function(){return new THREE.SphereGeometry(r,10,8);}),M(0xf4fbff));
     m.scale.y=0.35; m.position.set(WX(x),z,WZ(y2d)); staticGroup.add(m);
   }
-  sheet(1151,1142,105,1157,1174,82,170);  /* tier 1: top pool → upper shelf */
-  sheet(1158,1188,79,1162,1238,52,162);   /* tier 2: upper shelf → lower shelf */
-  sheet(1163,1250,49,1168,1298,3,154);    /* tier 3: lower shelf → plunge pool */
-  foam(1157,1178,81,38); foam(1162,1242,51,42); foam(1168,1302,4,48); foam(1150,1105,108,16);
-  foam(1120,1186,80,20); foam(1196,1186,80,20); foam(1126,1250,50,22); foam(1200,1250,50,22); /* side bursts where the widened sheets strike the shelves */
+  sheet(1151,1142,105,1157,1174,82,214);  /* tier 1: top pool → upper shelf */
+  sheet(1158,1188,79,1162,1238,52,204);   /* tier 2: upper shelf → lower shelf */
+  sheet(1163,1250,49,1168,1298,3,194);    /* tier 3: lower shelf → plunge pool */
+  foam(1157,1178,81,50); foam(1162,1242,51,56); foam(1168,1302,4,62); foam(1150,1105,108,16);
+  foam(1120,1186,80,27); foam(1196,1186,80,27); foam(1126,1250,50,29); foam(1200,1250,50,29); /* side bursts where the widened sheets strike the shelves */
   buildFallsSpray(); /* animated spray mist at the three plunge bases */
   buildFallsMist();  /* drifting mist clouds + expanding ripple rings in the plunge pool */
+  buildSmoke();      /* chimney smoke over every house (positions follow the house features, so it rebuilds with the town) */
   /* ---- features ---- */
   townFeatures.forEach(function(f){
     var gh=terrainH(f.x,f.y);
@@ -6059,6 +6180,8 @@ function render3D(now){
   if(typeof currentPlacedSig==='function'&&placedSig!==currentPlacedSig())rebuildPlaced3D();
   if(typeof updateEditorVisuals==='function')updateEditorVisuals();
   updateWaterFx(now); /* water shader time, waterfall scroll, spray */
+  updateSmoke(now);   /* chimney smoke drifting over the rooftops */
+  updateTownsfolk(now); /* villagers strolling the streets and plaza */
   // entities
   var seen={};
   /* first-person: the player's own body is not rendered (camera sits at eye level) */
@@ -6181,7 +6304,7 @@ function render3D(now){
     if(Math.abs(camera3d.fov-wantFov)>0.05){camera3d.fov+=(wantFov-camera3d.fov)*0.35;camera3d.updateProjectionMatrix();}
   }
   // sun follows player for tight shadows
-  sunLight.position.set(tx+260,420,tz+160);sunLight.target.position.set(tx,0,tz);
+  sunLight.position.set(tx+330,235,tz+185);sunLight.target.position.set(tx,0,tz);
   clouds.forEach(function(c,i){c.position.x+=0.14+i*0.012;if(c.position.x>2700)c.position.x=-2700;});
   // hint fade
   if(!hintT0)hintT0=now;
