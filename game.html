@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark"/>
 <link rel="icon" href="data:,"/>
 <title>AETHERIA ONLINE 公式サイト — ブラウザで遊べるファンタジーMMORPG【公開版】</title>
-<meta name="description" content="AETHERIA ONLINE（エーテリア オンライン）公式サイト【公開版】。ダウンロード不要、ブラウザですぐに冒険できるファンタジーMMORPG。このページのリンクを送れば、友だちも同じ世界に入って一緒に遊べます。ルミナスの町を拠点に、草原・森・古代遺跡を巡る冒険が今始まる。"/>
+<meta name="description" content="AETHERIA ONLINE（エーテリア オンライン）公式サイト【公開版】。ダウンロード不要、ブラウザですぐに冒険できるファンタジーMMORPG。このページのリンクを送れば、友だちも同じ世界に入って一緒に遊べます。ルミナス平原を拠点に、草原・森・古代遺跡を巡る冒険が今始まる。"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=DotGothic16&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
@@ -30,7 +30,7 @@ canvas{display:block}
 #game3d{position:absolute;inset:0;z-index:1}
 #game3d canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 #game3d canvas:active{cursor:grabbing}
-/* ゲームプレイ中（マップ／メニュー／商人などの画面を開いていない時）は
+/* ゲームプレイ中（マップ／メニューなどの画面を開いていない時）は
    OSカーソルを表示しない。ポインターロックが効いていない間もこの指定で隠す */
 body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 #labels{position:absolute;inset:0;z-index:15;pointer-events:none;overflow:hidden}
@@ -114,18 +114,6 @@ body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 .map-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:9px;text-align:left}
 .map-legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
 .map-card .bag-actions button{background:var(--gold)}
-#shopModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
-.shop-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
-.shop-card h2{margin:0 0 4px;font-size:18px}
-.shop-card .sub{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 6px}
-.shop-wallet{display:flex;gap:8px;margin:10px 0 4px}
-.shop-wallet div{flex:1;background:#0b100e;border:1px solid var(--line);border-radius:8px;padding:9px;text-align:center}
-.shop-wallet b{display:block;font-size:16px;color:var(--gold)}
-.shop-wallet span{font-size:10px;color:var(--muted)}
-.shop-row{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line)}
-.shop-row .bag-info b{font-size:13px}
-.shop-buy{background:var(--gold);border:0;border-radius:6px;padding:8px 13px;font-weight:900;font-size:12px;color:#1c1503;flex-shrink:0;white-space:nowrap}
-.shop-buy:disabled{opacity:.35;cursor:default}
 
 /* ===== TOP BAR ===== */
 #topbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;pointer-events:none;z-index:20;gap:8px}
@@ -564,7 +552,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <div class="avatar" id="hudAvatar">⚔️</div>
           <div class="char-meta">
             <div class="name" id="hudName">冒険者</div>
-            <div class="sub"><span class="lv-badge" id="hudLv">Lv.1</span><span id="hudClass">ウォーリアー</span><span id="hudZone">ルミナスの町</span></div>
+            <div class="sub"><span class="lv-badge" id="hudLv">Lv.1</span><span id="hudClass">ウォーリアー</span><span id="hudZone">ルミナス平原</span></div>
           </div>
           <div class="hud-arrows" id="hudArrows"><b>🏹 × <span id="hudArrowCount">0</span></b><span>矢の所持数</span></div>
         </div>
@@ -586,7 +574,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <aside id="quest">
         <h3>◆ メインクエスト</h3>
         <div id="questTitle">スライム討伐</div>
-        <div id="questDesc">始まりの草原のスライムを倒そう。町の北側が草原だよ。</div>
+        <div id="questDesc">始まりの草原のスライムを倒そう。スポーン地点の北側が草原だよ。</div>
         <div id="questProg"><div class="track"><i id="questBar" style="width:0%"></i></div><span id="questCount">0 / 5</span></div>
         <div id="questReward">報酬: 80 EXP / 50 G</div>
       </aside>
@@ -603,7 +591,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     </div>
 
     <div id="joystick"><div id="stick"></div></div>
-    <button type="button" id="interactPrompt"><b>E</b>：商人マーロウと話す</button>
+    <button type="button" id="interactPrompt"><b>E</b>：刺さった矢を回収する</button>
 
     <div id="worldMapModal"><div class="map-card">
       <h2>🗺️ 全体マップ <span style="color:var(--gold);font-size:12px">— ルミナス地方</span></h2>
@@ -616,26 +604,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button id="mapZoomResetBtn" type="button">全体に戻す</button>
       </div>
       <p class="map-zoom-hint">地図をタップ／クリックすると、その場所を中心に拡大します（最大4倍）。拡大した状態でクリックすると全体に戻ります。ホイールでも拡大・縮小できます。</p>
-      <div class="map-legend"><span><i style="background:#ffd34d"></i>現在地</span><span><i style="background:#8d8574"></i>町</span><span><i style="background:#3a5c38"></i>草原・平原</span><span><i style="background:#2f5a30"></i>森</span><span><i style="background:#2e5f7a"></i>湖</span><span><i style="background:#e0c084"></i>砂漠</span><span><i style="background:#dfe9f2"></i>雪原</span><span><i style="background:#b0503a"></i>火山</span><span><i style="background:#5d5a68"></i>遺跡</span></div>
+      <div class="map-legend"><span><i style="background:#ffd34d"></i>現在地</span><span><i style="background:#3a5c38"></i>草原・平原</span><span><i style="background:#2f5a30"></i>森</span><span><i style="background:#2e5f7a"></i>湖</span><span><i style="background:#e0c084"></i>砂漠</span><span><i style="background:#dfe9f2"></i>雪原</span><span><i style="background:#b0503a"></i>火山</span><span><i style="background:#5d5a68"></i>遺跡</span></div>
       <div class="bag-actions"><button id="closeWorldMapBtn" type="button">閉じる（M）</button></div>
-    </div></div>
-
-    <div id="shopModal"><div class="shop-card">
-      <h2>🏪 マーロウ商店</h2>
-      <p class="sub">「いらっしゃい！旅の道具なら何でも揃うよ。矢はアーチャーの命綱だ、切らさないようにな。」</p>
-      <div class="shop-wallet"><div><b id="shopGold">0 G</b><span>所持ゴールド</span></div><div><b>🏹 × <span id="shopArrows">0</span></b><span>矢の所持数</span></div></div>
-      <div id="shopList">
-        <div class="shop-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢 ×10</b><small>アーチャーの射撃に使う矢（1本 2G）</small></div><button type="button" class="shop-buy" data-buy="10">20 G で買う</button></div>
-        <div class="shop-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢 ×50</b><small>たっぷり補充（1本 2G）</small></div><button type="button" class="shop-buy" data-buy="50">100 G で買う</button></div>
-        <div class="shop-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢 ×100</b><small>遠征用の大束（1本 2G）</small></div><button type="button" class="shop-buy" data-buy="100">200 G で買う</button></div>
-        <div class="shop-row"><span class="bag-ico">🧪</span><div class="bag-info"><b>回復ポーション ×1</b><small>使うとHPを45回復</small></div><button type="button" class="shop-buy" data-buy-potion="1">30 G で買う</button></div>
-      </div>
-      <div class="bag-actions"><button id="closeShopBtn" type="button">店を出る</button></div>
     </div></div>
 
     <div id="levelUp"><div class="big">LEVEL UP!</div><p id="levelUpText">レベルが上がった！</p></div>
 
-    <div id="deathScreen"><div class="death-card"><h2>力尽きた…</h2><p>暗闇の中、ルミナスの町の教会の鐘の音が聞こえる。<br>経験値ペナルティなしで町に帰還します。</p><button id="respawnBtn">町で復活する</button></div></div>
+    <div id="deathScreen"><div class="death-card"><h2>力尽きた…</h2><p>暗闇の中、遠くで鳥のさえずりが聞こえる。<br>経験値ペナルティなしでスポーン地点に帰還します。</p><button id="respawnBtn">スポーン地点で復活する</button></div></div>
 
     <div id="helpModal"><div class="help-card">
       <h2>遊び方 — AETHERIA ONLINE</h2>
@@ -648,8 +623,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
-        <tr><td>買い物</td><td>町の広場の商人マーロウに近づいて <kbd>E</kbd> キー（または表示されるボタン）で話しかけると、矢やポーションを買えます</td></tr>
-        <tr><td>矢（アーチャー）</td><td>アーチャーの射撃は矢を1本ずつ消費し、矢が0本だと攻撃できません。矢は放った方向へ放物線を描いて飛び、地形に刺さった矢は近づいて <kbd>E</kbd> キーで回収できます。町の商人でも買えます</td></tr>
+        <tr><td>矢（アーチャー）</td><td>アーチャーの射撃は矢を1本ずつ消費し、矢が0本だと攻撃できません。矢は放った方向へ放物線を描いて飛び、地形に刺さった矢は近づいて <kbd>E</kbd> キーで回収できます</td></tr>
         <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
@@ -659,7 +633,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はソロプレイになります</td></tr>
         <tr><td>セーブ</td><td>アカウントでログイン中は<b>自動保存</b>されます（操作不要）。手動同期とバックアップ用のファイル書き出しは Escメニューの「セーブ」から行えます</td></tr>
         <tr><td>クエスト</td><td>右上のクエストを進めると報酬GET。最終目標は北東の森のボス討伐！</td></tr>
-        <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）。さらに遠くには雪原・砂漠・深淵の森・紅蓮火山（最強・炎魔イフリート）が広がります</td></tr>
+        <tr><td>エリア</td><td>スポーン地点の周囲は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）。さらに遠くには雪原・砂漠・深淵の森・紅蓮火山（最強・炎魔イフリート）が広がります</td></tr>
       </table>
       <button id="closeHelp">閉じる</button>
     </div></div>
@@ -757,7 +731,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <div class="hero-cap">
             <div>
               <div class="hc-title">AETHERIA <span>ONLINE</span></div>
-              <p>ダウンロード不要、ブラウザですぐに冒険できるファンタジーMMORPG。ルミナスの町を拠点に、草原・森・古代遺跡を巡り、遺跡の守護者に挑もう。</p>
+              <p>ダウンロード不要、ブラウザですぐに冒険できるファンタジーMMORPG。ルミナス平原を拠点に、草原・森・古代遺跡を巡り、遺跡の守護者に挑もう。</p>
             </div>
             <div class="hero-badges"><span class="gold">基本プレイ無料</span><span>一人称3D</span><span>スマホ対応</span><span>リンクで友だちと合流</span></div>
           </div>
@@ -768,7 +742,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <div class="start-card">
           <div class="start-visual">
             <canvas id="previewCanvas" width="600" height="520"></canvas>
-            <div class="caption"><b>WELCOME TO AETHERIA</b><p>歩ける・会える・戦える世界が、ブラウザの中に広がっています。同じリンクを開いた友だちとは、町の広場で落ち合えます。</p></div>
+            <div class="caption"><b>WELCOME TO AETHERIA</b><p>歩ける・会える・戦える世界が、ブラウザの中に広がっています。同じリンクを開いた友だちとは、スポーン地点で落ち合えます。</p></div>
           </div>
           <div class="start-form">
             <div class="eyebrow">BROWSER MMORPG — 正式サービス中</div>
@@ -865,7 +839,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         </section>
         <section class="world-panel" aria-label="世界の数字">
           <h2>ルミナス地方へようこそ</h2>
-          <p>噴水の広場を中心に家々が並ぶルミナスの町。北にはスライムの跳ねる草原、東には獣の潜む深い森、北東の丘には守護者ゴーレムの眠る古代遺跡。さらに世界の果てには、白銀の雪原、灼熱の砂漠、深淵の森と翠玉湖、そして炎魔イフリートの君臨する紅蓮火山が広がっています。</p>
+          <p>冒険の始まりの地、ルミナス平原。北にはスライムの跳ねる草原、東には獣の潜む深い森、北東の丘には守護者ゴーレムの眠る古代遺跡。さらに世界の果てには、白銀の雪原、灼熱の砂漠、深淵の森と翠玉湖、そして炎魔イフリートの君臨する紅蓮火山が広がっています。</p>
           <div class="world-stats">
             <div><b>10</b><span>エリア</span></div>
             <div><b>3</b><span>クラス</span></div>
@@ -878,7 +852,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="sec-panel" aria-label="ゲームの特徴">
           <h2>FEATURES <span>— 特徴</span></h2>
           <div class="feat-grid">
-            <div class="feat"><div class="f-ico">👁️</div><h3>一人称で歩く世界</h3><p>カメラはあなたの目線そのもの。右手に武器を構え、町並み・森・遺跡を自分の足で歩き回る没入感。</p></div>
+            <div class="feat"><div class="f-ico">👁️</div><h3>一人称で歩く世界</h3><p>カメラはあなたの目線そのもの。右手に武器を構え、草原・森・遺跡を自分の足で歩き回る没入感。</p></div>
             <div class="feat"><div class="f-ico">◆</div><h3>リンクで友だちと合流</h3><p>このページのリンクを送るだけ。同じリンクを開いた実プレイヤーが ◆ マークで現れ、動きとチャットが同期します。</p></div>
             <div class="feat"><div class="f-ico">🗺️</div><h3>王道の冒険の1日目</h3><p>スライム討伐から始まる全6章のメインクエスト。最終目標は紅蓮火山の炎魔イフリートの討伐。</p></div>
             <div class="feat"><div class="f-ico">☁️</div><h3>サーバー自動保存</h3><p>ホーム画面でアカウントを作るだけ。進捗はサーバーへ自動保存され、どの端末からでもログインすれば続きから再開できます。セーブ操作は不要です。</p></div>
@@ -889,9 +863,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <h2>WORLD <span>— 舞台はルミナス地方</span></h2>
           <p class="sec-sub">10のエリアが1つの世界につながっている（128×128タイル）</p>
           <div class="zone-grid">
-            <div class="zone-card"><b>🏘️ ルミナスの町</b><p>噴水の広場を中心に家々が並ぶ、冒険の拠点。安全地帯で、HPも回復する。ここからすべての物語が始まる。</p></div>
-            <div class="zone-card"><b>🌿 始まりの草原</b><p>町の北に広がる穏やかな草原。スライムが跳ねる、駆け出し冒険者の狩り場。</p></div>
-            <div class="zone-card"><b>🌲 ささやきの森</b><p>町の東に広がる深い森。ゴブリン、フォレストウルフ、オークが巣くう。レベルを上げてから挑もう。</p></div>
+            <div class="zone-card"><b>🌿 ルミナス平原</b><p>冒険の始まりの地。スポーン地点の周囲は安全地帯で、HPも回復する。ここからすべての物語が始まる。</p></div>
+            <div class="zone-card"><b>🌿 始まりの草原</b><p>平原の北に広がる穏やかな草原。スライムが跳ねる、駆け出し冒険者の狩り場。</p></div>
+            <div class="zone-card"><b>🌲 ささやきの森</b><p>平原の東に広がる深い森。ゴブリン、フォレストウルフ、オークが巣くう。レベルを上げてから挑もう。</p></div>
             <div class="zone-card"><b>💧 月影湖</b><p>南西にたたずむ静かな湖。世界のほころびを感じる、不思議な場所。</p></div>
             <div class="zone-card"><b>🏛️ 古代遺跡</b><p>北東の丘に眠る古代の遺跡。守護者ゴーレム（Lv.10）と、宙に浮かぶ蒼いクリスタルが待つ。</p></div>
             <div class="zone-card"><b>❄️ 白銀の雪原</b><p>北東の果ての雪原。フロストウルフとアイスゴーレムが徘徊する、吹雪の大地。</p></div>
@@ -899,7 +873,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <div class="zone-card"><b>🌋 紅蓮火山</b><p>南東の果ての活火山。マグマスライムとラーヴァゴーレム、そして炎魔イフリート（Lv.14）が君臨する最難関エリア。</p></div>
             <div class="zone-card"><b>🌳 深淵の森と翠玉湖</b><p>南西の奥地に広がる古い森と、エメラルド色に光る湖。古木のトレントが森を守る。</p></div>
             <div class="zone-card"><b>🗿 忘れられた遺跡</b><p>北の大地に埋もれたもうひとつの遺跡。番人のオークたちが今も見張りを続ける。</p></div>
-            <div class="zone-card"><b>◆ 実プレイヤー</b><p>リンクを開いた実プレイヤーが ◆ マークでこの世界に加わります。町の広場で落ち合って、一緒に冒険しよう。</p></div>
+            <div class="zone-card"><b>◆ 実プレイヤー</b><p>リンクを開いた実プレイヤーが ◆ マークでこの世界に加わります。スポーン地点で落ち合って、一緒に冒険しよう。</p></div>
           </div>
         </section>
 
@@ -916,7 +890,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="sec-panel" id="secQuest" aria-label="メインクエスト">
           <h2>MAIN QUEST <span>— 全6章の物語</span></h2>
           <ol class="quest-chain">
-            <li><span class="q-num">1</span><div><b>スライム討伐</b><small>始まりの草原（町の北）のスライムを5体倒そう。</small></div><span class="q-reward">報酬 80 EXP / 50 G</span></li>
+            <li><span class="q-num">1</span><div><b>スライム討伐</b><small>始まりの草原のスライムを5体倒そう。</small></div><span class="q-reward">報酬 80 EXP / 50 G</span></li>
             <li><span class="q-num">2</span><div><b>ゴブリン退治</b><small>東の森に巣くうゴブリンを5体退治しよう。少し強いのでレベルを上げてから。</small></div><span class="q-reward">報酬 180 EXP / 120 G</span></li>
             <li><span class="q-num">3</span><div><b>森の脅威</b><small>フォレストウルフとオークを合わせて6体倒して森に平和を。</small></div><span class="q-reward">報酬 320 EXP / 220 G</span></li>
             <li><span class="q-num">4</span><div><b>遺跡の守護者</b><small>北東の遺跡に眠るボス「守護者ゴーレム」を討伐せよ！</small></div><span class="q-reward">報酬 800 EXP / 600 G</span></li>
@@ -935,12 +909,12 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
             <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動でダッシュ。MPを毎秒1消費し、尽きるとダッシュできません</td></tr>
             <tr><td>全体マップ</td><td><kbd>M</kbd> キー。歩いて探索したエリアだけが表示される全体マップ（探索記録はセーブに残ります）</td></tr>
-            <tr><td>買い物・矢</td><td>町の商人マーロウに近づいて <kbd>E</kbd> で買い物。アーチャーの射撃は矢を消費し、矢は放物線を描いて飛びます。地形に刺さった矢は近づいて <kbd>E</kbd> で回収できます</td></tr>
+            <tr><td>矢</td><td>アーチャーの射撃は矢を消費し、矢は放物線を描いて飛びます。地形に刺さった矢は近づいて <kbd>E</kbd> で回収できます</td></tr>
             <tr><td>スキル</td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
             <tr><td>ポーション</td><td><kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
             <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
             <tr><td>セーブ</td><td>アカウントでログイン中は自動保存（操作不要）。ログインはホーム画面から。ゲストプレイ時は <kbd>Esc</kbd> メニューの「セーブ」（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でファイルに保存できます</td></tr>
-            <tr><td>オンライン</td><td>同期サーバー接続中は実プレイヤーが ◆ マークで表示。友だちと遊ぶときは、まず町の広場で落ち合うのがおすすめです</td></tr>
+            <tr><td>オンライン</td><td>同期サーバー接続中は実プレイヤーが ◆ マークで表示。友だちと遊ぶときは、まずスポーン地点で落ち合うのがおすすめです</td></tr>
           </table>
         </section>
 
@@ -948,16 +922,16 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <h2>FAQ <span>— よくある質問</span></h2>
           <div class="faq-list">
             <details><summary>料金はかかりますか？</summary><p>基本プレイ無料です。ダウンロードやインストールも不要で、ブラウザを開けばすぐに遊べます。</p></details>
-            <details><summary>友だちと一緒に遊べますか？</summary><p>はい。このページのリンクを友だちに送って、同じ時間に開いてもらうだけです。同期サーバーに接続できていれば、お互いが ◆ マークのプレイヤーとして見え、動きとチャットが同期します。まず町の広場（スポーン地点の近く）で落ち合ってみてください。</p></details>
+            <details><summary>友だちと一緒に遊べますか？</summary><p>はい。このページのリンクを友だちに送って、同じ時間に開いてもらうだけです。同期サーバーに接続できていれば、お互いが ◆ マークのプレイヤーとして見え、動きとチャットが同期します。まずスポーン地点で落ち合ってみてください。</p></details>
             <details><summary>相手が ◆ マークで見えません</summary><p>同期サーバーがスリープしている可能性があります（無料枠の仕様で、しばらく誰も使っていないと眠ります）。ページを開いてから最大1分ほど待って入り直すと、サーバーが目覚めて接続できることがあります。画面上の表示が「オンライン ○人」になれば同期中です。</p></details>
             <details><summary>役職（クラス）は変更できますか？</summary><p>役職はアカウントごとに、キャラクターを最初に作るときに1回だけ選べます。一度決めると、そのアカウントでは変更できません。保存済みキャラクターがあるアカウントでは役職を選び直す画面自体が出ず、決めた役職で固定されます。別の役職で遊びたい場合は、別のアカウントで新しく始めてください。アカウントが違えば、違う役職を選べます。</p></details>
             <details><summary>セーブはどうなりますか？</summary><p>ホーム画面でサーバーアカウントを作ってログインすれば、進捗は自動でサーバーに保存されます。セーブボタンを押す必要はありません。別のスマホやPCからでも、同じアカウントでログインすれば続きから遊べます。アカウントなしのゲストプレイでは、従来どおり 💾 からファイルに書き出して保存できます。</p></details>
             <details><summary>スマホでも遊べますか？</summary><p>はい。移動スティック・攻撃ボタン・スキルボタンなど、タッチ操作に最適化したUIを用意しています。</p></details>
-            <details><summary>力尽きたらどうなりますか？</summary><p>経験値ペナルティなしでルミナスの町に帰還します。安心してボスに挑戦してください。</p></details>
+            <details><summary>力尽きたらどうなりますか？</summary><p>経験値ペナルティなしでスポーン地点に帰還します。安心してボスに挑戦してください。</p></details>
           </div>
         </section>
 
-        <div class="link-note">🔗 <b>友だちを誘うには：</b>このページのリンク（URL）をそのまま送るだけ。相手はリンクを開いてキャラクターを作れば、同じルミナス地方に入れます。合流のコツは「町の広場で待ち合わせ」。お互い ◆ マークで表示されます。</div>
+        <div class="link-note">🔗 <b>友だちを誘うには：</b>このページのリンク（URL）をそのまま送るだけ。相手はリンクを開いてキャラクターを作れば、同じルミナス地方に入れます。合流のコツは「スポーン地点で待ち合わせ」。お互い ◆ マークで表示されます。</div>
       </div>
 
       <div class="official-foot">
@@ -997,7 +971,7 @@ var ETYPES={
   ifrit:{name:"火山の炎魔イフリート",emoji:"👿",hp:1250,atk:38,exp:1000,gold:900,lv:14,speed:1.35,size:40,color:"#e5484d",boss:true}
 };
 var QUESTS=[
-  {title:"スライム討伐",desc:"始まりの草原（町の北）のスライムを倒そう。",target:"slime",need:5,exp:80,gold:50},
+  {title:"スライム討伐",desc:"始まりの草原のスライムを倒そう。",target:"slime",need:5,exp:80,gold:50},
   {title:"ゴブリン退治",desc:"東の森に巣くうゴブリンを退治しよう。少し強いのでレベルを上げてから。",target:"goblin",need:5,exp:180,gold:120},
   {title:"森の脅威",desc:"フォレストウルフとオークを倒して森に平和を。",target:"any_mid",need:6,exp:320,gold:220},
   {title:"遺跡の守護者",desc:"北東の遺跡に眠るボス「守護者ゴーレム」を討伐せよ！",target:"boss",need:1,exp:800,gold:600},
@@ -1030,9 +1004,6 @@ var aimTarget=null;
 var EXP_N=64, explored=[], exploredCount=0;
 /* arrows stuck in the terrain: they stay for a while and can be picked back up with E */
 var stuckArrows=[];
-/* the town merchant (shop) */
-var MERCHANT={x:1505,y:1535,name:"商人マーロウ",r:16};
-var ARROW_PRICE=2;
 
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
 var DEFAULT_BINDS={attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
@@ -1234,10 +1205,10 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('shopModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid';
 }
 /* ===== カーソル表示制御 =====
-   マップ／メニュー／商人などの画面を開いている間だけカーソルを使い、
+   マップ／メニューなどの画面を開いている間だけカーソルを使い、
    ゲームに戻った瞬間にカーソルを消してポインターロックを取り直す。
    ブラウザのクールダウン等でロックを取り直せなかった場合でも、
    body.hide-cursor の CSS でカーソルは表示されない（次のクリックでロックされる）。 */
@@ -1303,7 +1274,6 @@ function closeSubModal(id){
 function handleEscape(){
   if(menuOpen){closeGameMenu();return true;}
   if($('worldMapModal').style.display==='grid'){closeWorldMap();return true;}
-  if($('shopModal').style.display==='grid'){closeShop();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
@@ -1322,7 +1292,7 @@ function refreshBagUI(){
   var hpFull=player.hp>=player.maxHp;
   var html='';
   html+='<div class="bag-row"><span class="bag-ico">🧪</span><div class="bag-info"><b>回復ポーション</b><small>使うとHPを45回復</small></div><span class="bag-count">× '+player.potions+'</span><button type="button" class="bag-use" data-use="potion"'+((player.potions<=0||hpFull)?' disabled':'')+'>使う</button></div>';
-  html+='<div class="bag-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢</b><small>アーチャーの射撃で1本ずつ消費。町の商人で買える／地形に刺さった矢はEキーで回収</small></div><span class="bag-count">× '+player.arrows+'</span></div>';
+  html+='<div class="bag-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢</b><small>アーチャーの射撃で1本ずつ消費。地形に刺さった矢はEキーで回収</small></div><span class="bag-count">× '+player.arrows+'</span></div>';
   html+='<div class="bag-row"><span class="bag-ico">'+weapon[0]+'</span><div class="bag-info"><b>'+weapon[1]+'</b><small>'+weapon[2]+'</small></div><span class="bag-tag">装備中</span></div>';
   html+='<div class="bag-row"><span class="bag-ico">💰</span><div class="bag-info"><b>ゴールド</b><small>冒険で集めたお金</small></div><span class="bag-count">'+player.gold+' G</span></div>';
   html+='<div class="bag-row"><span class="bag-ico">🏅</span><div class="bag-info"><b>討伐記録</b><small>これまでに倒したモンスター</small></div><span class="bag-count">'+player.kills+' 体</span></div>';
@@ -1346,7 +1316,7 @@ function refreshPlayersUI(){
 function doLogout(){
   if(acct.token)serverSave(false);
   returnToMenu=false;closeGameMenu(true);
-  ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal','shopModal'].forEach(function(id){$(id).style.display='none';});
+  ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
   netClosed=true;clearTimeout(netRetryTimer);
   if(netWs){try{netWs.close();}catch(e){}netWs=null;}
@@ -1477,166 +1447,31 @@ function regionAt(x,y){
   if(x<1500&&y>3250) return 'deepforest';
   return 'green';
 }
-/* ===== LUMINAS — a mountain castle town (photo layout, enlarged ×1.2) =====
-   The whole town was scaled up by ~1.2, keeping the photo's proportions:
-   wall aspect, plaza size, river width, chapel/castle positions and the
-   mountain height all grow together. Layout by compass (north = photo top,
-   town centre as reference):
-   - FALLS: north centre, slightly WEST — a two-tier fall pouring off the
-     rocky mountain cliff through the north water-gate; its source stream
-     runs down from the northern peaks.
-   - RIVER: falls → south → under the falls-lane bridge → widens into a
-     pond at the town centre, just NORTH of the plaza → turns east–SE →
-     a big bright-blue pond on the east side → out the SE water-gate.
-   - CHAPEL: EAST of the falls, on the north-centre terrace, glowing blue.
-   - CASTLE: the NE corner, crowning its cliff plateau; the whole NE is
-     one great stepped district of stone terraces and stair flights.
-   - CLOCK TOWER: west centre, standing among the houses.
-   - PLAZA: centre, slightly south — circular, fountain at its heart.
-   - HOUSES crowd three districts: west centre (around the clock tower),
-     south of the plaza, and around the east pond; elsewhere they thin out.
-   - WALL: a rounded ring bulging south; gates SOUTH-WEST and SOUTH-EAST
-     only; the north side is closed by wall and mountain.
-   - TERRAIN: north & NE are rocky peaks and pine-covered slopes; west
-     outside the wall is gentle grassland with crop fields; south is forest. */
-var TOWN_CX=1300, TOWN_CY=1320;               // centre of the walled town
-var PLAZA={x:1300,y:1500};                    // fountain plaza, centre–south
-var PLAZA_R=300;                              // circular plaza ring radius
-var CASTLE={x:1820,y:470,w:390,h:185};        // castle on the NE cliff plateau
-var CHAPEL={x:1420,y:470,w:320,h:200};        // glowing chapel, east of the falls
-var RIVER_HW=55;                              // river half width
-var CLOCK={x:952,y:1284};                     // clock tower, west centre
-var POND={x:784,y:1866,w:312,h:180};          // garden pond (SW garden)
-var CPOND={x:1300,y:1070,rx:235,ry:125};      // river pond just north of the plaza
-var EPOND={x:1900,y:1330,rx:250,ry:160};      // big bright-blue pond, east side
-var RIVER_PTS=[[1180,110],[1179,250],[1176,400],[1176,545],[1173,700],[1170,850],[1195,960],[1300,1070],[1450,1135],[1620,1205],[1780,1270],[1900,1330],[2010,1470],[2075,1650],[2100,1850],[2180,2080],[2320,2320]];
-var FALLS_PT={x:1176,y:545};                  // the falls at the north water-gate
-var GATE_SW_A=2.27, GATE_SE_A=0.96;           // gate directions (rad; S = π/2, y-down)
-var RIVER_IN_A=-1.70, RIVER_OUT_A=0.68;       // where the river pierces the wall
-/* Wall outline: radius from the town centre as a function of direction —
-   southern bulge, tight north, NE shoulder for the castle cliff, plus a
-   hand-drawn wobble so the ring never reads as a geometric shape. */
-function townRadius(a){
-  var s=Math.sin(a), c=Math.cos(a);
-  var r=980;
-  r+=140*Math.pow(Math.max(0,s),1.6);                    // southern bulge
-  r-=84*Math.pow(Math.max(0,-s),1.3);                    // north hugs the mountain
-  var dNE=a+Math.PI/4; while(dNE>Math.PI)dNE-=Math.PI*2; while(dNE<-Math.PI)dNE+=Math.PI*2;
-  r+=195*Math.exp(-Math.pow(dNE/0.6,2));                 // NE shoulder (castle cliff)
-  r+=46*Math.max(0,c)*Math.max(0,s);                     // SE fullness
-  r+=41*Math.sin(3*a+0.8)+24*Math.sin(5*a+2.1);          // irregularity
-  return r;
-}
-/* signed distance to the wall ring: negative inside the town */
-function townShape(x,y){var dx=x-TOWN_CX, dy=y-TOWN_CY; return Math.hypot(dx,dy)-townRadius(Math.atan2(dy,dx));}
-function gatePoint(a){var r=townRadius(a); return {x:TOWN_CX+Math.cos(a)*r, y:TOWN_CY+Math.sin(a)*r};}
-var GATE_SW=gatePoint(GATE_SW_A), GATE_SE=gatePoint(GATE_SE_A);
-function segDist(px,py,ax,ay,bx,by){var dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy;var t=L2?((px-ax)*dx+(py-ay)*dy)/L2:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(ax+dx*t),py-(ay+dy*t));}
-function riverDist(x,y){var d=1e9;for(var i=0;i<RIVER_PTS.length-1;i++){var dd=segDist(x,y,RIVER_PTS[i][0],RIVER_PTS[i][1],RIVER_PTS[i+1][0],RIVER_PTS[i+1][1]);if(dd<d)d=dd;}return d;}
-function inTown(x,y){return townShape(x,y)<=-6;}
-/* No-spawn safe zone: the walled town plus a buffer (~3 tiles) outside the
-   walls. No spawn point is placed inside it, the spawner never materialises
-   a mob there, live mobs found inside are removed, and isSafe() covers the
-   whole area — so Luminas, its gates and the roads just outside stay safe. */
-var NO_SPAWN_MARGIN=120;
-function inNoSpawn(x,y){return townShape(x,y)<=NO_SPAWN_MARGIN;}
+/* ===== SPAWN SAFE ZONE =====
+   The town of Luminas has been removed entirely: walls, gates, houses,
+   castle, chapel, clock tower, plaza, avenues, the river, the falls,
+   the ponds and the terraced town terrain are all gone, and the land
+   is natural grassland again. The spawn point stays where the town
+   centre was (1300,1680). A small circle around it remains a no-spawn
+   safe zone so nobody is attacked the moment they log in: no spawn
+   point materialises inside it, mobs found inside are removed by the
+   despawn sweep, and players standing inside slowly heal (isSafe). */
+var SPAWN_X=1300, SPAWN_Y=1680;
+var SAFE_R=170; /* about 4 tiles around the spawn point */
+function inNoSpawn(x,y){return Math.hypot(x-SPAWN_X,y-SPAWN_Y)<=SAFE_R;}
 function genWorld(){
   obstacles=[];decorations=[];
   var tseed=987654;function trnd(){tseed=(tseed*16807)%2147483647;return tseed/2147483647;}
-  var WALL_C=["#ddd5c2","#e7dfca","#d8cbae","#e2d7bd","#cfc0a0","#eae2cf"];
-  var ROOF_C=["#7a4630","#8a4f30","#6e3b28","#93522f","#7d3a28","#855231"];
-  var WALL_HEX=["#ddd5c2","#e7dfca","#d8cbae","#e2d7bd","#cfc0a0"];
-  // ---- city houses on a street grid, kept clear of the avenues, the
-  //      plaza ring, the terraces, the river and the pond garden. They
-  //      CROWD the three districts of the photo — west centre around the
-  //      clock tower, south of the plaza, and around the east pond — and
-  //      thin out everywhere else. ----
-  for(var by=400;by<2240;by+=112){
-    for(var bx=400;bx<2240;bx+=112){
-      var hw=92+Math.floor(trnd()*16), hh=80+Math.floor(trnd()*16);
-      var hx=bx+Math.floor(trnd()*6), hy=by+Math.floor(trnd()*6);
-      var hcx=hx+hw/2, hcy=hy+hh/2;
-      if(townShape(hcx,hcy)>-95) continue;                  // inside the wall ring, with margin
-      if(hx<1400&&hx+hw>1200) continue;                      // grand avenue (N–S) stays clear
-      if(hy<1595&&hy+hh>1405) continue;                      // cross avenue (E–W) stays clear
-      if(Math.hypot(hcx-PLAZA.x,hcy-PLAZA.y)<PLAZA_R+100) continue; // circular plaza
-      if(hcx>1300&&hcy>330&&hcy<800) continue;               // north terraces (chapel & castle plateaus)
-      if(hcx>1500&&hcy>=800&&hcy<1150) continue;             // NE mid terrace
-      if(riverDist(hcx,hcy)<150) continue;                   // the river and its banks
-      if(Math.pow((hcx-CPOND.x)/(CPOND.rx+100),2)+Math.pow((hcy-CPOND.y)/(CPOND.ry+100),2)<1) continue; // centre pond
-      if(Math.pow((hcx-EPOND.x)/(EPOND.rx+80),2)+Math.pow((hcy-EPOND.y)/(EPOND.ry+80),2)<1) continue; // east pond
-      if(Math.hypot(hcx-CLOCK.x,hcy-CLOCK.y)<120) continue;  // clock tower plot
-      if(hy<705&&hy+hh>595&&hx>820&&hx<1520) continue;       // falls lane (W–E, under the falls)
-      if(hy<940&&hy+hh>820&&hx<1420) continue;               // west lane to the river bridge
-      if(Math.abs(hcx-GATE_SW.x)<95&&hcy>1450) continue;     // SW gate street
-      if(Math.abs(hcx-GATE_SE.x)<95&&hcy>1450) continue;     // SE gate street
-      if(hcx>POND.x-85&&hcx<POND.x+POND.w+85&&hcy>POND.y-85&&hcy<POND.y+POND.h+70) continue; // pond garden
-      if(Math.hypot(hcx-MERCHANT.x,hcy-MERCHANT.y)<110) continue;
-      var dense=Math.hypot(hcx-CLOCK.x,hcy-CLOCK.y)<500
-             ||(hcy>PLAZA.y+100&&Math.hypot(hcx-PLAZA.x,hcy-PLAZA.y)<720)
-             ||Math.hypot(hcx-EPOND.x,hcy-EPOND.y)<580;
-      if(!dense&&trnd()<0.32) continue;                      // sparse outside the three districts
-      obstacles.push({type:'rect',x:hx,y:hy,w:hw,h:hh,c:WALL_HEX[Math.floor(trnd()*WALL_HEX.length)],house:true,
-        rc:ROOF_C[Math.floor(trnd()*ROOF_C.length)],hh:100+Math.floor(trnd()*80)+(Math.hypot(hcx-TOWN_CX,hcy-TOWN_CY)<680?40:0),chim:trnd()<0.45});
-    }
-  }
-  // ---- the city wall: an irregular rounded ring of stone blocks that
-  //      follows townRadius(), so the south side bulges in a great curve
-  //      and the north side tucks under the mountain. Openings: the SW and
-  //      SE gates ONLY (the south/east policy holds), plus the river's
-  //      two water-gates, sealed with iron grates. ----
-  var RIN_P=gatePoint(RIVER_IN_A), ROUT_P=gatePoint(RIVER_OUT_A);
-  var WN=134;
-  for(var wi=0;wi<WN;wi++){
-    var wp=gatePoint(wi/WN*Math.PI*2);
-    if(Math.hypot(wp.x-GATE_SW.x,wp.y-GATE_SW.y)<104) continue;   // SW gate
-    if(Math.hypot(wp.x-GATE_SE.x,wp.y-GATE_SE.y)<104) continue;   // SE gate
-    if(Math.hypot(wp.x-RIN_P.x,wp.y-RIN_P.y)<72) continue;        // river in (N)
-    if(Math.hypot(wp.x-ROUT_P.x,wp.y-ROUT_P.y)<72) continue;      // river out (SE)
-    if(wp.x>CASTLE.x-20&&wp.x<CASTLE.x+CASTLE.w+20&&wp.y>CASTLE.y-20&&wp.y<CASTLE.y+CASTLE.h+20) continue; // the castle itself closes the NE ring
-    obstacles.push({type:'rect',x:wp.x-33,y:wp.y-33,w:66,h:66,c:"#9a958a",wall:true});
-  }
-  // iron grates seal the river gaps so the stream is the only way through
-  obstacles.push({type:'rect',x:RIN_P.x-48,y:RIN_P.y-20,w:96,h:40,c:"#3a3733",grate:true});
-  obstacles.push({type:'rect',x:ROUT_P.x-48,y:ROUT_P.y-20,w:96,h:40,c:"#3a3733",grate:true});
-  // waterfall cliff at the river's entry, just inside the north wall
-  obstacles.push({type:'rect',x:FALLS_PT.x-65,y:FALLS_PT.y+16,w:130,h:56,c:"#5a564e",cliff:true});
-  // gate towers flanking both gates
-  [[GATE_SW,GATE_SW_A],[GATE_SE,GATE_SE_A]].forEach(function(gt){
-    var tx=-Math.sin(gt[1]), ty=Math.cos(gt[1]);
-    obstacles.push({type:'circle',x:gt[0].x+tx*112,y:gt[0].y+ty*112,r:36,tower:true});
-    obstacles.push({type:'circle',x:gt[0].x-tx*112,y:gt[0].y-ty*112,r:36,tower:true});
-  });
-  // bastions around the ring (W / NW / N / NE / E / S / WSW)
-  [3.14,3.93,4.71,5.50,0,1.57,2.75].forEach(function(ba){
-    var bp=gatePoint(ba);
-    obstacles.push({type:'circle',x:bp.x,y:bp.y,r:34,tower:true});
-  });
-  // ---- the castle crowning the north terrace, and the glowing chapel ----
-  obstacles.push({type:'rect',x:CASTLE.x,y:CASTLE.y,w:CASTLE.w,h:CASTLE.h,c:"#8d9299",castle:true});
-  obstacles.push({type:'rect',x:CHAPEL.x,y:CHAPEL.y,w:CHAPEL.w,h:CHAPEL.h,c:"#e9eef4",chapel:true});
-  obstacles.push({type:'circle',x:CLOCK.x,y:CLOCK.y,r:30,tower:true,clock:true});
-  // ---- pond garden inside the south gate ----
-  obstacles.push({type:'rect',x:POND.x,y:POND.y,w:POND.w,h:POND.h,c:"#2e6f92",pond:true});
-  // ---- circular plaza: colonnade pillars (openings at the four avenues) ----
-  for(var pa=0;pa<24;pa++){
-    var ang=pa/24*Math.PI*2, rem=((ang%(Math.PI/2))+Math.PI/2)%(Math.PI/2);
-    if(rem<0.30||rem>Math.PI/2-0.30) continue;               // avenue openings
-    obstacles.push({type:'circle',x:PLAZA.x+Math.cos(ang)*PLAZA_R,y:PLAZA.y+Math.sin(ang)*PLAZA_R,r:11,pillar:true});
-  }
-  obstacles.push({type:'circle',x:PLAZA.x,y:PLAZA.y,r:52,fountain:true}); // fountain at the plaza heart
-  obstacles.push({type:'circle',x:MERCHANT.x,y:MERCHANT.y,r:30,stall:true}); // merchant stall
   // ruins NE (original)
   for(var i=0;i<7;i++) obstacles.push({type:'rect',x:2050+ (i%3)*130,y:280+Math.floor(i/3)*150,w:56,h:90,c:"#6f6a7d",ruin:true});
   // forgotten ruins (north, in the new lands)
   for(var j=0;j<7;j++) obstacles.push({type:'rect',x:2780+(j%3)*170,y:300+Math.floor(j/3)*190,w:56,h:90,c:"#7a7466",ruin:true});
-  // trees & rocks scattered (avoid town center), vegetation follows the region
+  // trees & rocks scattered (avoid the spawn clearing), vegetation follows the region
   var tries=0;
   while(decorations.length<620 && tries<9000){
     tries++;
     var x=60+Math.random()*(W-120), y=60+Math.random()*(H-120);
-    if(townShape(x,y)<70) continue;   // inside the city walls of Luminas (+ margin)
-    if(riverDist(x,y)<125) continue;        // the river: north stream, town ponds, SE outflow
+    if(Math.hypot(x-1300,y-1680)<130) continue;  // spawn clearing stays open
     if(x>1950&&x<2620&&y<650) continue;
     if(x>2650&&x<3500&&y<1000) continue;              // forgotten ruins floor
     if(Math.hypot(x-420,y-2150)<300) continue;          // lake 1
@@ -1653,43 +1488,6 @@ function genWorld(){
     var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+Math.random()*14:10+Math.random()*8,seed:Math.random()*10};
     decorations.push(d);
     if(kind!=='flower') obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});
-  }
-  // the mountain ridge behind the north wall: pines & crags (deterministic)
-  for(var ri=0;ri<48;ri++){
-    var rx2=150+trnd()*2500, ry2=50+trnd()*380;
-    var rkind=trnd()<0.68?'tree':'rock';
-    var rd={x:rx2,y:ry2,kind:rkind,s:rkind==='tree'?24+trnd()*14:13+trnd()*11,seed:trnd()*10};
-    decorations.push(rd);
-    obstacles.push({type:'circle',x:rx2,y:ry2,r:rd.s*0.45,ref:rd});
-  }
-  // garden trees on the chapel terrace and the castle terrace corners
-  [[1370,455],[1370,705],[1755,455],[1790,460],[2250,455],[2250,705],[1620,830]].forEach(function(tp2){
-    var td={x:tp2[0],y:tp2[1],kind:'tree',s:24,seed:tp2[0]%10};
-    decorations.push(td);
-    obstacles.push({type:'circle',x:tp2[0],y:tp2[1],r:11,ref:td});
-  });
-  // a pine grove just inside the west wall — the town meets the forest there
-  for(var wti=0;wti<9;wti++){
-    var wtx=470+((wti*67)%60), wty=920+wti*128;
-    if(Math.abs(wty-PLAZA.y)<150) continue;
-    if(collide(wtx,wty,30)) continue;
-    var wd={x:wtx,y:wty,kind:'tree',s:23+((wti*37)%8),seed:wti*1.7+2};
-    decorations.push(wd);
-    obstacles.push({type:'circle',x:wtx,y:wty,r:11,ref:wd});
-  }
-  // the southern forest: a band of pines outside the south wall, kept
-  // clear of the two gate roads and the river's outflow
-  for(var sfi=0;sfi<44;sfi++){
-    var sfa=0.55+trnd()*2.05, sfr=townRadius(sfa)+150+trnd()*330;
-    var sfx=TOWN_CX+Math.cos(sfa)*sfr, sfy=TOWN_CY+Math.sin(sfa)*sfr;
-    if(sfx<80||sfx>W-80||sfy>H-80) continue;
-    if(Math.abs(sfx-GATE_SW.x)<130) continue;                    // south road
-    if(Math.abs(sfy-GATE_SE.y)<120&&sfx>GATE_SE.x-100) continue; // east road
-    if(riverDist(sfx,sfy)<150) continue;                         // the outflow
-    if(collide(sfx,sfy,30)) continue;
-    var sd={x:sfx,y:sfy,kind:'tree',s:22+trnd()*12,seed:trnd()*10};
-    decorations.push(sd);
-    obstacles.push({type:'circle',x:sfx,y:sfy,r:sd.s*0.45,ref:sd});
   }
   // lakes: 月影湖 (SW, original) / 翠玉湖 (deep south-west) / desert oasis
   decorations.push({x:420,y:2150,kind:'lake',s:230});
@@ -1777,7 +1575,6 @@ function losClear(x1,y1,x2,y2){
   return true;
 }
 function zoneAt(x,y){
-  if(inTown(x,y)) return "ルミナスの町（安全地帯）";
   if(x>3850&&y>3850) return "紅蓮火山（危険）";
   if(x>3250&&y>=1400&&y<=3400) return "灼熱の砂漠";
   if(x>3350&&y<1350) return "白銀の雪原";
@@ -1794,7 +1591,6 @@ function zoneAt(x,y){
 }
 function zoneColorAt(x,y){
   var z=zoneAt(x,y);
-  if(z.indexOf('町')>=0) return '#8d8574';
   if(z.indexOf('雪原')>=0) return '#dfe9f2';
   if(z.indexOf('砂漠')>=0) return '#e0c084';
   if(z.indexOf('火山')>=0) return '#b0503a';
@@ -1889,8 +1685,8 @@ function spawnEnemy(type,x,y,sp){
 }
 function addSpawnPoint(type,x,y){spawnPoints.push({type:type,x:x,y:y,e:null,coolUntil:0});}
 /* Scatter n spawn points over a band, resampling any point that lands in
-   the Luminas no-spawn safe zone (town + buffer) so near-town bands keep
-   their population — just never inside the walls or at the gates. */
+   the spawn no-spawn safe zone so nearby bands keep
+   their population — just never inside the safe circle. */
 function scatter(type,n,x0,x1,y0,y1){
   for(var i=0;i<n;i++){
     for(var t=0;t<12;t++){
@@ -1948,7 +1744,7 @@ function trySpawnNear(immediate){
     if(sp.e&&!sp.e.dead)continue;               /* point already has a live mob */
     if(sp.e&&sp.e.dead){sp.e=null;}              /* corpse cleanup finished it */
     if(now<sp.coolUntil)continue;                /* respawn cooldown */
-    if(inNoSpawn(sp.x,sp.y))continue;            /* Luminas safe zone: never materialises */
+    if(inNoSpawn(sp.x,sp.y))continue;            /* spawn safe zone: never materialises */
     if(Math.hypot(sp.x-player.x,sp.y-player.y)>SPAWN_RANGE)continue;
     /* never spawn inside a building or the safe zone, and keep fresh
        spawns spaced away from other live mobs: jitter until clear */
@@ -1969,7 +1765,7 @@ function despawnFar(){
   for(var i=enemies.length-1;i>=0;i--){
     var e=enemies[i];
     if(e.dead)continue;
-    /* the Luminas safe zone stays clear: a mob found inside it (wandered
+    /* the spawn safe zone stays clear: a mob found inside it (wandered
        in, or left over from before the zone existed) is removed unless
        the player is actively fighting it */
     if(inNoSpawn(e.x,e.y)&&target!==e&&aimTarget!==e){
@@ -2085,7 +1881,7 @@ function updateQuest(){
   $('questReward').textContent=q.done?'自由に冒険しよう！':('報酬: '+q.exp+' EXP / '+q.gold+' G');
 }
 function noArrows(){
-  toast('矢がない！町の商人マーロウから矢を買おう（地形に刺さった矢はEキーで回収できる）',3400);
+  toast('矢がない！地形に刺さった矢はEキーで回収できる',3400);
   beep(140,0.12,'square',0.04);
   var chip=$('hudArrows'); if(chip){chip.classList.remove('empty');void chip.offsetWidth;chip.classList.add('empty');}
 }
@@ -2579,14 +2375,6 @@ function waterDepthAt(x,y){
     var dist=Math.hypot(x-o.x,y-o.y);
     if(dist<o.s){var dep=(1-dist/o.s)*120;if(dep>d)d=dep;}
   }
-  // the Luminas river: a shallow stream — wading depth only, never swimming
-  var rd=riverDist(x,y);
-  if(rd<70){var rdep=(1-rd/70)*16; if(rdep>d)d=rdep;}
-  // the town's two river ponds deepen toward the middle — deep enough to swim
-  [[CPOND.x,CPOND.y,CPOND.rx,CPOND.ry],[EPOND.x,EPOND.y,EPOND.rx,EPOND.ry]].forEach(function(p){
-    var q=Math.pow((x-p[0])/p[2],2)+Math.pow((y-p[1])/p[3],2);
-    if(q<1){var pdep=(1-Math.sqrt(q))*55; if(pdep>d)d=pdep;}
-  });
   return d;
 }
 var drownTickT=0;
@@ -2662,7 +2450,7 @@ function update(dt,now){
     jumpVY-=0.00045*dt;
     if(jumpY<=0){jumpY=0;jumpVY=0;}
   }
-  // mp regen (paused while dashing or swimming), town heal
+  // mp regen (paused while dashing or swimming); safe-zone heal below
   if(!dashingNow&&!player.swimming)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
   // crosshair identification + eyesight: the enemy captured by the center
   // crosshair is the only one whose name/level/HP are revealed; any enemy
@@ -2699,7 +2487,6 @@ function update(dt,now){
       edt=e._slowT?Math.min(400,now-e._slowT):dt;
       e._slowT=now; slowTick=true;
     }
-    var inSafe=isSafe(e.x,e.y);
     if(dp<210&&!isSafe(player.x,player.y)) e.state='chase'; else if(dp>340) e.state='return';
     if(e.state==='chase'&&dp>e.r+player.r-4){
       var a=Math.atan2(player.y-e.y,player.x-e.x);
@@ -2723,11 +2510,6 @@ function update(dt,now){
         else{e._stuckMs=(e._stuckMs||0)+edt;if(e._stuckMs>1200){e.tx=0;e.ty=0;e.wt=400;e._stuckMs=0;}} /* boxed in: pick a new target */
       }}
       if(e.state==='return'){e.hp=Math.min(e.maxHp,e.hp+edt*0.02);}
-    }
-    if(inSafe){ // push out of town, sliding along buildings instead of through them
-      var px2=e.x+(e.x-TOWN_CX)*0.02, py2=e.y+(e.y-TOWN_CY)*0.02;
-      if(!collide(px2,e.y,e.r*0.7))e.x=px2;
-      if(!collide(e.x,py2,e.r*0.7))e.y=py2;
     }
   });
   // projectiles — mage bolts fly straight (legacy); ARROWS are physical:
@@ -2785,58 +2567,14 @@ function draw(){
     if(d.kind==='lake'){ctx.fillStyle='#2e5f7a';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.72,0,0,7);ctx.fill();ctx.fillStyle='#3a7291';ctx.beginPath();ctx.ellipse(d.x-cam.x-20,d.y-cam.y-14,d.s*0.7,d.s*0.45,0,0,7);ctx.fill();}
     else if(d.kind==='lava'){ctx.fillStyle='#c33d10';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.78,0,0,7);ctx.fill();ctx.fillStyle='#ff7a3c';ctx.beginPath();ctx.ellipse(d.x-cam.x-16,d.y-cam.y-10,d.s*0.66,d.s*0.45,0,0,7);ctx.fill();}
   });
-  // Luminas — a rounded, south-bulging wall ring: NE & north terraces, a
-  // river with two ponds, the fountain plaza just south of centre
-  function townPath(){ctx.beginPath();for(var ti=0;ti<=72;ti++){var tp=gatePoint(ti/72*Math.PI*2);if(ti===0)ctx.moveTo(tp.x-cam.x,tp.y-cam.y);else ctx.lineTo(tp.x-cam.x,tp.y-cam.y);}ctx.closePath();}
-  ctx.fillStyle='#8d8574';townPath();ctx.fill();
-  ctx.fillStyle='#9a958a';ctx.fillRect(1750-cam.x,410-cam.y,530,340);ctx.fillRect(1330-cam.x,410-cam.y,460,330);ctx.fillRect(1560-cam.x,760-cam.y,500,320); // terraces (castle / chapel / NE mid)
-  ctx.fillStyle='#7c9a52';ctx.fillRect(POND.x-72-cam.x,POND.y-66-cam.y,POND.w+144,POND.h+132); // garden green
-  ctx.fillStyle='#86a04e';ctx.fillRect(20-cam.x,890-cam.y,260,400);ctx.fillStyle='#b3a05e';ctx.fillRect(20-cam.x,1330-cam.y,260,280);ctx.fillStyle='#77913f';ctx.fillRect(40-cam.x,1610-cam.y,240,240); // west fields
-  ctx.fillStyle='#b3a888';ctx.fillRect(1215-cam.x,530-cam.y,170,1660);ctx.fillRect(320-cam.x,PLAZA.y-85-cam.y,1960,170); // avenues
-  ctx.fillRect(GATE_SW.x-65-cam.x,PLAZA.y-cam.y,130,720);ctx.fillRect(GATE_SE.x-65-cam.x,PLAZA.y-cam.y,130,740); // gate streets
-  ctx.fillRect(865-cam.x,600-cam.y,620,100);ctx.fillRect(620-cam.x,825-cam.y,760,110); // falls lane & west lane
-  ctx.fillStyle='#a89c80';ctx.beginPath();ctx.arc(PLAZA.x-cam.x,PLAZA.y-cam.y,PLAZA_R+34,0,7);ctx.fill();
-  ctx.strokeStyle='#cbbfa4';ctx.lineWidth=13;ctx.beginPath();ctx.arc(PLAZA.x-cam.x,PLAZA.y-cam.y,PLAZA_R,0,7);ctx.stroke();
-  // the river: falls at the north wall, ponds at centre & east, out the SE water-gate
-  ctx.strokeStyle='#2e8fa8';ctx.lineWidth=110;ctx.lineJoin='round';ctx.beginPath();
-  RIVER_PTS.forEach(function(rp,ri){if(ri===0)ctx.moveTo(rp[0]-cam.x,rp[1]-cam.y);else ctx.lineTo(rp[0]-cam.x,rp[1]-cam.y);});ctx.stroke();
-  ctx.fillStyle='#2e8fa8';
-  ctx.beginPath();ctx.ellipse(CPOND.x-cam.x,CPOND.y-cam.y,CPOND.rx,CPOND.ry,0,0,7);ctx.fill();
-  ctx.fillStyle='#35b6d9';
-  ctx.beginPath();ctx.ellipse(EPOND.x-cam.x,EPOND.y-cam.y,EPOND.rx,EPOND.ry,0,0,7);ctx.fill();
-  ctx.fillStyle='#cfeafb';ctx.fillRect(FALLS_PT.x-45-cam.x,FALLS_PT.y-10-cam.y,90,64);
-  ctx.strokeStyle='#8a8272';ctx.lineWidth=34;townPath();ctx.stroke(); // the curved city wall
-  ctx.fillStyle='#a34a32';
-  [[GATE_SW,GATE_SW_A],[GATE_SE,GATE_SE_A]].forEach(function(gt){var tx=-Math.sin(gt[1]),ty=Math.cos(gt[1]);[112,-112].forEach(function(off){ctx.beginPath();ctx.arc(gt[0].x+tx*off-cam.x,gt[0].y+ty*off-cam.y,25,0,7);ctx.fill();});});
-  [3.14,3.93,4.71,5.50,0,1.57,2.75].forEach(function(ba){var bp2=gatePoint(ba);ctx.beginPath();ctx.arc(bp2.x-cam.x,bp2.y-cam.y,24,0,7);ctx.fill();});
-  // dirt paths: from the SE gate eastward & the SW gate southward (no north gate)
-  ctx.fillStyle='#7d6b4d';ctx.fillRect(GATE_SE.x-cam.x,GATE_SE.y-28-cam.y,W-GATE_SE.x,56);ctx.fillRect(GATE_SW.x-28-cam.x,GATE_SW.y-cam.y,56,H-GATE_SW.y);
   // ruins floor
   ctx.fillStyle='#5d5a68';ctx.fillRect(1980-cam.x,180-cam.y,620,560);
-  // obstacles: houses / ruins / fountain
+  // obstacles: ruin blocks
   obstacles.forEach(function(o){
-    if(o.type==='rect'){
-      ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(o.x-cam.x+5,o.y-cam.y+7,o.w,o.h);
-      ctx.fillStyle=o.c;ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,o.h);
-      if(o.house){ctx.fillStyle=o.rc||'#8f3f2a';ctx.beginPath();ctx.moveTo(o.x-8-cam.x,o.y+6-cam.y);ctx.lineTo(o.x+o.w/2-cam.x,o.y-30-cam.y);ctx.lineTo(o.x+o.w+8-cam.x,o.y+6-cam.y);ctx.fill();
-        ctx.fillStyle='#ffe9a8';ctx.fillRect(o.x+o.w/2-9-cam.x,o.y+40-cam.y,18,32);ctx.fillRect(o.x+13-cam.x,o.y+18-cam.y,16,16);ctx.fillRect(o.x+o.w-29-cam.x,o.y+18-cam.y,16,16);}
-      else if(o.castle){ctx.fillStyle='#546a8a';ctx.fillRect(o.x+o.w/2-40-cam.x,o.y+o.h/2-40-cam.y,80,80);}
-      else if(o.chapel){ctx.fillStyle='#9fd4ff';ctx.fillRect(o.x+o.w/2-14-cam.x,o.y+o.h/2-30-cam.y,28,60);}
-      else if(o.grate){ctx.fillStyle='#2e2a26';ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,o.h);}
-      else if(o.cliff){ctx.fillStyle='#5a564e';ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,o.h);}
-      else if(o.pond){ctx.fillStyle='#3a7ea6';ctx.fillRect(o.x+8-cam.x,o.y+8-cam.y,o.w-16,o.h-16);}
-      else if(!o.wall){ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,10);}
-    }else if(o.tower){
-      ctx.fillStyle='#9a958a';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r,0,7);ctx.fill();
-      ctx.fillStyle='#a34a32';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r*0.62,0,7);ctx.fill();
-    }else if(o.pillar){
-      ctx.fillStyle='#cbbfa4';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r,0,7);ctx.fill();
-    }else if(o.fountain){
-      ctx.fillStyle='#7d95a8';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r,0,7);ctx.fill();
-      ctx.fillStyle='#4a90c2';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r-12,0,7);ctx.fill();
-      ctx.fillStyle='#aebfca';ctx.fillRect(o.x-5-cam.x,o.y-30-cam.y,10,30);
-      ctx.font='17px serif';ctx.textAlign='center';ctx.fillText('💧',o.x-cam.x,o.y-32-cam.y);
-    }
+    if(o.type!=='rect')return;
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(o.x-cam.x+5,o.y-cam.y+7,o.w,o.h);
+    ctx.fillStyle=o.c;ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,o.h);
+    ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,10);
   });
   // decorations sorted-ish
   decorations.forEach(function(d){
@@ -2849,24 +2587,13 @@ function draw(){
     else if(d.kind==='rock')ctx.fillText('🪨',sx,sy+4);
     else ctx.fillText(Math.floor(d.seed)%2?'🌼':'🌷',sx,sy+3);
   });
-  // merchant stall in the town plaza
-  (function(){
-    var sx=MERCHANT.x-cam.x, sy=MERCHANT.y-cam.y;
-    if(sx>-80&&sy>-80&&sx<vw+80&&sy<vh+80){
-      ctx.font='34px serif';ctx.textAlign='center';ctx.fillText('🏪',sx,sy+8);
-      ctx.font='700 11px "Noto Sans JP"';var nm='商人マーロウ';
-      var w2=ctx.measureText(nm).width+14;
-      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(sx-w2/2,sy-38,w2,15);
-      ctx.fillStyle='#ffd873';ctx.fillText(nm,sx,sy-27);
-    }
-  })();
   // stuck arrows (pick-up-able)
   ctx.fillStyle='#d8c9a3';
   stuckArrows.forEach(function(a){var sx=a.x-cam.x,sy=a.y-cam.y;if(sx<-10||sy<-10||sx>vw+10||sy>vh+10)return;ctx.fillRect(sx-1.5,sy-6,3,7);});
   // zone label for ruins boss area marker
   ctx.font='700 13px "Noto Sans JP"';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.fillText('— 古代遺跡 —',2290-cam.x,205-cam.y);
-  ctx.fillText('— ルミナスの町 —',1300-cam.x,2580-cam.y);
+  ctx.fillText('— ルミナス平原 —',1300-cam.x,2580-cam.y);
   ctx.fillText('— 始まりの草原 —',1300-cam.x,180-cam.y);
   ctx.fillText('— 忘れられた遺跡 —',3075-cam.x,205-cam.y);
   ctx.fillText('— 白銀の雪原 —',4300-cam.x,180-cam.y);
@@ -2947,29 +2674,12 @@ function drawMini(){
   patch(1550,600,2600,2000,'#2f5a30');       // whispering forest
   patch(1950,150,2650,770,'#5d5a68');        // ruins
   patch(2650,150,3500,1000,'#5d5a68');       // forgotten ruins
-  // Luminas — the rounded walled town + its river and two ponds
-  (function(){var tx=MX(TOWN_CX),ty=MY(TOWN_CY);
-    mctx.fillStyle='#8d8574';mctx.beginPath();mctx.ellipse(tx,ty,Math.max(3,1060*s),Math.max(3,1060*s),0,0,7);mctx.fill();
-    mctx.strokeStyle='#2e8fa8';mctx.lineWidth=Math.max(2,80*s);mctx.lineJoin='round';mctx.beginPath();
-    RIVER_PTS.forEach(function(rp,ri){var px=MX(rp[0]),py=MY(rp[1]);if(ri===0)mctx.moveTo(px,py);else mctx.lineTo(px,py);});mctx.stroke();
-    mctx.fillStyle='#2e8fa8';
-    mctx.beginPath();mctx.ellipse(MX(CPOND.x),MY(CPOND.y),Math.max(2,CPOND.rx*s),Math.max(2,CPOND.ry*s),0,0,7);mctx.fill();
-    mctx.beginPath();mctx.ellipse(MX(EPOND.x),MY(EPOND.y),Math.max(2,EPOND.rx*s),Math.max(2,EPOND.ry*s),0,0,7);mctx.fill();
-  })();
-  patch(POND.x,POND.y,POND.x+POND.w,POND.y+POND.h,'#2e6f92'); // garden pond
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
     var lx=MX(d.x),ly=MY(d.y);if(lx<-40||ly<-40||lx>S+40||ly>S+40)return;
     mctx.fillStyle='#2e5f7a';mctx.beginPath();mctx.ellipse(lx,ly,Math.max(3,d.s*s),Math.max(2,d.s*0.72*s),0,0,7);mctx.fill();
   });
-  // roads (from the city gates: SE gate → east, SW gate → south)
-  mctx.fillStyle='#7d6b4d';
-  mctx.fillRect(MX(GATE_SE.x),MY(GATE_SE.y-28),S,MY(GATE_SE.y+28)-MY(GATE_SE.y-28));
-  mctx.fillRect(MX(GATE_SW.x-28),MY(GATE_SW.y),MX(GATE_SW.x+28)-MX(GATE_SW.x-28),S);
-  // merchant
-  var mxp=MX(MERCHANT.x),myp=MY(MERCHANT.y);
-  if(mxp>=-4&&myp>=-4&&mxp<=S+4&&myp<=S+4){mctx.fillStyle='#ffd34d';mctx.fillRect(mxp-2.5,myp-2.5,5,5);}
   // real players in range
   remotes.forEach(function(r){var rx=MX(r.x),ry=MY(r.y);if(rx<0||ry<0||rx>S||ry>S)return;mctx.fillStyle='#2fbfa5';mctx.fillRect(rx-2,ry-2,4,4);});
   // enemies — ONLY ones the player has actually seen, and only while a
@@ -3032,7 +2742,7 @@ function drawWorldMap(){
     g.fillStyle='rgba(0,0,0,.55)';var w=g.measureText(text).width+8;g.fillRect(px-w/2,py-8,w,14);
     g.fillStyle='#fff';g.fillText(text,px,py+3);
   }
-  lbl(1300,1300,'ルミナスの町'); lbl(1300,500,'始まりの草原'); lbl(2050,1300,'ささやきの森');
+  lbl(1300,1680,'ルミナス平原'); lbl(1300,500,'始まりの草原'); lbl(2050,1300,'ささやきの森');
   lbl(2290,460,'古代遺跡'); lbl(420,2150,'月影湖'); lbl(3150,550,'忘れられた遺跡');
   lbl(4300,700,'白銀の雪原'); lbl(4250,2400,'灼熱の砂漠'); lbl(750,3900,'深淵の森');
   lbl(700,4300,'翠玉湖'); lbl(4550,4550,'紅蓮火山');
@@ -3055,55 +2765,16 @@ function drawWorldMap(){
 function openWorldMap(){ if(!started||!player)return; mapZoom=1;mapCenter={x:0.5,y:0.5}; drawWorldMap(); $('worldMapModal').style.display='grid'; if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}} syncCursorHide(); }
 function closeWorldMap(){ $('worldMapModal').style.display='none'; if(returnToMenu){returnToMenu=false;openGameMenu();} else{relockPointer();} }
 
-/* ================= MERCHANT / SHOP ================= */
-function nearMerchant(){ return player&&Math.hypot(player.x-MERCHANT.x,player.y-MERCHANT.y)<120; }
+/* ================= INTERACT (E key) =================
+   The town merchant went away with the town; E now only picks up
+   arrows stuck in the terrain. */
 function nearestStuckArrow(maxD){
   var best=null,bd=maxD||95;
   stuckArrows.forEach(function(a){var d=Math.hypot(a.x-player.x,a.y-player.y);if(d<bd){bd=d;best=a;}});
   return best;
 }
-function refreshShopUI(){
-  if(!player)return;
-  $('shopGold').textContent=player.gold+' G';
-  $('shopArrows').textContent=player.arrows;
-  document.querySelectorAll('#shopList .shop-buy[data-buy]').forEach(function(b){
-    var n=parseInt(b.getAttribute('data-buy'),10);
-    b.disabled=player.gold<n*ARROW_PRICE;
-    b.textContent=(n*ARROW_PRICE)+' G で買う';
-  });
-  document.querySelectorAll('#shopList .shop-buy[data-buy-potion]').forEach(function(b){
-    b.disabled=player.gold<30; b.textContent='30 G で買う';
-  });
-}
-function openShop(){
-  if(!player)return;
-  refreshShopUI();
-  $('shopModal').style.display='grid';
-  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
-  syncCursorHide();
-  chat('<b>商人マーロウ</b>: いらっしゃい、'+escHtml(player.name)+'さん！矢は1本2ゴールドだよ。','world');
-}
-function closeShop(){ $('shopModal').style.display='none'; relockPointer(); }
-function buyArrows(n){
-  if(!player)return;
-  var cost=n*ARROW_PRICE;
-  if(player.gold<cost){toast('ゴールドが足りません');beep(140,0.1,'square',0.04);return;}
-  player.gold-=cost; player.arrows+=n;
-  beep(784,0.09,'triangle',0.05);setTimeout(function(){beep(1046,0.13,'triangle',0.05);},80);
-  toast('矢 ×'+n+' を買った（所持 '+player.arrows+' 本）');
-  refreshShopUI(); updateHUD();
-}
-function buyPotion(){
-  if(!player)return;
-  if(player.gold<30){toast('ゴールドが足りません');beep(140,0.1,'square',0.04);return;}
-  player.gold-=30; player.potions++;
-  beep(659,0.09,'triangle',0.05);
-  toast('回復ポーションを買った（所持 '+player.potions+'）');
-  refreshShopUI(); updateHUD();
-}
 function tryInteract(){
   if(!started||!player||player.dead)return;
-  if(nearMerchant()){ openShop(); return; }
   var a=nearestStuckArrow(95);
   if(a){
     stuckArrows.splice(stuckArrows.indexOf(a),1);
@@ -3117,7 +2788,6 @@ function tryInteract(){
 function refreshInteractPrompt(){
   var el=$('interactPrompt'); if(!el)return;
   if(!started||!player||player.dead||menuOpen||isAnyOverlayOpen()){el.style.display='none';return;}
-  if(nearMerchant()){el.innerHTML='<b>E</b>：商人マーロウと話す';el.style.display='block';return;}
   if(nearestStuckArrow(95)){el.innerHTML='<b>E</b>：刺さった矢を回収する';el.style.display='block';return;}
   el.style.display='none';
 }
@@ -3152,7 +2822,7 @@ function cone(r,h,color,x,y,z,parent,seg){
 }
 function WX(x){return x-W/2;} function WZ(y){return y-H/2;}
 /* Rolling terrain height (world units) at game coords x,y: gentle hills and dips,
-   smoothly flattened around the town & spawn, the lake, the roads and the ruins floor
+   smoothly flattened around the spawn clearing, the lakes and the ruins floors
    so key areas stay easy to walk. Everything standing on the ground follows this. */
 function terrainH(x,y){
   var h=Math.sin(x*0.0042+1.7)*Math.cos(y*0.0036+0.4)*9
@@ -3164,90 +2834,19 @@ function terrainH(x,y){
   h+=vx*vy*16;
   // snowfield drifts roll a little higher
   if(x>3350&&y<1350)h+=Math.sin(x*0.003+0.8)*Math.cos(y*0.0035+1.9)*4;
-  // the mountain range backing the town to the north & NE: a high rocky
-  // ridge of peaks, craggy noise on top, its slopes pine-covered (the
-  // ridge decorations in genWorld) — the falls pour off its cliff face
-  var mrx=Math.max(0,Math.min(1,(x-100)/320))*Math.max(0,Math.min(1,(2700-x)/320));
-  var mrb=Math.exp(-Math.pow((y-150)/250,2));
-  h+=mrx*mrb*(128+88*Math.sin(x*0.0016+0.7)*Math.sin(x*0.00043-0.4)+26*Math.sin(x*0.011+2.0)*Math.cos(y*0.013));
   function flatC(cx,cy,r0,r1){var d=Math.hypot(x-cx,y-cy);if(d<=r0)return 0;if(d>=r1)return 1;var t=(d-r0)/(r1-r0);return t*t*(3-2*t);}
   function flatR(x0,y0,x1,y1,m0,m1){var dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1);var d=Math.hypot(dx,dy);if(d<=m0)return 0;if(d>=m1)return 1;var t=(d-m0)/(m1-m0);return t*t*(3-2*t);}
   var f=1;
-  f*=flatC(1300,1500,430,800);        // town plaza + spawn point (1300,1680)
-  f*=flatR(240,330,2360,2470,40,330); // the whole walled city of Luminas sits level
+  f*=flatC(1300,1680,260,520);        // spawn clearing stays level
   f*=flatC(420,2150,300,560);         // lake 1 surface stays level
   f*=flatC(700,4300,330,600);         // lake 2 （翠玉湖）
   f*=flatC(4200,2400,180,420);        // desert oasis
   f*=flatC(4750,4100,190,420);        // lava lake
   f*=flatC(4600,4600,320,620);        // ifrit arena
-  f*=flatR(GATE_SE.x-40,GATE_SE.y-65,5200,GATE_SE.y+65,10,240); // east road (from the SE gate across the new lands)
-  f*=flatR(GATE_SW.x-65,2000,GATE_SW.x+65,5200,10,240); // south road (from the SW gate, new)
-  f*=flatR(1950,1450,2700,2560,10,240); // river corridor SE of the walls
-  f*=flatR(1085,60,1265,640,10,180); // stream corridor north of the walls
   f*=flatR(1950,150,2650,770,10,220); // ruins floor
   f*=flatR(2650,150,3500,1000,10,220); // forgotten ruins floor
-  return h*f+terraceH(x,y);
+  return h*f;
 }
-/* Terraced town levels, added after the flattening so the town floor itself
-   stays level: the castle plateau on the NE cliff, a mid terrace below it
-   to the south-west (the NE stepped district), and the chapel plateau at
-   the north centre — each with a smooth ramped skirt. The plateaus stand
-   TALL (castle ≈175, chapel ≈138, mid ≈92) so the north of town towers
-   over the plaza and the south gates, as in the reference photo. */
-function terraceH(x,y){
-  function rectH(x0,y0,x1,y1,ht,m){
-    var dx=Math.max(x0-x,0,x-x1), dy=Math.max(y0-y,0,y-y1);
-    var d=Math.hypot(dx,dy);
-    if(d>=m)return 0;
-    var t=1-d/m; return ht*t*t*(3-2*t);
-  }
-  return Math.max(rectH(1750,410,2280,750,175,190), rectH(1560,760,2060,1080,92,125), rectH(1330,410,1790,740,138,165));
-}
-/* The river gorge: wherever the river runs across the terraces, the
-   terrace height is carved away so the stream stays on the surface and
-   the falls pour into a basin instead of sinking into the plateau. */
-var _terraceBase=terraceH;
-/* Stepped north→south town gradient (the photo's great slope): inside the
-   walls the ground descends in four broad treads from the northern wall
-   (≈68) down to the southern gates (0), each tread joined by a gentle
-   ramp ≈190 deep, so the whole descent is walkable on foot — the grand
-   avenue climbs it tread by tread, with stone step flights where the
-   ramps cross it. The plaza stays on one level tread of its own, and the
-   two river ponds are carved back to water level so their surfaces,
-   shores and swimming depths are unchanged. */
-function townBandH(y){
-  function sstep(y0,y1){var t=Math.max(0,Math.min(1,(y-y0)/(y1-y0)));return t*t*(3-2*t);}
-  return 20*(1-sstep(800,990))+18*(1-sstep(1170,1360))+16*(1-sstep(1580,1770))+14*(1-sstep(1990,2180));
-}
-function townSlopeH(x,y){
-  var ts=townShape(x,y);
-  if(ts>90)return 0;
-  var inside=ts<=-110?1:1-(ts+110)/200; inside=inside*inside*(3-2*inside);
-  var s=townBandH(y)*inside;
-  // the plaza floor is one level tread: blend the slope to the plaza's
-  // own band height across its apron so the disc, ring and fountain sit flat
-  var pd=Math.hypot(x-PLAZA.x,y-PLAZA.y);
-  if(pd<PLAZA_R+190){
-    var pt=pd<=PLAZA_R+40?0:(pd-PLAZA_R-40)/150; pt=pt*pt*(3-2*pt);
-    s=townBandH(PLAZA.y)*inside*(1-pt)+s*pt;
-  }
-  // the two river ponds stay at water level: carve the slope out of
-  // their basins (the carve apron reaches past the pond discs' rims)
-  var ponds=[[CPOND,CPOND.rx+75,CPOND.ry+75],[EPOND,EPOND.rx+75,EPOND.ry+75]];
-  for(var i=0;i<2;i++){
-    var e=Math.hypot((x-ponds[i][0].x)/ponds[i][1],(y-ponds[i][0].y)/ponds[i][2]);
-    if(e<1.5){var cf=e<=0.8?0:(e-0.8)/0.7; s*=cf*cf*(3-2*cf);}
-  }
-  return s;
-}
-terraceH=function(x,y){
-  var h=_terraceBase(x,y)+townSlopeH(x,y);
-  if(h<=0)return h;
-  var rd=riverDist(x,y);
-  if(rd<110){var t=Math.max(0,(rd-40)/70); h*=t*t*(3-2*t);}
-  return h;
-};
-
 /* first-person weapon viewmodel (attached to the camera) */
 var viewModel=null, vmCls='';
 /* archer draw rig: string segments + the nocked arrow are rebuilt every frame
@@ -3404,7 +3003,6 @@ function buildWorld3D(){
   var seed=12345;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
   for(var i=0;i<340;i++){
     var px=rnd()*W,pz=rnd()*H;
-    if(px>440&&px<2160&&pz>440&&pz<2160)continue;
     if(regionAt(px,pz)!=='green')continue;   // no grass patches in desert / snow / volcano / deep forest floor pads
     var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
     p.rotation.x=-Math.PI/2;p.rotation.z=rnd()*3;p.position.set(WX(px),terrainH(px,pz)+0.6,WZ(pz));p.receiveShadow=true;staticGroup.add(p);
@@ -3414,155 +3012,9 @@ function buildWorld3D(){
   flat(1950,2000,0xe0c084,4225,2400);       // desert
   flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
   flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
-  // Luminas — city ground: a subdivided stone sheet displaced by
-  // terrainH() so the paving follows the town's stepped north→south
-  // slope tread by tread (the old flat discs would have floated over the
-  // southern treads and sunk into the northern ones). Past the wall ring
-  // the sheet dives underground, so its square corners never show.
-  (function(){
-    var cgGeo=new THREE.PlaneGeometry(2520,2520,84,84);
-    var cp=cgGeo.attributes.position;
-    for(var cgi=0;cgi<cp.count;cgi++){
-      var gx=cp.getX(cgi)+1300, gy=1320-cp.getY(cgi);
-      var gh2=terrainH(gx,gy), cz=gh2+1.4, sh=townShape(gx,gy);
-      if(sh>30){var ct=Math.min(1,(sh-30)/90); cz=cz*(1-ct)+(gh2-60)*ct;}
-      cp.setZ(cgi,cz);
-    }
-    cgGeo.computeVertexNormals();
-    var cg=new THREE.Mesh(cgGeo,M(0x8d8574));
-    cg.rotation.x=-Math.PI/2;cg.position.set(WX(1300),0,WZ(1320));cg.receiveShadow=true;staticGroup.add(cg);
-  })();
-  // ---- the northern mountain range: a wall of rocky peaks and crags
-  //      behind the city wall (N & NE), snow-dusted grey stone — the
-  //      terrain ridge gives the slopes, these give the photo's skyline.
-  //      The falls pour off the cliff jaws at the river's water-gate. ----
-  (function(){
-    var seed2=777;function rnd2(){seed2=(seed2*16807)%2147483647;return seed2/2147483647;}
-    for(var pi=0;pi<13;pi++){
-      var px2=220+pi*185+rnd2()*70, py2=110+rnd2()*170, ph=210+rnd2()*150, pr=140+rnd2()*90;
-      var pk=cone(pr,ph,pi%3?0x878b90:0x767b82,WX(px2),terrainH(px2,py2)+ph/2-26,WZ(py2),staticGroup,7);
-      pk.rotation.y=rnd2()*3;
-    }
-    for(var ci3=0;ci3<10;ci3++){
-      var cx3=320+ci3*235+rnd2()*80, cy3=330+rnd2()*110, ch3=90+rnd2()*70, cr3=80+rnd2()*50;
-      cone(cr3,ch3,0x6e7278,WX(cx3),terrainH(cx3,cy3)+ch3/2-18,WZ(cy3),staticGroup,6);
-    }
-    // falls cliff: rock jaws flanking the waterfall at the north water-gate
-    box(80,210,100,0x74777d,WX(FALLS_PT.x-92),terrainH(FALLS_PT.x-92,FALLS_PT.y)+80,WZ(FALLS_PT.y),staticGroup);
-    box(80,210,100,0x7d8085,WX(FALLS_PT.x+92),terrainH(FALLS_PT.x+92,FALLS_PT.y)+80,WZ(FALLS_PT.y),staticGroup);
-    cone(70,150,0x83878c,WX(FALLS_PT.x-122),terrainH(FALLS_PT.x-122,FALLS_PT.y-40)+55,WZ(FALLS_PT.y-40),staticGroup,7);
-    cone(70,150,0x83878c,WX(FALLS_PT.x+122),terrainH(FALLS_PT.x+122,FALLS_PT.y-40)+55,WZ(FALLS_PT.y-40),staticGroup,7);
-  })();
-  // Avenues & gate streets: each pad is laid only where its tread of the
-  // town slope is level, so no pad ever floats over a tread drop. The
-  // steep northern avenue (pond ↔ chapel terrace) gets no pad at all —
-  // the terrain-following stone sheet paves it, and the stair flights
-  // mark the climb.
-  flat(170,160,0xb3a888,1300,1420,0,1.0);                   // grand avenue (plaza tread, pond side)
-  flat(170,340,0xb3a888,1300,1670,0,1.0);                   // grand avenue, south (plaza tread)
-  flat(1240,170,0xb3a888,940,1500,0,1.0);                   // cross avenue, west (plaza tread)
-  flat(720,170,0xb3a888,1920,1500,0,1.0);                   // cross avenue, east (pond shore tread)
-  flat(130,300,0xb3a888,GATE_SW.x,1700,0,1.0);              // SW gate street (upper)
-  flat(130,240,0xb3a888,GATE_SW.x,2100,0,1.0);              // SW gate street (lower)
-  flat(130,300,0xb3a888,GATE_SE.x,1700,0,1.0);              // SE gate street (upper)
-  flat(130,240,0xb3a888,GATE_SE.x,2100,0,1.0);              // SE gate street (lower)
-  flat(680,360,0x8d8574,2015,565,0,0.5);                    // castle plateau stone apron
-  flat(540,350,0x8d8574,1560,575,0,0.5);                    // chapel terrace stone apron
-  flat(640,330,0x8d8574,1810,920,0,0.5);                    // NE mid-terrace apron
-  // terrace plinths: solid stone bases under the three aprons, so the
-  // raised plateaus read as built terraces with retaining faces where
-  // their skirts fall away — never as thin floating slabs
-  [[2015,565,676,356],[1560,575,536,346],[1810,920,636,326]].forEach(function(ap){
-    var ah=terrainH(ap[0],ap[1]);
-    box(ap[2],64,ap[3],0x7c7668,WX(ap[0]),ah-30,WZ(ap[1]),staticGroup);
-  });
-  flat(620,100,0xb3a888,1175,650,0,1.0);                    // falls lane (avenue ↔ west bank, under the falls)
-  flat(760,110,0xb3a888,1000,880,0,1.0);                    // west lane to the river bridge
-  // grand staircase: stone steps climbing the avenue onto the chapel terrace
-  for(var sti=0;sti<5;sti++){
-    var sty=848-sti*24, stTop=terrainH(1300,sty)+4.5;
-    box(176,stTop,26,0x9a958a,WX(1300),stTop/2,WZ(sty),staticGroup);
-  }
-  // NE terrace steps: a flight climbing from the avenue side onto the mid terrace
-  for(var nsi=0;nsi<5;nsi++){
-    var nsy=1106-nsi*22, nsTop=terrainH(1810,nsy)+4.5;
-    box(190,nsTop,24,0x9a958a,WX(1810),nsTop/2,WZ(nsy),staticGroup);
-  }
-  // chapel steps: a short flight up from the avenue toward the chapel
-  for(var csi=0;csi<4;csi++){
-    var csx=1342+csi*26, csTop=terrainH(csx,620)+4.5;
-    box(26,csTop,64,0x9a958a,WX(csx),csTop/2,WZ(620),staticGroup);
-  }
-  // avenue step flights where the town's stepped slope drops its treads:
-  // one climbing the first tread north of the centre pond, one climbing
-  // from the pond shore up to the plaza tread — same solid-step build as
-  // the terrace stairs, so each tread reads as a stair landing on the avenue
-  for(var asi=0;asi<6;asi++){
-    var asy=972-asi*22, asTop=terrainH(1300,asy)+4.5;
-    box(176,asTop,24,0x9a958a,WX(1300),asTop/2,WZ(asy),staticGroup);
-  }
-  for(var psi=0;psi<4;psi++){
-    var psy=1306-psi*19, psTop=terrainH(1300,psy)+4.5;
-    box(176,psTop,21,0x9a958a,WX(1300),psTop/2,WZ(psy),staticGroup);
-  }
-  (function(){var pd=new THREE.Mesh(G('plazaDisc',function(){return new THREE.CircleGeometry(PLAZA_R+36,40);}),M(0xa89c80));
-    pd.rotation.x=-Math.PI/2;pd.position.set(WX(PLAZA.x),terrainH(PLAZA.x,PLAZA.y)+3.2,WZ(PLAZA.y));pd.receiveShadow=true;staticGroup.add(pd);})();
-  flat(POND.w+150,POND.h+140,0x5d8148,POND.x+POND.w/2,POND.y+POND.h/2,0,0.5); // garden lawn
-  // west fields outside the walls: patchwork crop plots on the grassland
-  flat(260,400,0x86a04e,150,1090,0,0.3);
-  flat(260,280,0xb3a05e,150,1470,0,0.35);
-  flat(240,240,0x77913f,160,1730,0,0.3);
-  flat(3300,56,0x7d6b4d,GATE_SE.x+1650,GATE_SE.y,0,0.7);   // east road (from the SE gate to the new lands)
-  flat(56,5200-GATE_SW.y,0x7d6b4d,GATE_SW.x,(5200+GATE_SW.y)/2,0,0.7);   // south road (from the SW gate)
   // ruins floors
   flat(620,560,0x5d5a68,2290,460);
   flat(850,850,0x6a6455,3075,575);
-  // ---- the Luminas river: a stream from the northern rocks, falls pouring
-  //      through the north water-gate, widening into a pond at the town
-  //      centre, a second pond on the east side, then out of the SE
-  //      water-gate. The ribbon follows RIVER_PTS segment by segment. ----
-  (function(){
-    var bed=0x4a4238, wat=M(0x2e8fa8,{transparent:true,opacity:0.85});
-    function ribbon(wdt,color,pts,top,mat){
-      for(var i=0;i<pts.length-1;i++){
-        var ax=pts[i][0],ay=pts[i][1],bx=pts[i+1][0],by=pts[i+1][1];
-        var len=Math.hypot(bx-ax,by-ay)+wdt*0.7;
-        var m=new THREE.Mesh(G('rib'+wdt+'_'+Math.round(len),function(){return new THREE.BoxGeometry(len,3,wdt);}),mat||M(color));
-        m.position.set(WX((ax+bx)/2),top-1.5,WZ((ay+by)/2));
-        m.rotation.y=-Math.atan2(by-ay,bx-ax);
-        m.receiveShadow=true;staticGroup.add(m);
-      }
-    }
-    function pondDisc(p,rad,top,mat){
-      var m=new THREE.Mesh(G('pondD'+rad,function(){return new THREE.CircleGeometry(rad,36);}),mat);
-      m.rotation.x=-Math.PI/2;m.scale.set(1,p.ry/p.rx,1);
-      m.position.set(WX(p.x),top,WZ(p.y));m.receiveShadow=true;staticGroup.add(m);return m;
-    }
-    ribbon(140,bed,RIVER_PTS,-0.6);                       // riverbed
-    ribbon(112,0,RIVER_PTS,2.6,wat);                      // water surface (blue-green)
-    pondDisc(CPOND,CPOND.rx+16,-0.5,M(bed)); pondDisc(CPOND,CPOND.rx,2.6,wat);   // centre pond
-    var watB=M(0x35b6d9,{transparent:true,opacity:0.88});
-    pondDisc(EPOND,EPOND.rx+16,-0.5,M(bed)); pondDisc(EPOND,EPOND.rx,2.6,watB);  // east pond — big & bright blue
-    // falls: TWO tiers pouring off the mountain cliff into the basin + foam.
-    // The drop is far taller now that the northern treads and terraces
-    // stand high: the upper sheet falls ≈150 from the spout lip (≈238,
-    // up at chapel-terrace height) to the mid ledge, the lower ≈112 more
-    // into the basin at river level.
-    var fallMat=M(0xcfeafb,{transparent:true,opacity:0.75});
-    var f1=new THREE.Mesh(G('falls1',function(){return new THREE.BoxGeometry(96,150,3);}),fallMat);
-    f1.position.set(WX(FALLS_PT.x),160,WZ(FALLS_PT.y+6));f1.rotation.x=0.14;staticGroup.add(f1);
-    var f2=new THREE.Mesh(G('falls2',function(){return new THREE.BoxGeometry(70,112,3);}),fallMat);
-    f2.position.set(WX(FALLS_PT.x),56,WZ(FALLS_PT.y+18));f2.rotation.x=0.14;staticGroup.add(f2);
-    box(120,16,12,0x6e675c,WX(FALLS_PT.x),240,WZ(FALLS_PT.y),staticGroup);         // stone spout lip above the falls
-    for(var fi=0;fi<6;fi++){var fm=sph(10+fi*2.2,0xeaf6ff,WX(FALLS_PT.x-40+fi*16),5,WZ(FALLS_PT.y+30+((fi*13)%24)),staticGroup,{transparent:true,opacity:0.9});fm.castShadow=false;fm.scale.y=0.5;}
-    // bridge parapets: the falls-lane bridge, the west-lane bridge, the east avenue bridge
-    [[1173,650],[1170,880],[2020,1500]].forEach(function(bp){
-      box(170,10,7,0x8a8578,WX(bp[0]),9,WZ(bp[1]-42),staticGroup);
-      box(170,10,7,0x8a8578,WX(bp[0]),9,WZ(bp[1]+42),staticGroup);
-      box(170,4,7,0x9a958a,WX(bp[0]),15,WZ(bp[1]-42),staticGroup);
-      box(170,4,7,0x9a958a,WX(bp[0]),15,WZ(bp[1]+42),staticGroup);
-    });
-  })();
   // lakes
   var lake=new THREE.Mesh(G('lake',function(){return new THREE.CircleGeometry(230,36);}),M(0x2e6f92));
   lake.rotation.x=-Math.PI/2;lake.scale.y=0.72;lake.position.set(WX(420),1.2,WZ(2150));lake.receiveShadow=true;staticGroup.add(lake);
@@ -3574,200 +3026,13 @@ function buildWorld3D(){
   oasis.rotation.x=-Math.PI/2;oasis.scale.y=0.74;oasis.position.set(WX(4200),1.2,WZ(2400));oasis.receiveShadow=true;staticGroup.add(oasis);
   var lava=new THREE.Mesh(G('lava',function(){return new THREE.CircleGeometry(150,30);}),M(0xff5a1f,{emissive:0xcc3300}));
   lava.rotation.x=-Math.PI/2;lava.scale.y=0.78;lava.position.set(WX(4750),1.4,WZ(4100));staticGroup.add(lava);
-  // merchant stall + the merchant himself (town plaza, east of the fountain)
-  (function(){
-    var mg=new THREE.Group();mg.position.set(WX(MERCHANT.x),terrainH(MERCHANT.x,MERCHANT.y),WZ(MERCHANT.y));staticGroup.add(mg);
-    box(64,6,40,0x6b4a2c,0,20,0,mg);                       // counter
-    box(58,16,34,0x8a5a3a,0,10,0,mg);
-    cyl(3,3,44,0x5d3f27,-30,22,-16,mg,6);cyl(3,3,44,0x5d3f27,30,22,-16,mg,6);
-    cyl(3,3,44,0x5d3f27,-30,22,16,mg,6);cyl(3,3,44,0x5d3f27,30,22,16,mg,6);
-    var awn=box(76,3,52,0xb03a30,0,46,0,mg);awn.rotation.z=0.06;
-    box(76,3,52,0xe9e2cf,0,44.4,0,mg).rotation.z=0.06;
-    // goods on the counter: arrow bundles + potion bottles
-    cyl(1.4,1.4,20,0xc9a86a,-16,32,4,mg,5);cyl(1.4,1.4,20,0xc9a86a,-12,32,6,mg,5);cyl(1.4,1.4,20,0xc9a86a,-20,32,6,mg,5);
-    sph(4,0xe5484d,14,28,-4,mg);sph(4,0x3e9be9,22,28,2,mg);sph(4,0x4caf7d,10,28,8,mg);
-    // merchant body (behind the counter)
-    var bg=new THREE.Group();bg.position.set(0,0,-26);mg.add(bg);
-    cyl(8,10,26,0x7a4a8a,0,30,0,bg,10);
-    sph(10,0xf2c89b,0,52,0,bg);
-    cone(13,10,0xe8c268,0,63,0,bg,10);                      // straw hat brim look
-    cyl(4,4,20,0x7a4a8a,-14,36,0,bg,7);cyl(4,4,20,0x7a4a8a,14,36,0,bg,7);
-  })();
-  // circular plaza colonnade ring + avenue lamps + pond garden hedges
-  (function(){
-    var pg=new THREE.Group();pg.position.set(WX(PLAZA.x),terrainH(PLAZA.x,PLAZA.y),WZ(PLAZA.y));staticGroup.add(pg);
-    // flat stone ring on the plaza floor under the colonnade (no tube geometry)
-    var step=new THREE.Mesh(G('plazaRing',function(){return new THREE.RingGeometry(PLAZA_R-15,PLAZA_R+17,56);}),M(0x8a8272));
-    step.rotation.x=-Math.PI/2;step.position.y=5.55;step.receiveShadow=true;pg.add(step);
-    // Segmented entablature: straight beams spanning pillar to pillar, seated
-    // on the capitals at y≈99–110 (well above eye height). The previous build
-    // used two full torus rings at y=64 / y=55 — right at eye level (54) and
-    // floating past the pillar tops — which rendered as two endless pipes
-    // cutting across the whole screen and through the buildings behind.
-    var kept=[];
-    for(var pa2=0;pa2<24;pa2++){
-      var ang2=pa2/24*Math.PI*2, rem2=((ang2%(Math.PI/2))+Math.PI/2)%(Math.PI/2);
-      kept.push(!(rem2<0.30||rem2>Math.PI/2-0.30));   // same skip rule as genWorld's pillars
-    }
-    for(var pb=0;pb<24;pb++){
-      var nb=(pb+1)%24;
-      if(!kept[pb]||!kept[nb])continue;               // no beam across the avenue openings
-      var a1=pb/24*Math.PI*2, a2=(pb+1)/24*Math.PI*2, am=(a1+a2)/2;
-      var chord=2*PLAZA_R*Math.sin((a2-a1)/2);
-      var bm=box(chord+26,11,17,0xcbbfa4,Math.cos(am)*PLAZA_R,104.5,Math.sin(am)*PLAZA_R,pg);
-      bm.rotation.y=-am-Math.PI/2;
-      var band=box(chord+26.6,3.2,18.4,0xb8912f,Math.cos(am)*PLAZA_R,101.8,Math.sin(am)*PLAZA_R,pg);
-      band.rotation.y=-am-Math.PI/2;
-    }
-    // lamp posts lining the grand avenue (warm globes)
-    for(var ly=560;ly<=2160;ly+=190){
-      [-108,108].forEach(function(off){
-        if(Math.abs(ly-PLAZA.y)<PLAZA_R+40)return;
-        if(Math.abs(ly-CPOND.y)<200)return;
-        var lg=new THREE.Group();lg.position.set(WX(1300+off),terrainH(1300+off,ly),WZ(ly));staticGroup.add(lg);
-        cyl(2.2,3,66,0x3a3f45,0,33,0,lg,6);
-        var gl=sph(6,0xffd98a,0,70,0,lg,{emissive:0xcc8a2a});gl.castShadow=false;
-      });
-    }
-    // pond garden: hedge ring + corner trees around the lawn
-    var gw=POND.w+144, gh2=POND.h+132;
-    var hg=new THREE.Group();hg.position.set(WX(POND.x+POND.w/2),terrainH(POND.x+POND.w/2,POND.y+POND.h/2),WZ(POND.y+POND.h/2));staticGroup.add(hg);
-    box(gw,20,12,0x3f6034,0,10,-gh2/2+6,hg);box(gw,20,12,0x3f6034,0,10,gh2/2-6,hg);
-    box(12,20,gh2,0x3f6034,-gw/2+6,10,0,hg);box(12,20,gh2,0x3f6034,gw/2-6,10,0,hg);
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(cn){
-      var tg2=new THREE.Group();tg2.position.set(cn[0]*(gw/2-26),0,cn[1]*(gh2/2-26));hg.add(tg2);
-      cyl(3.4,4.6,26,0x5d3f27,0,13,0,tg2,6);
-      sph(24,0x3e7a3e,0,44,0,tg2,{flatShading:true});sph(17,0x477d43,10,58,6,tg2,{flatShading:true});
-    });
-  })();
-  // obstacles
+  // obstacles: the ruin blocks (the only standing structures)
   obstacles.forEach(function(o){
-    if(o.type==='rect'){
-      if(o.house){
-        var g=new THREE.Group();g.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(g);
-        var wallH=o.hh||70, wallCol=parseInt(String(o.c).slice(1),16), roofCol=o.rc?parseInt(String(o.rc).slice(1),16):0x8f3f2a;
-        box(o.w,wallH,o.h,wallCol,0,wallH/2,0,g);
-        // half-timbered look: a stone ground floor and dark timber framing
-        box(o.w+4,wallH*0.40,o.h+4,0x8a8175,0,wallH*0.20,0,g);
-        box(o.w+5,8,o.h+5,0x4a3220,0,wallH*0.42,0,g);
-        box(o.w+5,8,o.h+5,0x4a3220,0,wallH*0.97,0,g);
-        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(cn2){
-          box(8,wallH,8,0x4a3220,cn2[0]*(o.w/2-2),wallH/2,cn2[1]*(o.h/2-2),g);
-        });
-        [-0.25,0.25].forEach(function(fx2){
-          box(6,wallH*0.55,3,0x4a3220,o.w*fx2,wallH*0.70,o.h/2+1,g);
-          box(6,wallH*0.55,3,0x4a3220,o.w*fx2,wallH*0.70,-o.h/2-1,g);
-        });
-        var roofH=Math.min(84,o.h*0.68);
-        var roof=cone(Math.max(o.w,o.h)*0.74,roofH,roofCol,0,wallH+roofH/2-2,0,g,4);roof.rotation.y=Math.PI/4;
-        if(o.w>=o.h)roof.scale.z=Math.max(0.55,o.h/o.w);else roof.scale.x=Math.max(0.55,o.w/o.h);
-        if(o.chim)box(11,26,11,0x9a8a76,o.w*0.26,wallH+15,0,g);
-        box(20,36,4,0x4a3220,0,18,o.h/2+1,g);
-        box(17,17,3,0xffe9a8,-o.w/2+24,wallH*0.58,o.h/2+1,g);
-        box(17,17,3,0xffe9a8,o.w/2-24,wallH*0.58,o.h/2+1,g);
-        box(17,17,3,0xf5e3b0,0,wallH*0.6,-o.h/2-1,g);
-        if(wallH>120){box(17,17,3,0xffe9a8,-o.w/2+24,wallH*0.3,o.h/2+1,g);box(17,17,3,0xf5e3b0,o.w/2-24,wallH*0.3,o.h/2+1,g);}
-      }else if(o.wall){
-        var wg=new THREE.Group();wg.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(wg);
-        box(o.w,210,o.h,0x9a958a,0,55,0,wg);                          // sunk deep so terrace runs never float
-        box(o.w+16,7,o.h+16,0xa39c8c,0,150,0,wg);                     // wall-top walkway（歩廊）
-        box(o.w,10,o.h+10,0x8a8578,0,165,0,wg);                       // parapet cap（胸壁）
-        var horiz=o.w>=o.h, span=horiz?o.w:o.h;
-        for(var ci2=26;ci2<span-10;ci2+=56){                          // crenellations
-          if(horiz)box(22,20,o.h+8,0x9a958a,-o.w/2+ci2,177,0,wg);
-          else box(o.w+8,20,22,0x9a958a,0,177,-o.h/2+ci2,wg);
-        }
-      }else if(o.castle){
-        var kg=new THREE.Group();kg.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(kg);
-        box(o.w+44,44,o.h+44,0x7c7668,0,-8,0,kg);                       // great stone plinth
-        box(o.w,120,o.h,0x8d9299,0,60,0,kg);                            // curtain block
-        box(o.w*0.54,168,o.h*0.66,0x979da3,0,84,0,kg);                  // the keep
-        box(o.w*0.54+16,12,o.h*0.66+16,0x7c7668,0,174,0,kg);            // keep parapet
-        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(cn){             // corner towers, slate-blue spires
-          var tx=cn[0]*(o.w/2-6), tz=cn[1]*(o.h/2-6);
-          cyl(30,36,208,0x8d9299,tx,104,tz,kg,10);
-          cyl(38,38,12,0x7c7668,tx,214,tz,kg,10);
-          cone(40,104,0x546a8a,tx,272,tz,kg,10);
-          sph(5,0xe8c268,tx,330,tz,kg);
-        });
-        cyl(26,32,268,0x979da3,0,134,0,kg,10);                          // central great tower
-        cone(34,120,0x546a8a,0,328,0,kg,10);
-        var orb3=sph(7,0xe8c268,0,394,0,kg,{emissive:0x8a6a10});orb3.castShadow=false;
-        box(44,64,6,0x3a2e22,0,32,o.h/2+2,kg);                          // gate
-        box(15,20,3,0xffe9a8,-52,120,o.h/2+2,kg);box(15,20,3,0xffe9a8,52,120,o.h/2+2,kg); // lit windows
-        box(15,20,3,0xffe9a8,0,150,-o.h/2-2,kg);
-        box(10,44,3,0xa83c2a,-o.w/2+34,120,o.h/2+3,kg);box(10,44,3,0xa83c2a,o.w/2-34,120,o.h/2+3,kg); // banners
-      }else if(o.chapel){
-        var hg2=new THREE.Group();hg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(hg2);
-        box(o.w,96,o.h,0xe9eef4,0,48,0,hg2);                            // white nave
-        box(o.w+16,12,o.h+16,0xc9cfd6,0,6,0,hg2);                       // plinth
-        var chRoof=cone(Math.max(o.w,o.h)*0.72,64,0x546a8a,0,128,0,hg2,4);chRoof.rotation.y=Math.PI/4;chRoof.scale.z=o.h/o.w;
-        cyl(13,17,150,0xdfe6ee,o.w/2-38,75,0,hg2,8);                    // bell tower
-        cone(19,74,0x6fb7ff,o.w/2-38,187,0,hg2,8).material=M(0x6fb7ff,{emissive:0x2a6ad4}); // glowing blue spire
-        var crys=sph(8,0x9fd4ff,o.w/2-38,238,0,hg2,{emissive:0x3e9be9});crys.castShadow=false;  // the shining crystal
-        var rose2=cyl(20,20,4,0x9fd4ff,0,64,o.h/2+2,hg2,18);rose2.rotation.x=Math.PI/2;rose2.material=M(0x9fd4ff,{emissive:0x2a6ad4});
-        box(24,52,4,0x4a3220,0,26,o.h/2+2,hg2);                         // door
-        [-0.28,0.28].forEach(function(fx){                              // glowing side windows
-          var win=box(13,30,3,0x9fd4ff,o.w*fx,58,o.h/2+2,hg2);win.material=M(0x9fd4ff,{emissive:0x2a6ad4});
-          var win2=box(13,30,3,0x9fd4ff,o.w*fx,58,-o.h/2-2,hg2);win2.material=M(0x9fd4ff,{emissive:0x2a6ad4});
-        });
-      }else if(o.grate){
-        var gg2=new THREE.Group();gg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(gg2);
-        box(o.w,10,o.h,0x6e675c,0,52,0,gg2);                             // stone lintel above the water
-        for(var gb=-3;gb<=3;gb++)box(4,54,4,0x2e2a26,gb*(o.w/7.5),25,0,gg2); // iron bars
-        box(o.w,5,o.h*0.7,0x2e2a26,0,26,0,gg2);
-      }else if(o.cliff){
-        var cg3=new THREE.Group();cg3.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(cg3);
-        box(o.w*0.5,120,o.h,0x5a564e,-o.w*0.28,60,0,cg3);
-        box(o.w*0.5,96,o.h,0x6a665e,o.w*0.28,48,0,cg3);
-        box(o.w*0.34,140,o.h,0x4e4a44,0,70,0,cg3);
-      }else if(o.pond){
-        var pg2=new THREE.Group();pg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(pg2);
-        box(o.w+16,10,o.h+16,0xaeb4ac,0,5,0,pg2);                      // stone rim
-        var wtr=box(o.w,4,o.h,0x2e7ea6,0,10,0,pg2);wtr.castShadow=false;
-        box(o.w*0.7,2,o.h*0.6,0x4a90c2,0,12.5,0,pg2).castShadow=false; // sunlit shallows
-        cyl(4,6,30,0xaebfca,-40,24,-20,pg2,7);cyl(4,6,36,0xaebfca,44,27,16,pg2,7); // garden fountains
-        sph(5,0x9fd4ff,-40,44,-20,pg2,{transparent:true,opacity:0.85}).castShadow=false;
-        sph(5,0x9fd4ff,44,50,16,pg2,{transparent:true,opacity:0.85}).castShadow=false;
-      }else{
-        var h=60+((o.x*7+o.y*13)%50);
-        var gh=terrainH(o.x+o.w/2,o.y+o.h/2);
-        box(o.w,h,o.h,o.c,WX(o.x+o.w/2),h/2+gh,WZ(o.y+o.h/2),staticGroup);
-        box(o.w+8,10,o.h+8,0x8a8496,WX(o.x+o.w/2),h+4+gh,WZ(o.y+o.h/2),staticGroup);
-      }
-    }else if(o.clock){
-      var ctg=new THREE.Group();ctg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(ctg);
-      box(52,26,52,0x7c7668,0,13,0,ctg);                                  // stone base
-      box(44,150,44,0x9a8f7c,0,101,0,ctg);                               // the tower shaft
-      box(50,10,50,0x8a8578,0,181,0,ctg);                                // cornice
-      var ckRoof=cone(38,64,0x546a8a,0,218,0,ctg,4);ckRoof.rotation.y=Math.PI/4;
-      sph(5.5,0xe8c268,0,256,0,ctg);
-      var face=cyl(16,16,4,0xf5efdd,0,140,23,ctg,20);face.rotation.x=Math.PI/2;   // clock face (south)
-      box(3,11,2,0x2e2a26,0,143,25.5,ctg);                               // hour hand
-      var mh=box(2.4,14,2,0x2e2a26,0,140,25.5,ctg);mh.rotation.z=-1.1;   // minute hand
-      var face2=cyl(16,16,4,0xf5efdd,23,140,0,ctg,20);face2.rotation.z=Math.PI/2; // clock face (east)
-      box(17,17,3,0xffe9a8,0,84,23,ctg);box(17,17,3,0xffe9a8,0,84,-23,ctg);
-    }else if(o.tower){
-      var tg3=new THREE.Group();tg3.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(tg3);
-      cyl(32,40,220,0x9a958a,0,110,0,tg3,12);
-      cyl(41,41,14,0x8a8578,0,226,0,tg3,12);
-      cone(48,84,0xa83c2a,0,274,0,tg3,12);                             // red roof (as in the photo)
-      sph(5.5,0xe8c268,0,322,0,tg3);
-      box(16,24,4,0xffe9a8,0,150,34,tg3);
-      box(14,20,4,0xffe9a8,0,196,35,tg3);
-    }else if(o.pillar){
-      var plg=new THREE.Group();plg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(plg);
-      cyl(8,10,92,0xded5c2,0,46,0,plg,8);
-      box(22,8,22,0xcbbfa4,0,95,0,plg);
-      box(24,7,24,0xcbbfa4,0,3,0,plg);
-    }else if(o.fountain){
-      var fg=new THREE.Group();fg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(fg);
-      cyl(o.r,o.r+6,16,0x7d95a8,0,8,0,fg,20);
-      cyl(o.r-10,o.r-10,6,0x4a90c2,0,15,0,fg,20);
-      cyl(7,11,58,0xaebfca,0,37,0,fg,10);
-      cyl(17,11,5,0x8fa8bc,0,50,0,fg,12);                       // mid bowl on the column
-      var orb=sph(9,0x9fd4ff,0,76,0,fg,{transparent:true,opacity:0.85});orb.castShadow=false;
-    }
+    if(o.type!=='rect')return;
+    var h=60+((o.x*7+o.y*13)%50);
+    var gh=terrainH(o.x+o.w/2,o.y+o.h/2);
+    box(o.w,h,o.h,o.c,WX(o.x+o.w/2),h/2+gh,WZ(o.y+o.h/2),staticGroup);
+    box(o.w+8,10,o.h+8,0x8a8496,WX(o.x+o.w/2),h+4+gh,WZ(o.y+o.h/2),staticGroup);
   });
   // decorations
   decorations.forEach(function(d){
@@ -4132,17 +3397,6 @@ function render3D(now){
     }
   });
   for(var sk in stuckMeshes){if(!stSeen[sk]){dynGroup.remove(stuckMeshes[sk]);delete stuckMeshes[sk];}}
-  // merchant name label
-  if(!render3D._merchLabel){
-    render3D._merchLabel=document.createElement('div');
-    render3D._merchLabel.className='nametag';
-    render3D._merchLabel.style.color='#ffd873';
-    render3D._merchLabel.textContent='🏪 商人マーロウ';
-    document.getElementById('labels').appendChild(render3D._merchLabel);
-  }
-  var msp=projectToScreen(WX(MERCHANT.x),terrainH(MERCHANT.x,MERCHANT.y)+96,WZ(MERCHANT.y),_pv);
-  if(msp&&Math.hypot(MERCHANT.x-player.x,MERCHANT.y-player.y)<900){render3D._merchLabel.style.display='block';render3D._merchLabel.style.transform='translate(-50%,-100%) translate('+msp.x.toFixed(1)+'px,'+msp.y.toFixed(1)+'px)';}
-  else render3D._merchLabel.style.display='none';
   // particles
   var ptSeen={};
   particles.forEach(function(p){
@@ -4397,7 +3651,7 @@ document.addEventListener('keydown',function(e){
   if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
   if(started&&e.code==='KeyM'&&$('worldMapModal').style.display==='grid'){closeWorldMap();e.preventDefault();return;}
   if($('settingsModal').style.display==='grid')return;
-  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('shopModal').style.display==='grid')return;
+  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&player&&e.code==='KeyM'&&document.activeElement!==$('chatInput')){e.preventDefault();openWorldMap();return;}
   if(started&&player&&e.code==='KeyE'&&document.activeElement!==$('chatInput')){e.preventDefault();tryInteract();return;}
@@ -4434,7 +3688,7 @@ $('skill3').addEventListener('click',function(){useSkill(3);});
 $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
   player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;
-  $('deathScreen').style.display='none';updateHUD();toast('ルミナスの町で復活した');
+  $('deathScreen').style.display='none';updateHUD();toast('スポーン地点で復活した');
   relockPointer();
   netSendPos(true);
 });
@@ -4531,14 +3785,7 @@ $('worldMapCanvas').addEventListener('wheel',function(e){
 $('mapZoomInBtn').addEventListener('click',function(){setMapZoom(mapZoom*2);});
 $('mapZoomOutBtn').addEventListener('click',function(){setMapZoom(mapZoom/2);});
 $('mapZoomResetBtn').addEventListener('click',function(){setMapZoom(1);});
-$('closeShopBtn').addEventListener('click',function(){closeShop();});
 $('interactPrompt').addEventListener('click',function(){tryInteract();});
-document.querySelectorAll('#shopList .shop-buy[data-buy]').forEach(function(b){
-  b.addEventListener('click',function(){buyArrows(parseInt(b.getAttribute('data-buy'),10));});
-});
-document.querySelectorAll('#shopList .shop-buy[data-buy-potion]').forEach(function(b){
-  b.addEventListener('click',function(){buyPotion();});
-});
 $('closePlayersBtn').addEventListener('click',function(){closeSubModal('playersModal');});
 $('menuSettingsBtn').addEventListener('click',function(){openFromMenu('settingsModal');});
 $('menuSoundBtn').addEventListener('click',function(){openFromMenu('settingsModal','sound');});
@@ -4617,7 +3864,7 @@ $('startBtn').addEventListener('click',function(){
   netConnect();
   chat('— AETHERIA ONLINE にログインしました —','sys');
   chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、ジャンプは Space、攻撃は F、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで Escメニューの「セーブ」からセーブできます。'),'world');
-  chat('<b>案内人リア</b>: 世界は大きく広がりました。Mキーで全体マップ（探索した場所だけ表示）、Shiftでダッシュができます。町の広場の商人マーロウ（噴水の東）では矢やポーションが買えますよ。','world');
+  chat('<b>案内人リア</b>: 世界は大きく広がりました。Mキーで全体マップ（探索した場所だけ表示）、Shiftでダッシュができます。スポーン地点の周囲は安全地帯で、敵が湧かずHPが回復しますよ。','world');
   if(selectedClass==='archer')chat('<b>案内人リア</b>: アーチャーは矢を消費して戦います。最初に30本持たせてあります。矢は放物線を描いて飛び、地形に刺さった矢は近づいてEキーで回収できます。','world');
   if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
