@@ -298,6 +298,14 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .sound-test-btn:hover{border-color:var(--gold)}
 .set-row.is-muted{opacity:.45}
 .set-row.is-muted input[type=range]{pointer-events:none}
+.res-mode{display:flex;gap:6px;flex-shrink:0}
+.res-mode .sound-toggle{min-width:0;padding:8px 11px;font-size:12px;white-space:nowrap}
+.res-now{font-size:12px;font-weight:900;color:var(--gold);text-align:right}
+#swimBanner{display:none;margin:0 auto 8px;width:fit-content;max-width:100%;padding:6px 14px;border-radius:99px;background:rgba(14,42,56,.92);border:1px solid #3a7291;color:#bfe6f7;font-size:12px;font-weight:700;text-align:center}
+#swimBanner.danger{background:rgba(64,14,14,.94);border-color:#e5484d;color:#ffc9c9;animation:swimWarn .8s ease-in-out infinite alternate}
+@keyframes swimWarn{from{transform:scale(1)}to{transform:scale(1.045)}}
+.msg{transition:opacity .7s ease}
+.msg.fading{opacity:0}
 .key-btn{min-width:96px;background:#0b100e;border:1px solid var(--line2);color:var(--gold);border-radius:6px;padding:8px 12px;font-weight:900;font-size:13px}
 .key-btn:hover{border-color:var(--gold)}
 .key-btn.listening{border-color:var(--gold);background:#2a2413;color:#fff;box-shadow:0 0 0 3px rgba(232,194,104,.25)}
@@ -550,6 +558,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <!-- HUD -->
     <div id="hud">
+      <div id="swimBanner" role="status"></div>
       <div class="char-card">
         <div class="char-top">
           <div class="avatar" id="hudAvatar">⚔️</div>
@@ -657,7 +666,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="settingsModal"><div class="settings-card">
       <h2>⚙ 設定</h2>
-      <p class="set-note">技や攻撃のキー割り当て、視点の感度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD、ジャンプの Space、カーソルキーの視点移動は固定です。</p>
+      <p class="set-note">技や攻撃のキー割り当て、視点の感度、描画解像度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD、ジャンプの Space、カーソルキーの視点移動は固定です。</p>
       <h3>キー割り当て</h3>
       <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー（Spaceはジャンプ専用）</div></div><button type="button" class="key-btn" data-bind="attack">F</button></div>
       <div class="set-row"><div><div class="set-label">スキル1</div><div class="set-desc" id="bindDesc1">強撃 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s1">1</button></div>
@@ -667,6 +676,10 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <h3>感度</h3>
       <div class="set-row"><div><div class="set-label">マウス感度</div><div class="set-desc">マウスロック中・ドラッグで見回す速さ</div></div><div class="set-ctl"><input type="range" id="sensRange" min="30" max="250" step="5" value="100"/><span class="set-val" id="sensVal">100%</span></div></div>
       <div class="set-row"><div><div class="set-label">カーソルキー感度</div><div class="set-desc">矢印キーで視点を回す速さ</div></div><div class="set-ctl"><input type="range" id="keySensRange" min="30" max="250" step="5" value="100"/><span class="set-val" id="keySensVal">100%</span></div></div>
+      <h3>画質・解像度</h3>
+      <div class="set-row"><div><div class="set-label">解像度モード</div><div class="set-desc">自動：FPSを見て描画解像度を自動調整（重い場面だけ下げ、軽い場面では上げます）。手動：下のスライダーの倍率で固定します</div></div><div class="res-mode"><button type="button" class="sound-toggle on" id="resAutoBtn" aria-pressed="true">自動（動的）</button><button type="button" class="sound-toggle off" id="resManualBtn" aria-pressed="false">手動</button></div></div>
+      <div class="set-row" id="resScaleRow"><div><div class="set-label">解像度（手動）</div><div class="set-desc">描画の細かさの倍率。下げると軽く、上げるときれいになります</div></div><div class="set-ctl"><input type="range" id="resScaleRange" min="50" max="150" step="5" value="100" aria-label="解像度（手動）"/><span class="set-val" id="resScaleVal">100%</span></div></div>
+      <div class="set-row"><div><div class="set-label">現在の描画倍率</div><div class="set-desc">いま実際に描画している倍率とフレームレート</div></div><span class="res-now" id="resNowVal">—</span></div>
       <h3 id="soundSection">サウンド</h3>
       <div class="set-row"><div><div class="set-label">サウンド</div><div class="set-desc">ゲーム内の効果音の ON / OFF</div></div><button type="button" class="sound-toggle on" id="soundToggleBtn" aria-pressed="true">ON ♪</button></div>
       <div class="set-row" id="masterVolRow"><div><div class="set-label">全体の音量</div><div class="set-desc">すべての効果音にかかる音量</div></div><div class="set-ctl"><input type="range" id="masterVolRange" min="0" max="100" step="5" value="100" aria-label="全体の音量"/><span class="set-val" id="masterVolVal">100%</span></div></div>
@@ -1023,7 +1036,7 @@ var ARROW_PRICE=2;
 
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
 var DEFAULT_BINDS={attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
-var settings={binds:{attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1,masterVol:1,seVol:1};
+var settings={binds:{attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1,masterVol:1,seVol:1,resMode:'auto',resScale:1};
 var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1,Space:1};
 var captureBind=null; // action name currently waiting for a key press
 function keyLabel(code){
@@ -1075,6 +1088,68 @@ function setSoundOn(on,announce){
   if(soundOn)beep(700,0.06,'triangle',0.04);
   markSettingsChanged();
 }
+/* ================= RESOLUTION (dynamic + manual render scale) =================
+   The renderer draws at basePixelRatio() × render scale.
+   - auto mode: an FPS watcher steps dynScale down when frames get heavy
+     and back up when there is headroom, so busy scenes stay smooth while
+     calm scenes render at full quality.
+   - manual mode: the settings slider fixes the scale (50%–150%).
+   resMode/resScale live in `settings`, so they autosave with the rest. */
+var dynScale=1;            /* current scale while in auto mode (0.5–1) */
+var dynFps=0;              /* last measured FPS (0 = not measured yet) */
+var dynAccMs=0,dynFrames=0,dynLastEval=0,dynHoldUntil=0;
+function basePixelRatio(){return Math.min(1.5,window.devicePixelRatio||1);}
+function currentRenderScale(){return settings.resMode==='manual'?settings.resScale:dynScale;}
+function applyRenderScale(){
+  if(typeof renderer==='undefined'||!renderer)return;
+  var pr=Math.max(0.3,Math.min(2,basePixelRatio()*currentRenderScale()));
+  renderer.setPixelRatio(pr);
+  if(viewW>0&&viewH>0)renderer.setSize(viewW,viewH);
+}
+function refreshResUI(){
+  var auto=settings.resMode!=='manual';
+  var ab=$('resAutoBtn'),mb=$('resManualBtn');
+  if(ab){ab.classList.toggle('on',auto);ab.classList.toggle('off',!auto);ab.setAttribute('aria-pressed',auto?'true':'false');}
+  if(mb){mb.classList.toggle('on',!auto);mb.classList.toggle('off',auto);mb.setAttribute('aria-pressed',auto?'false':'true');}
+  var rp=Math.round(settings.resScale*100);
+  var rr=$('resScaleRange'),rv=$('resScaleVal');
+  if(rr)rr.value=rp; if(rv)rv.textContent=rp+'%';
+  var row=$('resScaleRow'); if(row)row.classList.toggle('is-muted',auto);
+  var nv=$('resNowVal');
+  if(nv){
+    var cs=currentRenderScale();
+    nv.textContent='×'+cs.toFixed(2)+(auto?'（自動）':'（手動）')+(dynFps>0?' ・ '+Math.round(dynFps)+' FPS':'');
+  }
+}
+function setResMode(mode){
+  settings.resMode=(mode==='manual')?'manual':'auto';
+  if(settings.resMode==='auto'){
+    /* start from the scale that was on screen so there is no sudden jump */
+    dynScale=Math.max(0.5,Math.min(1,settings.resScale));
+    dynAccMs=0;dynFrames=0;dynHoldUntil=0;
+  }
+  applyRenderScale();refreshResUI();markSettingsChanged();
+}
+/* called every frame from loop(); rawMs is the unclamped frame interval */
+function dynResTick(now,rawMs){
+  if(!started||typeof renderer==='undefined'||!renderer)return;
+  if(rawMs>0&&rawMs<250){dynAccMs+=rawMs;dynFrames++;}
+  if(!dynLastEval)dynLastEval=now;
+  if(now-dynLastEval<800)return;
+  var secs=dynAccMs/1000;
+  if(dynFrames>4&&secs>0)dynFps=dynFrames/secs;
+  dynAccMs=0;dynFrames=0;dynLastEval=now;
+  if(settings.resMode!=='manual'&&now>=dynHoldUntil&&dynFps>0){
+    var ns=dynScale;
+    if(dynFps<45)ns=Math.max(0.5,dynScale-0.12);       /* heavy: step down decisively */
+    else if(dynFps>=57)ns=Math.min(1,dynScale+0.06);   /* headroom: creep back up */
+    if(ns!==dynScale){
+      dynScale=ns;applyRenderScale();
+      dynHoldUntil=now+1600; /* let the new scale settle before judging again */
+    }
+  }
+  if($('settingsModal').style.display==='grid')refreshResUI();
+}
 /* ================= SETTINGS AUTOSAVE =================
    Every settings change is autosaved:
    - logged in: settings ride inside the character save JSON
@@ -1087,7 +1162,8 @@ var SETTINGS_STORE_KEY='aetheria-settings-v1';
 var guestSettingsTimer=null;
 function snapshotSettings(){
   return {binds:{attack:settings.binds.attack,s1:settings.binds.s1,s2:settings.binds.s2,s3:settings.binds.s3,potion:settings.binds.potion},
-    sens:settings.sens,keySens:settings.keySens,masterVol:settings.masterVol,seVol:settings.seVol,soundOn:!!soundOn};
+    sens:settings.sens,keySens:settings.keySens,masterVol:settings.masterVol,seVol:settings.seVol,soundOn:!!soundOn,
+    resMode:settings.resMode,resScale:settings.resScale};
 }
 function settingsKey(){try{return JSON.stringify(snapshotSettings());}catch(e){return '';}}
 function applySettingsData(s){
@@ -1104,7 +1180,9 @@ function applySettingsData(s){
   settings.masterVol=clampNum(s.masterVol,settings.masterVol,0,1);
   settings.seVol=clampNum(s.seVol,settings.seVol,0,1);
   if(typeof s.soundOn==='boolean')soundOn=s.soundOn;
-  refreshKeyLabels();refreshSensUI();refreshSoundUI();
+  if(s.resMode==='manual'||s.resMode==='auto')settings.resMode=s.resMode;
+  settings.resScale=clampNum(s.resScale,settings.resScale,0.5,1.5);
+  refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshResUI();applyRenderScale();
 }
 function saveGuestSettings(){
   if(typeof acct!=='undefined'&&acct&&acct.token)return; /* logged in: server is the store */
@@ -1203,7 +1281,7 @@ function closeGameMenu(skipRelock){
 }
 function openFromMenu(id,anchor){
   returnToMenu=true;closeGameMenu(true);
-  if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshBindDescs();}
+  if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshResUI();refreshBindDescs();}
   if(id==='saveModal')refreshSaveUI();
   if(id==='bagModal')refreshBagUI();
   if(id==='playersModal')refreshPlayersUI();
@@ -1498,6 +1576,18 @@ function collide(nx,ny,r){
   }
   return false;
 }
+/* Rescue a mob that ended up inside a building (spawn overlap or a push):
+   expanding ring search for the nearest free spot, then move it there so
+   it never stays embedded in a wall. */
+function unstickEnemy(e){
+  var dirs=[[1,0],[-1,0],[0,1],[0,-1],[0.7071,0.7071],[-0.7071,0.7071],[0.7071,-0.7071],[-0.7071,-0.7071]];
+  for(var step=8;step<=120;step+=8){
+    for(var i=0;i<8;i++){
+      var nx=e.x+dirs[i][0]*step, ny=e.y+dirs[i][1]*step;
+      if(!collide(nx,ny,e.r*0.7)){e.x=nx;e.y=ny;return;}
+    }
+  }
+}
 function zoneAt(x,y){
   if(inTown(x,y)) return "ルミナスの町（安全地帯）";
   if(x>3850&&y>3850) return "紅蓮火山（危険）";
@@ -1644,7 +1734,12 @@ function trySpawnNear(immediate){
     if(sp.e&&sp.e.dead){sp.e=null;}              /* corpse cleanup finished it */
     if(now<sp.coolUntil)continue;                /* respawn cooldown */
     if(Math.hypot(sp.x-player.x,sp.y-player.y)>SPAWN_RANGE)continue;
-    var e=spawnEnemy(sp.type,sp.x+(Math.random()*80-40),sp.y+(Math.random()*80-40),sp);
+    /* never spawn inside a building: jitter the point until it is clear */
+    var e=null, tt=ETYPES[sp.type], sr=(tt?tt.size:20)*0.7;
+    for(var tries=0;tries<6&&!e;tries++){
+      var sx=sp.x+(Math.random()*160-80), sy=sp.y+(Math.random()*160-80);
+      if(!collide(sx,sy,sr))e=spawnEnemy(sp.type,sx,sy,sp);
+    }
     if(e){sp.e=e;made++;}
   }
 }
@@ -1671,6 +1766,14 @@ function chat(html,cls){
   var log=$('chatLog');var div=document.createElement('div');div.className='msg '+(cls||'');div.innerHTML=html;log.appendChild(div);
   while(log.children.length>60) log.removeChild(log.firstChild);
   log.scrollTop=log.scrollHeight;
+  /* system notices (EXP gains, level ups, quest / save notices…) clear
+     themselves 15 seconds after they appear; player chat stays */
+  if(cls==='sys'){
+    setTimeout(function(){
+      div.classList.add('fading');
+      setTimeout(function(){if(div.parentNode)div.parentNode.removeChild(div);},750);
+    },15000);
+  }
 }
 function toast(msg,ms){
   var t=$('toast');t.textContent=msg;t.style.display='block';
@@ -2235,10 +2338,54 @@ function updateSkillUI(now){
   if(pr>0){pb.style.display='block';pb.textContent='';}else pb.style.display='none';
 }
 
+/* ================= WATER & SWIMMING =================
+   Lakes (decorations with kind 'lake') have depth: the water deepens
+   toward the middle — 0 at the shore, about 120 at the centre.
+   Shallow water (depth < SWIM_DEPTH) is wading: a little slower, no cost.
+   At SWIM_DEPTH or deeper the player swims: movement switches to a slow
+   paddle, MP drains the whole time, and at 0 MP the player starts
+   drowning (HP drains) until they get back to shallow water. The swim
+   banner above the status panel shows which state you are in. */
+var SWIM_DEPTH=30, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
+function waterDepthAt(x,y){
+  var d=0;
+  for(var i=0;i<decorations.length;i++){var o=decorations[i];
+    if(o.kind!=='lake')continue;
+    var dist=Math.hypot(x-o.x,y-o.y);
+    if(dist<o.s){var dep=(1-dist/o.s)*120;if(dep>d)d=dep;}
+  }
+  return d;
+}
+var drownTickT=0;
+function updateSwimBanner(){
+  var b=$('swimBanner');if(!b)return;
+  if(!player||player.dead||!player.swimming){b.style.display='none';return;}
+  b.style.display='block';
+  if(player.mp<=0){b.className='danger';b.textContent='⚠ MPが尽きた！溺れています ― 急いで岸（浅瀬）へ戻って！';}
+  else{b.className='';b.textContent='🏊 泳ぎ中 ― MPを消費しています（水深 約'+(player.swimDepth/10).toFixed(1)+'m）';}
+}
+
 /* ================= UPDATE ================= */
 function update(dt,now){
   if(!player||player.dead){return;}
   var dashingNow=false;
+  /* water state for this frame: depth at the player's feet */
+  player.swimDepth=waterDepthAt(player.x,player.y);
+  var wasSwimming=!!player.swimming;
+  player.swimming=player.swimDepth>=SWIM_DEPTH;
+  if(player.swimming&&!wasSwimming)chat('🏊 深い水に入った ― 泳いでいる間はMPを消費します','sys');
+  if(player.swimming){
+    if(player.mp>0){
+      player.mp=Math.max(0,player.mp-dt*0.001*SWIM_MP_PER_SEC);
+      if(player.mp<=0)chat('⚠ <b>MPが尽きた！</b> 溺れ始めています ― 急いで岸へ戻ってください','sys');
+    }else{
+      /* drowning: HP drains until the player reaches shallow water */
+      player.hp-=dt*0.001*DROWN_HP_PER_SEC;
+      if(now-drownTickT>600){drownTickT=now;addDmg(player.x,player.y,'-'+Math.max(1,Math.round(DROWN_HP_PER_SEC*0.6)),'#ff8a8a');beep(90,0.09,'sawtooth',0.03);}
+      if(player.hp<=0){player.hp=0;player.dead=true;$('deathScreen').style.display='grid';chat('☠ <b>'+player.name+'</b> は水に溺れてしまった…','sys');updateSwimBanner();return;}
+    }
+  }
+  updateSwimBanner();
   // cursor (arrow) keys rotate the camera view instead of moving
   var typing=document.activeElement===$('chatInput')||document.activeElement===$('nameInput')||document.activeElement===$('sensRange')||document.activeElement===$('keySensRange');
   if(!typing){
@@ -2263,11 +2410,12 @@ function update(dt,now){
     mx=wmx;my=wmy;
     /* DASH (Shift): about 2x normal speed while held, drains 1 MP per second;
        passive MP regen pauses while dashing, and at 0 MP dashing is impossible. */
-    if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0){
+    if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0&&!player.swimming){
       dashingNow=true;
       player.mp=Math.max(0,player.mp-dt*0.001);
     }
     var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
+    if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     if(!collide(nx,player.y,player.r)) player.x=nx;
     if(!collide(player.x,ny,player.r)) player.y=ny;
@@ -2281,8 +2429,8 @@ function update(dt,now){
     jumpVY-=0.00045*dt;
     if(jumpY<=0){jumpY=0;jumpVY=0;}
   }
-  // mp regen (paused while dashing), town heal
-  if(!dashingNow)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
+  // mp regen (paused while dashing or swimming), town heal
+  if(!dashingNow&&!player.swimming)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
   // crosshair identification + eyesight: the enemy captured by the center
   // crosshair is the only one whose name/level/HP are revealed; any enemy
   // that enters the player's field of view counts as "seen" for the minimap.
@@ -2307,6 +2455,8 @@ function update(dt,now){
   enemies.forEach(function(e){
     if(e.dead)return;
     if(e.hitFlash>0)e.hitFlash--;
+    /* a mob that is somehow inside a building gets nudged out first */
+    if(collide(e.x,e.y,e.r*0.7))unstickEnemy(e);
     var dp=Math.hypot(player.x-e.x,player.y-e.y);
     var edt=dt, slowTick=false;
     if(dp>1100){
@@ -2325,11 +2475,25 @@ function update(dt,now){
       if(!e.atkT||now-e.atkT>(e.boss?900:1100)){e.atkT=now;hurtPlayer(e.atk*(0.85+Math.random()*0.3),e);beep(120,0.06,'square',0.03);}
     }else{
       e.wt-=edt;
-      if(e.wt<=0){e.wt=1600+Math.random()*2200;e.tx=e.homeX+(Math.random()*130-65);e.ty=e.homeY+(Math.random()*130-65);}
-      if(e.tx){var d2=Math.hypot(e.tx-e.x,e.ty-e.y);if(d2>4){var wsp=e.speed*0.45*(slowTick?(edt/16.7):1);e.x+=(e.tx-e.x)/d2*wsp;e.y+=(e.ty-e.y)/d2*wsp;e.walk+=edt*0.01;}}
+      if(e.wt<=0){e.wt=1600+Math.random()*2200;e.tx=e.homeX+(Math.random()*130-65);e.ty=e.homeY+(Math.random()*130-65);
+        /* a wander target inside a building is useless: skip it */
+        if(e.tx&&collide(e.tx,e.ty,e.r*0.7)){e.tx=0;e.ty=0;e.wt=500;}}
+      if(e.tx){var d2=Math.hypot(e.tx-e.x,e.ty-e.y);if(d2>4){var wsp=e.speed*0.45*(slowTick?(edt/16.7):1);
+        /* axis-separated move, same as the player's: slide along walls
+           instead of walking into / through buildings */
+        var wx2=e.x+(e.tx-e.x)/d2*wsp, wy2=e.y+(e.ty-e.y)/d2*wsp, movedW=false;
+        if(!collide(wx2,e.y,e.r*0.7)){e.x=wx2;movedW=true;}
+        if(!collide(e.x,wy2,e.r*0.7)){e.y=wy2;movedW=true;}
+        if(movedW){e.walk+=edt*0.01;e._stuckMs=0;}
+        else{e._stuckMs=(e._stuckMs||0)+edt;if(e._stuckMs>1200){e.tx=0;e.ty=0;e.wt=400;e._stuckMs=0;}} /* boxed in: pick a new target */
+      }}
       if(e.state==='return'){e.hp=Math.min(e.maxHp,e.hp+edt*0.02);}
     }
-    if(inSafe){e.x+=(e.x-1300)*0.02;e.y+=(e.y-1300)*0.02;} // push out of town
+    if(inSafe){ // push out of town, sliding along buildings instead of through them
+      var px2=e.x+(e.x-1300)*0.02, py2=e.y+(e.y-1300)*0.02;
+      if(!collide(px2,e.y,e.r*0.7))e.x=px2;
+      if(!collide(e.x,py2,e.r*0.7))e.y=py2;
+    }
   });
   // projectiles — mage bolts fly straight (legacy); ARROWS are physical:
   // they arc under gravity toward the crosshair, stop in terrain (and can be
@@ -2856,7 +3020,7 @@ function init3D(){
   var holder=document.getElementById('game3d');
   renderer=new THREE.WebGLRenderer({antialias:true});
   if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;}
-  renderer.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
+  renderer.setPixelRatio(Math.max(0.3,Math.min(2,basePixelRatio()*currentRenderScale())));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   holder.appendChild(renderer.domElement);
   canvas.style.display='none';
@@ -3494,6 +3658,8 @@ function render3D(now){
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
   var eyeY=terrainH(player.x,player.y)+54+jumpY;
+  /* swimming: the eyes ride low at the water surface with a gentle bob */
+  if(player.swimming)eyeY=terrainH(player.x,player.y)+30+Math.sin(now/300)*1.8;
   var cp=Math.cos(camPitch);
   camera3d.position.set(tx,eyeY,tz);
   camera3d.lookAt(tx-Math.sin(camYaw)*cp,eyeY+Math.sin(camPitch),tz-Math.cos(camYaw)*cp);
@@ -3654,7 +3820,9 @@ function drawPreview(){
 /* ================= LOOP ================= */
 var lastT=performance.now(),miniT=0,listT=0,exploreT=0,spawnT=0;
 function loop(now){
+  var rawMs=now-lastT;
   var dt=Math.min(50,now-lastT);lastT=now;
+  dynResTick(now,rawMs);
   syncCursorHide();
   if(started){
     update(dt,now);
@@ -3673,7 +3841,7 @@ function loop(now){
     }
     if(THREE_OK){render3D(now);}else{draw();}
     if(now-miniT>180){miniT=now;drawMini();}
-    if(now-listT>900){listT=now;updatePlayerList();updateHUD();refreshSaveUI();acctTick(now);$('hudZone').textContent=zoneAt(player.x,player.y);if($('playersModal').style.display==='grid')refreshPlayersUI();}
+    if(now-listT>900){listT=now;updatePlayerList();updateHUD();updateSwimBanner();refreshSaveUI();acctTick(now);$('hudZone').textContent=zoneAt(player.x,player.y);if($('playersModal').style.display==='grid')refreshPlayersUI();}
     updateSkillUI(now);
     /* bow draw gauge + safety: drawing is cancelled if a menu/modal opens or the player falls */
     (function(){
@@ -3721,7 +3889,7 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started){if(acct.token)serverSave(true);else downloadSave();}return;}
   if(!started)return;
   if(document.activeElement===$('chatInput'))return;
-  if(e.code==='Space'){e.preventDefault();if(!e.repeat&&player&&!player.dead&&jumpY<=0&&jumpVY===0)jumpVY=0.17;}
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat&&player&&!player.dead&&!player.swimming&&jumpY<=0&&jumpVY===0)jumpVY=0.17;}
   var b=settings.binds;
   if(e.code===b.attack){e.preventDefault();if(player&&player.cls==='archer'){if(!e.repeat)startBowDraw();}else playerAttack(1);}
   if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
@@ -3802,6 +3970,9 @@ $('masterVolRange').addEventListener('input',function(){settings.masterVol=this.
 $('masterVolRange').addEventListener('change',function(){if(soundOn)beep(660,0.08,'triangle',0.05);});
 $('seVolRange').addEventListener('input',function(){settings.seVol=this.value/100;refreshSoundUI();markSettingsChanged();});
 $('seVolRange').addEventListener('change',function(){if(soundOn)beep(660,0.08,'triangle',0.05);});
+$('resAutoBtn').addEventListener('click',function(){setResMode('auto');beep(700,0.05,'triangle',0.03);});
+$('resManualBtn').addEventListener('click',function(){setResMode('manual');beep(700,0.05,'triangle',0.03);});
+$('resScaleRange').addEventListener('input',function(){settings.resScale=this.value/100;if(settings.resMode==='manual')applyRenderScale();refreshResUI();markSettingsChanged();});
 $('soundTestBtn').addEventListener('click',function(){
   if(!soundOn){toast('サウンドが OFF です。ON にしてから試してください');return;}
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(659,0.1,'triangle',0.05);},110);setTimeout(function(){beep(784,0.16,'triangle',0.05);},220);
@@ -3809,12 +3980,13 @@ $('soundTestBtn').addEventListener('click',function(){
 $('resetSettingsBtn').addEventListener('click',function(){
   settings.binds={attack:DEFAULT_BINDS.attack,s1:DEFAULT_BINDS.s1,s2:DEFAULT_BINDS.s2,s3:DEFAULT_BINDS.s3,potion:DEFAULT_BINDS.potion};
   settings.sens=1;settings.keySens=1;settings.masterVol=1;settings.seVol=1;soundOn=true;captureBind=null;
-  refreshKeyLabels();refreshSensUI();refreshSoundUI();
+  settings.resMode='auto';settings.resScale=1;dynScale=1;dynAccMs=0;dynFrames=0;dynHoldUntil=0;
+  refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshResUI();applyRenderScale();
   markSettingsChanged();
   toast('設定を初期状態に戻しました');beep(600,0.06,'square',0.03);
 });
 loadGuestSettings();
-refreshKeyLabels();refreshSoundUI();
+refreshKeyLabels();refreshSoundUI();refreshResUI();
 $('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');});
 /* game menu (Esc) wiring — the ONLY way to open settings / sound / save / help in game */
 $('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
