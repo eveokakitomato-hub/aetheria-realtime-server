@@ -582,7 +582,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <!-- HUD -->
     <div id="hud">
       <div id="swimBanner" role="status"></div>
-      <div id="hoverBanner" role="status">🕊 浮遊中 — ジャンプキーを2回すばやく押すと降りられます</div>
+      <div id="hoverBanner" role="status">🕊 浮遊中 — Space長押しで上昇 ／ Spaceを短く2回押すと降りられます</div>
       <div class="char-card">
         <div class="char-top">
           <div class="avatar" id="hudAvatar">⚔️</div>
@@ -656,8 +656,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
         <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
-        <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を2回すばやく押す（ダブルタップ）と浮遊が解除され、地面へ降ります。着地すると通常状態に戻ります</td></tr>
-        <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木などの配置ができ、編集はセーブデータに保存されます</td></tr>
+        <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を<b>長押しすると上昇</b>します（押すたびにも少し上がります）。浮遊の解除は、<kbd>Space</kbd> を<b>短く2回すばやく押す</b>（ダブルタップ）ときだけです。長押しでは解除されず、上昇し続けます。着地すると通常状態に戻ります</td></tr>
+        <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木などの配置ができ、削除モードでは町の家・城壁・木・岩など既存の物も消せます。編集も削除の記録もセーブデータに保存され、「全リセット」で元に戻ります</td></tr>
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
@@ -771,7 +771,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <button type="button" id="edPlaceModeBtn">モード: 配置</button>
           <button type="button" class="primary" id="edPlaceBtn">📌 照準の場所に置く</button>
         </div>
-        <p class="ed-note">半透明のプレビューが照準の場所に出ます。「モード: 削除」に切り替えると、照準に一番近い置いた物が赤く光り、「削除する」で消せます。置いた物には当たり判定が付きます。</p>
+        <p class="ed-note">半透明のプレビューが照準の場所に出ます。「モード: 削除」に切り替えると、照準に一番近い物が赤く光り、「削除する」で消せます。消せるのは置いた物だけでなく、町の家・城壁・門・時計塔・礼拝堂・城・噴水・街灯・露店や、木・岩・遺跡などの既存の物も対象です（川や橋などの水まわりは消せません）。既存の物を消した記録も自動保存され、次回も消えたままになります。「編集を全部リセット」で元に戻ります。置いた物には当たり判定が付きます。</p>
       </div>
       <div class="ed-actions">
         <button type="button" id="edUndoBtn">↩ 元に戻す</button>
@@ -992,6 +992,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
             <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程になります</td></tr>
             <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
+            <tr><td>浮遊（飛行）</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）のみ。空中でもう一度 <kbd>Space</kbd> で浮遊し、浮遊中は <kbd>Space</kbd> 長押しで上昇、短く2回押すと解除されて降ります</td></tr>
             <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動でダッシュ。MPを毎秒1消費し、尽きるとダッシュできません</td></tr>
             <tr><td>全体マップ</td><td><kbd>M</kbd> キー。歩いて探索したエリアだけが表示される全体マップ（探索記録はセーブに残ります）</td></tr>
             <tr><td>矢</td><td>アーチャーの射撃は矢を消費し、矢は放物線を描いて飛びます。地形に刺さった矢は近づいて <kbd>E</kbd> で回収できます</td></tr>
@@ -1072,6 +1073,14 @@ var started=false, soundOn=true, audioCtx=null;
 var keys={}, joyVec={x:0,y:0};
 var jumpY=0, jumpVY=0; // jump height above terrain / vertical velocity (Space)
 var hovering=false, hoverTapT=0; // float mode (gamemaster only): gravity stopped mid-air
+var hoverPressT=0, hoverPressWasSecond=false; // current Space press while floating: its start time + whether it began soon after a short tap
+var HOVER_HOLD_MS=160;      // holding Space at least this long counts as a hold (rise), never as a tap
+var HOVER_TAP_MS=260;       // releasing Space within this long counts as a short tap
+var HOVER_DOUBLE_MS=380;    // a second short tap starting within this window after the previous tap = double-tap (cancel float)
+var HOVER_RISE_PER_MS=0.16; // upward speed while Space is held during float
+var HOVER_TAP_NUDGE=16;     // small upward step given on every Space press while floating
+var HOVER_MAX_Y=900;        // ceiling for float altitude (jumpY)
+function clearHoverPress(){hoverPressT=0;hoverPressWasSecond=false;}
 var cam={x:0,y:0};
 var viewW=960, viewH=640;
 /* 3D camera state (first-person) */
@@ -1405,7 +1414,7 @@ function refreshPlayersUI(){
 function doLogout(){
   if(typeof editorState!=='undefined'&&editorState&&editorState.active){editorState.active=false;editorState.applying=false;var ep=$('editorPanel');if(ep)ep.style.display='none';}
   if(acct.token)serverSave(false); /* save FIRST (buildSaveData runs synchronously), then clear */
-  clearWorldEditSilent(); hovering=false; /* world edits never leak into the next session */
+  clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); /* world edits never leak into the next session */
   returnToMenu=false;closeGameMenu(true);
   ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
@@ -1671,7 +1680,7 @@ function genWorld(){
   var tries=0;
   while(decorations.length<620 && tries<9000){
     tries++;
-    var x=60+Math.random()*(W-120), y=60+Math.random()*(H-120);
+    var x=60+trnd()*(W-120), y=60+trnd()*(H-120); /* seeded (was Math.random): the scatter must be identical on every genWorld() so editor deletions of trees/rocks can be recorded by position and re-applied after a rebuild */
     if(Math.hypot(x-1300,y-1680)<130) continue;  // spawn clearing stays open
     if(townNorm(x,y)<1.18) continue;             // never inside the town of Luminas or hugging its wall
     if(waterDepthAt(x,y)>0) continue;            // nor in the town river / ponds
@@ -1682,13 +1691,13 @@ function genWorld(){
     if(Math.hypot(x-4200,y-2400)<200) continue;         // desert oasis
     if(Math.hypot(x-4750,y-4100)<210) continue;         // lava lake
     if(Math.hypot(x-4600,y-4600)<330) continue;         // ifrit arena
-    var reg=regionAt(x,y), kind, roll=Math.random();
+    var reg=regionAt(x,y), kind, roll=trnd();
     if(reg==='desert') kind=roll<0.42?'cactus':'rock';
     else if(reg==='snow') kind=roll<0.68?'snowtree':'rock';
     else if(reg==='volcano') kind='rock';
     else if(reg==='deepforest') kind=roll<0.82?'tree':(roll<0.92?'rock':'flower');
     else kind=roll<0.72?'tree':(roll<0.86?'rock':'flower');
-    var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+Math.random()*14:10+Math.random()*8,seed:Math.random()*10};
+    var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+trnd()*14:10+trnd()*8,seed:trnd()*10};
     decorations.push(d);
     if(kind!=='flower') obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});
   }
@@ -2499,6 +2508,7 @@ function applySaveData(data){
 function startFromSave(source){
   setupSkillUI(player.cls);
   genWorld();populate();
+  applyBuiltinDeletions(); /* deleted pre-existing objects stay deleted after the rebuild (gamemaster saves only) */
   syncPlacedObstacles(); placedSig='__dirty__'; refreshGroundAll(); /* world edits (gamemaster) re-applied */
   // genWorld rebuilt obstacles; if saved position now collides, fall back to town
   if(collide(player.x,player.y,player.r)){player.x=SPAWN_X;player.y=SPAWN_Y;lastSavedKey=progressKey();}
@@ -2601,8 +2611,17 @@ function updateSwimBanner(){
 /* ================= HOVER / FLIGHT (gamemaster only) =================
    Ground Space = normal jump (everyone). Space again mid-air starts the
    float ONLY for the gamemaster account; other players just fall as
-   usual. While floating, a double-tap of Space (two presses within
-   350ms) cancels the float and gravity resumes. Landing resets it. */
+   usual. While floating:
+     - HOLDING Space rises: every press gives a small upward step, and
+       once the press has been held past HOVER_HOLD_MS the player keeps
+       rising for as long as the key stays down (handled in update()).
+       A hold is never a tap, so holding can never cancel the float.
+     - A double-tap cancels the float, but it is only recognised when
+       the second press is ALSO released quickly (a short tap that
+       started within HOVER_DOUBLE_MS of the previous short tap).
+       The decision is made on key release (handleJumpRelease), not on
+       press, so a press that turns into a hold rises instead of
+       cancelling. Landing resets everything. */
 function updateHoverBanner(){
   var b=$('hoverBanner'); if(!b)return;
   b.style.display=(hovering&&player&&!player.dead)?'block':'none';
@@ -2610,21 +2629,38 @@ function updateHoverBanner(){
 function handleJumpKey(){
   if(!started||!player||player.dead)return;
   if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
-  if(player.swimming){hovering=false;updateHoverBanner();return;}
+  if(player.swimming){hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();return;}
   var now=performance.now();
   if(hovering){
-    if(now-hoverTapT<350){
-      hovering=false;hoverTapT=0;jumpVY=0;
-      toast('浮遊を解除しました — 地面へ降りています');
-      beep(420,0.07,'sine',0.03);updateHoverBanner();
-    }else hoverTapT=now;
+    /* Record this press and give the per-press upward step. Whether it
+       is a tap (counts toward a double-tap) or a hold (rise) is decided
+       later: by how long it stays down, in update() and on release. */
+    hoverPressT=now;
+    hoverPressWasSecond=(hoverTapT>0&&now-hoverTapT<=HOVER_DOUBLE_MS);
+    jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_TAP_NUDGE);
     return;
   }
   if(jumpY<=0&&jumpVY===0){jumpVY=0.17;return;} /* grounded: normal jump for everyone */
   if(!isGameMaster())return; /* mid-air press: only gamemaster can float */
-  hovering=true;jumpVY=0;hoverTapT=0;
-  toast('🕊 浮遊モード — 空中をそのまま移動できます（Spaceを2回すばやく押すと解除）',3200);
+  hovering=true;jumpVY=0;hoverTapT=0;clearHoverPress();
+  toast('🕊 浮遊モード — Space長押しで上昇／短く2回押すと解除',3600);
   beep(880,0.08,'sine',0.04);updateHoverBanner();
+}
+function handleJumpRelease(){
+  if(!hoverPressT)return; /* no press was tracked while floating (e.g. the press that started the float) */
+  var now=performance.now();
+  var heldMs=now-hoverPressT;
+  var wasSecond=hoverPressWasSecond;
+  clearHoverPress();
+  if(!hovering||!player||player.dead)return;
+  if(heldMs>=HOVER_TAP_MS){hoverTapT=0;return;} /* it was a hold: rises already handled in update(); never a tap */
+  if(wasSecond){
+    hovering=false;hoverTapT=0;jumpVY=0;
+    toast('浮遊を解除しました — 地面へ降りています');
+    beep(420,0.07,'sine',0.03);updateHoverBanner();
+  }else{
+    hoverTapT=now; /* first short tap: remember it in case a second short tap follows quickly */
+  }
 }
 
 /* ================= UPDATE ================= */
@@ -2687,14 +2723,21 @@ function update(dt,now){
   // jump physics (Space): gravity pulls the player back down onto the terrain height;
   // horizontal movement above keeps working while airborne.
   // HOVER (gamemaster only): gravity stops and the player floats at this
-  // height until a double-tap of Space cancels it or they land.
+  // height until a short double-tap of Space cancels it or they land.
+  // While Space is held down past HOVER_HOLD_MS the float RISES at a
+  // steady speed; once a press counts as a hold it can no longer be the
+  // second tap of a double-tap, so holding never cancels the float.
   if(hovering){
     jumpVY=0;
-    if(player.swimming)hovering=false;
+    if(player.swimming){hovering=false;hoverTapT=0;clearHoverPress();}
+    else if(keys['Space']&&hoverPressT&&now-hoverPressT>=HOVER_HOLD_MS&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
+      hoverTapT=0;hoverPressWasSecond=false; /* this press is a hold now, not a tap */
+      jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_RISE_PER_MS*dt);
+    }
   }else if(jumpVY!==0||jumpY>0){
     jumpY+=jumpVY*dt;
     jumpVY-=0.00045*dt;
-    if(jumpY<=0){jumpY=0;jumpVY=0;hovering=false;}
+    if(jumpY<=0){jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;clearHoverPress();}
   }
   updateHoverBanner();
   // mp regen (paused while dashing or swimming); safe-zone heal below
@@ -3169,6 +3212,8 @@ var terrainDelta=new Float32Array(EDIT_N*EDIT_N);
 var terrainChanged={}; /* idx -> true, for sparse serialisation */
 var placedObjects=[];  /* {id,t,x,y,rot(deg)} */
 var placedSeq=0;
+var deletedBuiltins=[]; /* bids ("kind@x,y") of PRE-EXISTING world objects deleted in the editor: town houses/walls/landmarks, trees, rocks, ruins */
+var builtinsFiltered=false; /* true while the live obstacles/decorations/townFeatures arrays have those deletions applied */
 var editSeq=0;         /* bumped on any world edit; part of progressKey() */
 var undoStack=[];
 var editorState={active:false,mode:'terrain',tool:'raise',brush:130,strength:5,
@@ -3197,26 +3242,32 @@ function markEditChanged(){
 }
 function worldEditKey(){
   var n=0; for(var k in terrainChanged)n++;
-  return 'WE'+editSeq+':'+n+':'+placedObjects.length;
+  return 'WE'+editSeq+':'+n+':'+placedObjects.length+':'+deletedBuiltins.length;
 }
 function serializeWorldEdit(){
   var n=0; for(var k in terrainChanged)n++;
-  if(n===0&&placedObjects.length===0)return null;
+  if(n===0&&placedObjects.length===0&&deletedBuiltins.length===0)return null;
   var terr=[];
   for(var idx in terrainChanged){
     var d=terrainDelta[Number(idx)];
     if(Math.abs(d)>0.05)terr.push([Number(idx),Math.round(d*10)/10]);
   }
   var pl=placedObjects.map(function(o){return {t:o.t,x:Math.round(o.x),y:Math.round(o.y),rot:Math.round(o.rot)};});
-  return {v:1,terrain:terr,placed:pl};
+  return {v:1,terrain:terr,placed:pl,del:deletedBuiltins.slice()};
 }
 function clearWorldEditSilent(){
+  var hadBuiltinDeletions=builtinsFiltered||deletedBuiltins.length>0;
   terrainDelta=new Float32Array(EDIT_N*EDIT_N);
   terrainChanged={}; terrainHasEdits=false; placedObjects=[]; placedSeq=0; undoStack=[];
+  deletedBuiltins=[]; builtinsFiltered=false;
   editorState.stroke=null; editorState.applying=false;
   placedSig='__dirty__';
   if(typeof obstacles!=='undefined')syncPlacedObstacles();
   refreshGroundAll();
+  /* if pre-existing objects had been deleted from the live world, rebuild
+     the pristine world so they come back (used by 全リセット, logout and
+     by non-gamemaster loads, whose clients must never see deletions) */
+  if(hadBuiltinDeletions&&typeof genWorld==='function'){genWorld();syncPlacedObstacles();placedSig='__dirty__';}
 }
 function loadWorldEdit(we){
   clearWorldEditSilent();
@@ -3239,6 +3290,16 @@ function loadWorldEdit(we){
       placedObjects.push({id:++placedSeq,t:o.t,x:x,y:y,rot:((rot%360)+360)%360});
     });
   }
+  /* deleted pre-existing objects: validated bid strings, re-applied to
+     the live world now and again after every genWorld() rebuild */
+  deletedBuiltins=[];
+  if(Array.isArray(we.del)){
+    we.del.slice(0,400).forEach(function(b){
+      if(typeof b!=='string'||!/^[a-z]+@-?\d+,-?\d+$/.test(b))return;
+      if(deletedBuiltins.indexOf(b)<0)deletedBuiltins.push(b);
+    });
+  }
+  applyBuiltinDeletions();
   editSeq++;
   refreshGroundAll();
   syncPlacedObstacles();
@@ -3478,6 +3539,104 @@ function nearestPlaced(x,y,maxD){
   placedObjects.forEach(function(o){var d=Math.hypot(o.x-x,o.y-y);if(d<bd){bd=d;best=o;}});
   return best;
 }
+/* ---- pre-existing (built-in) objects: deletable in the editor ----
+   Every deletable built-in gets a stable bid "kind@x,y" from its centre
+   coordinates. The world generation is deterministic (seeded), so the
+   same object reappears at the same centre after every genWorld() and
+   the bid keeps identifying it across sessions. Deleting removes the
+   render record (townFeatures / decorations / the ruin obstacle) AND
+   its collision obstacle(s); the bid list is serialised in the save
+   (worldEdit.del) and re-applied after each world rebuild. Restoring
+   (undo / 全リセット) regenerates the pristine world and re-applies
+   whatever deletions remain. Water, bridges, terrace steps/skirts and
+   the waterfall are NOT deletable: other systems (swimming, crossing,
+   terrain support) depend on them. */
+var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1};
+var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱'};
+var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:105,castle:125,fountain:55,lamp:26,stall:48,ruin:62};
+function builtinBid(kind,x,y){return kind+'@'+Math.round(x)+','+Math.round(y);}
+function builtinTargets(){
+  var out=[];
+  townFeatures.forEach(function(f){
+    if(!BUILTIN_FEATURE_KINDS[f.kind])return;
+    out.push({bid:builtinBid(f.kind,f.x,f.y),kind:f.kind,x:f.x,y:f.y,r:BUILTIN_RADIUS[f.kind]||50});
+  });
+  decorations.forEach(function(d){
+    if(d.kind!=='tree'&&d.kind!=='snowtree'&&d.kind!=='cactus'&&d.kind!=='rock')return;
+    out.push({bid:builtinBid(d.kind,d.x,d.y),kind:d.kind,x:d.x,y:d.y,r:Math.max(26,(d.s||14)*1.15)});
+  });
+  obstacles.forEach(function(o){
+    if(o.ruin&&!o.town&&o.type==='rect')out.push({bid:builtinBid('ruin',o.x+o.w/2,o.y+o.h/2),kind:'ruin',x:o.x+o.w/2,y:o.y+o.h/2,r:BUILTIN_RADIUS.ruin});
+  });
+  return out;
+}
+function nearestBuiltin(x,y){
+  var best=null,bs=1e9;
+  builtinTargets().forEach(function(t){
+    if(deletedBuiltins.indexOf(t.bid)>=0)return;
+    var d=Math.hypot(t.x-x,t.y-y);
+    if(d<t.r+38){var s=d-t.r;if(s<bs){bs=s;best={t:t,d:d,score:s};}}
+  });
+  return best;
+}
+/* choose what a delete action at (x,y) hits: a placed object or a
+   pre-existing one, whichever the aim is effectively closest to */
+function pickDeleteTarget(x,y){
+  var o=nearestPlaced(x,y,130);
+  var b=nearestBuiltin(x,y);
+  if(b&&(!o||b.score<Math.hypot(o.x-x,o.y-y)-50))return {builtin:b.t};
+  if(o)return {placed:o};
+  if(b)return {builtin:b.t};
+  return null;
+}
+function removeBuiltinNow(bid){
+  var parts=bid.split('@'); if(parts.length!==2)return false;
+  var kind=parts[0], xy=parts[1].split(','), cx=Number(xy[0]), cy=Number(xy[1]);
+  if(!isFinite(cx)||!isFinite(cy))return false;
+  function near(x,y,tol){return Math.abs(x-cx)<=tol&&Math.abs(y-cy)<=tol;}
+  var removed=false;
+  if(BUILTIN_FEATURE_KINDS[kind]){
+    for(var i=townFeatures.length-1;i>=0;i--){var f=townFeatures[i];if(f.kind===kind&&near(f.x,f.y,3)){townFeatures.splice(i,1);removed=true;}}
+    if(!removed)return false;
+    for(var j=obstacles.length-1;j>=0;j--){var o=obstacles[j];if(!o.town||o.placed)continue;
+      var ox=(o.type==='rect')?o.x+o.w/2:o.x, oy=(o.type==='rect')?o.y+o.h/2:o.y;
+      if(kind==='gate'||kind==='watergate'){if(o.tower&&Math.hypot(ox-cx,oy-cy)<=95)obstacles.splice(j,1);}
+      else if(near(ox,oy,4))obstacles.splice(j,1);
+    }
+  }else if(kind==='ruin'){
+    for(var k=obstacles.length-1;k>=0;k--){var ro=obstacles[k];if(ro.ruin&&!ro.town&&ro.type==='rect'&&near(ro.x+ro.w/2,ro.y+ro.h/2,3)){obstacles.splice(k,1);removed=true;}}
+  }else{ /* decoration kinds: tree / snowtree / cactus / rock */
+    for(var m=decorations.length-1;m>=0;m--){var d=decorations[m];
+      if(d.kind===kind&&near(d.x,d.y,3)){
+        for(var n=obstacles.length-1;n>=0;n--)if(obstacles[n].ref===d)obstacles.splice(n,1);
+        decorations.splice(m,1);removed=true;
+      }}
+  }
+  if(removed)_losSrc=null;
+  return removed;
+}
+function applyBuiltinDeletions(){
+  if(!deletedBuiltins.length){builtinsFiltered=false;return;}
+  deletedBuiltins.forEach(function(bid){removeBuiltinNow(bid);});
+  builtinsFiltered=true;
+}
+function restoreBuiltinsWorld(){
+  genWorld();
+  applyBuiltinDeletions();
+  syncPlacedObstacles();
+  placedSig='__dirty__';
+}
+function deleteBuiltinTarget(t){
+  if(deletedBuiltins.indexOf(t.bid)>=0)return;
+  deletedBuiltins.push(t.bid);
+  removeBuiltinNow(t.bid);
+  builtinsFiltered=true;
+  undoStack.push({kind:'builtin',bid:t.bid});
+  if(undoStack.length>60)undoStack.shift();
+  markEditChanged(); refreshEditorUI();
+  beep(330,0.07,'square',0.04);
+  toast('既存の'+(BUILTIN_LABEL[t.kind]||'オブジェクト')+'を削除しました（自動保存されます）');
+}
 function placeObjectAtAim(){
   if(placedObjects.length>=300){toast('置ける物の上限（300個）に達しました');return;}
   var aim=editorState.aim||computeEditorAim(); if(!aim)return;
@@ -3492,8 +3651,10 @@ function placeObjectAtAim(){
 }
 function deletePlacedAtAim(){
   var aim=editorState.aim||computeEditorAim(); if(!aim)return;
-  var o=nearestPlaced(aim.x,aim.y,130);
-  if(!o){toast('近くに消せる物がありません');return;}
+  var pick=pickDeleteTarget(aim.x,aim.y);
+  if(!pick){toast('近くに消せる物がありません');return;}
+  if(pick.builtin){deleteBuiltinTarget(pick.builtin);return;}
+  var o=pick.placed;
   var idx=placedObjects.indexOf(o);
   placedObjects.splice(idx,1);
   undoStack.push({kind:'delete',obj:o,index:idx});
@@ -3523,6 +3684,10 @@ function editorUndo(){
   }else if(u.kind==='delete'){
     placedObjects.splice(Math.min(u.index,placedObjects.length),0,u.obj);
     syncPlacedObstacles(); placedSig='__dirty__';
+  }else if(u.kind==='builtin'){
+    var bi=deletedBuiltins.indexOf(u.bid);
+    if(bi>=0)deletedBuiltins.splice(bi,1);
+    restoreBuiltinsWorld(); /* regenerate the pristine world, then re-apply the deletions that remain */
   }
   markEditChanged(); refreshEditorUI();
   beep(520,0.06,'triangle',0.04);
@@ -3579,15 +3744,17 @@ function updateEditorVisuals(){
       ghostGroup.position.set(WX(aim.x),terrainH(aim.x,aim.y)-1,WZ(aim.y));
       ghostGroup.rotation.y=-(editorState.rot*Math.PI/180);
     }
-  }else{ /* delete mode: highlight nearest placed object */
+  }else{ /* delete mode: highlight the nearest deletable object, placed or pre-existing */
     if(ghostGroup)ghostGroup.visible=false;
-    var o=nearestPlaced(aim.x,aim.y,130);
+    var pick=pickDeleteTarget(aim.x,aim.y);
     if(brushRing){
-      if(o){
+      if(pick){
+        var tx=pick.builtin?pick.builtin.x:pick.placed.x, ty=pick.builtin?pick.builtin.y:pick.placed.y;
+        var tr=pick.builtin?Math.max(30,pick.builtin.r):64;
         brushRing.visible=true;
         brushRing.material.color.setHex(0xff5560);
-        brushRing.position.set(WX(o.x),terrainH(o.x,o.y)+3,WZ(o.y));
-        brushRing.scale.set(64,64,64);
+        brushRing.position.set(WX(tx),terrainH(tx,ty)+3,WZ(ty));
+        brushRing.scale.set(tr,tr,tr);
       }else brushRing.visible=false;
     }
   }
@@ -3634,7 +3801,7 @@ function refreshEditorStatus(){
   var n=0; for(var k in terrainChanged)n++;
   var aim=editorState.aim;
   var pos=aim?('照準: '+Math.round(aim.x)+', '+Math.round(aim.y)+'（高さ '+Math.round(aim.z)+'）'):'';
-  st.innerHTML='作業モード中は敵が湧かず攻撃できません。 '+pos+'<br>編集中の地形セル <b>'+n+'</b> ／ 置いた物 <b>'+placedObjects.length+'</b> 個 ／ 編集はキャラクターと一緒に自動保存されます。';
+  st.innerHTML='作業モード中は敵が湧かず攻撃できません。 '+pos+'<br>編集中の地形セル <b>'+n+'</b> ／ 置いた物 <b>'+placedObjects.length+'</b> 個 ／ 消した既存の物 <b>'+deletedBuiltins.length+'</b> 件 ／ 編集はキャラクターと一緒に自動保存されます。';
   var ub=$('edUndoBtn'); if(ub)ub.disabled=undoStack.length===0;
 }
 function refreshEditorUI(){
@@ -4362,7 +4529,7 @@ function render3D(now){
   }
   if(!scene)return;
   if(!_pv)_pv=new THREE.Vector3();
-  var sig=obstacles.length+'_'+decorations.length;
+  var sig=obstacles.length+'_'+decorations.length+'_'+townFeatures.length+'_'+deletedBuiltins.length;
   if(sig!==staticSig){staticSig=sig;buildWorld3D();}
   if(typeof currentPlacedSig==='function'&&placedSig!==currentPlacedSig())rebuildPlaced3D();
   if(typeof updateEditorVisuals==='function')updateEditorVisuals();
@@ -4711,6 +4878,7 @@ document.addEventListener('keydown',function(e){
   if(e.code==='Enter'){e.preventDefault();$('chatInput').focus();}
 });
 document.addEventListener('keyup',function(e){keys[e.code]=false;
+  if(e.code==='Space')handleJumpRelease(); /* float: a release decides tap (double-tap cancel) vs hold (rise) */
   if(player&&player.cls==='archer'&&e.code===settings.binds.attack)releaseBow();
 });
 canvas.addEventListener('pointerdown',function(e){
@@ -4731,7 +4899,7 @@ $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
 $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
-  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;updateHoverBanner();
+  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();
   $('deathScreen').style.display='none';updateHUD();toast('スポーン地点で復活した');
   relockPointer();
   netSendPos(true);
@@ -4900,7 +5068,7 @@ $('startBtn').addEventListener('click',function(){
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
   resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
-  clearWorldEditSilent(); hovering=false; jumpY=0; jumpVY=0; /* a fresh character starts on a fresh world */
+  clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; /* a fresh character starts on a fresh world */
   setupSkillUI(selectedClass);
   genWorld();populate();
   started=true;
