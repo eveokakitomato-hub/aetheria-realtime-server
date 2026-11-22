@@ -53,15 +53,47 @@ function broadcast(obj, exceptId = null) {
   }
 }
 
-// ---- HTTP (ヘルスチェック用。ゲーム画面からの疎通確認のため CORS を許可) ----
+// ---- HTTP ----
+// /health: ヘルスチェック (ゲーム画面からの疎通確認のため CORS を許可)
+// / と /game: ゲーム本体 (game.html) を配信する。Cache-Control: no-store で
+// 常に最新を返すので、game.html を差し替えて再デプロイすれば、
+// プレイヤーはページ再読み込みだけで最新版になる。
+const fs = require('fs');
+const path = require('path');
+const GAME_FILE = path.join(__dirname, 'game.html');
+let gameCache = null;
+let gameCacheMtime = 0;
+function loadGame() {
+  try {
+    const st = fs.statSync(GAME_FILE);
+    if (!gameCache || st.mtimeMs !== gameCacheMtime) {
+      gameCache = fs.readFileSync(GAME_FILE);
+      gameCacheMtime = st.mtimeMs;
+    }
+    return gameCache;
+  } catch { return null; }
+}
 const httpServer = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.url === '/health') {
+  const url = (req.url || '/').split('?')[0];
+  if (url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true, players: players.size, protocol: 2 }));
+  } else if (url === '/' || url === '/game') {
+    const html = loadGame();
+    if (html) {
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store, must-revalidate',
+      });
+      res.end(html);
+    } else {
+      res.writeHead(503, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('game.html not uploaded yet');
+    }
   } else {
-    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('AETHERIA ONLINE realtime server');
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('not found');
   }
 });
 
