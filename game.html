@@ -30,6 +30,9 @@ canvas{display:block}
 #game3d{position:absolute;inset:0;z-index:1}
 #game3d canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 #game3d canvas:active{cursor:grabbing}
+/* ゲームプレイ中（マップ／メニュー／商人などの画面を開いていない時）は
+   OSカーソルを表示しない。ポインターロックが効いていない間もこの指定で隠す */
+body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 #labels{position:absolute;inset:0;z-index:15;pointer-events:none;overflow:hidden}
 #dmgLayer{position:absolute;inset:0;z-index:16;pointer-events:none;overflow:hidden}
 .nametag{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;text-align:center;font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px #000;background:rgba(0,0,0,.5);padding:2px 7px;border-radius:3px;will-change:transform}
@@ -39,13 +42,50 @@ canvas{display:block}
 .dmg-float{position:absolute;left:0;top:0;transform:translate(-50%,-100%);font-weight:700;font-size:14px;color:#fff;text-shadow:0 1px 3px #000,0 0 6px rgba(0,0,0,.5);white-space:nowrap;will-change:transform,opacity}
 .dmg-float.big{font-size:19px;font-weight:900}
 #camHint{position:absolute;left:50%;transform:translateX(-50%);bottom:152px;z-index:17;background:rgba(10,14,12,.75);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:5px 12px;border-radius:999px;pointer-events:none}
-#crosshair{position:absolute;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);z-index:17;pointer-events:none}
-#crosshair::before,#crosshair::after{content:"";position:absolute;background:rgba(255,255,255,.85);box-shadow:0 0 3px rgba(0,0,0,.8)}
-#crosshair::before{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%);clip-path:polygon(0 0,100% 0,100% 32%,0 32%,0 68%,100% 68%,100% 100%,0 100%)}
-#crosshair::after{top:50%;left:0;height:2px;width:100%;transform:translateY(-50%);clip-path:polygon(0 0,32% 0,32% 100%,0 100%,68% 0,100% 0,100% 100%,68% 100%)}
-#crosshair i{position:absolute;left:50%;top:50%;width:3px;height:3px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%)}
-#crosshair.on::before,#crosshair.on::after{background:#ff6b6b}
-#crosshair.on i{background:#ff6b6b;width:5px;height:5px}
+/* ===== CROSSHAIR — 照準リング＋4方向ティック＋中心ドット。
+   明暗どちらの背景でも見えるよう二重のアウトラインとドロップシャドウで縁取る。
+   敵を捉えると .on（赤く収縮＋鼓動する波紋）、ボスでは .boss（橙）、
+   ダメージを与えると .hit / .crit / .kill が一瞬光る ===== */
+#crosshair{position:absolute;left:50%;top:50%;width:52px;height:52px;transform:translate(-50%,-50%);z-index:17;pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.9)) drop-shadow(0 0 7px rgba(0,0,0,.4));transition:transform .12s ease}
+#crosshair .ch-ring{position:absolute;inset:13px;border-radius:50%;border:2px solid rgba(255,255,255,.8);border-top-color:var(--gold);border-bottom-color:var(--gold);box-shadow:0 0 0 1px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.35);animation:chSpin 16s linear infinite;transition:inset .12s ease,border-color .12s ease,box-shadow .12s ease}
+@keyframes chSpin{to{transform:rotate(360deg)}}
+#crosshair .ch-tick{position:absolute;background:#fff;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 6px rgba(0,0,0,.55);transition:top .12s ease,bottom .12s ease,left .12s ease,right .12s ease,background .12s ease,width .12s ease,height .12s ease}
+#crosshair .ch-tick.t{left:50%;top:0;width:3px;height:12px;transform:translateX(-50%)}
+#crosshair .ch-tick.b{left:50%;bottom:0;width:3px;height:12px;transform:translateX(-50%)}
+#crosshair .ch-tick.l{top:50%;left:0;height:3px;width:12px;transform:translateY(-50%)}
+#crosshair .ch-tick.r{top:50%;right:0;height:3px;width:12px;transform:translateY(-50%)}
+#crosshair i{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:var(--gold);border:1.5px solid #fff;box-shadow:0 0 7px rgba(232,194,104,.95),0 0 0 1px rgba(0,0,0,.65);transform:translate(-50%,-50%);z-index:2;transition:width .12s ease,height .12s ease,background .12s ease,box-shadow .12s ease}
+/* 敵を捉えた状態：赤く染まり、ティックが内側へ締まってリングが鼓動する */
+#crosshair.on{transform:translate(-50%,-50%) scale(1.07)}
+#crosshair.on .ch-ring{inset:16px;border-color:#ff5560;box-shadow:0 0 0 1px rgba(0,0,0,.65),0 0 14px rgba(255,85,96,.8),inset 0 0 8px rgba(255,85,96,.45);animation-duration:3.2s}
+#crosshair.on .ch-tick{background:#ff5560}
+#crosshair.on .ch-tick.t{top:4px;height:13px}
+#crosshair.on .ch-tick.b{bottom:4px;height:13px}
+#crosshair.on .ch-tick.l{left:4px;width:13px}
+#crosshair.on .ch-tick.r{right:4px;width:13px}
+#crosshair.on i{background:#ff5560;width:7px;height:7px;box-shadow:0 0 10px rgba(255,85,96,1),0 0 0 1px rgba(0,0,0,.65)}
+#crosshair.on::after{content:"";position:absolute;inset:5px;border-radius:50%;border:1.5px solid rgba(255,85,96,.55);animation:chPulse .85s ease-out infinite}
+@keyframes chPulse{0%{transform:scale(.68);opacity:.95}100%{transform:scale(1.18);opacity:0}}
+/* ボスを捉えた状態：橙色でより強く光る */
+#crosshair.boss .ch-ring{border-color:#ff8c42;box-shadow:0 0 0 1px rgba(0,0,0,.65),0 0 18px rgba(255,140,66,.95),inset 0 0 10px rgba(255,140,66,.55)}
+#crosshair.boss .ch-tick{background:#ff8c42}
+#crosshair.boss i{background:#ff8c42;box-shadow:0 0 12px rgba(255,140,66,1),0 0 0 1px rgba(0,0,0,.65)}
+#crosshair.boss::after{border-color:rgba(255,140,66,.6)}
+/* ヒットマーカー：与ダメージで金色に閃き、クリティカル／撃破でさらに大きく弾ける */
+#crosshair.hit .ch-ring{inset:10px;border-color:#ffd34d;box-shadow:0 0 0 1px rgba(0,0,0,.65),0 0 16px rgba(255,211,77,.95)}
+#crosshair.hit .ch-tick{background:#ffd34d}
+#crosshair.hit .ch-tick.t{top:-3px}
+#crosshair.hit .ch-tick.b{bottom:-3px}
+#crosshair.hit .ch-tick.l{left:-3px}
+#crosshair.hit .ch-tick.r{right:-3px}
+#crosshair.crit{transform:translate(-50%,-50%) scale(1.16)}
+#crosshair.crit i{background:#ffd34d;width:9px;height:9px;box-shadow:0 0 14px rgba(255,211,77,1),0 0 0 1px rgba(0,0,0,.65)}
+#crosshair.kill .ch-ring{inset:6px;border-color:#ffd34d;box-shadow:0 0 0 1px rgba(0,0,0,.65),0 0 22px rgba(255,211,77,1)}
+#crosshair.kill .ch-tick{background:#ffd34d}
+@media (prefers-reduced-motion:reduce){
+  #crosshair .ch-ring{animation:none}
+  #crosshair.on::after{animation:none;opacity:0}
+}
 .hud-arrows{flex-shrink:0;text-align:center;background:#0b100e;border:1px solid var(--line2);border-radius:6px;padding:6px 9px;min-width:64px}
 .hud-arrows b{display:block;font-size:15px;color:var(--gold);line-height:1.1}
 .hud-arrows span{font-size:9px;color:var(--muted);letter-spacing:.08em}
@@ -58,7 +98,13 @@ canvas{display:block}
 .map-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:600px;width:100%;padding:18px;max-height:92vh;overflow-y:auto;text-align:center}
 .map-card h2{margin:0 0 4px;font-size:18px;text-align:left}
 .map-card .sub{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 10px;text-align:left}
-#worldMapCanvas{width:100%;max-width:512px;height:auto;border:1px solid var(--line2);border-radius:6px;background:#0b0f0c}
+#worldMapCanvas{width:100%;max-width:512px;height:auto;border:1px solid var(--line2);border-radius:6px;background:#0b0f0c;cursor:zoom-in;touch-action:manipulation}
+.map-zoom-bar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.map-zoom-bar button{background:var(--panel2);border:1px solid var(--line2);color:var(--paper);border-radius:6px;padding:8px 14px;font-weight:900;font-size:12px;min-height:38px}
+.map-zoom-bar button:hover{border-color:var(--gold);color:var(--gold)}
+.map-zoom-bar button:disabled{opacity:.35}
+#mapZoomLabel{font-size:12px;font-weight:900;color:var(--gold);min-width:78px;text-align:center}
+.map-zoom-hint{font-size:11px;color:var(--muted);margin:7px 0 0;text-align:center;line-height:1.6}
 .map-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:9px;text-align:left}
 .map-legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
 .map-card .bag-actions button{background:var(--gold)}
@@ -481,7 +527,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="game3d"></div>
     <div id="labels"></div>
     <div id="dmgLayer"></div>
-    <div id="crosshair"><i></i></div>
+    <div id="crosshair" aria-hidden="true"><span class="ch-ring"></span><span class="ch-tick t"></span><span class="ch-tick b"></span><span class="ch-tick l"></span><span class="ch-tick r"></span><i></i></div>
     <div id="camHint">見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃 ・ Esc：メニュー</div>
 
     <!-- TOP -->
@@ -547,6 +593,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <h2>🗺️ 全体マップ <span style="color:var(--gold);font-size:12px">— ルミナス地方</span></h2>
       <p class="sub" id="worldMapSub">探索済み 0% — 歩いた場所だけが地図に描かれます。未探索のエリアは闇に隠れています。</p>
       <canvas id="worldMapCanvas" width="512" height="512"></canvas>
+      <div class="map-zoom-bar">
+        <button id="mapZoomOutBtn" type="button">－ 縮小</button>
+        <span id="mapZoomLabel">全体表示</span>
+        <button id="mapZoomInBtn" type="button">＋ 拡大</button>
+        <button id="mapZoomResetBtn" type="button">全体に戻す</button>
+      </div>
+      <p class="map-zoom-hint">地図をタップ／クリックすると、その場所を中心に拡大します（最大4倍）。拡大した状態でクリックすると全体に戻ります。ホイールでも拡大・縮小できます。</p>
       <div class="map-legend"><span><i style="background:#ffd34d"></i>現在地</span><span><i style="background:#8d8574"></i>町</span><span><i style="background:#3a5c38"></i>草原・平原</span><span><i style="background:#2f5a30"></i>森</span><span><i style="background:#2e5f7a"></i>湖</span><span><i style="background:#e0c084"></i>砂漠</span><span><i style="background:#dfe9f2"></i>雪原</span><span><i style="background:#b0503a"></i>火山</span><span><i style="background:#5d5a68"></i>遺跡</span></div>
       <div class="bag-actions"><button id="closeWorldMapBtn" type="button">閉じる（M）</button></div>
     </div></div>
@@ -1096,19 +1149,51 @@ var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
   return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('shopModal').style.display==='grid';
 }
+/* ===== カーソル表示制御 =====
+   マップ／メニュー／商人などの画面を開いている間だけカーソルを使い、
+   ゲームに戻った瞬間にカーソルを消してポインターロックを取り直す。
+   ブラウザのクールダウン等でロックを取り直せなかった場合でも、
+   body.hide-cursor の CSS でカーソルは表示されない（次のクリックでロックされる）。 */
+var _cursorHideState=null;
+function shouldHideCursor(){
+  if(!started||!player||player.dead)return false;
+  if(menuOpen||isAnyOverlayOpen())return false;
+  if($('gameMenu').style.display==='grid')return false;
+  var ds=$('deathScreen');if(ds&&ds.style.display==='grid')return false;
+  if(document.activeElement===$('chatInput'))return false;
+  return true;
+}
+function syncCursorHide(){
+  var hide=shouldHideCursor();
+  if(hide===_cursorHideState)return;
+  _cursorHideState=hide;
+  document.body.classList.toggle('hide-cursor',hide);
+}
+function relockPointer(){
+  syncCursorHide();
+  if(!shouldHideCursor())return;
+  var el=(typeof renderer!=='undefined'&&renderer)?renderer.domElement:null;
+  if(!el||document.pointerLockElement===el||!el.requestPointerLock)return;
+  try{var rp=el.requestPointerLock();if(rp&&rp.catch)rp.catch(function(){});}catch(e){}
+}
 function openGameMenu(){
   if(!started||!player||player.dead)return;
   menuOpen=true;keys={};joyVec.x=0;joyVec.y=0;
   $('menuCharLine').textContent=player.name+' ／ '+CLASSES[player.cls].name+' Lv.'+player.lv+' ／ '+zoneAt(player.x,player.y);
   $('gameMenu').style.display='grid';
   if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  syncCursorHide();
   beep(500,0.05,'triangle',0.03);
 }
-function closeGameMenu(){
+function closeGameMenu(skipRelock){
   menuOpen=false;$('gameMenu').style.display='none';
+  /* メニューからゲームに戻る時はカーソルを消してポインターロックを取り直す。
+     別の画面へ遷移する場合（サブ画面表示・ログアウト）は skipRelock=true で呼ばれ、
+     その間はカーソルを使えるままにする */
+  if(skipRelock){syncCursorHide();}else{relockPointer();}
 }
 function openFromMenu(id,anchor){
-  returnToMenu=true;closeGameMenu();
+  returnToMenu=true;closeGameMenu(true);
   if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshBindDescs();}
   if(id==='saveModal')refreshSaveUI();
   if(id==='bagModal')refreshBagUI();
@@ -1121,10 +1206,12 @@ function openFromMenu(id,anchor){
       var tb=$('soundToggleBtn'); if(tb&&tb.focus)tb.focus({preventScroll:true});
     },60);
   }
+  syncCursorHide();
 }
 function closeSubModal(id){
   $(id).style.display='none';
   if(returnToMenu){returnToMenu=false;openGameMenu();}
+  else{relockPointer();}
 }
 function handleEscape(){
   if(menuOpen){closeGameMenu();return true;}
@@ -1171,7 +1258,7 @@ function refreshPlayersUI(){
 }
 function doLogout(){
   if(acct.token)serverSave(false);
-  returnToMenu=false;closeGameMenu();
+  returnToMenu=false;closeGameMenu(true);
   ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal','shopModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
   netClosed=true;clearTimeout(netRetryTimer);
@@ -1546,6 +1633,7 @@ function nearestEnemy(maxDist){
 function damageEnemy(e,dmg,crit){
   if(!e||e.dead)return;
   e.hp-=dmg;e.hitFlash=6;e.aggro=player;e.state='chase';
+  flashCrosshair(e.hp<=0?'kill':(crit?'crit':''));
   addDmg(e.x+(Math.random()*20-10),e.y,dmg+(crit?'!':''),crit?'#ffd34d':'#fff',crit);
   burst(e.x,e.y,'#ffe9a8',crit?10:5);
   if(e.hp<=0) killEnemy(e);
@@ -2017,7 +2105,18 @@ function updateTargetUI(){
     box.style.display='block';$('targetName').textContent=e.name+'  Lv.'+e.lv+(e.boss?' — BOSS':'');
     $('targetHp').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';
   }else box.style.display='none';
-  var ch=$('crosshair'); if(ch)ch.classList.toggle('on',!!(e&&!e.dead));
+  var ch=$('crosshair'); if(ch){ch.classList.toggle('on',!!(e&&!e.dead));ch.classList.toggle('boss',!!(e&&!e.dead&&e.boss));}
+}
+/* ヒットマーカー：敵にダメージを与えた瞬間、クロスヘアを一瞬光らせる
+   （通常=hit／クリティカル=crit／撃破=kill） */
+var _chHitT=null;
+function flashCrosshair(kind){
+  var ch=$('crosshair'); if(!ch)return;
+  ch.classList.remove('hit','crit','kill');
+  void ch.offsetWidth; /* アニメーションを毎回リスタートさせる */
+  ch.classList.add('hit'); if(kind)ch.classList.add(kind);
+  clearTimeout(_chHitT);
+  _chHitT=setTimeout(function(){ch.classList.remove('hit','crit','kill');},kind==='kill'?300:150);
 }
 function updatePlayerList(){
   var rows=remotes.map(function(r){
@@ -2064,13 +2163,13 @@ function update(dt,now){
     var fx=-sy,fz=-cy,rx=cy,rz=-sy;
     var wmx=rx*mx+fx*(-my), wmy=rz*mx+fz*(-my);
     mx=wmx;my=wmy;
-    /* DASH (Shift): +60% speed while held, drains 1 MP per second;
+    /* DASH (Shift): about 2x normal speed while held, drains 1 MP per second;
        passive MP regen pauses while dashing, and at 0 MP dashing is impossible. */
     if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0){
       dashingNow=true;
       player.mp=Math.max(0,player.mp-dt*0.001);
     }
-    var sp=CLASSES[player.cls].speed*(dashingNow?1.6:1);
+    var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     if(!collide(nx,player.y,player.r)) player.x=nx;
     if(!collide(player.x,ny,player.r)) player.y=ny;
@@ -2355,22 +2454,46 @@ function drawMini(){
   mctx.fillStyle='rgba(255,255,255,.75)';mctx.font='700 9px "Noto Sans JP"';mctx.textAlign='right';mctx.fillText('N ↑',S-5,12);
 }
 
-/* ================= WORLD MAP (M key) — explored areas only ================= */
+/* ================= WORLD MAP (M key) — explored areas only =================
+   ズーム：地図をタップ／クリックすると、その場所を中心に 1→2→4倍と拡大し、
+   4倍の状態でクリックすると全体に戻る。＋／－／「全体に戻す」ボタンと
+   マウスホイールでも操作できる（タップ対応）。 */
+var mapZoom=1, mapCenter={x:0.5,y:0.5};
+function mapView(){
+  var S=512, vw=S/mapZoom, vh=S/mapZoom;
+  var vx=Math.max(0,Math.min(S-vw,mapCenter.x*S-vw/2));
+  var vy=Math.max(0,Math.min(S-vh,mapCenter.y*S-vh/2));
+  return {S:S,vw:vw,vh:vh,vx:vx,vy:vy};
+}
+function setMapZoom(z,cx,cy){
+  mapZoom=Math.max(1,Math.min(4,z));
+  if(typeof cx==='number')mapCenter.x=Math.max(0,Math.min(1,cx));
+  if(typeof cy==='number')mapCenter.y=Math.max(0,Math.min(1,cy));
+  if(mapZoom===1){mapCenter.x=0.5;mapCenter.y=0.5;}
+  drawWorldMap();
+}
 function drawWorldMap(){
   var cv=$('worldMapCanvas'); if(!cv||!player)return;
   var g=cv.getContext('2d'), S=512, cellPx=S/EXP_N;
+  var v=mapView();
+  function TX(wx){return (wx/W*S-v.vx)*mapZoom;}
+  function TY(wy){return (wy/H*S-v.vy)*mapZoom;}
   g.fillStyle='#0b0f0c'; g.fillRect(0,0,S,S);
-  for(var gy=0;gy<EXP_N;gy++)for(var gx=0;gx<EXP_N;gx++){
+  g.save(); g.beginPath(); g.rect(0,0,S,S); g.clip();
+  var gx0=Math.max(0,Math.floor(v.vx/cellPx)), gx1=Math.min(EXP_N-1,Math.ceil((v.vx+v.vw)/cellPx));
+  var gy0=Math.max(0,Math.floor(v.vy/cellPx)), gy1=Math.min(EXP_N-1,Math.ceil((v.vy+v.vh)/cellPx));
+  for(var gy=gy0;gy<=gy1;gy++)for(var gx=gx0;gx<=gx1;gx++){
     if(!explored[gy*EXP_N+gx])continue; /* unexplored stays hidden */
     var cx=(gx+0.5)*(W/EXP_N), cy=(gy+0.5)*(H/EXP_N);
     g.fillStyle=zoneColorAt(cx,cy);
-    g.fillRect(gx*cellPx,gy*cellPx,cellPx+0.5,cellPx+0.5);
+    g.fillRect((gx*cellPx-v.vx)*mapZoom,(gy*cellPx-v.vy)*mapZoom,cellPx*mapZoom+0.5,cellPx*mapZoom+0.5);
   }
   function lbl(x,y,text){
-    var px=x/W*S, py=y/H*S;
+    var px=TX(x), py=TY(y);
+    if(px<-60||px>S+60||py<-24||py>S+24)return;
     var cell=explored[Math.floor(y/H*EXP_N)*EXP_N+Math.floor(x/W*EXP_N)];
     if(!cell)return;
-    g.font='700 10px "Noto Sans JP"';g.textAlign='center';
+    g.font='700 '+(mapZoom>1?11:10)+'px "Noto Sans JP"';g.textAlign='center';
     g.fillStyle='rgba(0,0,0,.55)';var w=g.measureText(text).width+8;g.fillRect(px-w/2,py-8,w,14);
     g.fillStyle='#fff';g.fillText(text,px,py+3);
   }
@@ -2379,16 +2502,23 @@ function drawWorldMap(){
   lbl(4300,700,'白銀の雪原'); lbl(4250,2400,'灼熱の砂漠'); lbl(750,3900,'深淵の森');
   lbl(700,4300,'翠玉湖'); lbl(4550,4550,'紅蓮火山');
   // player marker
-  var px=player.x/W*S, py=player.y/H*S;
-  g.fillStyle='#ffd34d';g.beginPath();g.arc(px,py,5,0,7);g.fill();
-  g.strokeStyle='#fff';g.lineWidth=1.5;g.stroke();
-  g.font='700 9px "Noto Sans JP"';g.textAlign='center';g.fillStyle='#ffd34d';g.fillText('現在地',px,py-9);
+  var px=TX(player.x), py=TY(player.y);
+  if(px>=-20&&px<=S+20&&py>=-20&&py<=S+20){
+    g.fillStyle='#ffd34d';g.beginPath();g.arc(px,py,mapZoom>1?6:5,0,7);g.fill();
+    g.strokeStyle='#fff';g.lineWidth=1.5;g.stroke();
+    g.font='700 '+(mapZoom>1?10:9)+'px "Noto Sans JP"';g.textAlign='center';g.fillStyle='#ffd34d';g.fillText('現在地',px,py-10);
+  }
+  g.restore();
   var pct=Math.round(exploredCount/(EXP_N*EXP_N)*100);
   var sub=$('worldMapSub');
   if(sub)sub.textContent='探索済み '+pct+'%（'+exploredCount+' / '+(EXP_N*EXP_N)+' エリア）— 歩いた場所だけが地図に描かれます。現在地：'+zoneAt(player.x,player.y);
+  var zl=$('mapZoomLabel'); if(zl)zl.textContent=mapZoom>1?('拡大 ×'+mapZoom):'全体表示';
+  var zin=$('mapZoomInBtn'); if(zin)zin.disabled=mapZoom>=4;
+  var zout=$('mapZoomOutBtn'); if(zout)zout.disabled=mapZoom<=1;
+  cv.style.cursor=mapZoom>=4?'zoom-out':'zoom-in';
 }
-function openWorldMap(){ if(!started||!player)return; drawWorldMap(); $('worldMapModal').style.display='grid'; if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}} }
-function closeWorldMap(){ $('worldMapModal').style.display='none'; if(returnToMenu){returnToMenu=false;openGameMenu();} }
+function openWorldMap(){ if(!started||!player)return; mapZoom=1;mapCenter={x:0.5,y:0.5}; drawWorldMap(); $('worldMapModal').style.display='grid'; if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}} syncCursorHide(); }
+function closeWorldMap(){ $('worldMapModal').style.display='none'; if(returnToMenu){returnToMenu=false;openGameMenu();} else{relockPointer();} }
 
 /* ================= MERCHANT / SHOP ================= */
 function nearMerchant(){ return player&&Math.hypot(player.x-MERCHANT.x,player.y-MERCHANT.y)<120; }
@@ -2415,9 +2545,10 @@ function openShop(){
   refreshShopUI();
   $('shopModal').style.display='grid';
   if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  syncCursorHide();
   chat('<b>商人マーロウ</b>: いらっしゃい、'+escHtml(player.name)+'さん！矢は1本2ゴールドだよ。','world');
 }
-function closeShop(){ $('shopModal').style.display='none'; }
+function closeShop(){ $('shopModal').style.display='none'; relockPointer(); }
 function buyArrows(n){
   if(!player)return;
   var cost=n*ARROW_PRICE;
@@ -3195,6 +3326,7 @@ function drawPreview(){
 var lastT=performance.now(),miniT=0,listT=0,exploreT=0,spawnT=0;
 function loop(now){
   var dt=Math.min(50,now-lastT);lastT=now;
+  syncCursorHide();
   if(started){
     update(dt,now);
     /* mob population maintenance is deliberately infrequent (~1.4s):
@@ -3265,6 +3397,7 @@ $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
   player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1470;jumpY=0;jumpVY=0;
   $('deathScreen').style.display='none';updateHUD();toast('ルミナスの町で復活した');
+  relockPointer();
   netSendPos(true);
 });
 $('downloadSaveBtn').addEventListener('click',function(){downloadSave();});
@@ -3288,6 +3421,7 @@ $('saveFileInput').addEventListener('change',function(){
         setupSkillUI(player.cls);
         returnToMenu=false;
         $('saveModal').style.display='none';
+        relockPointer();
         updateHUD();updateQuest();updatePlayerList();refreshSaveUI();
         netSendPos(true);
         toast('セーブデータを読み込みました — Lv.'+player.lv,3200);
@@ -3334,6 +3468,27 @@ $('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
 $('menuPlayersBtn').addEventListener('click',function(){openFromMenu('playersModal');});
 $('menuMapBtn').addEventListener('click',function(){openFromMenu('worldMapModal');});
 $('closeWorldMapBtn').addEventListener('click',function(){closeWorldMap();});
+/* 全体マップのズーム操作：タップ／クリックでその場所を中心に拡大（1→2→4倍→全体） */
+$('worldMapCanvas').addEventListener('click',function(e){
+  var r=this.getBoundingClientRect(); if(!r.width||!r.height)return;
+  var v=mapView();
+  var cx=(e.clientX-r.left)/r.width*512, cy=(e.clientY-r.top)/r.height*512;
+  var wx=(v.vx+cx/mapZoom)/512, wy=(v.vy+cy/mapZoom)/512;
+  if(mapZoom>=4){setMapZoom(1);}
+  else setMapZoom(mapZoom*2,wx,wy);
+  beep(660,0.05,'triangle',0.03);
+});
+$('worldMapCanvas').addEventListener('wheel',function(e){
+  e.preventDefault();
+  var r=this.getBoundingClientRect(); if(!r.width||!r.height)return;
+  var v=mapView();
+  var cx=(e.clientX-r.left)/r.width*512, cy=(e.clientY-r.top)/r.height*512;
+  var wx=(v.vx+cx/mapZoom)/512, wy=(v.vy+cy/mapZoom)/512;
+  setMapZoom(e.deltaY<0?mapZoom*2:mapZoom/2,wx,wy);
+},{passive:false});
+$('mapZoomInBtn').addEventListener('click',function(){setMapZoom(mapZoom*2);});
+$('mapZoomOutBtn').addEventListener('click',function(){setMapZoom(mapZoom/2);});
+$('mapZoomResetBtn').addEventListener('click',function(){setMapZoom(1);});
 $('closeShopBtn').addEventListener('click',function(){closeShop();});
 $('interactPrompt').addEventListener('click',function(){tryInteract();});
 document.querySelectorAll('#shopList .shop-buy[data-buy]').forEach(function(b){
