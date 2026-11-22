@@ -364,6 +364,21 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .account-box .ob-row button{border-radius:6px;padding:8px 13px;font-weight:900;font-size:12px;border:1px solid var(--line2);background:var(--panel2);color:var(--paper);min-height:36px}
 .account-box .ob-row button.primary{background:var(--gold);border-color:var(--gold);color:#1c1503}
 #serverSaveBtn{background:#12241a!important;color:#8fe3ae!important;border-color:#2f5d3f!important}
+.acct-class-area{margin-top:12px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+.acct-class-area .aca-title{font-size:12px;font-weight:900;color:var(--paper);line-height:1.5}
+.acct-class-area .aca-title b{color:var(--gold)}
+.acct-class-area .aca-sub{font-size:11px;color:var(--muted);line-height:1.65;margin:4px 0 0}
+.acct-class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.acct-class-card{border:1px solid var(--line2);background:var(--panel2);border-radius:8px;padding:10px 7px;text-align:center;color:var(--paper)}
+.acct-class-card .ico{font-size:22px;display:block}
+.acct-class-card b{display:block;font-size:12px;margin-top:4px}
+.acct-class-card small{display:block;color:var(--muted);font-size:10px;line-height:1.45;margin-top:2px}
+.acct-class-card.sel{border-color:var(--gold);background:#2a2413;box-shadow:inset 0 0 0 1px var(--gold)}
+.acct-class-card.locked{opacity:.92}
+.acct-class-badge{display:inline-flex;align-items:center;gap:6px;background:#2a2413;border:1px solid var(--gold2);color:var(--gold);font-size:11px;font-weight:900;border-radius:999px;padding:5px 10px;margin-top:8px}
+#classAccountNote{font-size:11px;line-height:1.65;color:var(--muted);background:#0b100e;border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin:0 0 10px}
+#classAccountNote b{color:var(--gold)}
+#classAccountNote.ready{border-color:var(--gold2);color:#d8cf9f}
 #siteServerStatus{font-size:11px;font-weight:700;color:var(--muted)}
 #siteServerStatus.ok{color:#8fe3ae}#siteServerStatus.ng{color:#f0a3a8}
 .site-sections{width:min(1180px,100%);padding:6px 20px 0;display:flex;flex-direction:column;gap:14px}
@@ -620,20 +635,42 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
               <div id="acctLoggedIn" style="display:none">
                 <p class="acct-who">ログイン中：<b id="acctName"></b></p>
                 <p class="acct-char" id="acctCharInfo"></p>
+                <div class="acct-class-area" id="acctClassArea">
+                  <div id="acctClassPicker">
+                    <div class="aca-title">🎖️ このアカウントの役職を決める <b>（最初に1回だけ）</b></div>
+                    <p class="aca-sub">役職はアカウントごとに最初に1回だけ選べます。<b style="color:var(--paper)">一度決めて冒険を始めると、そのアカウントでは変更できません。</b>よく考えて選んでね。別の役職で遊びたいときは、別のアカウントで始めます。</p>
+                    <div class="acct-class-grid" id="acctClassGrid">
+                      <button type="button" class="acct-class-card sel" data-acct-class="warrior"><span class="ico">⚔️</span><b>ウォーリアー</b><small>近接・高耐久の前衛</small></button>
+                      <button type="button" class="acct-class-card" data-acct-class="mage"><span class="ico">🔮</span><b>メイジ</b><small>遠距離・高火力の魔法</small></button>
+                      <button type="button" class="acct-class-card" data-acct-class="archer"><span class="ico">🏹</span><b>アーチャー</b><small>遠距離・速射の射手</small></button>
+                    </div>
+                    <p class="aca-sub" id="acctClassPickDesc">選択中：<b style="color:var(--gold)">ウォーリアー</b> — 下で名前を決めて「冒険開始」を押すと、この役職で確定します。</p>
+                  </div>
+                  <div id="acctClassLocked" style="display:none">
+                    <div class="aca-title">🎖️ このアカウントの役職は確定済みです</div>
+                    <span class="acct-class-badge" id="acctClassBadge">⚔️ ウォーリアー で固定</span>
+                    <p class="aca-sub">役職は最初に決めたものから<b style="color:var(--paper)">変更できません</b>。そのため、役職を選び直す画面は表示されません。「つづきから冒険する」でそのまま再開できます。</p>
+                  </div>
+                </div>
                 <div class="ob-row">
                   <button type="button" class="primary" id="acctContinueBtn">▶ つづきから冒険する</button>
                   <button type="button" id="acctLogoutBtn">ログアウト</button>
                 </div>
-                <p class="acct-msg">新しいキャラクターを作り直す場合は、下のフォームからそのまま開始できます（サーバーの保存データは新しいキャラクターで上書きされます）。</p>
+                <p class="acct-msg" id="acctCreateHint"></p>
               </div>
             </div>
+            <div id="charNameBlock">
             <label for="nameInput">キャラクター名</label>
             <input id="nameInput" value="ソラ" maxlength="12" placeholder="名前を入力"/>
-            <label style="margin-top:16px">クラスを選ぶ</label>
+            </div>
+            <div id="mainClassBlock">
+            <label style="margin-top:16px">役職（クラス）を選ぶ — ゲスト用</label>
+            <p id="classAccountNote">ゲストプレイの役職です。アカウントでログインすると、<b>そのアカウント専用の役職を最初に1回だけ</b>選べます（一度決めると変更できません）。アカウントごとに違う役職で遊べます。</p>
             <div class="class-grid">
               <button class="class-card sel" data-class="warrior" type="button"><span class="ico">⚔️</span><b>ウォーリアー</b><small>近接・高耐久。剣で斬り込む前衛。</small><span class="stats">HP ★★★★★<br>攻撃 ★★★☆☆</span></button>
               <button class="class-card" data-class="mage" type="button"><span class="ico">🔮</span><b>メイジ</b><small>遠距離・魔法。高火力だが打たれ弱い。</small><span class="stats">HP ★★☆☆☆<br>攻撃 ★★★★★</span></button>
               <button class="class-card" data-class="archer" type="button"><span class="ico">🏹</span><b>アーチャー</b><small>遠距離・速射。距離を保って戦う。</small><span class="stats">HP ★★★☆☆<br>攻撃 ★★★★☆</span></button>
+            </div>
             </div>
             <button id="startBtn">▶ &nbsp;ゲームスタート — ログイン</button>
             <button id="continueBtn" type="button">📂 &nbsp;つづきから — セーブデータを読み込む</button>
@@ -660,6 +697,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.22</time><span class="news-tag update">役職</span><span><b>役職はアカウントごとに最初に1回だけ選択。</b>アカウントにキャラクターがない最初の1回だけ役職を選べます。一度決めると変更できず、保存済みキャラクターがあるアカウントでは選び直す画面は表示されません。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">アカウント</span><span><b>サーバーアカウント＆自動保存を開始。</b>ホーム画面でアカウントを作ると進捗がサーバーへ自動保存され、どの端末からでも続きが遊べるようになりました。セーブ操作は不要です。</span></li>
             <li><time>2026.11.22</time><span class="news-tag notice">お知らせ</span><span><b>公開リンク版をリリース。</b>このページのURLを送るだけで、友だちも同じブラウザで冒険に参加できるようになりました。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">オンライン</span><span><b>実プレイヤー同期が稼働中。</b>Render上の同期サーバーに接続し、位置とチャットのリアルタイム同期に対応しました。</span></li>
@@ -743,6 +781,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <details><summary>料金はかかりますか？</summary><p>基本プレイ無料です。ダウンロードやインストールも不要で、ブラウザを開けばすぐに遊べます。</p></details>
             <details><summary>友だちと一緒に遊べますか？</summary><p>はい。このページのリンクを友だちに送って、同じ時間に開いてもらうだけです。同期サーバーに接続できていれば、お互いが ◆ マークのプレイヤーとして見え、動きとチャットが同期します。まず町の広場（スポーン地点の近く）で落ち合ってみてください。</p></details>
             <details><summary>相手が ◆ マークで見えません</summary><p>同期サーバーがスリープしている可能性があります（無料枠の仕様で、しばらく誰も使っていないと眠ります）。ページを開いてから最大1分ほど待って入り直すと、サーバーが目覚めて接続できることがあります。タイトルバーの表示が「実プレイヤー ○人 オンライン」になれば同期中です。</p></details>
+            <details><summary>役職（クラス）は変更できますか？</summary><p>役職はアカウントごとに、キャラクターを最初に作るときに1回だけ選べます。一度決めると、そのアカウントでは変更できません。保存済みキャラクターがあるアカウントでは役職を選び直す画面自体が出ず、決めた役職で固定されます。別の役職で遊びたい場合は、別のアカウントで新しく始めてください。アカウントが違えば、違う役職を選べます。</p></details>
             <details><summary>セーブはどうなりますか？</summary><p>ホーム画面でサーバーアカウントを作ってログインすれば、進捗は自動でサーバーに保存されます。セーブボタンを押す必要はありません。別のスマホやPCからでも、同じアカウントでログインすれば続きから遊べます。アカウントなしのゲストプレイでは、従来どおり 💾 からファイルに書き出して保存できます。</p></details>
             <details><summary>スマホでも遊べますか？</summary><p>はい。移動スティック・攻撃ボタン・スキルボタンなど、タッチ操作に最適化したUIを用意しています。</p></details>
             <details><summary>力尽きたらどうなりますか？</summary><p>経験値ペナルティなしでルミナスの町に帰還します。安心してボスに挑戦してください。</p></details>
@@ -936,6 +975,7 @@ function doLogout(){
   started=false;keys={};joyVec.x=0;joyVec.y=0;target=null;
   $('startScreen').style.display='flex';
   $('startScreen').scrollTop=0;
+  if(typeof refreshAcctUI==='function')refreshAcctUI();
   resize();drawPreview();
   chat('— ログアウトしました —','sys');
 }
@@ -1321,26 +1361,61 @@ function acctErrorText(code){
   }
 }
 function acctMsg(text,isErr){var m=$('acctMsg');if(!m)return;m.textContent=text||'';m.style.color=isErr?'#f0a3a8':'#8fe3ae';}
+function acctHasCharacter(){return !!(acct.character&&acct.character.player&&CLASSES[acct.character.player.cls]);}
+function acctRoleLocked(){return !!acct.token&&acctHasCharacter();}
+function syncClassUI(){
+  document.querySelectorAll('.class-card').forEach(function(c){c.classList.toggle('sel',c.getAttribute('data-class')===selectedClass);});
+  document.querySelectorAll('.acct-class-card').forEach(function(c){c.classList.toggle('sel',c.getAttribute('data-acct-class')===selectedClass);});
+  var d=$('acctClassPickDesc');
+  if(d&&CLASSES[selectedClass])d.innerHTML='選択中：<b style="color:var(--gold)">'+CLASSES[selectedClass].icon+' '+CLASSES[selectedClass].name+'</b> — 下で名前を決めて「冒険開始」を押すと、この役職で確定します（あとから変更できません）。';
+}
+function setSelectedClass(clsKey){
+  if(acctRoleLocked())return; /* once an account has a saved character, its role is fixed */
+  if(!CLASSES[clsKey])return;
+  selectedClass=clsKey; syncClassUI();
+}
 function refreshAcctUI(){
   var form=$('acctForm'),box=$('acctLoggedIn'); if(!form||!box)return;
   var loggedIn=!!acct.token;
+  var hasChar=loggedIn&&acctHasCharacter();
+  var locked=hasChar;
+  if(locked){ selectedClass=acct.character.player.cls; }
   form.style.display=loggedIn?'none':'block';
   box.style.display=loggedIn?'block':'none';
+  var picker=$('acctClassPicker'),lockedBox=$('acctClassLocked'),badge=$('acctClassBadge');
+  var mainBlock=$('mainClassBlock'),nameBlock=$('charNameBlock'),startBtn=$('startBtn'),contFile=$('continueBtn'),hint=$('acctCreateHint');
   if(loggedIn){
     $('acctName').textContent='@'+acct.username;
     var info=$('acctCharInfo'),cont=$('acctContinueBtn');
-    if(acct.character&&acct.character.player){
+    if(hasChar){
       var p=acct.character.player;
-      info.textContent='保存済みキャラクター: '+p.name+'（'+((CLASSES[p.cls]||{}).name||'')+' Lv.'+p.lv+'）—「つづきから冒険する」でそのまま再開できます。進捗は自動保存されます。';
+      var cc=CLASSES[p.cls];
+      info.textContent='保存済みキャラクター: '+p.name+'（'+cc.name+' Lv.'+p.lv+'）—「つづきから冒険する」でそのまま再開できます。進捗は自動保存されます。';
       if(cont)cont.style.display='';
+      if(picker)picker.style.display='none';
+      if(lockedBox)lockedBox.style.display='block';
+      if(badge)badge.textContent=cc.icon+' '+cc.name+' で固定（変更不可）';
+      if(hint)hint.textContent='役職は確定済みのため、新しいキャラクターの作成や役職の選び直しはできません。';
     }else{
-      info.textContent='まだキャラクターがありません。下のフォームでキャラクターを作って開始すると、そのままサーバーに自動保存されます。';
+      info.textContent='まだキャラクターがありません。上の役職を選び、下で名前を決めて冒険を始めると、その役職で確定してサーバーに自動保存されます。';
       if(cont)cont.style.display='none';
+      if(picker)picker.style.display='block';
+      if(lockedBox)lockedBox.style.display='none';
+      if(hint)hint.textContent='役職を選べるのは今だけです。冒険開始後はこのアカウントでは変更できません。';
     }
-    $('startBtn').textContent='▶ 新しいキャラクターで冒険開始（自動保存ON）';
+    /* Role selection appears ONLY on the first run (no saved character).
+       With a saved character there is no reselection UI anywhere. */
+    if(mainBlock)mainBlock.style.display='none';
+    if(nameBlock)nameBlock.style.display=hasChar?'none':'block';
+    if(startBtn){startBtn.style.display=hasChar?'none':'block'; if(!hasChar)startBtn.textContent='▶ この役職で冒険開始（役職は確定・変更不可）';}
+    if(contFile)contFile.style.display='none';
   }else{
-    $('startBtn').textContent='▶ ゲストでゲームスタート（アカウントなし）';
+    if(mainBlock)mainBlock.style.display='block';
+    if(nameBlock)nameBlock.style.display='block';
+    if(startBtn){startBtn.style.display='block';startBtn.textContent='▶ ゲストでゲームスタート（アカウントなし）';}
+    if(contFile)contFile.style.display='block';
   }
+  syncClassUI();
   var ssb=$('serverSaveBtn'); if(ssb) ssb.style.display=loggedIn?'':'none';
 }
 function acctSetMode(mode){
@@ -1359,7 +1434,7 @@ function acctOnAuth(data){
 function acctStartFromCharacter(){
   if(!acct.character)return;
   try{ applySaveData(acct.character); }
-  catch(e){ acctMsg('保存済みキャラクターを読み込めませんでした。新しいキャラクターで開始できます。',true); return; }
+  catch(e){ acctMsg('保存済みキャラクターを読み込めませんでした。時間をおいて再ログインしてください。',true); return; }
   acct.savedKey=progressKey();
   startFromSave('server');
 }
@@ -1381,8 +1456,8 @@ function acctSubmit(){
         acctMsg('ログインしました。保存済みキャラクターで再開します…');
         acctStartFromCharacter();
       }else{
-        acctMsg(wasRegister?'アカウントを作成しました！下のフォームでキャラクターを作って開始してください。':'ログインしました。下のフォームでキャラクターを作って開始してください。');
-        toast(wasRegister?'☁ アカウントを作成しました':'☁ ログインしました — 自動保存ON');
+        acctMsg(wasRegister?'アカウントを作成しました！まずこのアカウントの役職を選んでください（最初に1回だけ・変更不可）。':'ログインしました。このアカウントの役職を選んでください（最初に1回だけ・変更不可）。');
+        toast(wasRegister?'☁ アカウントを作成しました — 役職を選んでね':'☁ ログインしました — 役職を選んでね');
         var ni=$('nameInput'); if(ni)ni.focus();
       }
     }else{
@@ -1402,6 +1477,7 @@ function serverSave(manual){
     acct.saving=false;
     if(r.data&&r.data.ok){
       acct.character=data; acct.lastAt=new Date(); acct.savedKey=progressKey(); acct.dirtySince=0;
+      refreshAcctUI(); /* first save fixes this account's role from now on */
       lastSaveAt=acct.lastAt; lastSavedKey=acct.savedKey;
       if(manual)toast('☁ サーバーに保存しました');
     }else if(r.status===401){
@@ -2334,6 +2410,11 @@ $('saveFileInput').addEventListener('change',function(){
   reader.onload=function(){
     try{
       var data=JSON.parse(reader.result);
+      if(acct.token){
+        /* A server account's role is decided once and fixed: a save file must never replace it. */
+        toast('アカウントでログイン中は、役職を変える読み込みはできません（役職は変更不可）',3800);
+        return;
+      }
       var wasStarted=started;
       applySaveData(data);
       if(wasStarted){
@@ -2423,15 +2504,29 @@ $('chatForm').addEventListener('submit',function(e){
     },700+Math.random()*900);
   }
 });
-/* class select */
+/* class select — guest grid + per-account first-time picker (synced).
+   Once an account has a saved character, setSelectedClass() is a no-op
+   and refreshAcctUI() hides every picker, so the role can never change. */
 document.querySelectorAll('.class-card').forEach(function(card){
   card.addEventListener('click',function(){
-    document.querySelectorAll('.class-card').forEach(function(c){c.classList.remove('sel');});
-    card.classList.add('sel');selectedClass=card.getAttribute('data-class');beep(600,0.06,'square',0.03);
+    if(typeof acctRoleLocked==='function'&&acctRoleLocked())return;
+    setSelectedClass(card.getAttribute('data-class'));beep(600,0.06,'square',0.03);
+  });
+});
+document.querySelectorAll('.acct-class-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    if(acctRoleLocked())return;
+    setSelectedClass(card.getAttribute('data-acct-class'));beep(600,0.06,'square',0.03);
   });
 });
 /* start */
 $('startBtn').addEventListener('click',function(){
+  if(acct.token&&acctHasCharacter()){
+    /* Role is fixed for this account: never create a replacement character. */
+    toast('このアカウントの役職は確定済みです。「つづきから冒険する」で再開してください',3600);
+    acctStartFromCharacter();
+    return;
+  }
   var name=$('nameInput').value.trim()||'冒険者';
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
@@ -2458,8 +2553,11 @@ document.querySelectorAll('[data-scrollto]').forEach(function(btn){
 });
 var heroPlayBtn=$('heroPlayBtn');
 if(heroPlayBtn) heroPlayBtn.addEventListener('click',function(){
-  var f=acct.token?document.getElementById('nameInput'):document.getElementById('acctUser');
-  if(f){ f.focus(); f.scrollIntoView({behavior:'smooth',block:'center'}); }
+  var f;
+  if(acct.token&&acctHasCharacter()) f=document.getElementById('acctContinueBtn');
+  else if(acct.token) f=document.getElementById('acctClassGrid')||document.getElementById('nameInput');
+  else f=document.getElementById('acctUser');
+  if(f){ if(f.focus)f.focus(); f.scrollIntoView({behavior:'smooth',block:'center'}); }
 });
 function checkServerHealth(manual){
   var st=$('siteServerStatus'),dot=$('siteNetDot');
