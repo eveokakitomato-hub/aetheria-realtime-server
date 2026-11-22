@@ -86,6 +86,12 @@ body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
   #crosshair .ch-ring{animation:none}
   #crosshair.on::after{animation:none;opacity:0}
 }
+/* ===== BOW DRAW GAUGE — アーチャーが弓を引き絞っている間、照準の周りに溜まり具合を表示 ===== */
+#drawGauge{position:absolute;left:50%;top:50%;width:84px;height:84px;transform:translate(-50%,-50%);z-index:17;pointer-events:none;display:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.85))}
+#drawGauge .dg-ring{position:absolute;inset:0;border-radius:50%;-webkit-mask:radial-gradient(closest-side,transparent 70%,#000 73%);mask:radial-gradient(closest-side,transparent 70%,#000 73%)}
+#drawGauge .dg-label{position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);font-size:10px;font-weight:900;letter-spacing:.14em;color:#ffe9a8;text-shadow:0 1px 3px #000;white-space:nowrap}
+#drawGauge.full .dg-label{color:var(--gold)}
+#crosshair.drawing .ch-ring{animation-duration:5s}
 .hud-arrows{flex-shrink:0;text-align:center;background:#0b100e;border:1px solid var(--line2);border-radius:6px;padding:6px 9px;min-width:64px}
 .hud-arrows b{display:block;font-size:15px;color:var(--gold);line-height:1.1}
 .hud-arrows span{font-size:9px;color:var(--muted);letter-spacing:.08em}
@@ -528,6 +534,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="labels"></div>
     <div id="dmgLayer"></div>
     <div id="crosshair" aria-hidden="true"><span class="ch-ring"></span><span class="ch-tick t"></span><span class="ch-tick b"></span><span class="ch-tick l"></span><span class="ch-tick r"></span><i></i></div>
+    <div id="drawGauge" aria-hidden="true"><span class="dg-ring"></span><span class="dg-label">DRAW</span></div>
     <div id="camHint">見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃 ・ Esc：メニュー</div>
 
     <!-- TOP -->
@@ -627,6 +634,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
         <tr><td>視点（一人称）</td><td>自分の目線で冒険できます。画面をクリックするとカーソルがロックされ、<b>マウスカーソルを動かすだけ</b>で上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグでも見回せて、<b>カーソルキー</b> <kbd>←</kbd><kbd>→</kbd> で左右、<kbd>↑</kbd><kbd>↓</kbd> で上下の視点移動もできます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
         <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
+        <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
@@ -910,6 +918,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
             <tr><td>視点（一人称）</td><td>画面をクリックするとカーソルがロックされ、マウスカーソルを動かすだけで上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグ、またはカーソルキー <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> でも視点移動できます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
             <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
+            <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程になります</td></tr>
             <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
             <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動でダッシュ。MPを毎秒1消費し、尽きるとダッシュできません</td></tr>
             <tr><td>全体マップ</td><td><kbd>M</kbd> キー。歩いて探索したエリアだけが表示される全体マップ（探索記録はセーブに残ります）</td></tr>
@@ -1390,12 +1399,63 @@ function regionAt(x,y){
   if(x<1500&&y>3250) return 'deepforest';
   return 'green';
 }
+/* ===== LUMINAS — a great walled city (photo-like layout) =====
+   A high stone wall (half-size TOWN_HALF) with gates N / S / E and red-roofed
+   gate towers; a wide grand avenue runs from the south gate, past a green
+   pond garden, through a circular colonnade plaza (the fountain at its heart)
+   up to a large domed cathedral at the north end. Dense pale houses with
+   red-brown roofs fill the blocks on both sides of the avenues. */
+var TOWN_C=1300, TOWN_HALF=790;               // town spans 510..2090 on both axes
+var PLAZA_R=235;                              // circular plaza ring radius
+var CATH={x:1120,y:545,w:360,h:225};          // cathedral footprint (north end)
+var POND={x:1150,y:1765,w:300,h:175};         // garden pond (inside the south gate)
+function inTown(x,y){return Math.abs(x-TOWN_C)<=TOWN_HALF&&Math.abs(y-TOWN_C)<=TOWN_HALF;}
 function genWorld(){
   obstacles=[];decorations=[];
-  // town plaza buildings (center)
-  var houses=[{x:1060,y:1060,w:150,h:110,c:"#8a5a3a"},{x:1420,y:1060,w:150,h:110,c:"#6a7a8a"},{x:1060,y:1420,w:150,h:110,c:"#7a6a4a"},{x:1420,y:1420,w:150,h:110,c:"#8a4a4a"},{x:1230,y:1000,w:140,h:100,c:"#5a6e5a"}];
-  houses.forEach(function(h){obstacles.push({type:'rect',x:h.x,y:h.y,w:h.w,h:h.h,c:h.c,house:true});});
-  obstacles.push({type:'circle',x:1300,y:1300,r:52,fountain:true}); // fountain
+  var tseed=987654;function trnd(){tseed=(tseed*16807)%2147483647;return tseed/2147483647;}
+  var WALL_C=["#ddd5c2","#e7dfca","#d8cbae","#e2d7bd","#cfc0a0","#eae2cf"];
+  var ROOF_C=["#a34a32","#8f3f2a","#b05a38","#7d3a28","#9c4a30","#ad5233"];
+  var WALL_HEX=["#ddd5c2","#e7dfca","#d8cbae","#e2d7bd","#cfc0a0"];
+  // ---- dense city houses on a street grid, kept clear of the avenues,
+  //      the plaza ring, the cathedral grounds and the pond garden ----
+  for(var by=582;by<1970;by+=134){
+    for(var bx=582;bx<1970;bx+=134){
+      var hw=98+Math.floor(trnd()*26), hh=84+Math.floor(trnd()*22);
+      var hx=bx+Math.floor(trnd()*14), hy=by+Math.floor(trnd()*14);
+      var hcx=hx+hw/2, hcy=hy+hh/2;
+      if(hx<1412&&hx+hw>1188) continue;                      // grand avenue (N–S) stays clear
+      if(hy<1412&&hy+hh>1188) continue;                      // cross avenue (E–W) stays clear
+      if(Math.hypot(hcx-1300,hcy-1300)<PLAZA_R+95) continue; // circular plaza
+      if(hcx>CATH.x-70&&hcx<CATH.x+CATH.w+70&&hcy<CATH.y+CATH.h+80) continue; // cathedral grounds
+      if(hcx>POND.x-85&&hcx<POND.x+POND.w+85&&hcy>POND.y-85&&hcy<POND.y+POND.h+70) continue; // pond garden
+      if(Math.hypot(hcx-MERCHANT.x,hcy-MERCHANT.y)<105) continue;
+      obstacles.push({type:'rect',x:hx,y:hy,w:hw,h:hh,c:WALL_HEX[Math.floor(trnd()*WALL_HEX.length)],house:true,
+        rc:ROOF_C[Math.floor(trnd()*ROOF_C.length)],hh:58+Math.floor(trnd()*58)+(Math.hypot(hcx-1300,hcy-1300)<560?22:0),chim:trnd()<0.45});
+    }
+  }
+  // ---- city wall: segments with gates at N (y=510) / S (y=2090) / E (x=2090);
+  //      the west wall is solid. Towers flank every gate and crown the corners ----
+  var WT=40, WL=TOWN_C-TOWN_HALF, WR=TOWN_C+TOWN_HALF, GT=88; // wall thickness / left / right / gate half-gap
+  function wallSeg(x,y,w,h){obstacles.push({type:'rect',x:x,y:y,w:w,h:h,c:"#9a958a",wall:true});}
+  wallSeg(WL-WT/2,WL-WT/2,TOWN_C-GT-(WL-WT/2),WT); wallSeg(TOWN_C+GT,WL-WT/2,WR+WT/2-(TOWN_C+GT),WT); // north
+  wallSeg(WL-WT/2,WR-WT/2,TOWN_C-GT-(WL-WT/2),WT); wallSeg(TOWN_C+GT,WR-WT/2,WR+WT/2-(TOWN_C+GT),WT); // south
+  wallSeg(WR-WT/2,WL+WT/2,WT,TOWN_C-GT-(WL+WT/2)); wallSeg(WR-WT/2,TOWN_C+GT,WT,WR-WT/2-(TOWN_C+GT)); // east
+  wallSeg(WL-WT/2,WL+WT/2,WT,WR-WL-WT);                                                              // west (solid)
+  [[1300-GT-24,WL],[1300+GT+24,WL],[1300-GT-24,WR],[1300+GT+24,WR],[WR,1300-GT-24],[WR,1300+GT+24],
+   [WL,WL],[WR,WL],[WL,WR],[WR,WR]].forEach(function(tp){
+    obstacles.push({type:'circle',x:tp[0],y:tp[1],r:36,tower:true});
+  });
+  // ---- domed cathedral at the north end of the avenue ----
+  obstacles.push({type:'rect',x:CATH.x,y:CATH.y,w:CATH.w,h:CATH.h,c:"#e7dfca",cathedral:true});
+  // ---- pond garden inside the south gate ----
+  obstacles.push({type:'rect',x:POND.x,y:POND.y,w:POND.w,h:POND.h,c:"#2e6f92",pond:true});
+  // ---- circular plaza: colonnade pillars (openings at the four avenues) ----
+  for(var pa=0;pa<24;pa++){
+    var ang=pa/24*Math.PI*2, rem=((ang%(Math.PI/2))+Math.PI/2)%(Math.PI/2);
+    if(rem<0.30||rem>Math.PI/2-0.30) continue;               // avenue openings
+    obstacles.push({type:'circle',x:1300+Math.cos(ang)*PLAZA_R,y:1300+Math.sin(ang)*PLAZA_R,r:11,pillar:true});
+  }
+  obstacles.push({type:'circle',x:1300,y:1300,r:52,fountain:true}); // fountain at the plaza heart
   obstacles.push({type:'circle',x:MERCHANT.x,y:MERCHANT.y,r:30,stall:true}); // merchant stall
   // ruins NE (original)
   for(var i=0;i<7;i++) obstacles.push({type:'rect',x:2050+ (i%3)*130,y:280+Math.floor(i/3)*150,w:56,h:90,c:"#6f6a7d",ruin:true});
@@ -1406,7 +1466,7 @@ function genWorld(){
   while(decorations.length<620 && tries<9000){
     tries++;
     var x=60+Math.random()*(W-120), y=60+Math.random()*(H-120);
-    if(Math.hypot(x-1300,y-1300)<300) continue;
+    if(x>430&&x<2170&&y>430&&y<2170) continue;   // inside the city walls of Luminas
     if(x>1950&&x<2620&&y<650) continue;
     if(x>2650&&x<3500&&y<1000) continue;              // forgotten ruins floor
     if(Math.hypot(x-420,y-2150)<300) continue;          // lake 1
@@ -1439,7 +1499,7 @@ function collide(nx,ny,r){
   return false;
 }
 function zoneAt(x,y){
-  if(Math.hypot(x-1300,y-1300)<330) return "ルミナスの町（安全地帯）";
+  if(inTown(x,y)) return "ルミナスの町（安全地帯）";
   if(x>3850&&y>3850) return "紅蓮火山（危険）";
   if(x>3250&&y>=1400&&y<=3400) return "灼熱の砂漠";
   if(x>3350&&y<1350) return "白銀の雪原";
@@ -1466,7 +1526,7 @@ function zoneColorAt(x,y){
   if(z.indexOf('遺跡')>=0) return '#5d5a68';
   return '#3a5c38';
 }
-function isSafe(x,y){return Math.hypot(x-1300,y-1300)<330;}
+function isSafe(x,y){return inTown(x,y);}
 
 /* ================= EXPLORATION (fog of war) =================
    The minimap shows a zoomed radius of ~18 tiles (MINI_VIEW_R world units).
@@ -1701,21 +1761,59 @@ function noArrows(){
   beep(140,0.12,'square',0.04);
   var chip=$('hudArrows'); if(chip){chip.classList.remove('empty');void chip.offsetWidth;chip.classList.add('empty');}
 }
+/* ================= BOW DRAW (archer) =================
+   Holding the attack input draws the bow: the string and the nocked arrow
+   visibly pull back (viewmodel), the draw gauge fills around the crosshair,
+   the view narrows slightly, and at full draw the bow trembles with a soft
+   ping. Releasing fires ONE physical arrow whose speed — and therefore its
+   range under gravity — scales with how long the bow was drawn. */
+var BOW_FULL_MS=900;
+var bowDraw={active:false,start:0,power:0,fullPinged:false};
+function bowPower(){ if(!bowDraw.active)return 0; return Math.min(1,(performance.now()-bowDraw.start)/BOW_FULL_MS); }
+function startBowDraw(){
+  if(!started||!player||player.dead||player.cls!=='archer')return false;
+  if(bowDraw.active)return true;
+  if(menuOpen||isAnyOverlayOpen())return false;
+  if(player.arrows<=0){noArrows();return false;}
+  bowDraw.active=true; bowDraw.start=performance.now(); bowDraw.power=0; bowDraw.fullPinged=false;
+  beep(180,0.08,'sine',0.02);
+  return true;
+}
+function cancelBowDraw(){
+  bowDraw.active=false; bowDraw.power=0;
+  var gEl=$('drawGauge'); if(gEl)gEl.style.display='none';
+  var ch=$('crosshair'); if(ch)ch.classList.remove('drawing');
+}
+function releaseBow(){
+  if(!bowDraw.active)return;
+  var p=Math.max(0.22,bowPower());           // even a quick tap looses a short shot
+  var full=p>=1;
+  cancelBowDraw();
+  if(!started||!player||player.dead||player.cls!=='archer')return;
+  var now=performance.now();
+  if(now-lastAttack<380)return;
+  lastAttack=now;
+  fireArrow(p,1,full);
+}
+function fireArrow(power,mult,full){
+  if(player.arrows<=0){noArrows();return;}
+  player.arrows--; atkAnimT=performance.now();
+  var spd=8.5+power*11.5, cp2=Math.cos(camPitch);   // 8.5 (tap) → 20 (full draw): range grows with draw
+  projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
+    z:terrainH(player.x,player.y)+54+jumpY,vz:Math.sin(camPitch)*spd,
+    dmg:Math.round(player.atk*(mult||1)*(full?1.15:1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:Math.round(50+power*95)});
+  beep(full?980:640+power*260,0.07,'sawtooth',0.03);
+  if(full)flashCrosshair(null);
+  updateHUD();
+}
 function playerAttack(mult,skillKey){
   if(!started||player.dead)return;
   var now=performance.now(),c=CLASSES[player.cls];
   if(!skillKey){if(now-lastAttack<380)return;lastAttack=now;}
-  /* ARCHER: every shot consumes one arrow and flies physically toward the
-     crosshair (gravity arc) — no auto-aim, no arrows = no attack. */
+  /* ARCHER skills fire instantly at a solid draw; the BASIC attack goes
+     through the draw-and-release system above (see startBowDraw). */
   if(player.cls==='archer'){
-    if(player.arrows<=0){noArrows();return;}
-    player.arrows--; atkAnimT=now;
-    var spd=13.5, cp2=Math.cos(camPitch);
-    projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
-      z:terrainH(player.x,player.y)+54+jumpY,vz:Math.sin(camPitch)*spd,
-      dmg:Math.round(player.atk*(mult||1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:110});
-    beep(700,0.06,'sawtooth',0.025);
-    updateHUD();
+    fireArrow(0.65,mult,false);
     return;
   }
   atkAnimT=now;
@@ -2288,13 +2386,17 @@ function draw(){
     if(d.kind==='lake'){ctx.fillStyle='#2e5f7a';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.72,0,0,7);ctx.fill();ctx.fillStyle='#3a7291';ctx.beginPath();ctx.ellipse(d.x-cam.x-20,d.y-cam.y-14,d.s*0.7,d.s*0.45,0,0,7);ctx.fill();}
     else if(d.kind==='lava'){ctx.fillStyle='#c33d10';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.78,0,0,7);ctx.fill();ctx.fillStyle='#ff7a3c';ctx.beginPath();ctx.ellipse(d.x-cam.x-16,d.y-cam.y-10,d.s*0.66,d.s*0.45,0,0,7);ctx.fill();}
   });
-  // town plaza
-  ctx.fillStyle='#8d8574';ctx.fillRect(1300-330-cam.x,1300-330-cam.y,660,660);
-  ctx.fillStyle='#9a917e';ctx.fillRect(1300-330-cam.x,1300-14-cam.y,660,28);ctx.fillRect(1300-14-cam.x,1300-330-cam.y,28,660);
-  ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1;
-  for(var px=1300-330;px<1300+330;px+=42){ctx.beginPath();ctx.moveTo(px-cam.x,1300-330-cam.y);ctx.lineTo(px-cam.x,1300+330-cam.y);ctx.stroke();}
-  // dirt paths: north, east (extended) & south (new)
-  ctx.fillStyle='#7d6b4d';ctx.fillRect(1272-cam.x,0-cam.y,56,970);ctx.fillRect(1630-cam.x,1272-cam.y,W-1630,56);ctx.fillRect(1272-cam.x,1630-cam.y,56,H-1630);
+  // Luminas — walled city ground, grand avenues, plaza ring, pond garden
+  ctx.fillStyle='#8d8574';ctx.fillRect(510-cam.x,510-cam.y,1580,1580);
+  ctx.fillStyle='#7c9a52';ctx.fillRect(POND.x-72-cam.x,POND.y-66-cam.y,POND.w+144,POND.h+132); // garden green
+  ctx.fillStyle='#b3a888';ctx.fillRect(1218-cam.x,545-cam.y,164,1545);ctx.fillRect(545-cam.x,1218-cam.y,1545,164); // avenues
+  ctx.fillStyle='#a89c80';ctx.beginPath();ctx.arc(1300-cam.x,1300-cam.y,PLAZA_R+34,0,7);ctx.fill();
+  ctx.strokeStyle='#cbbfa4';ctx.lineWidth=13;ctx.beginPath();ctx.arc(1300-cam.x,1300-cam.y,PLAZA_R,0,7);ctx.stroke();
+  ctx.strokeStyle='#8a8272';ctx.lineWidth=34;ctx.strokeRect(510-cam.x,510-cam.y,1580,1580); // city wall
+  ctx.fillStyle='#a34a32';
+  [[1212,510],[1388,510],[1212,2090],[1388,2090],[2090,1212],[2090,1388],[510,510],[2090,510],[510,2090],[2090,2090]].forEach(function(tp){ctx.beginPath();ctx.arc(tp[0]-cam.x,tp[1]-cam.y,25,0,7);ctx.fill();});
+  // dirt paths: north, east (extended) & south (new) — from the city gates outward
+  ctx.fillStyle='#7d6b4d';ctx.fillRect(1272-cam.x,0-cam.y,56,510);ctx.fillRect(2090-cam.x,1272-cam.y,W-2090,56);ctx.fillRect(1272-cam.x,2090-cam.y,56,H-2090);
   // ruins floor
   ctx.fillStyle='#5d5a68';ctx.fillRect(1980-cam.x,180-cam.y,620,560);
   // obstacles: houses / ruins / fountain
@@ -2302,9 +2404,16 @@ function draw(){
     if(o.type==='rect'){
       ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(o.x-cam.x+5,o.y-cam.y+7,o.w,o.h);
       ctx.fillStyle=o.c;ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,o.h);
-      if(o.house){ctx.fillStyle='#5d3a26';ctx.beginPath();ctx.moveTo(o.x-10-cam.x,o.y-cam.y);ctx.lineTo(o.x+o.w/2-cam.x,o.y-42-cam.y);ctx.lineTo(o.x+o.w+10-cam.x,o.y-cam.y);ctx.fill();
-        ctx.fillStyle='#ffe9a8';ctx.fillRect(o.x+o.w/2-11-cam.x,o.y+44-cam.y,22,38);ctx.fillRect(o.x+16-cam.x,o.y+22-cam.y,20,20);ctx.fillRect(o.x+o.w-36-cam.x,o.y+22-cam.y,20,20);}
-      else{ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,10);}
+      if(o.house){ctx.fillStyle=o.rc||'#8f3f2a';ctx.beginPath();ctx.moveTo(o.x-8-cam.x,o.y+6-cam.y);ctx.lineTo(o.x+o.w/2-cam.x,o.y-30-cam.y);ctx.lineTo(o.x+o.w+8-cam.x,o.y+6-cam.y);ctx.fill();
+        ctx.fillStyle='#ffe9a8';ctx.fillRect(o.x+o.w/2-9-cam.x,o.y+40-cam.y,18,32);ctx.fillRect(o.x+13-cam.x,o.y+18-cam.y,16,16);ctx.fillRect(o.x+o.w-29-cam.x,o.y+18-cam.y,16,16);}
+      else if(o.cathedral){ctx.fillStyle='#8f8574';ctx.beginPath();ctx.arc(o.x+o.w/2-cam.x,o.y+o.h/2-cam.y,58,0,7);ctx.fill();ctx.fillStyle='#b8912f';ctx.beginPath();ctx.arc(o.x+o.w/2-cam.x,o.y+o.h/2-cam.y,15,0,7);ctx.fill();}
+      else if(o.pond){ctx.fillStyle='#3a7ea6';ctx.fillRect(o.x+8-cam.x,o.y+8-cam.y,o.w-16,o.h-16);}
+      else if(!o.wall){ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(o.x-cam.x,o.y-cam.y,o.w,10);}
+    }else if(o.tower){
+      ctx.fillStyle='#9a958a';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r,0,7);ctx.fill();
+      ctx.fillStyle='#a34a32';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r*0.62,0,7);ctx.fill();
+    }else if(o.pillar){
+      ctx.fillStyle='#cbbfa4';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r,0,7);ctx.fill();
     }else if(o.fountain){
       ctx.fillStyle='#7d95a8';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r,0,7);ctx.fill();
       ctx.fillStyle='#4a90c2';ctx.beginPath();ctx.arc(o.x-cam.x,o.y-cam.y,o.r-12,0,7);ctx.fill();
@@ -2340,7 +2449,7 @@ function draw(){
   // zone label for ruins boss area marker
   ctx.font='700 13px "Noto Sans JP"';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.fillText('— 古代遺跡 —',2290-cam.x,205-cam.y);
-  ctx.fillText('— ルミナスの町 —',1300-cam.x,1000-cam.y);
+  ctx.fillText('— ルミナスの町 —',1300-cam.x,452-cam.y);
   ctx.fillText('— 始まりの草原 —',1300-cam.x,180-cam.y);
   ctx.fillText('— 忘れられた遺跡 —',3075-cam.x,205-cam.y);
   ctx.fillText('— 白銀の雪原 —',4300-cam.x,180-cam.y);
@@ -2421,18 +2530,19 @@ function drawMini(){
   patch(1550,600,2600,2000,'#2f5a30');       // whispering forest
   patch(1950,150,2650,770,'#5d5a68');        // ruins
   patch(2650,150,3500,1000,'#5d5a68');       // forgotten ruins
-  patch(1300-330,1300-330,1300+330,1300+330,'#8d8574'); // town plaza
+  patch(510,510,2090,2090,'#8d8574'); // Luminas — the walled city
+  patch(POND.x,POND.y,POND.x+POND.w,POND.y+POND.h,'#2e6f92'); // garden pond
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
     var lx=MX(d.x),ly=MY(d.y);if(lx<-40||ly<-40||lx>S+40||ly>S+40)return;
     mctx.fillStyle='#2e5f7a';mctx.beginPath();mctx.ellipse(lx,ly,Math.max(3,d.s*s),Math.max(2,d.s*0.72*s),0,0,7);mctx.fill();
   });
-  // roads (east / south from town)
+  // roads (from the city gates: east / south / north)
   mctx.fillStyle='#7d6b4d';
-  mctx.fillRect(MX(1630),MY(1272),S,MY(1328)-MY(1272));
-  mctx.fillRect(MX(1272),MY(1630),MX(1328)-MX(1272),S);
-  mctx.fillRect(MX(1272),0,MX(1328)-MX(1272),MY(970));
+  mctx.fillRect(MX(2090),MY(1272),S,MY(1328)-MY(1272));
+  mctx.fillRect(MX(1272),MY(2090),MX(1328)-MX(1272),S);
+  mctx.fillRect(MX(1272),0,MX(1328)-MX(1272),MY(510));
   // merchant
   var mxp=MX(MERCHANT.x),myp=MY(MERCHANT.y);
   if(mxp>=-4&&myp>=-4&&mxp<=S+4&&myp<=S+4){mctx.fillStyle='#ffd34d';mctx.fillRect(mxp-2.5,myp-2.5,5,5);}
@@ -2633,6 +2743,7 @@ function terrainH(x,y){
   function flatR(x0,y0,x1,y1,m0,m1){var dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1);var d=Math.hypot(dx,dy);if(d<=m0)return 0;if(d>=m1)return 1;var t=(d-m0)/(m1-m0);return t*t*(3-2*t);}
   var f=1;
   f*=flatC(1300,1300,400,760);        // town plaza + spawn point (1300,1470)
+  f*=flatR(470,470,2130,2130,30,300); // the whole walled city of Luminas sits level
   f*=flatC(420,2150,300,560);         // lake 1 surface stays level
   f*=flatC(700,4300,330,600);         // lake 2 （翠玉湖）
   f*=flatC(4200,2400,180,420);        // desert oasis
@@ -2648,9 +2759,30 @@ function terrainH(x,y){
 
 /* first-person weapon viewmodel (attached to the camera) */
 var viewModel=null, vmCls='';
+/* archer draw rig: string segments + the nocked arrow are rebuilt every frame
+   from the current draw power, so the string and arrow visibly pull back */
+var vmBow=null; // {strA,strB,arrow,tipT,tipB,nockZ0}
+function vmStrut(mesh,a,b){
+  var dir=new THREE.Vector3().subVectors(b,a), len=Math.max(0.001,dir.length());
+  mesh.position.copy(a).addScaledVector(dir,0.5);
+  mesh.scale.set(1,len,1);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());
+}
+function updateBowRig(power,now){
+  if(!vmBow||!viewModel)return;
+  var pull=power*15;                                   // string/arrow travel (viewmodel units)
+  var tremble=(power>=1)?Math.sin(now*0.045)*0.35:0;   // full-draw tremble = the "手応え"
+  var nock=new THREE.Vector3(-4.4,tremble,7.5+pull);
+  vmStrut(vmBow.strA,vmBow.tipT,nock);
+  vmStrut(vmBow.strB,nock,vmBow.tipB);
+  vmBow.arrow.position.z=pull;
+  vmBow.arrow.position.y=tremble;
+  viewModel.position.z=-0.9+power*0.10;                // the bow itself eases back toward the archer
+}
 function buildViewModel(){
   if(!camera3d)return;
   if(viewModel){camera3d.remove(viewModel);viewModel=null;vmCls='';}
+  vmBow=null;
   var clsKey=(player&&player.cls)?player.cls:'warrior';
   var g=new THREE.Group();
   if(clsKey==='warrior'){
@@ -2691,18 +2823,25 @@ function buildViewModel(){
     for(var gi2=0;gi2<4;gi2++){var wrap=new THREE.Mesh(new THREE.TorusGeometry(1.95,0.5,6,12),M(0x8a2f2a));wrap.position.set(-4.4,-3.3+gi2*2.2,1.1);wrap.rotation.x=Math.PI/2;g.add(wrap);}
     sph(2.1,0xe8c268,-4.4,6.4,1.1,g);      // gold riser caps
     sph(2.1,0xe8c268,-4.4,-6.4,1.1,g);
-    // string: tip → nock (pulled to the arrow) → tip
-    var nock=V3(-4.4,0,7.5);
-    strut(V3(0,31,-5),nock,0.34,0xe9e2cf,g);
-    strut(nock,V3(0,-31,-5),0.34,0xe9e2cf,g);
+    // string: two DYNAMIC segments (tip → nock → tip) rebuilt per frame by
+    // updateBowRig() — pulling the attack input drags the nock point back
+    function dynStrut(r,color){
+      var m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,1,6),M(color));
+      m.castShadow=false;g.add(m);return m;
+    }
+    var strA=dynStrut(0.34,0xe9e2cf), strB=dynStrut(0.34,0xe9e2cf);
     strut(V3(-4.4,2.6,4.4),V3(-4.4,-2.6,4.4),0.55,0xb03a30,g); // serving wrap at nock point
-    // nocked arrow: wooden shaft along -z, steel broadhead, red/white fletching
+    // nocked arrow in its own group so it slides back with the string:
+    // wooden shaft along -z, steel broadhead, red/white fletching
+    var arrowG=new THREE.Group();g.add(arrowG);
     var shaft2=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,37,7),M(0xc9a86a));
-    shaft2.rotation.x=Math.PI/2;shaft2.position.set(-4.4,0,-9);g.add(shaft2);
+    shaft2.rotation.x=Math.PI/2;shaft2.position.set(-4.4,0,-9);arrowG.add(shaft2);
     var head2=new THREE.Mesh(new THREE.ConeGeometry(1.5,6.5,6),M(0xd8dde2));
-    head2.rotation.x=-Math.PI/2;head2.position.set(-4.4,0,-30.5);g.add(head2);
-    var fl1=box(0.35,4.6,6.5,0xe5484d,-4.4,0,5.6,g);
-    var fl2=box(4.6,0.35,6.5,0xf2ead8,-4.4,0,5.6,g);
+    head2.rotation.x=-Math.PI/2;head2.position.set(-4.4,0,-30.5);arrowG.add(head2);
+    var fl1=box(0.35,4.6,6.5,0xe5484d,-4.4,0,5.6,arrowG);
+    var fl2=box(4.6,0.35,6.5,0xf2ead8,-4.4,0,5.6,arrowG);
+    vmBow={strA:strA,strB:strB,arrow:arrowG,tipT:V3(0,31,-5),tipB:V3(0,-31,-5)};
+    updateBowRig(0,0);
     g.rotation.set(0.02,0.06,0.03);
   }
   g.traverse(function(c){c.castShadow=false;c.receiveShadow=false;});
@@ -2716,6 +2855,7 @@ function init3D(){
   if(!THREE_OK)return;
   var holder=document.getElementById('game3d');
   renderer=new THREE.WebGLRenderer({antialias:true});
+  if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;}
   renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   holder.appendChild(renderer.domElement);
@@ -2769,7 +2909,7 @@ function buildWorld3D(){
   var seed=12345;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
   for(var i=0;i<340;i++){
     var px=rnd()*W,pz=rnd()*H;
-    if(Math.hypot(px-1300,pz-1300)<345)continue;
+    if(px>440&&px<2160&&pz>440&&pz<2160)continue;
     if(regionAt(px,pz)!=='green')continue;   // no grass patches in desert / snow / volcano / deep forest floor pads
     var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
     p.rotation.x=-Math.PI/2;p.rotation.z=rnd()*3;p.position.set(WX(px),terrainH(px,pz)+0.6,WZ(pz));p.receiveShadow=true;staticGroup.add(p);
@@ -2779,11 +2919,16 @@ function buildWorld3D(){
   flat(1950,2000,0xe0c084,4225,2400);       // desert
   flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
   flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
-  // town plaza + roads
-  flat(660,660,0x8d8574,1300,1300);
-  flat(56,970,0x7d6b4d,1300,485);           // north road
-  flat(3570,56,0x7d6b4d,3415,1300);         // east road (extended to the new lands)
-  flat(56,3570,0x7d6b4d,1300,3415);         // south road (new)
+  // Luminas — city ground, grand avenues, plaza disc, pond garden lawn
+  flat(1580,1580,0x8d8574,1300,1300);                       // city ground inside the walls
+  flat(164,1550,0xb3a888,1300,1305);                        // grand avenue (cathedral ↔ south gate)
+  flat(1550,164,0xb3a888,1305,1300);                        // cross avenue (west wall ↔ east gate)
+  (function(){var pd=new THREE.Mesh(G('plazaDisc',function(){return new THREE.CircleGeometry(PLAZA_R+36,40);}),M(0xa89c80));
+    pd.rotation.x=-Math.PI/2;pd.position.set(WX(1300),2.6,WZ(1300));pd.receiveShadow=true;staticGroup.add(pd);})();
+  flat(POND.w+150,POND.h+140,0x5d8148,POND.x+POND.w/2,POND.y+POND.h/2); // garden lawn
+  flat(56,510,0x7d6b4d,1300,255);           // north road (from the north gate)
+  flat(3110,56,0x7d6b4d,3645,1300);         // east road (from the east gate to the new lands)
+  flat(56,3110,0x7d6b4d,1300,3645);         // south road (from the south gate)
   // ruins floors
   flat(620,560,0x5d5a68,2290,460);
   flat(850,850,0x6a6455,3075,575);
@@ -2817,22 +2962,102 @@ function buildWorld3D(){
     cone(13,10,0xe8c268,0,63,0,bg,10);                      // straw hat brim look
     cyl(4,4,20,0x7a4a8a,-14,36,0,bg,7);cyl(4,4,20,0x7a4a8a,14,36,0,bg,7);
   })();
+  // circular plaza colonnade ring + avenue lamps + pond garden hedges
+  (function(){
+    var pg=new THREE.Group();pg.position.set(WX(1300),terrainH(1300,1300),WZ(1300));staticGroup.add(pg);
+    var beam=new THREE.Mesh(new THREE.TorusGeometry(PLAZA_R,8,8,56),M(0xcbbfa4));
+    beam.rotation.x=Math.PI/2;beam.position.y=64;beam.castShadow=true;pg.add(beam);
+    var trim=new THREE.Mesh(new THREE.TorusGeometry(PLAZA_R,3.4,6,56),M(0xb8912f));
+    trim.rotation.x=Math.PI/2;trim.position.y=55;pg.add(trim);
+    var step=new THREE.Mesh(new THREE.TorusGeometry(PLAZA_R,5,6,56),M(0x8a8272));
+    step.rotation.x=Math.PI/2;step.position.y=2;step.scale.z=0.4;pg.add(step);
+    // lamp posts lining the grand avenue (warm globes)
+    for(var ly=830;ly<=1990;ly+=232){
+      [-104,104].forEach(function(off){
+        if(Math.abs(ly-1300)<PLAZA_R+40)return;
+        var lg=new THREE.Group();lg.position.set(WX(1300+off),terrainH(1300+off,ly),WZ(ly));staticGroup.add(lg);
+        cyl(2.2,3,52,0x3a3f45,0,26,0,lg,6);
+        var gl=sph(6,0xffd98a,0,56,0,lg,{emissive:0xcc8a2a});gl.castShadow=false;
+      });
+    }
+    // pond garden: hedge ring + corner trees around the lawn
+    var gw=POND.w+144, gh2=POND.h+132;
+    var hg=new THREE.Group();hg.position.set(WX(POND.x+POND.w/2),terrainH(1300,POND.y+POND.h/2),WZ(POND.y+POND.h/2));staticGroup.add(hg);
+    box(gw,20,12,0x3f6034,0,10,-gh2/2+6,hg);box(gw,20,12,0x3f6034,0,10,gh2/2-6,hg);
+    box(12,20,gh2,0x3f6034,-gw/2+6,10,0,hg);box(12,20,gh2,0x3f6034,gw/2-6,10,0,hg);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(cn){
+      var tg2=new THREE.Group();tg2.position.set(cn[0]*(gw/2-26),0,cn[1]*(gh2/2-26));hg.add(tg2);
+      cyl(3.4,4.6,26,0x5d3f27,0,13,0,tg2,6);
+      sph(24,0x3e7a3e,0,44,0,tg2,{flatShading:true});sph(17,0x477d43,10,58,6,tg2,{flatShading:true});
+    });
+  })();
   // obstacles
   obstacles.forEach(function(o){
     if(o.type==='rect'){
       if(o.house){
         var g=new THREE.Group();g.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(g);
-        box(o.w,o.h*0.85,o.h,o.c,0,o.h*0.42,0,g);
-        var roof=cone(Math.max(o.w,o.h)*0.78,o.h*0.62,0x5d3a26,0,o.h*0.85+o.h*0.3,0,g,4);roof.rotation.y=Math.PI/4;
-        box(22,38,4,0x4a3220,0,20,o.h/2+1,g);
-        box(20,20,3,0xffe9a8,-o.w/2+26,o.h*0.55,o.h/2+1,g);
-        box(20,20,3,0xffe9a8,o.w/2-26,o.h*0.55,o.h/2+1,g);
+        var wallH=o.hh||70, wallCol=parseInt(String(o.c).slice(1),16), roofCol=o.rc?parseInt(String(o.rc).slice(1),16):0x8f3f2a;
+        box(o.w,wallH,o.h,wallCol,0,wallH/2,0,g);
+        var roof=cone(Math.max(o.w,o.h)*0.74,Math.min(52,o.h*0.52),roofCol,0,wallH+Math.min(52,o.h*0.52)/2-2,0,g,4);roof.rotation.y=Math.PI/4;
+        if(o.chim)box(11,20,11,0x9a8a76,o.w*0.26,wallH+12,0,g);
+        box(20,36,4,0x4a3220,0,18,o.h/2+1,g);
+        box(17,17,3,0xffe9a8,-o.w/2+24,wallH*0.58,o.h/2+1,g);
+        box(17,17,3,0xffe9a8,o.w/2-24,wallH*0.58,o.h/2+1,g);
+        box(17,17,3,0xf5e3b0,0,wallH*0.6,-o.h/2-1,g);
+      }else if(o.wall){
+        var wg=new THREE.Group();wg.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(wg);
+        box(o.w,104,o.h,0x9a958a,0,52,0,wg);
+        box(o.w,10,o.h+10,0x8a8578,0,107,0,wg);                       // parapet cap
+        var horiz=o.w>=o.h, span=horiz?o.w:o.h;
+        for(var ci2=26;ci2<span-10;ci2+=56){                          // crenellations
+          if(horiz)box(22,15,o.h+8,0x9a958a,-o.w/2+ci2,116,0,wg);
+          else box(o.w+8,15,22,0x9a958a,0,116,-o.h/2+ci2,wg);
+        }
+      }else if(o.cathedral){
+        var cg2=new THREE.Group();cg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(cg2);
+        box(o.w,120,o.h,0xe7dfca,0,60,0,cg2);                          // nave
+        box(o.w+18,14,o.h+18,0xcfc4a8,0,7,0,cg2);                      // plinth
+        box(o.w*0.6,52,o.h*0.7,0xded3b8,0,146,0,cg2);                  // upper tier
+        cyl(74,80,34,0xcfc4a8,0,188,0,cg2,20);                          // dome drum
+        var dome=sph(76,0x7d94a6,0,196,0,cg2);dome.scale.y=0.92;        // the great dome
+        cyl(5,7,30,0xb8912f,0,268,0,cg2,8);
+        var orb2=sph(9,0xe8c268,0,288,0,cg2,{emissive:0x8a6a10});orb2.castShadow=false;
+        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(cn){            // corner spires
+          var sx=cn[0]*(o.w/2-24), sz=cn[1]*(o.h/2-24);
+          cyl(15,18,168,0xe2d7bd,sx,84,sz,cg2,8);
+          cone(21,58,0xa34a32,sx,196,sz,cg2,8);
+          sph(4.5,0xe8c268,sx,230,sz,cg2);
+        });
+        for(var pi2=-2;pi2<=2;pi2++)cyl(6,7,74,0xf2ead8,pi2*44,37,o.h/2+16,cg2,8); // portico columns
+        box(o.w*0.52,10,34,0xcfc4a8,0,80,o.h/2+16,cg2);                // portico roof
+        var rose=cyl(26,26,4,0x9fd4ff,0,88,o.h/2+2,cg2,20);rose.rotation.x=Math.PI/2; // rose window
+        box(24,44,4,0x4a3220,0,22,o.h/2+2,cg2);                        // great door
+      }else if(o.pond){
+        var pg2=new THREE.Group();pg2.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(pg2);
+        box(o.w+16,10,o.h+16,0xaeb4ac,0,5,0,pg2);                      // stone rim
+        var wtr=box(o.w,4,o.h,0x2e7ea6,0,10,0,pg2);wtr.castShadow=false;
+        box(o.w*0.7,2,o.h*0.6,0x4a90c2,0,12.5,0,pg2).castShadow=false; // sunlit shallows
+        cyl(4,6,30,0xaebfca,-40,24,-20,pg2,7);cyl(4,6,36,0xaebfca,44,27,16,pg2,7); // garden fountains
+        sph(5,0x9fd4ff,-40,44,-20,pg2,{transparent:true,opacity:0.85}).castShadow=false;
+        sph(5,0x9fd4ff,44,50,16,pg2,{transparent:true,opacity:0.85}).castShadow=false;
       }else{
         var h=60+((o.x*7+o.y*13)%50);
         var gh=terrainH(o.x+o.w/2,o.y+o.h/2);
         box(o.w,h,o.h,o.c,WX(o.x+o.w/2),h/2+gh,WZ(o.y+o.h/2),staticGroup);
         box(o.w+8,10,o.h+8,0x8a8496,WX(o.x+o.w/2),h+4+gh,WZ(o.y+o.h/2),staticGroup);
       }
+    }else if(o.tower){
+      var tg3=new THREE.Group();tg3.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(tg3);
+      cyl(32,38,148,0x9a958a,0,74,0,tg3,12);
+      cyl(40,40,12,0x8a8578,0,152,0,tg3,12);
+      cone(46,62,0xa83c2a,0,188,0,tg3,12);                             // red roof (as in the photo)
+      sph(5.5,0xe8c268,0,224,0,tg3);
+      box(16,24,4,0xffe9a8,0,104,34,tg3);
+    }else if(o.pillar){
+      var plg=new THREE.Group();plg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(plg);
+      cyl(8,10,56,0xded5c2,0,28,0,plg,8);
+      box(22,8,22,0xcbbfa4,0,59,0,plg);
+      box(24,7,24,0xcbbfa4,0,3,0,plg);
     }else if(o.fountain){
       var fg=new THREE.Group();fg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(fg);
       cyl(o.r,o.r+6,16,0x7d95a8,0,8,0,fg,20);
@@ -3211,6 +3436,18 @@ function render3D(now){
     var baseRx=(player.cls==='warrior'?-0.5:player.cls==='mage'?-0.35:0.02);
     var baseRz=(player.cls==='warrior'?-0.25:player.cls==='mage'?-0.15:0.03);
     viewModel.rotation.set(baseRx+swing,player.cls==='archer'?0.06:0,baseRz+swingZ);
+    /* bow draw: pull the string + arrow, steady the bow, narrow the view */
+    if(player.cls==='archer'&&vmBow){
+      var dp=bowDraw.active?bowPower():0;
+      bowDraw.power=dp;
+      updateBowRig(dp,now);
+      if(bowDraw.active&&dp>=1&&!bowDraw.fullPinged){bowDraw.fullPinged=true;beep(1174,0.09,'sine',0.035);}
+    }
+  }
+  /* draw-zoom: while the bow is drawn the field of view eases in (aim feel) */
+  if(camera3d){
+    var wantFov=camFov-((player&&player.cls==='archer'&&bowDraw.active)?7*bowDraw.power:0);
+    if(Math.abs(camera3d.fov-wantFov)>0.05){camera3d.fov+=(wantFov-camera3d.fov)*0.35;camera3d.updateProjectionMatrix();}
   }
   // sun follows player for tight shadows
   sunLight.position.set(tx+260,420,tz+160);sunLight.target.position.set(tx,0,tz);
@@ -3245,7 +3482,7 @@ function syncDmgTexts(now){
    - click once to lock the pointer: moving the mouse cursor itself turns
      the view (FPS-style mouse look), click attacks, Esc releases the lock
    - cursor (arrow) keys also turn the view (handled in update()) */
-var CAM_HINT_DEFAULT='見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃 ・ Esc：メニュー';
+var CAM_HINT_DEFAULT='見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃（アーチャーは長押しで弓を引き絞り、離して発射） ・ Esc：メニュー';
 function setupCameraControls(){
   var el=renderer.domElement;
   var dragging=false,moved=0,lx=0,ly=0,downT=0;
@@ -3256,10 +3493,17 @@ function setupCameraControls(){
     camYaw-=(e.movementX||0)*0.0028*settings.sens;
     camPitch=Math.max(-1.15,Math.min(1.35,camPitch-(e.movementY||0)*0.0025*settings.sens));
   });
-  /* while locked, a click is an attack (aim is the center crosshair) */
+  /* while locked, pressing is an attack (aim is the center crosshair);
+     for the archer, pressing STARTS the draw and releasing looses the arrow */
   document.addEventListener('pointerdown',function(e){
-    if(isLocked()&&e.target===el&&started&&player&&!player.dead)playerAttack(1);
+    if(isLocked()&&e.target===el&&started&&player&&!player.dead){
+      if(player.cls==='archer')startBowDraw(); else playerAttack(1);
+    }
   });
+  document.addEventListener('pointerup',function(e){
+    if(player&&player.cls==='archer'&&bowDraw.active)releaseBow();
+  });
+  document.addEventListener('pointercancel',function(){ if(bowDraw.active)cancelBowDraw(); });
   document.addEventListener('pointerlockchange',function(){
     var hint=document.getElementById('camHint');
     if(hint)hint.textContent=isLocked()?'マウスカーソル移動で視点 ・ クリックで攻撃 ・ Escでカーソルを解放':CAM_HINT_DEFAULT;
@@ -3267,6 +3511,8 @@ function setupCameraControls(){
   el.addEventListener('pointerdown',function(e){
     dragging=true;moved=0;lx=e.clientX;ly=e.clientY;downT=performance.now();
     try{el.setPointerCapture(e.pointerId);}catch(err){}
+    /* archer: pressing on the view starts the draw (aim can still be dragged) */
+    if(started&&player&&!player.dead&&player.cls==='archer'&&!isLocked())startBowDraw();
   });
   el.addEventListener('pointermove',function(e){
     if(!dragging||isLocked())return;
@@ -3278,6 +3524,14 @@ function setupCameraControls(){
   function up(e){
     if(!dragging)return;dragging=false;
     if(isLocked())return;
+    if(player&&player.cls==='archer'&&bowDraw.active){
+      /* releasing looses the drawn arrow; no pointer-lock request mid-shot */
+      releaseBow();
+      if(moved<7&&e.pointerType==='mouse'&&el.requestPointerLock){
+        try{var rp2=el.requestPointerLock();if(rp2&&rp2.catch)rp2.catch(function(){});}catch(err){}
+      }
+      return;
+    }
     if(moved<7&&performance.now()-downT<400&&started&&player&&!player.dead){
       // click: raycast to ground, attack nearest enemy there
       var ndc=new THREE.Vector2((e.clientX/viewW)*2-1,-(e.clientY/viewH)*2+1);
@@ -3346,6 +3600,24 @@ function loop(now){
     if(now-miniT>180){miniT=now;drawMini();}
     if(now-listT>900){listT=now;updatePlayerList();updateHUD();refreshSaveUI();acctTick(now);$('hudZone').textContent=zoneAt(player.x,player.y);if($('playersModal').style.display==='grid')refreshPlayersUI();}
     updateSkillUI(now);
+    /* bow draw gauge + safety: drawing is cancelled if a menu/modal opens or the player falls */
+    (function(){
+      var gEl=$('drawGauge'), chEl=$('crosshair');
+      if(bowDraw.active&&(player.dead||menuOpen||isAnyOverlayOpen()))cancelBowDraw();
+      if(bowDraw.active&&player.cls==='archer'){
+        var p=bowPower(); bowDraw.power=p;
+        if(gEl){gEl.style.display='block';
+          var ring=gEl.querySelector('.dg-ring');
+          if(ring)ring.style.background='conic-gradient('+(p>=1?'#e8c268':'#ffe9a8')+' '+(p*360)+'deg, rgba(255,255,255,.16) 0deg)';
+          gEl.classList.toggle('full',p>=1);
+          var lb=gEl.querySelector('.dg-label'); if(lb)lb.textContent=p>=1?'FULL DRAW':'DRAW '+Math.round(p*100)+'%';
+        }
+        if(chEl)chEl.classList.add('drawing');
+      }else{
+        if(gEl)gEl.style.display='none';
+        if(chEl)chEl.classList.remove('drawing');
+      }
+    })();
     // mp/hp bars smooth
     $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
     $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
@@ -3376,20 +3648,27 @@ document.addEventListener('keydown',function(e){
   if(document.activeElement===$('chatInput'))return;
   if(e.code==='Space'){e.preventDefault();if(!e.repeat&&player&&!player.dead&&jumpY<=0&&jumpVY===0)jumpVY=0.17;}
   var b=settings.binds;
-  if(e.code===b.attack){e.preventDefault();playerAttack(1);}
+  if(e.code===b.attack){e.preventDefault();if(player&&player.cls==='archer'){if(!e.repeat)startBowDraw();}else playerAttack(1);}
   if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
   if(e.code===b.potion)usePotion();
   if(e.code==='Enter'){e.preventDefault();$('chatInput').focus();}
 });
-document.addEventListener('keyup',function(e){keys[e.code]=false;});
+document.addEventListener('keyup',function(e){keys[e.code]=false;
+  if(player&&player.cls==='archer'&&e.code===settings.binds.attack)releaseBow();
+});
 canvas.addEventListener('pointerdown',function(e){
   if(!started)return;
   var wx=e.clientX+cam.x,wy=e.clientY+cam.y; // canvas is fullscreen at 0,0 of wrap approx
   var best=null,bd=60;
   enemies.forEach(function(en){var d=Math.hypot(en.x-wx,en.y-wy);if(d<bd){bd=d;best=en;}});
-  if(best){target=best;updateTargetUI();playerAttack(1);}
+  if(best){target=best;updateTargetUI();}
+  if(player&&player.cls==='archer')startBowDraw(); else if(best)playerAttack(1);
 });
-$('attackBtn').addEventListener('click',function(){playerAttack(1);});
+canvas.addEventListener('pointerup',function(){if(player&&player.cls==='archer')releaseBow();});
+$('attackBtn').addEventListener('pointerdown',function(e){e.preventDefault();if(player&&player.cls==='archer')startBowDraw();});
+$('attackBtn').addEventListener('pointerup',function(e){e.preventDefault();if(player&&player.cls==='archer')releaseBow();});
+$('attackBtn').addEventListener('pointerleave',function(){if(bowDraw.active&&player&&player.cls==='archer')releaseBow();});
+$('attackBtn').addEventListener('click',function(){if(player&&player.cls==='archer')return;playerAttack(1);});
 $('skill1').addEventListener('click',function(){useSkill(1);});
 $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
@@ -3566,7 +3845,7 @@ $('startBtn').addEventListener('click',function(){
   var name=$('nameInput').value.trim()||'冒険者';
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
-  resetExplored(); stuckArrows=[]; aimTarget=null; markExplored();
+  resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
   setupSkillUI(selectedClass);
   genWorld();populate();
   started=true;
