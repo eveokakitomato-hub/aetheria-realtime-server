@@ -1031,7 +1031,7 @@ var EXP_N=64, explored=[], exploredCount=0;
 /* arrows stuck in the terrain: they stay for a while and can be picked back up with E */
 var stuckArrows=[];
 /* the town merchant (shop) */
-var MERCHANT={x:1470,y:1330,name:"商人マーロウ",r:16};
+var MERCHANT={x:1470,y:1500,name:"商人マーロウ",r:16};
 var ARROW_PRICE=2;
 
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
@@ -1477,30 +1477,62 @@ function regionAt(x,y){
   if(x<1500&&y>3250) return 'deepforest';
   return 'green';
 }
-/* ===== LUMINAS — a mountain castle town (photo-like layout) =====
-   A stone wall follows the land around a terraced town backed by a pine-
-   covered mountain ridge to the north. A river pours over the north wall
-   as a waterfall, runs south through the town under three stone bridges
-   and leaves through a grated water-gate in the south wall. The castle
-   crowns a high terrace at the north end of the grand avenue; a blue-
-   glowing chapel stands on its own terrace to the west; a clock tower
-   watches over the circular fountain plaza. Gates: SOUTH and EAST only —
-   the north side is closed by wall and mountain. Half-timbered houses
-   with brown roofs fill the blocks between the avenues and the river. */
-var TOWN_C=1300, TOWN_HALF=790;               // town spans 510..2090 on both axes
-var PLAZA_R=235;                              // circular plaza ring radius
-var CASTLE={x:1020,y:530,w:560,h:250};        // castle on the north terrace
-var CHAPEL={x:620,y:770,w:320,h:190};         // glowing chapel, west terrace
-var RIVER_X=1700, RIVER_HW=45;                // river centre line / half width
-var CLOCK={x:1105,y:1105};                    // clock tower, NW of the plaza
-var POND={x:1150,y:1765,w:300,h:175};         // garden pond (inside the south gate)
-function inTown(x,y){return Math.abs(x-TOWN_C)<=TOWN_HALF&&Math.abs(y-TOWN_C)<=TOWN_HALF;}
+/* ===== LUMINAS — a mountain castle town (photo layout, enlarged) =====
+   The town is bigger now, and its stone wall is NOT a square: it follows
+   an irregular rounded ring — a long bulge to the south, a tighter north
+   side under the pine-covered mountain, a fuller shoulder to the NE —
+   with a walkway and parapet along the top. Gates: SOUTH-WEST and
+   SOUTH-EAST only; the north side is closed by wall and mountain.
+   A river pours through the north water-gate as a waterfall, widens
+   into a pond at the town centre, forms a second pond on the east side
+   and leaves through the SE water-gate. Bridges cross it north and east
+   of the circular fountain plaza (which sits just south of centre).
+   The clock tower stands west–NW of the plaza; the blue-glowing chapel
+   crowns a terrace at the north centre; the castle crowns the NE cliff
+   above a flight of stone terraces. Half-timbered houses with brown
+   roofs crowd the plaza and the river banks; inside the west wall a
+   pine grove meets the town, and outside it lie fields and grassland. */
+var TOWN_CX=1300, TOWN_CY=1320;               // centre of the walled town
+var PLAZA={x:1300,y:1470};                    // fountain plaza, just south of centre
+var PLAZA_R=250;                              // circular plaza ring radius
+var CASTLE={x:1500,y:540,w:440,h:200};        // castle on the NE cliff terrace
+var CHAPEL={x:930,y:520,w:330,h:200};         // glowing chapel, north-centre terrace
+var RIVER_HW=45;                              // river half width
+var CLOCK={x:1010,y:1290};                    // clock tower, west–NW of the plaza
+var POND={x:870,y:1775,w:260,h:150};          // garden pond (SW garden)
+var CPOND={x:1560,y:1095,rx:215,ry:150};      // river pond at the town centre
+var EPOND={x:1930,y:1345,rx:205,ry:145};      // second pond, east side
+var RIVER_PTS=[[1560,300],[1556,430],[1553,559],[1545,720],[1535,880],[1520,1000],[1540,1090],[1620,1180],[1740,1260],[1850,1320],[1930,1345],[2005,1500],[2005,1670],[1982,1853],[2060,2060],[2200,2300]];
+var FALLS_PT={x:1553,y:559};                  // the falls at the north water-gate
+var GATE_SW_A=2.27, GATE_SE_A=0.96;           // gate directions (rad; S = π/2, y-down)
+var RIVER_IN_A=-1.25, RIVER_OUT_A=0.66;       // where the river pierces the wall
+/* Wall outline: radius from the town centre as a function of direction —
+   southern bulge, tight north, NE shoulder for the castle cliff, plus a
+   hand-drawn wobble so the ring never reads as a geometric shape. */
+function townRadius(a){
+  var s=Math.sin(a), c=Math.cos(a);
+  var r=800;
+  r+=115*Math.pow(Math.max(0,s),1.6);                    // southern bulge
+  r-=70*Math.pow(Math.max(0,-s),1.3);                    // north hugs the mountain
+  var dNE=a+Math.PI/4; while(dNE>Math.PI)dNE-=Math.PI*2; while(dNE<-Math.PI)dNE+=Math.PI*2;
+  r+=125*Math.exp(-Math.pow(dNE/0.55,2));                // NE shoulder (castle cliff)
+  r+=38*Math.max(0,c)*Math.max(0,s);                     // SE fullness
+  r+=34*Math.sin(3*a+0.8)+20*Math.sin(5*a+2.1);          // irregularity
+  return r;
+}
+/* signed distance to the wall ring: negative inside the town */
+function townShape(x,y){var dx=x-TOWN_CX, dy=y-TOWN_CY; return Math.hypot(dx,dy)-townRadius(Math.atan2(dy,dx));}
+function gatePoint(a){var r=townRadius(a); return {x:TOWN_CX+Math.cos(a)*r, y:TOWN_CY+Math.sin(a)*r};}
+var GATE_SW=gatePoint(GATE_SW_A), GATE_SE=gatePoint(GATE_SE_A);
+function segDist(px,py,ax,ay,bx,by){var dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy;var t=L2?((px-ax)*dx+(py-ay)*dy)/L2:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(ax+dx*t),py-(ay+dy*t));}
+function riverDist(x,y){var d=1e9;for(var i=0;i<RIVER_PTS.length-1;i++){var dd=segDist(x,y,RIVER_PTS[i][0],RIVER_PTS[i][1],RIVER_PTS[i+1][0],RIVER_PTS[i+1][1]);if(dd<d)d=dd;}return d;}
+function inTown(x,y){return townShape(x,y)<=-6;}
 /* No-spawn safe zone: the walled town plus a buffer (~3 tiles) outside the
    walls. No spawn point is placed inside it, the spawner never materialises
    a mob there, live mobs found inside are removed, and isSafe() covers the
    whole area — so Luminas, its gates and the roads just outside stay safe. */
 var NO_SPAWN_MARGIN=120;
-function inNoSpawn(x,y){return Math.abs(x-TOWN_C)<=TOWN_HALF+NO_SPAWN_MARGIN&&Math.abs(y-TOWN_C)<=TOWN_HALF+NO_SPAWN_MARGIN;}
+function inNoSpawn(x,y){return townShape(x,y)<=NO_SPAWN_MARGIN;}
 function genWorld(){
   obstacles=[];decorations=[];
   var tseed=987654;function trnd(){tseed=(tseed*16807)%2147483647;return tseed/2147483647;}
@@ -1509,47 +1541,60 @@ function genWorld(){
   var WALL_HEX=["#ddd5c2","#e7dfca","#d8cbae","#e2d7bd","#cfc0a0"];
   // ---- dense city houses on a street grid, kept clear of the avenues,
   //      the plaza ring, the terraces, the river and the pond garden ----
-  for(var by=578;by<1980;by+=122){
-    for(var bx=578;bx<1980;bx+=122){
-      var hw=92+Math.floor(trnd()*20), hh=78+Math.floor(trnd()*18);
-      var hx=bx+Math.floor(trnd()*14), hy=by+Math.floor(trnd()*14);
+  for(var by=560;by<2080;by+=98){
+    for(var bx=560;bx<2080;bx+=98){
+      var hw=88+Math.floor(trnd()*18), hh=76+Math.floor(trnd()*16);
+      var hx=bx+Math.floor(trnd()*10), hy=by+Math.floor(trnd()*10);
       var hcx=hx+hw/2, hcy=hy+hh/2;
+      if(townShape(hcx,hcy)>-85) continue;                  // inside the wall ring, with margin
       if(hx<1412&&hx+hw>1188) continue;                      // grand avenue (N–S) stays clear
-      if(hy<1412&&hy+hh>1188) continue;                      // cross avenue (E–W) stays clear
-      if(Math.hypot(hcx-1300,hcy-1300)<PLAZA_R+95) continue; // circular plaza
-      if(hcx>800&&hcx<1660&&hcy>390&&hcy<880) continue;      // castle terrace & its skirts
-      if(hcx>460&&hcx<1080&&hcy>610&&hcy<1120) continue;     // chapel terrace & its skirts
-      if(hx<1775&&hx+hw>1605) continue;                      // the river and its banks
-      if(Math.hypot(hcx-CLOCK.x,hcy-CLOCK.y)<100) continue;  // clock tower plot
-      if(hx>1360&&hx<1800&&hy<1040&&hy+hh>930) continue;     // north lane to the river bridge
-      if(hx>1440&&hx<1800&&hy<1790&&hy+hh>1680) continue;    // south lane to the river bridge
+      if(hy<1582&&hy+hh>1358) continue;                      // cross avenue (E–W) stays clear
+      if(Math.hypot(hcx-PLAZA.x,hcy-PLAZA.y)<PLAZA_R+95) continue; // circular plaza
+      if(hcx>1440&&hcy>400&&hcy<1000) continue;              // NE terraces (castle cliff & mid terrace)
+      if(hcx>860&&hcx<1400&&hcy>430&&hcy<800) continue;      // chapel terrace & its skirts
+      if(riverDist(hcx,hcy)<140) continue;                   // the river and its banks
+      if(Math.pow((hcx-CPOND.x)/(CPOND.rx+95),2)+Math.pow((hcy-CPOND.y)/(CPOND.ry+95),2)<1) continue; // centre pond
+      if(Math.pow((hcx-EPOND.x)/(EPOND.rx+95),2)+Math.pow((hcy-EPOND.y)/(EPOND.ry+95),2)<1) continue; // east pond
+      if(Math.hypot(hcx-CLOCK.x,hcy-CLOCK.y)<105) continue;  // clock tower plot
+      if(hy<1050&&hy+hh>950&&hx>1240) continue;              // north lane to the river bridge
+      if(Math.abs(hcx-GATE_SW.x)<85&&hcy>1400) continue;     // SW gate street
+      if(Math.abs(hcx-GATE_SE.x)<85&&hcy>1400) continue;     // SE gate street
       if(hcx>POND.x-85&&hcx<POND.x+POND.w+85&&hcy>POND.y-85&&hcy<POND.y+POND.h+70) continue; // pond garden
       if(Math.hypot(hcx-MERCHANT.x,hcy-MERCHANT.y)<105) continue;
       obstacles.push({type:'rect',x:hx,y:hy,w:hw,h:hh,c:WALL_HEX[Math.floor(trnd()*WALL_HEX.length)],house:true,
         rc:ROOF_C[Math.floor(trnd()*ROOF_C.length)],hh:96+Math.floor(trnd()*76)+(Math.hypot(hcx-1300,hcy-1300)<560?36:0),chim:trnd()<0.45});
     }
   }
-  // ---- city wall: gates at S (y=2090) and E (x=2090) ONLY. The north side
-  //      is closed: three runs (the middle one rides the castle terrace),
-  //      split only by the river's grated water-gates where the stream
-  //      enters (north) and leaves (south). The west wall is solid. ----
-  var WT=40, WL=TOWN_C-TOWN_HALF, WR=TOWN_C+TOWN_HALF, GT=88; // wall thickness / left / right / gate half-gap
-  var RV0=RIVER_X-RIVER_HW, RV1=RIVER_X+RIVER_HW;             // river span 1655..1745
-  function wallSeg(x,y,w,h){obstacles.push({type:'rect',x:x,y:y,w:w,h:h,c:"#9a958a",wall:true});}
-  wallSeg(WL-WT/2,WL-WT/2,882-(WL-WT/2),WT); wallSeg(878,WL-WT/2,1582-878,WT); wallSeg(1578,WL-WT/2,RV0+2-1578,WT); wallSeg(RV1-2,WL-WT/2,WR+WT/2-(RV1-2),WT); // north (solid, segments overlap at the seams)
-  wallSeg(WL-WT/2,WR-WT/2,TOWN_C-GT+2-(WL-WT/2),WT); wallSeg(TOWN_C+GT-2,WR-WT/2,RV0+2-(TOWN_C+GT-2),WT); wallSeg(RV1-2,WR-WT/2,WR+WT/2-(RV1-2),WT);              // south (gate + water-gate)
-  wallSeg(WR-WT/2,WL+WT/2,WT,TOWN_C-GT+2-(WL+WT/2)); wallSeg(WR-WT/2,TOWN_C+GT-2,WT,WR-WT/2-(TOWN_C+GT-2)); // east (gate)
-  wallSeg(WL-WT/2,WL+WT/2,WT,WR-WL-WT);                                                              // west (solid)
+  // ---- the city wall: an irregular rounded ring of stone blocks that
+  //      follows townRadius(), so the south side bulges in a great curve
+  //      and the north side tucks under the mountain. Openings: the SW and
+  //      SE gates ONLY (the south/east policy holds), plus the river's
+  //      two water-gates, sealed with iron grates. ----
+  var RIN_P=gatePoint(RIVER_IN_A), ROUT_P=gatePoint(RIVER_OUT_A);
+  var WN=118;
+  for(var wi=0;wi<WN;wi++){
+    var wp=gatePoint(wi/WN*Math.PI*2);
+    if(Math.hypot(wp.x-GATE_SW.x,wp.y-GATE_SW.y)<104) continue;   // SW gate
+    if(Math.hypot(wp.x-GATE_SE.x,wp.y-GATE_SE.y)<104) continue;   // SE gate
+    if(Math.hypot(wp.x-RIN_P.x,wp.y-RIN_P.y)<72) continue;        // river in (N)
+    if(Math.hypot(wp.x-ROUT_P.x,wp.y-ROUT_P.y)<72) continue;      // river out (SE)
+    obstacles.push({type:'rect',x:wp.x-33,y:wp.y-33,w:66,h:66,c:"#9a958a",wall:true});
+  }
   // iron grates seal the river gaps so the stream is the only way through
-  obstacles.push({type:'rect',x:RV0-2,y:WL-WT/2,w:RV1-RV0+4,h:WT,c:"#3a3733",grate:true});
-  obstacles.push({type:'rect',x:RV0-2,y:WR-WT/2,w:RV1-RV0+4,h:WT,c:"#3a3733",grate:true});
+  obstacles.push({type:'rect',x:RIN_P.x-48,y:RIN_P.y-20,w:96,h:40,c:"#3a3733",grate:true});
+  obstacles.push({type:'rect',x:ROUT_P.x-48,y:ROUT_P.y-20,w:96,h:40,c:"#3a3733",grate:true});
   // waterfall cliff at the river's entry, just inside the north wall
-  obstacles.push({type:'rect',x:RV0-10,y:WL+6,w:RV1-RV0+20,h:52,c:"#5a564e",cliff:true});
-  [[WL,WL],[WR,WL],[WL,WR],[WR,WR],                                   // corners
-   [1300-GT-24,WR],[1300+GT+24,WR],[WR,1300-GT-24],[WR,1300+GT+24],   // gate towers (S & E)
-   [1000,WL],[1560,WL],                                               // towers flanking the castle hill
-   [WL,1300],[760,WR],[1900,WR]].forEach(function(tp){                // bastions
-    obstacles.push({type:'circle',x:tp[0],y:tp[1],r:36,tower:true});
+  obstacles.push({type:'rect',x:FALLS_PT.x-55,y:FALLS_PT.y+16,w:110,h:52,c:"#5a564e",cliff:true});
+  // gate towers flanking both gates
+  [[GATE_SW,GATE_SW_A],[GATE_SE,GATE_SE_A]].forEach(function(gt){
+    var tx=-Math.sin(gt[1]), ty=Math.cos(gt[1]);
+    obstacles.push({type:'circle',x:gt[0].x+tx*112,y:gt[0].y+ty*112,r:36,tower:true});
+    obstacles.push({type:'circle',x:gt[0].x-tx*112,y:gt[0].y-ty*112,r:36,tower:true});
+  });
+  // bastions around the ring (W / NW / N / NE / E / S / WSW)
+  [3.14,3.93,4.71,5.50,0,1.57,2.75].forEach(function(ba){
+    var bp=gatePoint(ba);
+    obstacles.push({type:'circle',x:bp.x,y:bp.y,r:34,tower:true});
   });
   // ---- the castle crowning the north terrace, and the glowing chapel ----
   obstacles.push({type:'rect',x:CASTLE.x,y:CASTLE.y,w:CASTLE.w,h:CASTLE.h,c:"#8d9299",castle:true});
@@ -1561,9 +1606,9 @@ function genWorld(){
   for(var pa=0;pa<24;pa++){
     var ang=pa/24*Math.PI*2, rem=((ang%(Math.PI/2))+Math.PI/2)%(Math.PI/2);
     if(rem<0.30||rem>Math.PI/2-0.30) continue;               // avenue openings
-    obstacles.push({type:'circle',x:1300+Math.cos(ang)*PLAZA_R,y:1300+Math.sin(ang)*PLAZA_R,r:11,pillar:true});
+    obstacles.push({type:'circle',x:PLAZA.x+Math.cos(ang)*PLAZA_R,y:PLAZA.y+Math.sin(ang)*PLAZA_R,r:11,pillar:true});
   }
-  obstacles.push({type:'circle',x:1300,y:1300,r:52,fountain:true}); // fountain at the plaza heart
+  obstacles.push({type:'circle',x:PLAZA.x,y:PLAZA.y,r:52,fountain:true}); // fountain at the plaza heart
   obstacles.push({type:'circle',x:MERCHANT.x,y:MERCHANT.y,r:30,stall:true}); // merchant stall
   // ruins NE (original)
   for(var i=0;i<7;i++) obstacles.push({type:'rect',x:2050+ (i%3)*130,y:280+Math.floor(i/3)*150,w:56,h:90,c:"#6f6a7d",ruin:true});
@@ -1574,9 +1619,8 @@ function genWorld(){
   while(decorations.length<620 && tries<9000){
     tries++;
     var x=60+Math.random()*(W-120), y=60+Math.random()*(H-120);
-    if(x>430&&x<2170&&y>430&&y<2170) continue;   // inside the city walls of Luminas
-    if(x>1540&&x<1800&&y>2060&&y<2620) continue;        // the river south of the walls
-    if(x>1560&&x<1840&&y<530) continue;                 // the stream & falls north of the walls
+    if(townShape(x,y)<70) continue;   // inside the city walls of Luminas (+ margin)
+    if(riverDist(x,y)<125) continue;        // the river: north stream, town ponds, SE outflow
     if(x>1950&&x<2620&&y<650) continue;
     if(x>2650&&x<3500&&y<1000) continue;              // forgotten ruins floor
     if(Math.hypot(x-420,y-2150)<300) continue;          // lake 1
@@ -1596,18 +1640,27 @@ function genWorld(){
   }
   // the mountain ridge behind the north wall: pines & crags (deterministic)
   for(var ri=0;ri<30;ri++){
-    var rx2=420+trnd()*1760, ry2=80+trnd()*330;
+    var rx2=300+trnd()*2000, ry2=80+trnd()*330;
     var rkind=trnd()<0.6?'tree':'rock';
     var rd={x:rx2,y:ry2,kind:rkind,s:rkind==='tree'?22+trnd()*13:12+trnd()*10,seed:trnd()*10};
     decorations.push(rd);
     obstacles.push({type:'circle',x:rx2,y:ry2,r:rd.s*0.45,ref:rd});
   }
   // garden trees on the chapel terrace and the castle terrace corners
-  [[600,725],[985,1018],[955,600],[1620,735],[700,1005],[960,830],[640,730],[905,735],[905,560]].forEach(function(tp2){
+  [[905,500],[905,745],[1200,745],[1470,480],[2100,470],[2130,720],[1660,760]].forEach(function(tp2){
     var td={x:tp2[0],y:tp2[1],kind:'tree',s:24,seed:tp2[0]%10};
     decorations.push(td);
     obstacles.push({type:'circle',x:tp2[0],y:tp2[1],r:11,ref:td});
   });
+  // a pine grove just inside the west wall — the town meets the forest there
+  for(var wti=0;wti<9;wti++){
+    var wtx=615+((wti*67)%60), wty=820+wti*135;
+    if(Math.abs(wty-PLAZA.y)<140) continue;
+    if(collide(wtx,wty,30)) continue;
+    var wd={x:wtx,y:wty,kind:'tree',s:23+((wti*37)%8),seed:wti*1.7+2};
+    decorations.push(wd);
+    obstacles.push({type:'circle',x:wtx,y:wty,r:11,ref:wd});
+  }
   // lakes: 月影湖 (SW, original) / 翠玉湖 (deep south-west) / desert oasis
   decorations.push({x:420,y:2150,kind:'lake',s:230});
   decorations.push({x:700,y:4300,kind:'lake',s:260});
@@ -1772,7 +1825,7 @@ function beep(f,d,type,v){
 /* ================= ENTITIES ================= */
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
-  return {name:name,cls:clsKey,x:1300,y:1470,r:16,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
+  return {name:name,cls:clsKey,x:1300,y:1600,r:16,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
     lv:1,exp:0,gold:120,potions:3,arrows:(clsKey==='archer'?30:0),kills:0,dir:1,walk:0,dead:false};
 }
 function expNeed(lv){return 80+lv*55;}
@@ -2396,8 +2449,8 @@ function applySaveData(data){
   np.gold=Math.floor(num(p.gold,0,0,999999));np.potions=Math.floor(num(p.potions,0,0,999));np.kills=Math.floor(num(p.kills,0,0,999999));
   np.arrows=Math.floor(num(p.arrows,(p.cls==='archer'?30:0),0,9999));
   exploredFromString(data.explored);
-  np.x=num(p.x,1300,40,W-40);np.y=num(p.y,1470,40,H-40);
-  if(collide(np.x,np.y,np.r)){np.x=1300;np.y=1470;}
+  np.x=num(p.x,1300,40,W-40);np.y=num(p.y,1600,40,H-40);
+  if(collide(np.x,np.y,np.r)){np.x=1300;np.y=1600;}
   player=np;selectedClass=np.cls;
   var q=data.quest||{};
   questIdx=Math.floor(num(q.idx,0,0,QUESTS.length-1));questCount=Math.floor(num(q.count,0,0,99));
@@ -2409,7 +2462,7 @@ function startFromSave(source){
   setupSkillUI(player.cls);
   genWorld();populate();
   // genWorld rebuilt obstacles; if saved position now collides, fall back to town
-  if(collide(player.x,player.y,player.r)){player.x=1300;player.y=1470;lastSavedKey=progressKey();}
+  if(collide(player.x,player.y,player.r)){player.x=1300;player.y=1600;lastSavedKey=progressKey();}
   started=true;
   $('startScreen').style.display='none';$('saveModal').style.display='none';
   markExplored();
@@ -2497,9 +2550,13 @@ function waterDepthAt(x,y){
     if(dist<o.s){var dep=(1-dist/o.s)*120;if(dep>d)d=dep;}
   }
   // the Luminas river: a shallow stream — wading depth only, never swimming
-  if(x>RIVER_X-70&&x<RIVER_X+70&&y>520&&y<2560){
-    var rdep=(1-Math.abs(x-RIVER_X)/70)*16; if(rdep>d)d=rdep;
-  }
+  var rd=riverDist(x,y);
+  if(rd<70){var rdep=(1-rd/70)*16; if(rdep>d)d=rdep;}
+  // the town's two river ponds deepen toward the middle — deep enough to swim
+  [[CPOND.x,CPOND.y,CPOND.rx,CPOND.ry],[EPOND.x,EPOND.y,EPOND.rx,EPOND.ry]].forEach(function(p){
+    var q=Math.pow((x-p[0])/p[2],2)+Math.pow((y-p[1])/p[3],2);
+    if(q<1){var pdep=(1-Math.sqrt(q))*55; if(pdep>d)d=pdep;}
+  });
   return d;
 }
 var drownTickT=0;
@@ -2698,23 +2755,31 @@ function draw(){
     if(d.kind==='lake'){ctx.fillStyle='#2e5f7a';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.72,0,0,7);ctx.fill();ctx.fillStyle='#3a7291';ctx.beginPath();ctx.ellipse(d.x-cam.x-20,d.y-cam.y-14,d.s*0.7,d.s*0.45,0,0,7);ctx.fill();}
     else if(d.kind==='lava'){ctx.fillStyle='#c33d10';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.78,0,0,7);ctx.fill();ctx.fillStyle='#ff7a3c';ctx.beginPath();ctx.ellipse(d.x-cam.x-16,d.y-cam.y-10,d.s*0.66,d.s*0.45,0,0,7);ctx.fill();}
   });
-  // Luminas — terraced castle town: walls, avenues, river & bridges, plaza
-  ctx.fillStyle='#8d8574';ctx.fillRect(510-cam.x,510-cam.y,1580,1580);
-  ctx.fillStyle='#9a958a';ctx.fillRect(880-cam.x,470-cam.y,700,330);ctx.fillRect(540-cam.x,690-cam.y,460,350); // terraces
+  // Luminas — a rounded, south-bulging wall ring: NE & north terraces, a
+  // river with two ponds, the fountain plaza just south of centre
+  function townPath(){ctx.beginPath();for(var ti=0;ti<=72;ti++){var tp=gatePoint(ti/72*Math.PI*2);if(ti===0)ctx.moveTo(tp.x-cam.x,tp.y-cam.y);else ctx.lineTo(tp.x-cam.x,tp.y-cam.y);}ctx.closePath();}
+  ctx.fillStyle='#8d8574';townPath();ctx.fill();
+  ctx.fillStyle='#9a958a';ctx.fillRect(1460-cam.x,440-cam.y,720,340);ctx.fillRect(880-cam.x,470-cam.y,460,300);ctx.fillRect(1400-cam.x,720-cam.y,580,290); // terraces (castle / chapel / NE mid)
   ctx.fillStyle='#7c9a52';ctx.fillRect(POND.x-72-cam.x,POND.y-66-cam.y,POND.w+144,POND.h+132); // garden green
-  ctx.fillStyle='#b3a888';ctx.fillRect(1218-cam.x,545-cam.y,164,1545);ctx.fillRect(545-cam.x,1218-cam.y,1545,164); // avenues
-  ctx.fillRect(1412-cam.x,953-cam.y,388,64);ctx.fillRect(1440-cam.x,1708-cam.y,360,64); // lanes to the bridges
-  ctx.fillStyle='#a89c80';ctx.beginPath();ctx.arc(1300-cam.x,1300-cam.y,PLAZA_R+34,0,7);ctx.fill();
-  ctx.strokeStyle='#cbbfa4';ctx.lineWidth=13;ctx.beginPath();ctx.arc(1300-cam.x,1300-cam.y,PLAZA_R,0,7);ctx.stroke();
-  // the river: falls at the north wall, a stream through town, out the south
-  ctx.fillStyle='#3a7ea6';ctx.fillRect(1655-cam.x,300-cam.y,90,2260);
-  ctx.fillStyle='#cfeafb';ctx.fillRect(1663-cam.x,516-cam.y,74,52);
-  ctx.strokeStyle='#8a8272';ctx.lineWidth=34;ctx.strokeRect(510-cam.x,510-cam.y,1580,1580); // city wall
-  ctx.fillStyle='#3a7ea6';ctx.fillRect(1655-cam.x,2073-cam.y,90,34);ctx.fillRect(1655-cam.x,493-cam.y,90,34); // water-gates stay wet
+  ctx.fillStyle='#86a04e';ctx.fillRect(80-cam.x,880-cam.y,300,420);ctx.fillStyle='#b3a05e';ctx.fillRect(80-cam.x,1300-cam.y,300,300);ctx.fillStyle='#77913f';ctx.fillRect(100-cam.x,1600-cam.y,280,260); // west fields
+  ctx.fillStyle='#b3a888';ctx.fillRect(1218-cam.x,525-cam.y,164,1505);ctx.fillRect(555-cam.x,PLAZA.y-82-cam.y,1500,164); // avenues
+  ctx.fillRect(GATE_SW.x-60-cam.x,PLAZA.y-cam.y,120,580);ctx.fillRect(GATE_SE.x-60-cam.x,PLAZA.y-cam.y,120,600); // gate streets
+  ctx.fillRect(1300-cam.x,968-cam.y,460,64); // north lane to the bridge
+  ctx.fillStyle='#a89c80';ctx.beginPath();ctx.arc(PLAZA.x-cam.x,PLAZA.y-cam.y,PLAZA_R+34,0,7);ctx.fill();
+  ctx.strokeStyle='#cbbfa4';ctx.lineWidth=13;ctx.beginPath();ctx.arc(PLAZA.x-cam.x,PLAZA.y-cam.y,PLAZA_R,0,7);ctx.stroke();
+  // the river: falls at the north wall, ponds at centre & east, out the SE water-gate
+  ctx.strokeStyle='#2e8fa8';ctx.lineWidth=90;ctx.lineJoin='round';ctx.beginPath();
+  RIVER_PTS.forEach(function(rp,ri){if(ri===0)ctx.moveTo(rp[0]-cam.x,rp[1]-cam.y);else ctx.lineTo(rp[0]-cam.x,rp[1]-cam.y);});ctx.stroke();
+  ctx.fillStyle='#2e8fa8';
+  ctx.beginPath();ctx.ellipse(CPOND.x-cam.x,CPOND.y-cam.y,CPOND.rx,CPOND.ry,0,0,7);ctx.fill();
+  ctx.beginPath();ctx.ellipse(EPOND.x-cam.x,EPOND.y-cam.y,EPOND.rx,EPOND.ry,0,0,7);ctx.fill();
+  ctx.fillStyle='#cfeafb';ctx.fillRect(FALLS_PT.x-37-cam.x,FALLS_PT.y-6-cam.y,74,52);
+  ctx.strokeStyle='#8a8272';ctx.lineWidth=34;townPath();ctx.stroke(); // the curved city wall
   ctx.fillStyle='#a34a32';
-  [[1212,2090],[1388,2090],[2090,1212],[2090,1388],[510,510],[2090,510],[510,2090],[2090,2090],[1000,510],[1560,510],[510,1300]].forEach(function(tp){ctx.beginPath();ctx.arc(tp[0]-cam.x,tp[1]-cam.y,25,0,7);ctx.fill();});
-  // dirt paths: east (extended) & south — from the city gates outward (no north gate)
-  ctx.fillStyle='#7d6b4d';ctx.fillRect(2090-cam.x,1272-cam.y,W-2090,56);ctx.fillRect(1272-cam.x,2090-cam.y,56,H-2090);
+  [[GATE_SW,GATE_SW_A],[GATE_SE,GATE_SE_A]].forEach(function(gt){var tx=-Math.sin(gt[1]),ty=Math.cos(gt[1]);[112,-112].forEach(function(off){ctx.beginPath();ctx.arc(gt[0].x+tx*off-cam.x,gt[0].y+ty*off-cam.y,25,0,7);ctx.fill();});});
+  [3.14,3.93,4.71,5.50,0,1.57,2.75].forEach(function(ba){var bp2=gatePoint(ba);ctx.beginPath();ctx.arc(bp2.x-cam.x,bp2.y-cam.y,24,0,7);ctx.fill();});
+  // dirt paths: from the SE gate eastward & the SW gate southward (no north gate)
+  ctx.fillStyle='#7d6b4d';ctx.fillRect(GATE_SE.x-cam.x,GATE_SE.y-28-cam.y,W-GATE_SE.x,56);ctx.fillRect(GATE_SW.x-28-cam.x,GATE_SW.y-cam.y,56,H-GATE_SW.y);
   // ruins floor
   ctx.fillStyle='#5d5a68';ctx.fillRect(1980-cam.x,180-cam.y,620,560);
   // obstacles: houses / ruins / fountain
@@ -2851,19 +2916,26 @@ function drawMini(){
   patch(1550,600,2600,2000,'#2f5a30');       // whispering forest
   patch(1950,150,2650,770,'#5d5a68');        // ruins
   patch(2650,150,3500,1000,'#5d5a68');       // forgotten ruins
-  patch(510,510,2090,2090,'#8d8574'); // Luminas — the walled city
+  // Luminas — the rounded walled town + its river and two ponds
+  (function(){var tx=MX(TOWN_CX),ty=MY(TOWN_CY);
+    mctx.fillStyle='#8d8574';mctx.beginPath();mctx.ellipse(tx,ty,Math.max(3,870*s),Math.max(3,870*s),0,0,7);mctx.fill();
+    mctx.strokeStyle='#2e8fa8';mctx.lineWidth=Math.max(2,80*s);mctx.lineJoin='round';mctx.beginPath();
+    RIVER_PTS.forEach(function(rp,ri){var px=MX(rp[0]),py=MY(rp[1]);if(ri===0)mctx.moveTo(px,py);else mctx.lineTo(px,py);});mctx.stroke();
+    mctx.fillStyle='#2e8fa8';
+    mctx.beginPath();mctx.ellipse(MX(CPOND.x),MY(CPOND.y),Math.max(2,CPOND.rx*s),Math.max(2,CPOND.ry*s),0,0,7);mctx.fill();
+    mctx.beginPath();mctx.ellipse(MX(EPOND.x),MY(EPOND.y),Math.max(2,EPOND.rx*s),Math.max(2,EPOND.ry*s),0,0,7);mctx.fill();
+  })();
   patch(POND.x,POND.y,POND.x+POND.w,POND.y+POND.h,'#2e6f92'); // garden pond
-  patch(1655,300,1745,2560,'#2e6f92'); // the river through town
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
     var lx=MX(d.x),ly=MY(d.y);if(lx<-40||ly<-40||lx>S+40||ly>S+40)return;
     mctx.fillStyle='#2e5f7a';mctx.beginPath();mctx.ellipse(lx,ly,Math.max(3,d.s*s),Math.max(2,d.s*0.72*s),0,0,7);mctx.fill();
   });
-  // roads (from the city gates: east / south / north)
+  // roads (from the city gates: SE gate → east, SW gate → south)
   mctx.fillStyle='#7d6b4d';
-  mctx.fillRect(MX(2090),MY(1272),S,MY(1328)-MY(1272));
-  mctx.fillRect(MX(1272),MY(2090),MX(1328)-MX(1272),S);
+  mctx.fillRect(MX(GATE_SE.x),MY(GATE_SE.y-28),S,MY(GATE_SE.y+28)-MY(GATE_SE.y-28));
+  mctx.fillRect(MX(GATE_SW.x-28),MY(GATE_SW.y),MX(GATE_SW.x+28)-MX(GATE_SW.x-28),S);
   // merchant
   var mxp=MX(MERCHANT.x),myp=MY(MERCHANT.y);
   if(mxp>=-4&&myp>=-4&&mxp<=S+4&&myp<=S+4){mctx.fillStyle='#ffd34d';mctx.fillRect(mxp-2.5,myp-2.5,5,5);}
@@ -3063,29 +3135,31 @@ function terrainH(x,y){
   if(x>3350&&y<1350)h+=Math.sin(x*0.003+0.8)*Math.cos(y*0.0035+1.9)*4;
   // the mountain ridge backing the town to the north: two high shoulders
   // with a saddle behind the castle, craggy noise on top
-  var mrx=Math.max(0,Math.min(1,(x-330)/260))*Math.max(0,Math.min(1,(2230-x)/260));
+  var mrx=Math.max(0,Math.min(1,(x-240)/300))*Math.max(0,Math.min(1,(2360-x)/300));
   var mrb=Math.exp(-Math.pow((y-215)/235,2));
   h+=mrx*mrb*(86+64*Math.sin(x*0.0016+0.7)*Math.sin(x*0.00043-0.4)+16*Math.sin(x*0.011+2.0)*Math.cos(y*0.013));
   function flatC(cx,cy,r0,r1){var d=Math.hypot(x-cx,y-cy);if(d<=r0)return 0;if(d>=r1)return 1;var t=(d-r0)/(r1-r0);return t*t*(3-2*t);}
   function flatR(x0,y0,x1,y1,m0,m1){var dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1);var d=Math.hypot(dx,dy);if(d<=m0)return 0;if(d>=m1)return 1;var t=(d-m0)/(m1-m0);return t*t*(3-2*t);}
   var f=1;
-  f*=flatC(1300,1300,400,760);        // town plaza + spawn point (1300,1470)
-  f*=flatR(470,470,2130,2130,30,300); // the whole walled city of Luminas sits level
+  f*=flatC(1300,1470,420,780);        // town plaza + spawn point (1300,1600)
+  f*=flatR(320,320,2280,2280,30,320); // the whole walled city of Luminas sits level
   f*=flatC(420,2150,300,560);         // lake 1 surface stays level
   f*=flatC(700,4300,330,600);         // lake 2 （翠玉湖）
   f*=flatC(4200,2400,180,420);        // desert oasis
   f*=flatC(4750,4100,190,420);        // lava lake
   f*=flatC(4600,4600,320,620);        // ifrit arena
-  f*=flatR(1590,1240,5200,1360,10,240); // east road (extended across the new lands)
-  f*=flatR(1240,1590,1360,5200,10,240); // south road (new)
-  f*=flatR(1540,2000,1740,2560,10,200); // river corridor south of the walls
+  f*=flatR(1760,1995,5200,2125,10,240); // east road (from the SE gate across the new lands)
+  f*=flatR(645,1900,770,5200,10,240); // south road (from the SW gate, new)
+  f*=flatR(1900,1760,2620,2440,10,200); // river corridor SE of the walls
+  f*=flatR(1450,240,1660,600,10,180); // stream corridor north of the walls
   f*=flatR(1950,150,2650,770,10,220); // ruins floor
   f*=flatR(2650,150,3500,1000,10,220); // forgotten ruins floor
   return h*f+terraceH(x,y);
 }
 /* Terraced town levels, added after the flattening so the town floor itself
-   stays level: the castle plateau (north end of the avenue) and the chapel
-   plateau (west side), each with a smooth ramped skirt. */
+   stays level: the castle plateau on the NE cliff, a mid terrace below it
+   to the south-west (the NE stepped district), and the chapel plateau at
+   the north centre — each with a smooth ramped skirt. */
 function terraceH(x,y){
   function rectH(x0,y0,x1,y1,ht,m){
     var dx=Math.max(x0-x,0,x-x1), dy=Math.max(y0-y,0,y-y1);
@@ -3093,8 +3167,19 @@ function terraceH(x,y){
     if(d>=m)return 0;
     var t=1-d/m; return ht*t*t*(3-2*t);
   }
-  return Math.max(rectH(880,470,1580,800,64,100), rectH(540,690,1000,1040,34,90));
+  return Math.max(rectH(1460,440,2180,780,72,110), rectH(1400,720,1980,1010,38,100), rectH(880,470,1340,770,36,95));
 }
+/* The river gorge: wherever the river runs across the terraces, the
+   terrace height is carved away so the stream stays on the surface and
+   the falls pour into a basin instead of sinking into the plateau. */
+var _terraceBase=terraceH;
+terraceH=function(x,y){
+  var h=_terraceBase(x,y);
+  if(h<=0)return h;
+  var rd=riverDist(x,y);
+  if(rd<110){var t=Math.max(0,(rd-40)/70); h*=t*t*(3-2*t);}
+  return h;
+};
 
 /* first-person weapon viewmodel (attached to the camera) */
 var viewModel=null, vmCls='';
@@ -3262,61 +3347,90 @@ function buildWorld3D(){
   flat(1950,2000,0xe0c084,4225,2400);       // desert
   flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
   flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
-  // Luminas — city ground, grand avenues, plaza disc, pond garden lawn
-  flat(1580,1580,0x8d8574,1300,1300);                       // city ground inside the walls
-  flat(164,800,0xb3a888,1300,1690,0,1.0);                   // grand avenue, south half (plaza ↔ south gate)
-  flat(164,560,0xb3a888,1300,1020,0,1.0);                   // grand avenue, mid stretch (plaza ↔ terrace steps)
-  flat(164,300,0xb3a888,1300,660,0,1.0);                    // grand avenue across the castle terrace
-  flat(1550,164,0xb3a888,1305,1300,0,1.0);                  // cross avenue (west wall ↔ east gate — its river span is the great bridge)
-  flat(700,340,0x8d8574,1230,635,0,0.5);                    // castle terrace stone apron
-  flat(480,360,0x8d8574,770,865,0,0.5);                     // chapel terrace stone apron
-  flat(388,64,0xb3a888,1606,985,0,1.0);                     // north lane to the river bridge
-  flat(360,64,0xb3a888,1620,1740,0,1.0);                    // south lane to the river bridge
-  // grand staircase: stone steps climbing the avenue onto the castle terrace
-  for(var sti=0;sti<6;sti++){
-    var sty=892-sti*23, stTop=terrainH(1300,sty)+4.5;
+  // Luminas — city ground: two overlapping stone discs follow the rounded,
+  // south-bulging wall ring (no square slab any more)
+  (function(){
+    var cg1=new THREE.Mesh(G('cityGround',function(){return new THREE.CircleGeometry(880,48);}),M(0x8d8574));
+    cg1.rotation.x=-Math.PI/2;cg1.position.set(WX(1300),terrainH(1300,1330)+2,WZ(1330));cg1.receiveShadow=true;staticGroup.add(cg1);
+    var cg2=new THREE.Mesh(G('cityGroundS',function(){return new THREE.CircleGeometry(600,40);}),M(0x8d8574));
+    cg2.rotation.x=-Math.PI/2;cg2.position.set(WX(1300),terrainH(1300,1780)+2.15,WZ(1780));cg2.receiveShadow=true;staticGroup.add(cg2);
+  })();
+  flat(164,640,0xb3a888,1300,1150,0,1.0);                   // grand avenue, north (plaza ↔ terraces)
+  flat(164,330,0xb3a888,1300,690,0,1.0);                    // grand avenue across the chapel terrace front
+  flat(164,580,0xb3a888,1300,1760,0,1.0);                   // grand avenue, south (plaza ↔ south garden)
+  flat(1500,164,0xb3a888,1305,1470,0,1.0);                  // cross avenue (west wall ↔ east pond bridge)
+  flat(120,580,0xb3a888,GATE_SW.x,1760,0,1.0);              // SW gate street
+  flat(120,600,0xb3a888,GATE_SE.x,1770,0,1.0);              // SE gate street
+  flat(620,340,0x8d8574,1720,610,0,0.5);                    // castle terrace stone apron
+  flat(480,320,0x8d8574,1110,620,0,0.5);                    // chapel terrace stone apron
+  flat(580,300,0x8d8574,1690,865,0,0.5);                    // NE mid-terrace apron
+  flat(460,64,0xb3a888,1530,1000,0,1.0);                    // north lane to the river bridge
+  // grand staircase: stone steps climbing the avenue onto the chapel terrace
+  for(var sti=0;sti<5;sti++){
+    var sty=852-sti*23, stTop=terrainH(1300,sty)+4.5;
     box(176,stTop,26,0x9a958a,WX(1300),stTop/2,WZ(sty),staticGroup);
   }
-  // chapel steps: a short flight up the west terrace toward the chapel
+  // NE terrace steps: a flight climbing from the north lane onto the mid terrace
+  for(var nsi=0;nsi<5;nsi++){
+    var nsy=1006-nsi*22, nsTop=terrainH(1690,nsy)+4.5;
+    box(190,nsTop,24,0x9a958a,WX(1690),nsTop/2,WZ(nsy),staticGroup);
+  }
+  // chapel steps: a short flight up from the avenue toward the chapel
   for(var csi=0;csi<4;csi++){
-    var csx=1112-csi*24, csTop=terrainH(csx,865)+4.5;
-    box(26,csTop,64,0x9a958a,WX(csx),csTop/2,WZ(865),staticGroup);
+    var csx=1312-csi*24, csTop=terrainH(csx,640)+4.5;
+    box(26,csTop,64,0x9a958a,WX(csx),csTop/2,WZ(640),staticGroup);
   }
   (function(){var pd=new THREE.Mesh(G('plazaDisc',function(){return new THREE.CircleGeometry(PLAZA_R+36,40);}),M(0xa89c80));
-    pd.rotation.x=-Math.PI/2;pd.position.set(WX(1300),5.4,WZ(1300));pd.receiveShadow=true;staticGroup.add(pd);})();
+    pd.rotation.x=-Math.PI/2;pd.position.set(WX(PLAZA.x),5.4,WZ(PLAZA.y));pd.receiveShadow=true;staticGroup.add(pd);})();
   flat(POND.w+150,POND.h+140,0x5d8148,POND.x+POND.w/2,POND.y+POND.h/2,0,0.5); // garden lawn
-  flat(3110,56,0x7d6b4d,3645,1300,0,0.7);   // east road (from the east gate to the new lands)
-  flat(56,3110,0x7d6b4d,1300,3645,0,0.7);   // south road (from the south gate)
+  // west fields outside the walls: patchwork crop plots on the grassland
+  flat(300,420,0x86a04e,230,1090,0,0.3);
+  flat(300,300,0xb3a05e,230,1450,0,0.35);
+  flat(280,260,0x77913f,240,1700,0,0.3);
+  flat(3110,56,0x7d6b4d,3750,2060,0,0.7);   // east road (from the SE gate to the new lands)
+  flat(56,3110,0x7d6b4d,GATE_SW.x,3650,0,0.7);   // south road (from the SW gate)
   // ruins floors
   flat(620,560,0x5d5a68,2290,460);
   flat(850,850,0x6a6455,3075,575);
-  // ---- the Luminas river: a stream at the north wall's foot, falls pouring
-  //      through the water-gate into a basin, a wading stream through town
-  //      under three stone bridges, out the south water-gate ----
+  // ---- the Luminas river: a stream from the northern rocks, falls pouring
+  //      through the north water-gate, widening into a pond at the town
+  //      centre, a second pond on the east side, then out of the SE
+  //      water-gate. The ribbon follows RIVER_PTS segment by segment. ----
   (function(){
-    var bed=0x4a4238, wat=M(0x3a90c2,{transparent:true,opacity:0.85});
-    function slab(w,d,color,x,y2d,top,mat){
-      var m=new THREE.Mesh(G('rs'+w+'_'+d+'_'+top,function(){return new THREE.BoxGeometry(w,3,d);}),mat||M(color));
-      m.position.set(WX(x),top-1.5,WZ(y2d));m.receiveShadow=true;staticGroup.add(m);return m;
+    var bed=0x4a4238, wat=M(0x2e8fa8,{transparent:true,opacity:0.85});
+    function ribbon(wdt,color,pts,top,mat){
+      for(var i=0;i<pts.length-1;i++){
+        var ax=pts[i][0],ay=pts[i][1],bx=pts[i+1][0],by=pts[i+1][1];
+        var len=Math.hypot(bx-ax,by-ay)+wdt*0.7;
+        var m=new THREE.Mesh(G('rib'+wdt+'_'+Math.round(len),function(){return new THREE.BoxGeometry(len,3,wdt);}),mat||M(color));
+        m.position.set(WX((ax+bx)/2),top-1.5,WZ((ay+by)/2));
+        m.rotation.y=-Math.atan2(by-ay,bx-ax);
+        m.receiveShadow=true;staticGroup.add(m);
+      }
     }
-    slab(116,2060,bed,RIVER_X,1580,-0.6);                       // riverbed (town + south corridor)
-    var wtr=slab(94,2050,0,RIVER_X,1585,2.6,wat);wtr.castShadow=false;   // water surface
-    slab(116,180,bed,RIVER_X,455,terrainH(RIVER_X,455)+1.2);    // stream bed outside the north wall
-    var wtr2=slab(94,170,0,RIVER_X,458,terrainH(RIVER_X,458)+3.2,wat);wtr2.castShadow=false;
+    function pondDisc(p,rad,top,mat){
+      var m=new THREE.Mesh(G('pondD'+rad,function(){return new THREE.CircleGeometry(rad,36);}),mat);
+      m.rotation.x=-Math.PI/2;m.scale.set(1,p.ry/p.rx,1);
+      m.position.set(WX(p.x),top,WZ(p.y));m.receiveShadow=true;staticGroup.add(m);return m;
+    }
+    ribbon(116,bed,RIVER_PTS,-0.6);                       // riverbed
+    ribbon(94,0,RIVER_PTS,2.6,wat);                       // water surface (blue-green)
+    pondDisc(CPOND,CPOND.rx+16,-0.5,M(bed)); pondDisc(CPOND,CPOND.rx,2.6,wat);   // centre pond
+    pondDisc(EPOND,EPOND.rx+16,-0.5,M(bed)); pondDisc(EPOND,EPOND.rx,2.6,wat);   // east pond
     // falls: two translucent sheets pouring into the basin + foam pillows
     var fallMat=M(0xcfeafb,{transparent:true,opacity:0.75});
     var f1=new THREE.Mesh(G('falls1',function(){return new THREE.BoxGeometry(84,120,3);}),fallMat);
-    f1.position.set(WX(RIVER_X),58,WZ(578));f1.rotation.x=0.16;staticGroup.add(f1);
+    f1.position.set(WX(FALLS_PT.x),58,WZ(FALLS_PT.y+8));f1.rotation.x=0.16;staticGroup.add(f1);
     var f2=new THREE.Mesh(G('falls2',function(){return new THREE.BoxGeometry(60,96,3);}),fallMat);
-    f2.position.set(WX(RIVER_X),48,WZ(586));f2.rotation.x=0.16;staticGroup.add(f2);
-    box(110,14,10,0x6e675c,WX(RIVER_X),122,WZ(572),staticGroup);         // stone spout lip above the falls
-    for(var fi=0;fi<5;fi++){var fm=sph(10+fi*2.2,0xeaf6ff,WX(RIVER_X-34+fi*17),4,WZ(596+((fi*13)%22)),staticGroup,{transparent:true,opacity:0.9});fm.castShadow=false;fm.scale.y=0.5;}
-    // bridge parapets where the avenues & lanes cross the river
-    [[1300,78],[985,28],[1740,28]].forEach(function(bp){
-      box(150,10,7,0x8a8578,WX(RIVER_X),9,WZ(bp[0]-bp[1]),staticGroup);
-      box(150,10,7,0x8a8578,WX(RIVER_X),9,WZ(bp[0]+bp[1]),staticGroup);
-      box(150,4,7,0x9a958a,WX(RIVER_X),15,WZ(bp[0]-bp[1]),staticGroup);
-      box(150,4,7,0x9a958a,WX(RIVER_X),15,WZ(bp[0]+bp[1]),staticGroup);
+    f2.position.set(WX(FALLS_PT.x),48,WZ(FALLS_PT.y+16));f2.rotation.x=0.16;staticGroup.add(f2);
+    box(110,14,10,0x6e675c,WX(FALLS_PT.x),122,WZ(FALLS_PT.y+2),staticGroup);         // stone spout lip above the falls
+    for(var fi=0;fi<5;fi++){var fm=sph(10+fi*2.2,0xeaf6ff,WX(FALLS_PT.x-34+fi*17),4,WZ(FALLS_PT.y+28+((fi*13)%22)),staticGroup,{transparent:true,opacity:0.9});fm.castShadow=false;fm.scale.y=0.5;}
+    // bridge parapets: the north lane bridge and the east avenue bridge
+    [[1520,1000],[1991,1470]].forEach(function(bp){
+      box(170,10,7,0x8a8578,WX(bp[0]),9,WZ(bp[1]-42),staticGroup);
+      box(170,10,7,0x8a8578,WX(bp[0]),9,WZ(bp[1]+42),staticGroup);
+      box(170,4,7,0x9a958a,WX(bp[0]),15,WZ(bp[1]-42),staticGroup);
+      box(170,4,7,0x9a958a,WX(bp[0]),15,WZ(bp[1]+42),staticGroup);
     });
   })();
   // lakes
@@ -3351,7 +3465,7 @@ function buildWorld3D(){
   })();
   // circular plaza colonnade ring + avenue lamps + pond garden hedges
   (function(){
-    var pg=new THREE.Group();pg.position.set(WX(1300),terrainH(1300,1300),WZ(1300));staticGroup.add(pg);
+    var pg=new THREE.Group();pg.position.set(WX(PLAZA.x),terrainH(PLAZA.x,PLAZA.y),WZ(PLAZA.y));staticGroup.add(pg);
     // flat stone ring on the plaza floor under the colonnade (no tube geometry)
     var step=new THREE.Mesh(G('plazaRing',function(){return new THREE.RingGeometry(PLAZA_R-15,PLAZA_R+17,56);}),M(0x8a8272));
     step.rotation.x=-Math.PI/2;step.position.y=5.55;step.receiveShadow=true;pg.add(step);
@@ -3376,9 +3490,9 @@ function buildWorld3D(){
       band.rotation.y=-am-Math.PI/2;
     }
     // lamp posts lining the grand avenue (warm globes)
-    for(var ly=830;ly<=1990;ly+=232){
+    for(var ly=640;ly<=2010;ly+=232){
       [-104,104].forEach(function(off){
-        if(Math.abs(ly-1300)<PLAZA_R+40)return;
+        if(Math.abs(ly-PLAZA.y)<PLAZA_R+40)return;
         var lg=new THREE.Group();lg.position.set(WX(1300+off),terrainH(1300+off,ly),WZ(ly));staticGroup.add(lg);
         cyl(2.2,3,66,0x3a3f45,0,33,0,lg,6);
         var gl=sph(6,0xffd98a,0,70,0,lg,{emissive:0xcc8a2a});gl.castShadow=false;
@@ -3425,7 +3539,8 @@ function buildWorld3D(){
       }else if(o.wall){
         var wg=new THREE.Group();wg.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(wg);
         box(o.w,210,o.h,0x9a958a,0,55,0,wg);                          // sunk deep so terrace runs never float
-        box(o.w,10,o.h+10,0x8a8578,0,165,0,wg);                       // parapet cap
+        box(o.w+16,7,o.h+16,0xa39c8c,0,150,0,wg);                     // wall-top walkway（歩廊）
+        box(o.w,10,o.h+10,0x8a8578,0,165,0,wg);                       // parapet cap（胸壁）
         var horiz=o.w>=o.h, span=horiz?o.w:o.h;
         for(var ci2=26;ci2<span-10;ci2+=56){                          // crenellations
           if(horiz)box(22,20,o.h+8,0x9a958a,-o.w/2+ci2,177,0,wg);
@@ -4187,7 +4302,7 @@ $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
 $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
-  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1470;jumpY=0;jumpVY=0;
+  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1600;jumpY=0;jumpVY=0;
   $('deathScreen').style.display='none';updateHUD();toast('ルミナスの町で復活した');
   relockPointer();
   netSendPos(true);
