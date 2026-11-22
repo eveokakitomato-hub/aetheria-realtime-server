@@ -199,6 +199,24 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .help-card td{padding:7px 6px;border-top:1px solid var(--line);color:var(--muted)}
 .help-card td:first-child{color:#fff;font-weight:700;white-space:nowrap;width:130px}
 .help-card button{width:100%;margin-top:14px;background:var(--gold);border:0;border-radius:6px;padding:11px;font-weight:900;color:#1c1503}
+#settingsModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+.settings-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:520px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
+.settings-card h2{margin:0 0 4px;font-size:18px}
+.settings-card .set-note{font-size:11px;color:var(--muted);line-height:1.6;margin:0 0 6px}
+.settings-card h3{font-size:12px;letter-spacing:.12em;color:var(--gold);margin:16px 0 2px}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid var(--line)}
+.set-row .set-label{font-size:13px;font-weight:700}
+.set-row .set-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px}
+.set-ctl{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.set-ctl input[type=range]{accent-color:var(--gold);width:130px;min-height:28px}
+.set-val{font-size:12px;font-weight:900;color:var(--gold);min-width:44px;text-align:right}
+.key-btn{min-width:96px;background:#0b100e;border:1px solid var(--line2);color:var(--gold);border-radius:6px;padding:8px 12px;font-weight:900;font-size:13px}
+.key-btn:hover{border-color:var(--gold)}
+.key-btn.listening{border-color:var(--gold);background:#2a2413;color:#fff;box-shadow:0 0 0 3px rgba(232,194,104,.25)}
+.settings-actions{display:grid;gap:8px;margin-top:16px}
+.settings-actions button{border-radius:7px;padding:12px;font-weight:900;font-size:14px;border:1px solid var(--line2)}
+#resetSettingsBtn{background:var(--panel2);color:var(--paper)}
+#closeSettingsBtn{background:var(--gold);color:#1c1503;border-color:var(--gold)}
 
 /* ===== PRODUCTION / OFFICIAL SITE ===== */
 #startScreen{flex-direction:column;align-items:center;justify-content:flex-start;padding:0;background:linear-gradient(180deg,#0a120d 0%,#070b09 100%)}
@@ -354,6 +372,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <div class="top-actions">
           <button class="icon-btn" id="saveBtn" title="セーブ">💾</button>
           <button class="icon-btn" id="soundBtn" title="サウンド ON/OFF">♪</button>
+          <button class="icon-btn" id="settingsBtn" title="設定（キー・感度）">⚙</button>
           <button class="icon-btn" id="helpBtn" title="遊び方">?</button>
         </div>
       </div>
@@ -407,7 +426,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="skill"><button id="skill2"><span class="key">2</span><span id="s2ico">🌀</span><span class="cd"></span></button><small id="s2name">旋風斬</small></div>
       <div class="skill"><button id="skill3"><span class="key">3</span><span id="s3ico">✦</span><span class="cd"></span></button><small id="s3name">奥義</small></div>
       <div class="skill potion"><button id="potionBtn"><span class="key">Q</span>🧪<span class="cd"></span></button><small>ポーション</small></div>
-      <div class="skill atk-skill"><button id="attackBtn">⚔</button><small>攻撃 / Space</small></div>
+      <div class="skill atk-skill"><button id="attackBtn">⚔</button><small id="atkLabel">攻撃 / Space</small></div>
     </div>
 
     <div id="joystick"><div id="stick"></div></div>
@@ -422,8 +441,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
         <tr><td>視点（一人称）</td><td>自分の目線で冒険できます。画面をクリックするとカーソルがロックされ、<b>マウスカーソルを動かすだけ</b>で上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグでも見回せて、<b>カーソルキー</b> <kbd>←</kbd><kbd>→</kbd> で左右、<kbd>↑</kbd><kbd>↓</kbd> で上下の視点移動もできます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
         <tr><td>攻撃</td><td><kbd>Space</kbd> または右下の剣ボタン。近くの敵を自動で狙います</td></tr>
-        <tr><td>スキル</td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
-        <tr><td>ポーション</td><td><kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
+        <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
+        <tr><td>ポーション</td><td>初期設定は <kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
+        <tr><td>設定</td><td>右上の ⚙ ボタンで、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
         <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
         <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はNPC冒険者と遊ぶモードになります</td></tr>
         <tr><td>セーブ</td><td>右上の 💾 ボタン（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でセーブデータをファイルに保存。タイトルの「つづきから」でそのファイルを選ぶと再開できます</td></tr>
@@ -431,6 +451,24 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）</td></tr>
       </table>
       <button id="closeHelp">閉じる</button>
+    </div></div>
+
+    <div id="settingsModal"><div class="settings-card">
+      <h2>⚙ 設定</h2>
+      <p class="set-note">技や攻撃のキー割り当てと、視点の感度を調整できます。変更はすぐに反映され、この端末に保存されます（再読み込みしても残ります）。移動の WASD とカーソルキーの視点移動は固定です。</p>
+      <h3>キー割り当て</h3>
+      <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー</div></div><button type="button" class="key-btn" data-bind="attack">Space</button></div>
+      <div class="set-row"><div><div class="set-label">スキル1</div><div class="set-desc" id="bindDesc1">強撃 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s1">1</button></div>
+      <div class="set-row"><div><div class="set-label">スキル2</div><div class="set-desc" id="bindDesc2">旋風斬 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s2">2</button></div>
+      <div class="set-row"><div><div class="set-label">スキル3（奥義）</div><div class="set-desc" id="bindDesc3">天覇断空斬 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s3">3</button></div>
+      <div class="set-row"><div><div class="set-label">ポーション</div><div class="set-desc">HPを45回復するキー</div></div><button type="button" class="key-btn" data-bind="potion">Q</button></div>
+      <h3>感度</h3>
+      <div class="set-row"><div><div class="set-label">マウス感度</div><div class="set-desc">マウスロック中・ドラッグで見回す速さ</div></div><div class="set-ctl"><input type="range" id="sensRange" min="30" max="250" step="5" value="100"/><span class="set-val" id="sensVal">100%</span></div></div>
+      <div class="set-row"><div><div class="set-label">カーソルキー感度</div><div class="set-desc">矢印キーで視点を回す速さ</div></div><div class="set-ctl"><input type="range" id="keySensRange" min="30" max="250" step="5" value="100"/><span class="set-val" id="keySensVal">100%</span></div></div>
+      <div class="settings-actions">
+        <button id="resetSettingsBtn" type="button">初期設定に戻す</button>
+        <button id="closeSettingsBtn" type="button">閉じる</button>
+      </div>
     </div></div>
 
     <div id="saveModal"><div class="save-card">
@@ -666,6 +704,87 @@ var skillCd={s1:0,s2:0,s3:0};
 var selectedClass='warrior';
 var lastSaveAt=null, lastSavedKey='', saveLoadContext='title';
 var obstacles=[], decorations=[];
+
+/* ================= SETTINGS (key bindings & sensitivity) ================= */
+var DEFAULT_BINDS={attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
+var settings={binds:{attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1};
+var SETTINGS_KEY='aetheria-settings-v1';
+function saveSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){}}
+function loadSettings(){
+  try{
+    var raw=localStorage.getItem(SETTINGS_KEY); if(!raw)return;
+    var s=JSON.parse(raw); if(!s||typeof s!=='object')return;
+    if(s.binds&&typeof s.binds==='object'){
+      var used={};
+      for(var k2 in DEFAULT_BINDS){
+        var code=s.binds[k2];
+        if(typeof code==='string'&&code&&!used[code]){settings.binds[k2]=code;used[code]=1;}
+      }
+    }
+    if(typeof s.sens==='number')settings.sens=Math.max(0.3,Math.min(2.5,s.sens));
+    if(typeof s.keySens==='number')settings.keySens=Math.max(0.3,Math.min(2.5,s.keySens));
+  }catch(e){}
+}
+loadSettings();
+var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1};
+var captureBind=null; // action name currently waiting for a key press
+function keyLabel(code){
+  if(!code)return '—';
+  var map={Space:'Space',ShiftLeft:'Shift',ShiftRight:'Shift',ControlLeft:'Ctrl',ControlRight:'Ctrl',AltLeft:'Alt',AltRight:'Alt',
+    Tab:'Tab',CapsLock:'CapsLock',Backquote:'`',Minus:'-',Equal:'=',BracketLeft:'[',BracketRight:']',Backslash:'\\',
+    Semicolon:';',Quote:"'",Comma:',',Period:'.',Slash:'/',Escape:'Esc'};
+  if(map[code])return map[code];
+  if(code.indexOf('Key')===0)return code.slice(3);
+  if(code.indexOf('Digit')===0)return code.slice(5);
+  if(code.indexOf('Numpad')===0)return 'Num'+code.slice(6);
+  return code;
+}
+function refreshKeyLabels(){
+  var b=settings.binds;
+  var k1=$('skill1').querySelector('.key'),k2=$('skill2').querySelector('.key'),k3=$('skill3').querySelector('.key'),kq=$('potionBtn').querySelector('.key');
+  if(k1)k1.textContent=keyLabel(b.s1);
+  if(k2)k2.textContent=keyLabel(b.s2);
+  if(k3)k3.textContent=keyLabel(b.s3);
+  if(kq)kq.textContent=keyLabel(b.potion);
+  var al=$('atkLabel'); if(al)al.textContent='攻撃 / '+keyLabel(b.attack);
+  document.querySelectorAll('.key-btn[data-bind]').forEach(function(btn){
+    var act=btn.getAttribute('data-bind');
+    if(captureBind===act){btn.textContent='キーを押して…';btn.classList.add('listening');}
+    else{btn.textContent=keyLabel(b[act]);btn.classList.remove('listening');}
+  });
+}
+function refreshSensUI(){
+  var sp=Math.round(settings.sens*100),kp=Math.round(settings.keySens*100);
+  var sr=$('sensRange'),sv=$('sensVal'),kr=$('keySensRange'),kv=$('keySensVal');
+  if(sr)sr.value=sp; if(sv)sv.textContent=sp+'%';
+  if(kr)kr.value=kp; if(kv)kv.textContent=kp+'%';
+}
+function refreshBindDescs(){
+  if(!player)return;
+  var c=CLASSES[player.cls];
+  var d1=$('bindDesc1'),d2=$('bindDesc2'),d3=$('bindDesc3');
+  if(d1)d1.textContent=c.s1.name+'（MP '+c.s1.mp+'）';
+  if(d2)d2.textContent=c.s2.name+'（MP '+c.s2.mp+'）';
+  if(d3)d3.textContent=c.s3.name+'（MP '+c.s3.mp+'）';
+}
+function handleBindCapture(e){
+  var act=captureBind; captureBind=null;
+  e.preventDefault();
+  if(e.code!=='Escape'){
+    if(RESERVED_KEYS[e.code]){toast('そのキーは移動・視点・チャット用に予約されています');}
+    else if(['ShiftLeft','ShiftRight','ControlLeft','ControlRight','AltLeft','AltRight','MetaLeft','MetaRight'].indexOf(e.code)>=0){toast('修飾キー単体には割り当てできません');}
+    else{
+      // if another action already uses this key, swap the two bindings
+      for(var other in settings.binds){
+        if(other!==act&&settings.binds[other]===e.code)settings.binds[other]=settings.binds[act];
+      }
+      settings.binds[act]=e.code;
+      beep(700,0.06,'square',0.03);
+    }
+  }
+  refreshKeyLabels();
+  saveSettings();
+}
 
 /* ================= REALTIME SYNC (public server) =================
    Protocol 2 client for the deployed sync server. Positions are sent in
@@ -1139,9 +1258,9 @@ function updateSkillUI(now){
 function update(dt,now){
   if(!player||player.dead){return;}
   // cursor (arrow) keys rotate the camera view instead of moving
-  var typing=document.activeElement===$('chatInput')||document.activeElement===$('nameInput');
+  var typing=document.activeElement===$('chatInput')||document.activeElement===$('nameInput')||document.activeElement===$('sensRange')||document.activeElement===$('keySensRange');
   if(!typing){
-    var rotSpd=dt*0.0019;
+    var rotSpd=dt*0.0019*settings.keySens;
     if(keys['ArrowLeft'])camYaw+=rotSpd;
     if(keys['ArrowRight'])camYaw-=rotSpd;
     if(keys['ArrowUp'])camPitch=Math.min(1.35,camPitch+rotSpd*0.75);
@@ -1747,8 +1866,8 @@ function setupCameraControls(){
   /* mouse look: while pointer-locked, plain cursor movement rotates the view */
   document.addEventListener('mousemove',function(e){
     if(!isLocked()||!started||!player||player.dead)return;
-    camYaw-=(e.movementX||0)*0.0028;
-    camPitch=Math.max(-1.15,Math.min(1.35,camPitch-(e.movementY||0)*0.0025));
+    camYaw-=(e.movementX||0)*0.0028*settings.sens;
+    camPitch=Math.max(-1.15,Math.min(1.35,camPitch-(e.movementY||0)*0.0025*settings.sens));
   });
   /* while locked, a click is an attack (aim is the center crosshair) */
   document.addEventListener('pointerdown',function(e){
@@ -1766,8 +1885,8 @@ function setupCameraControls(){
     if(!dragging||isLocked())return;
     var dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;
     moved+=Math.abs(dx)+Math.abs(dy);
-    camYaw-=dx*0.005;
-    camPitch=Math.max(-1.15,Math.min(1.35,camPitch-dy*0.0045));
+    camYaw-=dx*0.005*settings.sens;
+    camPitch=Math.max(-1.15,Math.min(1.35,camPitch-dy*0.0045*settings.sens));
   });
   function up(e){
     if(!dragging)return;dragging=false;
@@ -1846,14 +1965,17 @@ function resize(){
 }
 window.addEventListener('resize',resize);
 document.addEventListener('keydown',function(e){
+  if(captureBind){handleBindCapture(e);return;}
+  if($('settingsModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&e.code.indexOf('Arrow')===0&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput'))e.preventDefault();
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started)downloadSave();return;}
   if(!started)return;
   if(document.activeElement===$('chatInput'))return;
-  if(e.code==='Space'){e.preventDefault();playerAttack(1);}
-  if(e.code==='Digit1')useSkill(1); if(e.code==='Digit2')useSkill(2); if(e.code==='Digit3')useSkill(3);
-  if(e.code==='KeyQ')usePotion();
+  var b=settings.binds;
+  if(e.code===b.attack){e.preventDefault();playerAttack(1);}
+  if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
+  if(e.code===b.potion)usePotion();
   if(e.code==='Enter'){e.preventDefault();$('chatInput').focus();}
 });
 document.addEventListener('keyup',function(e){keys[e.code]=false;});
@@ -1903,6 +2025,23 @@ $('saveFileInput').addEventListener('change',function(){
   reader.onerror=function(){toast('ファイルの読み込みに失敗しました');};
   reader.readAsText(f);
 });
+$('settingsBtn').addEventListener('click',function(){captureBind=null;refreshKeyLabels();refreshSensUI();refreshBindDescs();$('settingsModal').style.display='grid';});
+$('closeSettingsBtn').addEventListener('click',function(){captureBind=null;refreshKeyLabels();$('settingsModal').style.display='none';});
+document.querySelectorAll('.key-btn[data-bind]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    captureBind=(captureBind===btn.getAttribute('data-bind'))?null:btn.getAttribute('data-bind');
+    refreshKeyLabels();
+  });
+});
+$('sensRange').addEventListener('input',function(){settings.sens=this.value/100;refreshSensUI();saveSettings();});
+$('keySensRange').addEventListener('input',function(){settings.keySens=this.value/100;refreshSensUI();saveSettings();});
+$('resetSettingsBtn').addEventListener('click',function(){
+  settings.binds={attack:DEFAULT_BINDS.attack,s1:DEFAULT_BINDS.s1,s2:DEFAULT_BINDS.s2,s3:DEFAULT_BINDS.s3,potion:DEFAULT_BINDS.potion};
+  settings.sens=1;settings.keySens=1;captureBind=null;
+  refreshKeyLabels();refreshSensUI();saveSettings();
+  toast('設定を初期状態に戻しました');beep(600,0.06,'square',0.03);
+});
+refreshKeyLabels();
 $('helpBtn').addEventListener('click',function(){$('helpModal').style.display='grid';});
 $('closeHelp').addEventListener('click',function(){$('helpModal').style.display='none';});
 $('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'♪':'✕';toast(soundOn?'サウンド ON':'サウンド OFF');});
