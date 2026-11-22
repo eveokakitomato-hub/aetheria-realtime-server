@@ -38,7 +38,7 @@ canvas{display:block}
 .nametag .ehp i{display:block;height:100%;background:#e5484d}
 .dmg-float{position:absolute;left:0;top:0;transform:translate(-50%,-100%);font-weight:700;font-size:14px;color:#fff;text-shadow:0 1px 3px #000,0 0 6px rgba(0,0,0,.5);white-space:nowrap;will-change:transform,opacity}
 .dmg-float.big{font-size:19px;font-weight:900}
-#camHint{position:absolute;left:50%;transform:translateX(-50%);bottom:96px;z-index:17;background:rgba(10,14,12,.75);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:5px 12px;border-radius:999px;pointer-events:none}
+#camHint{position:absolute;left:50%;transform:translateX(-50%);bottom:152px;z-index:17;background:rgba(10,14,12,.75);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:5px 12px;border-radius:999px;pointer-events:none}
 #crosshair{position:absolute;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);z-index:17;pointer-events:none}
 #crosshair::before,#crosshair::after{content:"";position:absolute;background:rgba(255,255,255,.85);box-shadow:0 0 3px rgba(0,0,0,.8)}
 #crosshair::before{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%);clip-path:polygon(0 0,100% 0,100% 32%,0 32%,0 68%,100% 68%,100% 100%,0 100%)}
@@ -59,8 +59,8 @@ canvas{display:block}
 .icon-btn{width:38px;height:38px;border:1px solid var(--line2);background:rgba(10,14,12,.85);color:var(--paper);border-radius:6px;display:grid;place-items:center;font-size:16px}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold)}
 
-/* ===== PLAYER HUD (bottom, above chat) — basic status only ===== */
-#hud{position:absolute;left:12px;bottom:188px;width:340px;max-width:calc(100vw - 24px);z-index:20}
+/* ===== PLAYER HUD (bottom-center) — basic status only ===== */
+#hud{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:340px;max-width:calc(100vw - 24px);z-index:20}
 .char-card{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;backdrop-filter:blur(8px)}
 .char-top{display:flex;gap:10px;align-items:center}
 .avatar{width:46px;height:46px;border-radius:6px;border:2px solid var(--gold2);display:grid;place-items:center;font-size:24px;flex-shrink:0;background:#223128}
@@ -114,8 +114,8 @@ canvas{display:block}
 #chatInput{flex:1;background:transparent;border:0;color:#fff;padding:9px 10px;font-size:13px;outline:none;min-width:0}
 #chatForm button{background:var(--gold);border:0;font-weight:900;padding:0 16px;color:#1c1503}
 
-/* ===== ACTION BAR (right side, vertical stack, mid-to-lower — below minimap/quest) ===== */
-#actionbar{position:absolute;right:12px;bottom:12px;left:auto;transform:none;z-index:22;display:flex;flex-direction:column;gap:8px;align-items:center}
+/* ===== ACTION BAR (top-left, vertical stack — below the top bar) ===== */
+#actionbar{position:absolute;left:12px;top:66px;right:auto;bottom:auto;transform:none;z-index:22;display:flex;flex-direction:column;gap:8px;align-items:center}
 .skill{width:58px;text-align:center}
 .skill button{width:58px;height:58px;border-radius:8px;border:1px solid var(--line2);background:rgba(12,18,15,.92);color:#fff;font-size:24px;position:relative;overflow:hidden;display:grid;place-items:center}
 .skill button:hover{border-color:var(--gold)}
@@ -241,6 +241,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .menu-item.danger b{color:#f0a3a8}
 .menu-note{font-size:11px;color:var(--dim);line-height:1.6;margin:12px 0 0}
 #bagModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+#playersModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
 .bag-card h2{margin:0 0 4px;font-size:18px}
 .bag-card .sub{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 6px}
@@ -308,7 +309,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 @media(max-width:900px){.news-grid{grid-template-columns:1fr}.official-nav{display:none}.start-wrap{padding:12px 12px 4px}.news-grid,.official-foot{padding-left:12px;padding-right:12px}}
 
 @media(max-width:900px){
-  #hud{top:auto;bottom:122px;left:10px;width:min(248px,56vw)}
+  #hud{top:auto;bottom:122px;left:50%;transform:translateX(-50%);width:min(248px,56vw)}
   #hud .char-card{padding:8px 9px}
   #hud .avatar{width:38px;height:38px;font-size:20px}
   #rightPanel{top:58px;right:10px;width:150px;max-height:262px}
@@ -320,7 +321,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   #playerList{display:none}
   #chatLog{height:64px}
   #chat{left:10px;bottom:10px;width:calc(100vw - 20px)}
-  #actionbar{top:330px;bottom:auto;left:auto;right:10px;transform:none;flex-direction:column;gap:6px}
+  #actionbar{top:66px;bottom:auto;left:10px;right:auto;transform:none;flex-direction:column;gap:6px}
   .skill{width:50px}.skill button{width:50px;height:50px;font-size:20px}
   .skill small{display:none}
   .skill.atk-skill{width:56px}
@@ -457,7 +458,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="topbar">
       <div class="brand"><div class="brand-badge">A</div><div><b>AETHERIA</b><span>ONLINE</span></div></div>
       <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end">
-        <div class="online-pill"><span class="dot" id="netDot"></span><span id="onlineCount">接続中…</span><span class="srv-sep" style="color:var(--dim)">|</span><span class="srv-name" id="srvName" style="color:var(--muted)">公開サーバー: ルミナス</span></div>
+        <div class="online-pill"><span class="dot" id="netDot"></span><span id="onlineCount">オンライン 0人</span></div>
       </div>
     </div>
 
@@ -505,7 +506,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="skill"><button id="skill2"><span class="key">2</span><span id="s2ico">🌀</span><span class="cd"></span></button><small id="s2name">旋風斬</small></div>
       <div class="skill"><button id="skill3"><span class="key">3</span><span id="s3ico">✦</span><span class="cd"></span></button><small id="s3name">奥義</small></div>
       <div class="skill potion"><button id="potionBtn"><span class="key">Q</span>🧪<span class="cd"></span></button><small>ポーション</small></div>
-      <div class="skill atk-skill"><button id="attackBtn">⚔</button><small id="atkLabel">攻撃 / Space</small></div>
+      <div class="skill atk-skill"><button id="attackBtn">⚔</button><small id="atkLabel">攻撃 / F</small></div>
     </div>
 
     <div id="joystick"><div id="stick"></div></div>
@@ -519,7 +520,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <table>
         <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
         <tr><td>視点（一人称）</td><td>自分の目線で冒険できます。画面をクリックするとカーソルがロックされ、<b>マウスカーソルを動かすだけ</b>で上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグでも見回せて、<b>カーソルキー</b> <kbd>←</kbd><kbd>→</kbd> で左右、<kbd>↑</kbd><kbd>↓</kbd> で上下の視点移動もできます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
-        <tr><td>攻撃</td><td><kbd>Space</kbd> または画面右側に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
+        <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
+        <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
         <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
@@ -536,9 +538,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="settingsModal"><div class="settings-card">
       <h2>⚙ 設定</h2>
-      <p class="set-note">技や攻撃のキー割り当て、視点の感度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD とカーソルキーの視点移動は固定です。</p>
+      <p class="set-note">技や攻撃のキー割り当て、視点の感度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD、ジャンプの Space、カーソルキーの視点移動は固定です。</p>
       <h3>キー割り当て</h3>
-      <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー</div></div><button type="button" class="key-btn" data-bind="attack">Space</button></div>
+      <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー（Spaceはジャンプ専用）</div></div><button type="button" class="key-btn" data-bind="attack">F</button></div>
       <div class="set-row"><div><div class="set-label">スキル1</div><div class="set-desc" id="bindDesc1">強撃 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s1">1</button></div>
       <div class="set-row"><div><div class="set-label">スキル2</div><div class="set-desc" id="bindDesc2">旋風斬 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s2">2</button></div>
       <div class="set-row"><div><div class="set-label">スキル3（奥義）</div><div class="set-desc" id="bindDesc3">天覇断空斬 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s3">3</button></div>
@@ -563,6 +565,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="menu-list">
         <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span></button>
+        <button type="button" class="menu-item" id="menuPlayersBtn"><span class="mi-ico">◆</span><span class="mi-body"><b>オンラインプレイヤー</b><small>今つながっている実プレイヤーの一覧を見る</small></span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSoundBtn"><span class="mi-ico">♪</span><span class="mi-body"><b>サウンド設定</b><small>効果音の ON / OFF と音量（全体・効果音）を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>自動保存の状態確認・手動同期とファイル書き出し</small></span></button>
@@ -577,6 +580,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <p class="sub" id="bagSub">持ち物</p>
       <div id="bagList"></div>
       <div class="bag-actions"><button id="closeBagBtn" type="button">閉じる</button></div>
+    </div></div>
+
+    <div id="playersModal"><div class="bag-card">
+      <h2>◆ オンラインプレイヤー</h2>
+      <p class="sub" id="playersSub">接続中のプレイヤー</p>
+      <div id="playersList"></div>
+      <div class="bag-actions"><button id="closePlayersBtn" type="button">閉じる</button></div>
     </div></div>
 
     <div id="saveModal"><div class="save-card">
@@ -699,7 +709,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <p class="save-note">アカウントでログイン中は、進捗がサーバーへ自動保存されます（セーブ操作は不要）。アカウントなしのゲストプレイでは、ゲーム内の 💾 からファイルに書き出して保存できます。</p>
             <div class="howto">
               <div><b>移動</b>　<kbd>WASD</kbd> / スティック</div>
-              <div><b>攻撃</b>　<kbd>Space</kbd> / 剣ボタン</div>
+              <div><b>攻撃</b>　<kbd>F</kbd> / 剣ボタン　<b>ジャンプ</b>　<kbd>Space</kbd></div>
               <div><b>スキル</b>　<kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> キー</div>
               <div><b>回復</b>　<kbd>Q</kbd> ポーション</div>
             </div>
@@ -780,7 +790,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <table class="howto-table">
             <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
             <tr><td>視点（一人称）</td><td>画面をクリックするとカーソルがロックされ、マウスカーソルを動かすだけで上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグ、またはカーソルキー <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> でも視点移動できます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
-            <tr><td>攻撃</td><td><kbd>Space</kbd> または画面右側に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
+            <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
+            <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
             <tr><td>スキル</td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
             <tr><td>ポーション</td><td><kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
             <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
@@ -794,7 +805,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <div class="faq-list">
             <details><summary>料金はかかりますか？</summary><p>基本プレイ無料です。ダウンロードやインストールも不要で、ブラウザを開けばすぐに遊べます。</p></details>
             <details><summary>友だちと一緒に遊べますか？</summary><p>はい。このページのリンクを友だちに送って、同じ時間に開いてもらうだけです。同期サーバーに接続できていれば、お互いが ◆ マークのプレイヤーとして見え、動きとチャットが同期します。まず町の広場（スポーン地点の近く）で落ち合ってみてください。</p></details>
-            <details><summary>相手が ◆ マークで見えません</summary><p>同期サーバーがスリープしている可能性があります（無料枠の仕様で、しばらく誰も使っていないと眠ります）。ページを開いてから最大1分ほど待って入り直すと、サーバーが目覚めて接続できることがあります。タイトルバーの表示が「実プレイヤー ○人 オンライン」になれば同期中です。</p></details>
+            <details><summary>相手が ◆ マークで見えません</summary><p>同期サーバーがスリープしている可能性があります（無料枠の仕様で、しばらく誰も使っていないと眠ります）。ページを開いてから最大1分ほど待って入り直すと、サーバーが目覚めて接続できることがあります。画面上の表示が「オンライン ○人」になれば同期中です。</p></details>
             <details><summary>役職（クラス）は変更できますか？</summary><p>役職はアカウントごとに、キャラクターを最初に作るときに1回だけ選べます。一度決めると、そのアカウントでは変更できません。保存済みキャラクターがあるアカウントでは役職を選び直す画面自体が出ず、決めた役職で固定されます。別の役職で遊びたい場合は、別のアカウントで新しく始めてください。アカウントが違えば、違う役職を選べます。</p></details>
             <details><summary>セーブはどうなりますか？</summary><p>ホーム画面でサーバーアカウントを作ってログインすれば、進捗は自動でサーバーに保存されます。セーブボタンを押す必要はありません。別のスマホやPCからでも、同じアカウントでログインすれば続きから遊べます。アカウントなしのゲストプレイでは、従来どおり 💾 からファイルに書き出して保存できます。</p></details>
             <details><summary>スマホでも遊べますか？</summary><p>はい。移動スティック・攻撃ボタン・スキルボタンなど、タッチ操作に最適化したUIを用意しています。</p></details>
@@ -847,6 +858,7 @@ var canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 var mini=document.getElementById('minimap'),mctx=mini.getContext('2d');
 var started=false, soundOn=true, audioCtx=null;
 var keys={}, joyVec={x:0,y:0};
+var jumpY=0, jumpVY=0; // jump height above terrain / vertical velocity (Space)
 var cam={x:0,y:0};
 var viewW=960, viewH=640;
 /* 3D camera state (first-person) */
@@ -859,9 +871,9 @@ var lastSaveAt=null, lastSavedKey='', saveLoadContext='title';
 var obstacles=[], decorations=[];
 
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
-var DEFAULT_BINDS={attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
-var settings={binds:{attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1,masterVol:1,seVol:1};
-var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1};
+var DEFAULT_BINDS={attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
+var settings={binds:{attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1,masterVol:1,seVol:1};
+var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1,Space:1};
 var captureBind=null; // action name currently waiting for a key press
 function keyLabel(code){
   if(!code)return '—';
@@ -975,7 +987,7 @@ function handleBindCapture(e){
   var act=captureBind; captureBind=null;
   e.preventDefault();
   if(e.code!=='Escape'){
-    if(RESERVED_KEYS[e.code]){toast('そのキーは移動・視点・チャット用に予約されています');}
+    if(RESERVED_KEYS[e.code]){toast('そのキーは移動・視点・ジャンプ・チャット用に予約されています');}
     else if(['ShiftLeft','ShiftRight','ControlLeft','ControlRight','AltLeft','AltRight','MetaLeft','MetaRight'].indexOf(e.code)>=0){toast('修飾キー単体には割り当てできません');}
     else{
       // if another action already uses this key, swap the two bindings
@@ -993,7 +1005,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid';
 }
 function openGameMenu(){
   if(!started||!player||player.dead)return;
@@ -1011,6 +1023,7 @@ function openFromMenu(id,anchor){
   if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshBindDescs();}
   if(id==='saveModal')refreshSaveUI();
   if(id==='bagModal')refreshBagUI();
+  if(id==='playersModal')refreshPlayersUI();
   $(id).style.display='grid';
   if(id==='settingsModal'&&anchor==='sound'){
     setTimeout(function(){
@@ -1026,6 +1039,7 @@ function closeSubModal(id){
 function handleEscape(){
   if(menuOpen){closeGameMenu();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
+  if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
   if($('saveModal').style.display==='grid'){closeSubModal('saveModal');return true;}
   if($('helpModal').style.display==='grid'){closeSubModal('helpModal');return true;}
@@ -1047,10 +1061,25 @@ function refreshBagUI(){
   html+='<div class="bag-row"><span class="bag-ico">🏅</span><div class="bag-info"><b>討伐記録</b><small>これまでに倒したモンスター</small></div><span class="bag-count">'+player.kills+' 体</span></div>';
   list.innerHTML=html;
 }
+function refreshPlayersUI(){
+  var sub=$('playersSub'),list=$('playersList');if(!list)return;
+  if(!player){list.innerHTML='';return;}
+  var online=netStatus==='online';
+  if(sub)sub.textContent=online?('オンライン '+(remotes.length+1)+'人（あなたを含む）'):'オフライン — ソロプレイ中（あなただけ）';
+  var html='';
+  html+='<div class="bag-row"><span class="bag-ico">'+CLASSES[player.cls].icon+'</span><div class="bag-info"><b>'+escHtml(player.name)+'（あなた）</b><small>'+CLASSES[player.cls].name+' Lv.'+player.lv+' ／ '+escHtml(zoneAt(player.x,player.y))+'</small></div><span class="bag-tag">自分</span></div>';
+  var rs=remotes.slice().sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''));});
+  rs.forEach(function(r){
+    var d=Math.round(Math.hypot(r.x-player.x,r.y-player.y)/10);
+    html+='<div class="bag-row"><span class="bag-ico" style="color:#7ef0d4">◆</span><div class="bag-info"><b style="color:#7ef0d4">'+escHtml(r.name||'冒険者')+'</b><small>'+(CLASSES[r.cls]?CLASSES[r.cls].name:'')+' Lv.'+(r.lv||1)+' ／ '+escHtml(zoneAt(r.x,r.y))+'</small></div><span class="bag-count">'+d+'m</span></div>';
+  });
+  if(online&&!rs.length)html+='<p class="sub" style="margin-top:10px">他のプレイヤーはまだ接続していません。</p>';
+  list.innerHTML=html;
+}
 function doLogout(){
   if(acct.token)serverSave(false);
   returnToMenu=false;closeGameMenu();
-  ['settingsModal','saveModal','helpModal','bagModal'].forEach(function(id){$(id).style.display='none';});
+  ['settingsModal','saveModal','helpModal','bagModal','playersModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
   netClosed=true;clearTimeout(netRetryTimer);
   if(netWs){try{netWs.close();}catch(e){}netWs=null;}
@@ -1076,17 +1105,13 @@ function pxToTile(v){return v/(W/64);}
 function tileToPx(v){return v*(W/64);}
 function netSetStatus(s){
   netStatus=s;
-  var label={idle:'オフライン',connecting:'同期サーバーへ接続中…',online:'オンライン',reconnecting:'再接続中…',error:'オフライン（サーバー応答なし）'}[s]||s;
-  var srv=$('srvName'); if(srv) srv.textContent='公開サーバー: ルミナス ／ '+label;
   var dot=$('netDot'); if(dot) dot.style.background=(s==='online')?'#43d17c':(s==='connecting'||s==='reconnecting')?'#e8913a':'#8a97a0';
   updateOnlinePill();
 }
 function netOnlineCount(){return netStatus==='online'?(remotes.length+1):0;}
 function updateOnlinePill(){
-  var el=$('onlineCount'); if(!el||!player) return;
-  if(netStatus==='online') el.textContent='実プレイヤー '+netOnlineCount()+'人 オンライン';
-  else if(netStatus==='connecting'||netStatus==='reconnecting') el.textContent='同期サーバーへ接続中…';
-  else el.textContent='オフライン — ソロプレイ中';
+  var el=$('onlineCount'); if(!el) return;
+  el.textContent='オンライン '+netOnlineCount()+'人';
 }
 function netConnect(){
   if(!player) return;
@@ -1241,7 +1266,11 @@ function makePlayer(name,clsKey){
     lv:1,exp:0,gold:120,potions:3,kills:0,dir:1,walk:0,dead:false};
 }
 function expNeed(lv){return 80+lv*55;}
+/* per-type population caps: nothing may spawn past these, so mobs can never flood the world */
+var SPAWN_CAPS={slime:16,goblin:11,wolf:8,orc:6,boss:1};
+function countAlive(type){var n=0;for(var i=0;i<enemies.length;i++)if(enemies[i].type===type&&!enemies[i].dead)n++;return n;}
 function spawnEnemy(type,x,y){
+  if(countAlive(type)>=(SPAWN_CAPS[type]||8))return null;
   var t=ETYPES[type];
   var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6};
   enemies.push(e); return e;
@@ -1281,12 +1310,14 @@ function nearestEnemy(maxDist){
   return best;
 }
 function damageEnemy(e,dmg,crit){
+  if(!e||e.dead)return;
   e.hp-=dmg;e.hitFlash=6;e.aggro=player;e.state='chase';
   addDmg(e.x+(Math.random()*20-10),e.y,dmg+(crit?'!':''),crit?'#ffd34d':'#fff',crit);
   burst(e.x,e.y,'#ffe9a8',crit?10:5);
   if(e.hp<=0) killEnemy(e);
 }
 function killEnemy(e){
+  if(e.dead)return; // one death = one respawn; duplicate kill calls must not multiply mobs
   e.dead=true;
   burst(e.x,e.y,ETYPES[e.type].color,22);
   beep(e.boss?180:520,0.15,'square',0.05);
@@ -1305,9 +1336,13 @@ function killEnemy(e){
   if(e.boss){chat('★☆★ <b>'+player.name+'</b> が遺跡の守護者ゴーレムを討伐しました！ ★☆★','sys');toast('ボス討伐！おめでとうございます！',4200);}
   setTimeout(function(){
     var idx=enemies.indexOf(e);if(idx>=0)enemies.splice(idx,1);
-    if(started) spawnEnemy(e.type,e.homeX+(Math.random()*80-40),e.homeY+(Math.random()*80-40));
     if(target===e) target=null;
   },600);
+  // respawn after a proper interval; spawnEnemy re-checks the per-type cap at that moment,
+  // so a crowded world simply skips the respawn instead of growing past the cap
+  setTimeout(function(){
+    if(started) spawnEnemy(e.type,e.homeX+(Math.random()*80-40),e.homeY+(Math.random()*80-40));
+  }, e.boss?20000:5000+Math.random()*4000);
   updateHUD();
 }
 function gainExp(n){
@@ -1766,6 +1801,13 @@ function update(dt,now){
     if(mx)player.dir=mx>0?1:-1;
     player.walk+=dt*0.02;
   }
+  // jump physics (Space): gravity pulls the player back down onto the terrain height;
+  // horizontal movement above keeps working while airborne
+  if(jumpVY!==0||jumpY>0){
+    jumpY+=jumpVY*dt;
+    jumpVY-=0.00045*dt;
+    if(jumpY<=0){jumpY=0;jumpVY=0;}
+  }
   // mp regen, town heal
   player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
   if(isSafe(player.x,player.y)&&player.hp<player.maxHp){player.hp=Math.min(player.maxHp,player.hp+dt*0.03);}
@@ -1907,10 +1949,12 @@ function drawEnemy(e){
   ctx.font=(e.r*1.55)+'px serif';ctx.textAlign='center';
   ctx.fillText(e.emoji,sx,sy+e.r*0.55+bob*0.4);
   nameTag(sx,sy-e.r-20,e.name,e.lv,e.boss?'#ff9d9d':(e.state==='chase'?'#ffb3b3':'#e8e2cf'));
-  // hp bar
-  var w=e.boss?110:52;
-  ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(sx-w/2,sy-e.r-8,w,6);
-  ctx.fillStyle=e.boss?'#c0392b':'#e5484d';ctx.fillRect(sx-w/2+1,sy-e.r-7,(w-2)*Math.max(0,e.hp/e.maxHp),4);
+  // hp bar — only when the player is close (or the enemy is targeted)
+  if(target===e||Math.hypot(e.x-player.x,e.y-player.y)<=400){
+    var w=e.boss?110:52;
+    ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(sx-w/2,sy-e.r-8,w,6);
+    ctx.fillStyle=e.boss?'#c0392b':'#e5484d';ctx.fillRect(sx-w/2+1,sy-e.r-7,(w-2)*Math.max(0,e.hp/e.maxHp),4);
+  }
   if(target===e){ctx.strokeStyle='#ffd34d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx,sy,e.r+9+Math.sin(performance.now()/150)*2,0,7);ctx.stroke();}
 }
 function drawMini(){
@@ -1954,6 +1998,24 @@ function cone(r,h,color,x,y,z,parent,seg){
   m.position.set(x,y,z);m.castShadow=true;(parent||dynGroup).add(m);return m;
 }
 function WX(x){return x-W/2;} function WZ(y){return y-H/2;}
+/* Rolling terrain height (world units) at game coords x,y: gentle hills and dips,
+   smoothly flattened around the town & spawn, the lake, the roads and the ruins floor
+   so key areas stay easy to walk. Everything standing on the ground follows this. */
+function terrainH(x,y){
+  var h=Math.sin(x*0.0042+1.7)*Math.cos(y*0.0036+0.4)*9
+       +Math.sin(x*0.0016-0.6)*Math.sin(y*0.0021+2.0)*8
+       +Math.sin((x+y)*0.0063+0.9)*3.2
+       +Math.cos(Math.hypot(x-2050,y-2050)*0.004)*4;
+  function flatC(cx,cy,r0,r1){var d=Math.hypot(x-cx,y-cy);if(d<=r0)return 0;if(d>=r1)return 1;var t=(d-r0)/(r1-r0);return t*t*(3-2*t);}
+  function flatR(x0,y0,x1,y1,m0,m1){var dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1);var d=Math.hypot(dx,dy);if(d<=m0)return 0;if(d>=m1)return 1;var t=(d-m0)/(m1-m0);return t*t*(3-2*t);}
+  var f=1;
+  f*=flatC(1300,1300,400,760);        // town plaza + spawn point (1300,1470)
+  f*=flatC(420,2150,300,560);         // lake surface stays level
+  f*=flatR(1240,0,1360,1010,10,240);  // north road
+  f*=flatR(1590,1240,2600,1360,10,240); // east road
+  f*=flatR(1950,150,2600,770,10,220); // ruins floor
+  return h*f;
+}
 
 /* first-person weapon viewmodel (attached to the camera) */
 var viewModel=null, vmCls='';
@@ -2008,8 +2070,15 @@ function init3D(){
   scene.add(sunLight);scene.add(sunLight.target);
   staticGroup=new THREE.Group();scene.add(staticGroup);
   dynGroup=new THREE.Group();scene.add(dynGroup);
-  // ground base
-  var ground=new THREE.Mesh(new THREE.PlaneGeometry(W,H),M(0x3a5c38));
+  // ground base — a subdivided plane displaced by terrainH() so the land rolls
+  var groundGeo=new THREE.PlaneGeometry(W,H,110,110);
+  var gp=groundGeo.attributes.position;
+  for(var gi=0;gi<gp.count;gi++){
+    // plane local (x,y) maps to game coords (x + W/2, H/2 - y) once rotated flat; local z becomes world height
+    gp.setZ(gi,terrainH(gp.getX(gi)+W/2,H/2-gp.getY(gi)));
+  }
+  groundGeo.computeVertexNormals();
+  var ground=new THREE.Mesh(groundGeo,M(0x3a5c38));
   ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;staticGroup.add(ground);
   // clouds
   for(var i=0;i<11;i++){
@@ -2028,7 +2097,7 @@ function buildWorld3D(){
   while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);}
   function flat(w,d,color,x,y2d,z,y){
     var m=new THREE.Mesh(G('f'+w+'_'+d,function(){return new THREE.BoxGeometry(w,4,d);}),M(color));
-    m.position.set(WX(x),y||2,WZ(y2d));m.receiveShadow=true;staticGroup.add(m);return m;
+    m.position.set(WX(x),(y===undefined?terrainH(x,y2d)+2:y),WZ(y2d));m.receiveShadow=true;staticGroup.add(m);return m;
   }
   // grass patches (stable pseudo-random)
   var seed=12345;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
@@ -2036,7 +2105,7 @@ function buildWorld3D(){
     var px=rnd()*W,pz=rnd()*H;
     if(Math.hypot(px-1300,pz-1300)<345)continue;
     var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
-    p.rotation.x=-Math.PI/2;p.rotation.z=rnd()*3;p.position.set(WX(px),0.6,WZ(pz));p.receiveShadow=true;staticGroup.add(p);
+    p.rotation.x=-Math.PI/2;p.rotation.z=rnd()*3;p.position.set(WX(px),terrainH(px,pz)+0.6,WZ(pz));p.receiveShadow=true;staticGroup.add(p);
   }
   // town plaza + roads
   flat(660,660,0x8d8574,1300,1300);
@@ -2053,7 +2122,7 @@ function buildWorld3D(){
   obstacles.forEach(function(o){
     if(o.type==='rect'){
       if(o.house){
-        var g=new THREE.Group();g.position.set(WX(o.x+o.w/2),0,WZ(o.y+o.h/2));staticGroup.add(g);
+        var g=new THREE.Group();g.position.set(WX(o.x+o.w/2),terrainH(o.x+o.w/2,o.y+o.h/2),WZ(o.y+o.h/2));staticGroup.add(g);
         box(o.w,o.h*0.85,o.h,o.c,0,o.h*0.42,0,g);
         var roof=cone(Math.max(o.w,o.h)*0.78,o.h*0.62,0x5d3a26,0,o.h*0.85+o.h*0.3,0,g,4);roof.rotation.y=Math.PI/4;
         box(22,38,4,0x4a3220,0,20,o.h/2+1,g);
@@ -2061,11 +2130,12 @@ function buildWorld3D(){
         box(20,20,3,0xffe9a8,o.w/2-26,o.h*0.55,o.h/2+1,g);
       }else{
         var h=60+((o.x*7+o.y*13)%50);
-        box(o.w,h,o.h,o.c,WX(o.x+o.w/2),h/2,WZ(o.y+o.h/2),staticGroup);
-        box(o.w+8,10,o.h+8,0x8a8496,WX(o.x+o.w/2),h+4,WZ(o.y+o.h/2),staticGroup);
+        var gh=terrainH(o.x+o.w/2,o.y+o.h/2);
+        box(o.w,h,o.h,o.c,WX(o.x+o.w/2),h/2+gh,WZ(o.y+o.h/2),staticGroup);
+        box(o.w+8,10,o.h+8,0x8a8496,WX(o.x+o.w/2),h+4+gh,WZ(o.y+o.h/2),staticGroup);
       }
     }else if(o.fountain){
-      var fg=new THREE.Group();fg.position.set(WX(o.x),0,WZ(o.y));staticGroup.add(fg);
+      var fg=new THREE.Group();fg.position.set(WX(o.x),terrainH(o.x,o.y),WZ(o.y));staticGroup.add(fg);
       cyl(o.r,o.r+6,16,0x7d95a8,0,8,0,fg,20);
       cyl(o.r-10,o.r-10,6,0x4a90c2,0,15,0,fg,20);
       cyl(7,10,44,0xaebfca,0,30,0,fg,10);
@@ -2077,45 +2147,52 @@ function buildWorld3D(){
     if(d.kind==='lake')return;
     var x=WX(d.x),z=WZ(d.y);
     if(d.kind==='tree'){
-      var tg=new THREE.Group();tg.position.set(x,0,z);staticGroup.add(tg);
+      var tg=new THREE.Group();tg.position.set(x,terrainH(d.x,d.y)-1.5,z);staticGroup.add(tg);
       var sd=d.seed, S=d.s;
       var sr=function(n){var v=Math.sin(sd*127.1+n*311.7)*43758.5453;return v-Math.floor(v);};
       tg.rotation.y=sd*2.39;
-      var bark=sr(2)<0.5?0x6b4a2c:0x5d3f27;
-      var greens=[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43];
+      // strong per-tree character: height, lean and silhouette all vary by seed
+      var hv=1.25+sr(20)*0.65;                    // height multiplier 1.25–1.90
+      tg.rotation.z=(sr(21)-0.5)*0.10;            // lean
+      tg.rotation.x=(sr(22)-0.5)*0.08;
+      var bark=[0x6b4a2c,0x5d3f27,0x74522f][Math.floor(sr(2)*3)];
+      var greens=[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43,0x548c46,0x24482a,0x3f7048];
+      var gpick=function(n){return greens[Math.floor(sr(n)*greens.length)];};
       if(sr(1)<0.42){
-        // pine: tall straight trunk + layered drooping tiers
-        var pth=S*2.7;
-        cyl(S*0.10,S*0.20,pth,bark,0,pth/2,0,tg,7);
-        cyl(S*0.20,S*0.34,S*0.3,bark,0,S*0.15,0,tg,7);
-        for(var li=0;li<4;li++){
-          var lt=li/3, lr=S*(1.05-0.62*lt), lh=S*(1.15-0.35*lt);
-          cone(lr,lh,greens[(Math.floor(sd*7)+li)%greens.length],(sr(li+3)-0.5)*S*0.12,pth*0.52+li*S*0.52+lh/2,(sr(li+5)-0.5)*S*0.12,tg,9);
+        // pine: very tall straight trunk + five dense, drooping tiers and a spire tip
+        var pth=S*3.1*hv;
+        cyl(S*0.10,S*0.21,pth,bark,0,pth/2,0,tg,7);
+        cyl(S*0.21,S*0.38,S*0.34,bark,0,S*0.17,0,tg,7);
+        for(var li=0;li<5;li++){
+          var lt=li/4, lr=S*(1.18-0.78*lt)*(0.9+sr(li+30)*0.25), lh=S*(1.2-0.42*lt);
+          cone(lr,lh,gpick(li+31),(sr(li+3)-0.5)*S*0.16,pth*(0.40+0.115*li)+lh/2,(sr(li+5)-0.5)*S*0.16,tg,9);
         }
+        cone(S*0.16,S*0.7,gpick(40),0,pth+S*0.3,0,tg,7);
       }else{
-        // broadleaf: tall tapered trunk, branches, leafy blob canopy
-        var th=S*2.35;
-        var trunk=cyl(S*0.13,S*0.26,th,bark,0,th/2,0,tg,8);trunk.rotation.z=(sr(3)-0.5)*0.07;
-        cyl(S*0.26,S*0.42,S*0.34,bark,0,S*0.17,0,tg,8);
-        for(var bi=0;bi<3;bi++){
-          var ba=sr(bi+4)*Math.PI*2, bl=S*(0.75+sr(bi+6)*0.3);
-          var br=cyl(S*0.045,S*0.085,bl,bark,Math.cos(ba)*S*0.30,th*0.86,Math.sin(ba)*S*0.30,tg,5);
-          br.rotation.set(Math.sin(ba)*0.85,0,-Math.cos(ba)*0.85);
+        // broadleaf: long tapered trunk, four uneven branches, big dense 7-blob canopy
+        var th=S*3.0*hv;
+        var trunk=cyl(S*0.13,S*0.27,th,bark,0,th/2,0,tg,8);trunk.rotation.z=(sr(3)-0.5)*0.09;
+        cyl(S*0.27,S*0.46,S*0.36,bark,0,S*0.18,0,tg,8);
+        for(var bi=0;bi<4;bi++){
+          var ba=sr(bi+4)*Math.PI*2, bl=S*(0.85+sr(bi+6)*0.45);
+          var br=cyl(S*0.045,S*0.09,bl,bark,Math.cos(ba)*S*0.32,th*(0.76+sr(bi+24)*0.16),Math.sin(ba)*S*0.32,tg,5);
+          br.rotation.set(Math.sin(ba)*(0.75+sr(bi+26)*0.3),0,-Math.cos(ba)*(0.75+sr(bi+26)*0.3));
         }
-        for(var ci=0;ci<5;ci++){
-          var cr=ci===0?S*0.92:S*(0.52+sr(ci+8)*0.22);
-          var blob=sph(Math.round(cr),greens[(Math.floor(sd*5)+ci)%greens.length],
-            ci===0?0:(sr(ci+10)-0.5)*S*1.05,
-            th+S*0.42+(ci===0?S*0.28:(sr(ci+14)-0.5)*S*0.55),
-            ci===0?0:(sr(ci+12)-0.5)*S*1.05,tg,{flatShading:true});
-          blob.scale.y=0.82;
+        for(var ci=0;ci<7;ci++){
+          var cr, cx2, cy2, cz2;
+          if(ci===0){cr=S*(0.98+sr(41)*0.22);cx2=0;cy2=th+S*0.62;cz2=0;}
+          else if(ci<5){var aa=sr(ci+42)*Math.PI*2, rr=S*(0.62+sr(ci+44)*0.3);
+            cr=S*(0.55+sr(ci+46)*0.25);cx2=Math.cos(aa)*rr;cy2=th+S*(0.34+sr(ci+48)*0.3);cz2=Math.sin(aa)*rr;}
+          else{cr=S*(0.5+sr(ci+50)*0.22);cx2=(sr(ci+52)-0.5)*S*0.8;cy2=th+S*(0.95+sr(ci+54)*0.35);cz2=(sr(ci+56)-0.5)*S*0.8;}
+          var blob=sph(Math.round(cr),gpick(ci+60),cx2,cy2,cz2,tg,{flatShading:true});
+          blob.scale.y=0.85;
         }
       }
     }else if(d.kind==='rock'){
       var r=new THREE.Mesh(G('rock'+Math.round(d.s),function(){return new THREE.DodecahedronGeometry(d.s*0.8,0);}),M(0x8d9299));
-      r.position.set(x,d.s*0.4,z);r.rotation.set(d.seed,d.seed*2,0);r.castShadow=true;r.receiveShadow=true;staticGroup.add(r);
+      r.position.set(x,terrainH(d.x,d.y)+d.s*0.4,z);r.rotation.set(d.seed,d.seed*2,0);r.castShadow=true;r.receiveShadow=true;staticGroup.add(r);
     }else{
-      var fg2=new THREE.Group();fg2.position.set(x,0,z);staticGroup.add(fg2);
+      var fg2=new THREE.Group();fg2.position.set(x,terrainH(d.x,d.y),z);staticGroup.add(fg2);
       cyl(1.2,1.2,9,0x3f7a3a,0,4,0,fg2,5);
       sph(4.5,Math.floor(d.seed)%2?0xffd34d:0xff8fb3,0,11,0,fg2);
     }
@@ -2192,6 +2269,7 @@ function makeLabel(ent,kind){
     el.innerHTML='<span></span><div class="ehp"><i></i></div>';
     el.firstChild.textContent='Lv.'+ent.lv+' '+ent.name;
     el._bar=el.querySelector('.ehp i');
+    el._barWrap=el.querySelector('.ehp');
   }else if(kind==='r'){
     el.textContent='◆ Lv.'+ent.lv+' '+ent.name;
   }else{
@@ -2224,7 +2302,8 @@ function syncEntity(ent,kind,now){
   if(Math.abs(dx)+Math.abs(dy)>0.05){ent._face=Math.atan2(dx,dy);ent._px=ent.x;ent._py=ent.y;}
   else if(kind!=='e'&&ent.dir){/* keep last facing */}
   var bob=(kind==='e'&&ent.type==='slime')?Math.abs(Math.sin(now/280+ent.walk))*4:Math.abs(Math.sin(ent.walk||0))*2.2;
-  mesh.position.set(WX(ent.x),bob+(mesh.userData.groundOff||0),WZ(ent.y));
+  var groundY=terrainH(ent.x,ent.y);
+  mesh.position.set(WX(ent.x),groundY+bob+(mesh.userData.groundOff||0),WZ(ent.y));
   if(ent._face!==undefined)mesh.rotation.y=ent._face;
   if(mesh.userData.squash)mesh.userData.squash.scale.y=0.62+Math.sin(now/240+ent.walk)*0.1;
   if(ent.hitFlash>0){mesh.traverse(function(c){if(c.userData._m)c.material=M(0xff5a5a);});rec._flash=true;}
@@ -2232,10 +2311,15 @@ function syncEntity(ent,kind,now){
     mesh.traverse(function(c){if(c.userData._m)c.material=c.userData._m;});rec._flash=false;}
   // label
   var hgt=(kind==='e')?(ent.boss?165:ent.r*2.6+44):86;
-  var sp=projectToScreen(WX(ent.x),hgt,WZ(ent.y),_pv);
+  var sp=projectToScreen(WX(ent.x),groundY+hgt,WZ(ent.y),_pv);
   if(sp){rec.label.style.display='block';rec.label.style.transform='translate(-50%,-100%) translate('+sp.x.toFixed(1)+'px,'+sp.y.toFixed(1)+'px)';}
   else rec.label.style.display='none';
-  if(kind==='e'&&rec.label._bar)rec.label._bar.style.width=Math.max(0,ent.hp/ent.maxHp*100)+'%';
+  if(kind==='e'&&rec.label._bar){
+    rec.label._bar.style.width=Math.max(0,ent.hp/ent.maxHp*100)+'%';
+    // HP bar only appears when the player is close (or has the enemy targeted)
+    var nearE=!player||target===ent||Math.hypot(ent.x-player.x,ent.y-player.y)<=400;
+    if(rec.label._barWrap)rec.label._barWrap.style.display=nearE?'block':'none';
+  }
   rec._seen=now;
   return rec;
 }
@@ -2268,7 +2352,7 @@ function render3D(now){
       m=new THREE.Mesh(G('proj',function(){return new THREE.SphereGeometry(6,10,8);}),M(p.from==='player'?0xffa53c:0xffffff,{emissive:0xcc5a00}));
       dynGroup.add(m);projMeshes[p._mid]=m;
     }
-    m.position.set(WX(p.x),26,WZ(p.y));
+    m.position.set(WX(p.x),terrainH(p.x,p.y)+26,WZ(p.y));
   });
   for(var k in projMeshes){if(!pSeen[k]){dynGroup.remove(projMeshes[k]);delete projMeshes[k];}}
   // particles
@@ -2281,7 +2365,7 @@ function render3D(now){
       m=new THREE.Mesh(G('part',function(){return new THREE.SphereGeometry(3.4,8,6);}),M(parseInt(String(p.color).replace('#',''),16)||0xffffff));
       dynGroup.add(m);partMeshes[p._mid]=m;
     }
-    m.position.set(WX(p.x),30,WZ(p.y));
+    m.position.set(WX(p.x),terrainH(p.x,p.y)+30,WZ(p.y));
     var s=1-p.t/p.life;m.scale.set(s,s,s);
   });
   for(var k2 in partMeshes){if(!ptSeen[k2]){dynGroup.remove(partMeshes[k2]);delete partMeshes[k2];}}
@@ -2294,12 +2378,12 @@ function render3D(now){
       render3D._ring.rotation.x=-Math.PI/2;scene.add(render3D._ring);
     }
     render3D._ring.visible=true;
-    render3D._ring.position.set(WX(target.x),2.5,WZ(target.y));
+    render3D._ring.position.set(WX(target.x),terrainH(target.x,target.y)+2.5,WZ(target.y));
     var rs=(target.r+12)/29*(1+Math.sin(now/150)*0.06);render3D._ring.scale.set(rs,rs,rs);
   }else if(render3D._ring)render3D._ring.visible=false;
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
-  var eyeY=54;
+  var eyeY=terrainH(player.x,player.y)+54+jumpY;
   var cp=Math.cos(camPitch);
   camera3d.position.set(tx,eyeY,tz);
   camera3d.lookAt(tx-Math.sin(camYaw)*cp,eyeY+Math.sin(camPitch),tz-Math.cos(camYaw)*cp);
@@ -2339,7 +2423,7 @@ function syncDmgTexts(now){
       el=document.createElement('div');el.className='dmg-float'+(d.big?' big':'');
       el.textContent=d.text;el.style.color=d.color;layer.appendChild(el);dmgEls[d._mid]=el;
     }
-    var sp=projectToScreen(WX(d.x),64,WZ(d.y),_pv);
+    var sp=projectToScreen(WX(d.x),terrainH(d.x,d.y)+64,WZ(d.y),_pv);
     if(sp){el.style.display='block';el.style.opacity=Math.max(0,1-d.t/46);el.style.transform='translate(-50%,-100%) translate('+sp.x.toFixed(1)+'px,'+sp.y.toFixed(1)+'px)';}
     else el.style.display='none';
   });
@@ -2439,7 +2523,7 @@ function loop(now){
     }
     if(THREE_OK){render3D(now);}else{draw();}
     if(now-miniT>180){miniT=now;drawMini();}
-    if(now-listT>900){listT=now;updatePlayerList();updateHUD();refreshSaveUI();acctTick(now);$('hudZone').textContent=zoneAt(player.x,player.y);}
+    if(now-listT>900){listT=now;updatePlayerList();updateHUD();refreshSaveUI();acctTick(now);$('hudZone').textContent=zoneAt(player.x,player.y);if($('playersModal').style.display==='grid')refreshPlayersUI();}
     updateSkillUI(now);
     // mp/hp bars smooth
     $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
@@ -2460,12 +2544,13 @@ document.addEventListener('keydown',function(e){
   if(captureBind){handleBindCapture(e);return;}
   if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
   if($('settingsModal').style.display==='grid')return;
-  if(menuOpen||$('bagModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid')return;
+  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&e.code.indexOf('Arrow')===0&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput'))e.preventDefault();
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started){if(acct.token)serverSave(true);else downloadSave();}return;}
   if(!started)return;
   if(document.activeElement===$('chatInput'))return;
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat&&player&&!player.dead&&jumpY<=0&&jumpVY===0)jumpVY=0.17;}
   var b=settings.binds;
   if(e.code===b.attack){e.preventDefault();playerAttack(1);}
   if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
@@ -2486,7 +2571,7 @@ $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
 $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
-  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1470;
+  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1470;jumpY=0;jumpVY=0;
   $('deathScreen').style.display='none';updateHUD();toast('ルミナスの町で復活した');
   netSendPos(true);
 });
@@ -2554,6 +2639,8 @@ $('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');})
 /* game menu (Esc) wiring — the ONLY way to open settings / sound / save / help in game */
 $('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
 $('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
+$('menuPlayersBtn').addEventListener('click',function(){openFromMenu('playersModal');});
+$('closePlayersBtn').addEventListener('click',function(){closeSubModal('playersModal');});
 $('menuSettingsBtn').addEventListener('click',function(){openFromMenu('settingsModal');});
 $('menuSoundBtn').addEventListener('click',function(){openFromMenu('settingsModal','sound');});
 $('menuSaveBtn').addEventListener('click',function(){openFromMenu('saveModal');});
@@ -2629,7 +2716,7 @@ $('startBtn').addEventListener('click',function(){
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
   netConnect();
   chat('— AETHERIA ONLINE にログインしました —','sys');
-  chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、攻撃は Space、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで Escメニューの「セーブ」からセーブできます。'),'world');
+  chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、ジャンプは Space、攻撃は F、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで Escメニューの「セーブ」からセーブできます。'),'world');
   if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
 });
