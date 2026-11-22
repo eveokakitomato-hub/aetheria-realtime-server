@@ -1,40 +1,47 @@
 'use strict';
 /**
- * AETHERIA ONLINE — リアルタイム同期サーバー (Phase 1: 移動 + チャット)
+ * AETHERIA ONLINE — リアルタイム同期サーバー (Phase 1.5: ゲーム画面接続版)
  *
  * 設計の要点
  * - WebSocket で常時接続。HTTP のリクエスト/レスポンスでは同期しない。
- * - サーバーが「正解」を持つ (authoritative): クライアントは入力だけ送り、
- *   位置はサーバーが計算する。速度の上限をサーバー側で強制するので、
- *   クライアントを改造しても高速移動チートはできない。
+ * - 座標系はゲーム本体 (64x64 タイルマップ) と同一。位置はタイル座標 x/y。
+ * - クライアントが移動を計算し、位置を約10回/秒で申告する (pos)。
+ *   サーバーは「あり得る移動か」を検証する: 前回位置からの距離が
+ *   経過時間 × 最大速度 (7 タイル/秒 + 余裕) を超える申告は、
+ *   進める分だけ進めた位置に丸める (テレポートチート防止)。
+ *   初回位置 (join 時) と復活時の teleport フラグ付き申告はそのまま受理する。
  * - Tick は 20Hz (50ms)。そのたびに「近くにいるプレイヤーだけ」の
- *   スナップショットを送る (AOI = Area of Interest)。
- * - クライアント側はスナップショット間を補間して滑らかに描く
- *   (client/aetheria-net.js 参照)。
+ *   スナップショットを送る (AOI = 半径 20 タイル)。
+ * - チャットは送信者以外全員へ中継する。
+ * - 敵AI・戦闘判定はまだクライアント側 (Phase 2 でサーバーへ移す)。
  *
  * 起動: npm install && npm start   (PORT 環境変数でポート変更可)
+ * Render では render.yaml / Dockerfile からそのままデプロイできる。
  */
 const http = require('http');
 const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 2567;
 const TICK_MS = 50;            // 20Hz
-const WORLD = { min: -250, max: 250 }; // プロトタイプのマップ範囲に合わせた仮の境界
-const MAX_SPEED = 14;          // units/sec (歩行+ダッシュ込みの上限。これを超える入力は丸める)
-const AOI_RADIUS = 120;        // この距離内のプレイヤーだけ互いに見える
+const WORLD = { min: 0.5, max: 63.5 }; // 64x64 タイルマップの内側
+const MAX_SPEED = 7;           // タイル/秒 (最速クラス 3.7 の約2倍まで許容)
+const SPEED_SLACK = 1.6;       // タイル (申告間隔の誤差吸収)
+const AOI_RADIUS = 20;         // タイル
 const CHAT_MAX_LEN = 200;
+const SPAWN = { x: 32.5, y: 54.5 }; // ルミナスの町 (ゲーム側 TOWN_SPAWN と同一)
+const CLASSES = ['warrior', 'mage', 'archer'];
 
 /** @type {Map<string, object>} sessionId -> player */
 const players = new Map();
 let nextId = 1;
 
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function num(v, fallback) { const n = Number(v); return Number.isFinite(n) ? n : fallback; }
 
 function publicState(p) {
   return {
-    id: p.id, name: p.name, cls: p.cls,
-    x: +p.x.toFixed(2), z: +p.z.toFixed(2), yaw: +p.yaw.toFixed(3),
-    hp: p.hp, maxHp: p.maxHp, level: p.level,
+    id: p.id, name: p.name, cls: p.cls, level: p.level,
+    x: +p.x.toFixed(2), y: +p.y.toFixed(2), angle: +p.angle.toFixed(3),
   };
 }
 
@@ -46,11 +53,12 @@ function broadcast(obj, exceptId = null) {
   }
 }
 
-// ---- HTTP (ヘルスチェック用) ----
+// ---- HTTP (ヘルスチェック用。ゲーム画面からの疎通確認のため CORS を許可) ----
 const httpServer = http.createServer((req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, players: players.size }));
+    res.end(JSON.stringify({ ok: true, players: players.size, protocol: 2 }));
   } else {
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('AETHERIA ONLINE realtime server');
@@ -63,17 +71,14 @@ wss.on('connection', (ws) => {
   const id = 'p' + (nextId++);
   const player = {
     id, ws,
-    name: 'Guest', cls: 'warrior',
-    x: 0, z: 10, yaw: 0, pitch: 0,
-    input: { dx: 0, dz: 0, sprint: false },
-    hp: 100, maxHp: 100, level: 1,
+    name: 'Guest', cls: 'warrior', level: 1,
+    x: SPAWN.x, y: SPAWN.y, angle: -Math.PI / 2,
+    lastPosAt: Date.now(),
     lastSeen: Date.now(),
   };
   players.set(id, player);
 
-  ws.send(JSON.stringify({ type: 'welcome', id, tickMs: TICK_MS, aoi: AOI_RADIUS }));
-  broadcast({ type: 'chat', system: true, text: `${player.name} がログインしました` }, id);
-  console.log(`[join] ${id} (online: ${players.size})`);
+  ws.send(JSON.stringify({ type: 'welcome', id, tickMs: TICK_MS, aoi: AOI_RADIUS, protocol: 2 }));
 
   ws.on('message', (raw) => {
     let m;
@@ -81,30 +86,49 @@ wss.on('connection', (ws) => {
     player.lastSeen = Date.now();
 
     switch (m.type) {
-      case 'join': // { name, cls } — キャラ作成画面から送る
+      case 'join': { // { name, cls, level, x, y } — キャラ情報と開始位置
         player.name = String(m.name || 'Guest').slice(0, 16);
-        player.cls = ['warrior', 'mage', 'archer'].includes(m.cls) ? m.cls : 'warrior';
+        player.cls = CLASSES.includes(m.cls) ? m.cls : 'warrior';
+        player.level = clamp(Math.floor(num(m.level, 1)) || 1, 1, 99);
+        if (m.x !== undefined && m.y !== undefined) {
+          player.x = clamp(num(m.x, SPAWN.x), WORLD.min, WORLD.max);
+          player.y = clamp(num(m.y, SPAWN.y), WORLD.min, WORLD.max);
+        }
+        player.lastPosAt = Date.now();
         broadcast({ type: 'chat', system: true, text: `${player.name} がログインしました` }, id);
+        console.log(`[join] ${id} ${player.name} (online: ${players.size})`);
         break;
+      }
 
-      case 'input': // { dx, dz, yaw, pitch, sprint } — 移動入力だけを受け取る
-        player.input.dx = clamp(Number(m.dx) || 0, -1, 1);
-        player.input.dz = clamp(Number(m.dz) || 0, -1, 1);
-        player.input.sprint = !!m.sprint;
-        player.yaw = Number(m.yaw) || 0;
-        player.pitch = clamp(Number(m.pitch) || 0, -1.4, 1.4);
+      case 'pos': { // { x, y, angle, teleport? } — 位置申告 (速度検証つき)
+        const tx = clamp(num(m.x, player.x), WORLD.min, WORLD.max);
+        const ty = clamp(num(m.y, player.y), WORLD.min, WORLD.max);
+        const now = Date.now();
+        if (m.teleport) {
+          player.x = tx; player.y = ty;
+        } else {
+          const dt = Math.max(0.001, (now - player.lastPosAt) / 1000);
+          const allowed = MAX_SPEED * dt + SPEED_SLACK;
+          const dx = tx - player.x;
+          const dy = ty - player.y;
+          const d = Math.hypot(dx, dy);
+          if (d <= allowed) { player.x = tx; player.y = ty; }
+          else if (d > 0) { player.x += (dx / d) * allowed; player.y += (dy / d) * allowed; }
+        }
+        player.lastPosAt = now;
+        player.angle = num(m.angle, player.angle);
         break;
+      }
 
-      case 'chat': // { text }
+      case 'chat': // { text } — 送信者以外へ中継 (送信者は自分の画面に即時表示済み)
         broadcast({
-          type: 'chat', from: player.name,
+          type: 'chat', from: player.name, cls: player.cls, level: player.level,
           text: String(m.text || '').slice(0, CHAT_MAX_LEN),
-        });
+        }, id);
         break;
 
       case 'attack': {
-        // Phase 1 は「近くの敵/プレイヤーへの攻撃イベント」の受け口だけ用意。
-        // 本番 Phase 2 では敵AIとダメージ判定をここ (サーバー側) に移す。
+        // 戦闘判定は Phase 2 でサーバー側へ移す。今は演出イベントの中継のみ。
         broadcast({ type: 'attack', from: id, target: String(m.target || '') }, id);
         break;
       }
@@ -126,26 +150,14 @@ wss.on('connection', (ws) => {
   ws.on('error', leave);
 });
 
-// ---- ゲームループ: 入力を積分して位置を更新し、AOI内の姿を配信 ----
+// ---- 配信ループ: AOI 内のプレイヤーだけスナップショットを送る ----
 setInterval(() => {
-  const dt = TICK_MS / 1000;
-  for (const p of players.values()) {
-    const { dx, dz, sprint } = p.input;
-    const len = Math.hypot(dx, dz);
-    if (len > 0.01) {
-      const speed = Math.min(MAX_SPEED, (sprint ? 13 : 8));
-      // 入力はカメラ向き(yaw)基準でクライアントがワールド座標に変換済みとする
-      p.x = clamp(p.x + (dx / len) * speed * dt * Math.min(len, 1), WORLD.min, WORLD.max);
-      p.z = clamp(p.z + (dz / len) * speed * dt * Math.min(len, 1), WORLD.min, WORLD.max);
-    }
-  }
-  // スナップショット配信 (相手ごとに「見える範囲」だけ送る)
   for (const p of players.values()) {
     if (p.ws.readyState !== 1) continue;
     const nearby = [];
     for (const other of players.values()) {
       if (other.id === p.id) continue;
-      if (Math.hypot(other.x - p.x, other.z - p.z) <= AOI_RADIUS) nearby.push(publicState(other));
+      if (Math.hypot(other.x - p.x, other.y - p.y) <= AOI_RADIUS) nearby.push(publicState(other));
     }
     p.ws.send(JSON.stringify({ type: 'snapshot', t: Date.now(), you: publicState(p), players: nearby }));
   }
@@ -160,5 +172,5 @@ setInterval(() => {
 }, 10000);
 
 httpServer.listen(PORT, () => {
-  console.log(`AETHERIA realtime server listening on :${PORT} (tick ${TICK_MS}ms, AOI ${AOI_RADIUS})`);
+  console.log(`AETHERIA realtime server listening on :${PORT} (tick ${TICK_MS}ms, AOI ${AOI_RADIUS} tiles, protocol 2)`);
 });
