@@ -340,6 +340,30 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .online-box .ob-row{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
 .online-box .ob-row button{border-radius:6px;padding:8px 13px;font-weight:900;font-size:12px;border:1px solid var(--line2);background:var(--panel2);color:var(--paper);min-height:36px}
 .online-box .ob-row button.primary{background:var(--gold);border-color:var(--gold);color:#1c1503}
+.account-box{background:#0b100e;border:1px solid var(--gold2);border-radius:8px;padding:12px 13px;margin:0 0 16px}
+.account-box .ob-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.account-box .ob-head b{font-size:13px}
+#acctStatus{font-size:11px;font-weight:700;color:var(--muted)}
+#acctStatus.ok{color:#8fe3ae}#acctStatus.ng{color:#f0a3a8}
+.account-box p{margin:7px 0 0;font-size:11px;color:var(--muted);line-height:1.65}
+.account-box p b{color:var(--paper)}
+.account-box label{margin-top:10px}
+.account-box input{width:100%;background:#131a17;border:1px solid var(--line2);border-radius:6px;color:#fff;padding:10px 12px;font-size:14px;outline:none}
+.account-box input:focus{border-color:var(--gold)}
+.acct-tabs{display:flex;gap:6px;margin-top:10px}
+.acct-tabs button{flex:1;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);border-radius:6px;padding:8px;font-weight:900;font-size:12px}
+.acct-tabs button.on{background:#2a2413;border-color:var(--gold);color:var(--gold)}
+#acctSubmitBtn{width:100%;background:var(--gold);color:#1c1503;border:0;border-radius:7px;padding:12px;font-weight:900;font-size:14px;margin-top:12px}
+#acctSubmitBtn:hover{background:#f2d07e}
+#acctSubmitBtn:disabled{opacity:.5;cursor:wait}
+.account-box .acct-msg{font-size:11px;line-height:1.65;color:var(--muted)}
+.account-box .acct-who{font-size:13px;color:var(--paper)}
+.account-box .acct-who b{color:var(--gold)}
+.account-box .acct-char{font-size:12px;color:var(--paper)}
+.account-box .ob-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.account-box .ob-row button{border-radius:6px;padding:8px 13px;font-weight:900;font-size:12px;border:1px solid var(--line2);background:var(--panel2);color:var(--paper);min-height:36px}
+.account-box .ob-row button.primary{background:var(--gold);border-color:var(--gold);color:#1c1503}
+#serverSaveBtn{background:#12241a!important;color:#8fe3ae!important;border-color:#2f5d3f!important}
 #siteServerStatus{font-size:11px;font-weight:700;color:var(--muted)}
 #siteServerStatus.ok{color:#8fe3ae}#siteServerStatus.ng{color:#f0a3a8}
 .site-sections{width:min(1180px,100%);padding:6px 20px 0;display:flex;flex-direction:column;gap:14px}
@@ -480,7 +504,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>設定</td><td>右上の ⚙ ボタンで、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
         <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
         <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はNPC冒険者と遊ぶモードになります</td></tr>
-        <tr><td>セーブ</td><td>右上の 💾 ボタン（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でセーブデータをファイルに保存。タイトルの「つづきから」でそのファイルを選ぶと再開できます</td></tr>
+        <tr><td>セーブ</td><td>アカウントでログイン中は<b>自動保存</b>されます（操作不要）。右上の 💾 は手動同期と、バックアップ用のファイル書き出しです</td></tr>
         <tr><td>クエスト</td><td>右上のクエストを進めると報酬GET。最終目標は北東の森のボス討伐！</td></tr>
         <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）</td></tr>
       </table>
@@ -512,9 +536,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
-        <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>冒険の記録をファイルに保存する</small></span></button>
+        <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>自動保存の状態確認・手動同期とファイル書き出し</small></span></button>
         <button type="button" class="menu-item" id="menuHelpBtn"><span class="mi-ico">❓</span><span class="mi-body"><b>遊び方</b><small>操作方法と冒険のヒントを見る</small></span></button>
-        <button type="button" class="menu-item danger" id="menuLogoutBtn"><span class="mi-ico">🚪</span><span class="mi-body"><b>ログアウト</b><small>タイトル画面に戻る（先にセーブがおすすめ）</small></span></button>
+        <button type="button" class="menu-item danger" id="menuLogoutBtn"><span class="mi-ico">🚪</span><span class="mi-body"><b>ログアウト</b><small>タイトル画面に戻る</small></span></button>
       </div>
       <p class="menu-note">Escキーでも閉じられます。オンライン中はメニューを開いても世界の時間は進み続けます。</p>
     </div></div>
@@ -528,9 +552,10 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="saveModal"><div class="save-card">
       <h2>💾 セーブ</h2>
-      <p class="sub">現在の冒険をファイルに書き出して保存できます。ページを閉じても、保存したファイルがあればタイトルの「つづきから」で再開できます。</p>
+      <p class="sub">アカウントでログイン中は、進捗はサーバーへ自動保存されるので、この画面を開く必要はありません。ここでは手動での同期と、バックアップ用のファイル書き出しができます。</p>
       <div class="save-summary" id="saveSummary">—</div>
       <div class="save-actions">
+        <button id="serverSaveBtn" type="button" style="display:none">☁ サーバーへ今すぐ保存（自動保存ON）</button>
         <button id="downloadSaveBtn" type="button">⬇ セーブデータを保存する</button>
         <button id="loadSaveBtn2" type="button">📂 セーブデータを読み込む</button>
         <button id="closeSaveBtn" type="button">閉じる</button>
@@ -576,7 +601,32 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <div class="start-form">
             <div class="eyebrow">BROWSER MMORPG — 正式サービス中</div>
             <h1>AETHERIA<br><span>ONLINE</span></h1>
-            <p class="lead">キャラクターを作ってログインしよう。草原でスライムを倒し、森を抜け、遺跡のボスに挑む——王道MMORPGの1日目がここから始まります。このページは公開リンク版なので、URLを送るだけで誰でも同じ世界に入れます。</p>
+            <p class="lead">アカウントでログインして冒険しよう。草原でスライムを倒し、森を抜け、遺跡のボスに挑む——王道MMORPGの1日目がここから始まります。進捗はサーバーへ自動保存されるので、セーブ操作はいりません。</p>
+            <div class="account-box" id="accountBox">
+              <div class="ob-head"><span class="net-dot busy" id="acctDot"></span><b>サーバーアカウント</b><span id="acctStatus">アカウントサーバーの状態を確認中…</span></div>
+              <p>アカウントを作ると、レベル・所持金・クエストの進捗が<b>サーバーへ自動保存</b>されます。わざわざセーブしなくて大丈夫。どの端末からでも、同じアカウントでログインすれば続きから遊べます。</p>
+              <div id="acctForm">
+                <div class="acct-tabs">
+                  <button type="button" id="tabLogin" class="on">ログイン</button>
+                  <button type="button" id="tabRegister">アカウント作成</button>
+                </div>
+                <label for="acctUser">ユーザー名（英小文字・数字・_ で3〜16文字）</label>
+                <input id="acctUser" maxlength="16" placeholder="例: sora_01" autocomplete="username" autocapitalize="none" spellcheck="false"/>
+                <label for="acctPass">パスワード（6文字以上）</label>
+                <input id="acctPass" type="password" maxlength="64" placeholder="パスワード" autocomplete="current-password"/>
+                <button type="button" id="acctSubmitBtn">ログインして続きから始める</button>
+                <p class="acct-msg" id="acctMsg" role="status"></p>
+              </div>
+              <div id="acctLoggedIn" style="display:none">
+                <p class="acct-who">ログイン中：<b id="acctName"></b></p>
+                <p class="acct-char" id="acctCharInfo"></p>
+                <div class="ob-row">
+                  <button type="button" class="primary" id="acctContinueBtn">▶ つづきから冒険する</button>
+                  <button type="button" id="acctLogoutBtn">ログアウト</button>
+                </div>
+                <p class="acct-msg">新しいキャラクターを作り直す場合は、下のフォームからそのまま開始できます（サーバーの保存データは新しいキャラクターで上書きされます）。</p>
+              </div>
+            </div>
             <label for="nameInput">キャラクター名</label>
             <input id="nameInput" value="ソラ" maxlength="12" placeholder="名前を入力"/>
             <label style="margin-top:16px">クラスを選ぶ</label>
@@ -595,7 +645,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
                 <button type="button" class="primary" id="heroPlayBtn">▶ すぐ遊ぶ（キャラ作成へ）</button>
               </div>
             </div>
-            <p class="save-note">セーブはファイルに書き出して保存します（公開リンク版の仕様）。次回はそのファイルを選ぶだけで、レベル・所持金・クエストの続きから再開できます。</p>
+            <p class="save-note">アカウントでログイン中は、進捗がサーバーへ自動保存されます（セーブ操作は不要）。アカウントなしのゲストプレイでは、ゲーム内の 💾 からファイルに書き出して保存できます。</p>
             <div class="howto">
               <div><b>移動</b>　<kbd>WASD</kbd> / スティック</div>
               <div><b>攻撃</b>　<kbd>Space</kbd> / 剣ボタン</div>
@@ -610,6 +660,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.22</time><span class="news-tag update">アカウント</span><span><b>サーバーアカウント＆自動保存を開始。</b>ホーム画面でアカウントを作ると進捗がサーバーへ自動保存され、どの端末からでも続きが遊べるようになりました。セーブ操作は不要です。</span></li>
             <li><time>2026.11.22</time><span class="news-tag notice">お知らせ</span><span><b>公開リンク版をリリース。</b>このページのURLを送るだけで、友だちも同じブラウザで冒険に参加できるようになりました。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">オンライン</span><span><b>実プレイヤー同期が稼働中。</b>Render上の同期サーバーに接続し、位置とチャットのリアルタイム同期に対応しました。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">アップデート</span><span><b>一人称3D＆公式サイトを刷新。</b>自分の目線で歩く3Dワールドと、全5章のメインクエストを実装しました。</span></li>
@@ -634,7 +685,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <div class="feat"><div class="f-ico">👁️</div><h3>一人称で歩く世界</h3><p>カメラはあなたの目線そのもの。右手に武器を構え、町並み・森・遺跡を自分の足で歩き回る没入感。</p></div>
             <div class="feat"><div class="f-ico">◆</div><h3>リンクで友だちと合流</h3><p>このページのリンクを送るだけ。同じリンクを開いた実プレイヤーが ◆ マークで現れ、動きとチャットが同期します。</p></div>
             <div class="feat"><div class="f-ico">🗺️</div><h3>王道の冒険の1日目</h3><p>スライム討伐から始まる全5章のメインクエスト。最終目標は遺跡に眠る守護者ゴーレムの討伐。</p></div>
-            <div class="feat"><div class="f-ico">💾</div><h3>ファイルセーブ</h3><p>進捗はセーブファイルに書き出して保存。どの端末でも、そのファイルを選べば続きから再開できます。</p></div>
+            <div class="feat"><div class="f-ico">☁️</div><h3>サーバー自動保存</h3><p>ホーム画面でアカウントを作るだけ。進捗はサーバーへ自動保存され、どの端末からでもログインすれば続きから再開できます。セーブ操作は不要です。</p></div>
           </div>
         </section>
 
@@ -681,7 +732,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>スキル</td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
             <tr><td>ポーション</td><td><kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
             <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
-            <tr><td>セーブ</td><td>右上の 💾 ボタン（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でファイルに保存。タイトルの「つづきから」でそのファイルを選ぶと再開できます</td></tr>
+            <tr><td>セーブ</td><td>アカウントでログイン中は自動保存（操作不要）。ログインはホーム画面から。ゲストプレイ時は右上の 💾 ボタン（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でファイルに保存できます</td></tr>
             <tr><td>オンライン</td><td>同期サーバー接続中は実プレイヤーが ◆ マークで表示。友だちと遊ぶときは、まず町の広場で落ち合うのがおすすめです</td></tr>
           </table>
         </section>
@@ -692,7 +743,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <details><summary>料金はかかりますか？</summary><p>基本プレイ無料です。ダウンロードやインストールも不要で、ブラウザを開けばすぐに遊べます。</p></details>
             <details><summary>友だちと一緒に遊べますか？</summary><p>はい。このページのリンクを友だちに送って、同じ時間に開いてもらうだけです。同期サーバーに接続できていれば、お互いが ◆ マークのプレイヤーとして見え、動きとチャットが同期します。まず町の広場（スポーン地点の近く）で落ち合ってみてください。</p></details>
             <details><summary>相手が ◆ マークで見えません</summary><p>同期サーバーがスリープしている可能性があります（無料枠の仕様で、しばらく誰も使っていないと眠ります）。ページを開いてから最大1分ほど待って入り直すと、サーバーが目覚めて接続できることがあります。タイトルバーの表示が「実プレイヤー ○人 オンライン」になれば同期中です。</p></details>
-            <details><summary>セーブはどうなりますか？</summary><p>公開リンク版では、進捗をセーブファイルに書き出して保存します。ゲーム画面右上の 💾 からいつでも保存でき、次回はタイトルの「つづきから」でそのファイルを選べば再開できます。ファイルは端末をまたいで使えます。</p></details>
+            <details><summary>セーブはどうなりますか？</summary><p>ホーム画面でサーバーアカウントを作ってログインすれば、進捗は自動でサーバーに保存されます。セーブボタンを押す必要はありません。別のスマホやPCからでも、同じアカウントでログインすれば続きから遊べます。アカウントなしのゲストプレイでは、従来どおり 💾 からファイルに書き出して保存できます。</p></details>
             <details><summary>スマホでも遊べますか？</summary><p>はい。移動スティック・攻撃ボタン・スキルボタンなど、タッチ操作に最適化したUIを用意しています。</p></details>
             <details><summary>力尽きたらどうなりますか？</summary><p>経験値ペナルティなしでルミナスの町に帰還します。安心してボスに挑戦してください。</p></details>
           </div>
@@ -703,7 +754,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
       <div class="official-foot">
         <span>AETHERIA ONLINE — ブラウザで遊べるファンタジーMMORPG【公開版】<br>ルミナス地方で、冒険があなたを待っている。</span>
-        <span>同期サーバー: wss://aetheria-realtime-server.onrender.com<br>セーブ形式: ファイル保存（JSON）</span>
+        <span>同期サーバー: wss://aetheria-realtime-server.onrender.com<br>セーブ形式: サーバー自動保存（アカウント）／ファイル書き出しも可</span>
       </div>
     </div>
 
@@ -874,6 +925,7 @@ function refreshBagUI(){
   list.innerHTML=html;
 }
 function doLogout(){
+  if(acct.token)serverSave(false);
   returnToMenu=false;closeGameMenu();
   ['settingsModal','saveModal','helpModal','bagModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
@@ -1231,6 +1283,169 @@ function hurtPlayer(dmg,src){
   updateHUD();
 }
 
+/* ================= SERVER ACCOUNTS & AUTOSAVE =================
+   Talks to the account API on the same Render server as realtime sync:
+   POST /api/register, POST /api/login, GET /api/character,
+   POST /api/save, POST /api/logout (Bearer session token).
+   The character itself lives on the server, so progress follows the
+   account across devices and no manual saving is needed. The session
+   token is kept only in memory for this page session (never persisted
+   in the browser). When the server reports accounts are not
+   configured yet (503 accounts_not_configured), the game falls back
+   to guest play + file export, exactly as before. */
+var API_BASE='https://aetheria-realtime-server.onrender.com';
+var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login'};
+function acctSetStatus(text,ok){
+  var st=$('acctStatus'); if(st){st.textContent=text; st.className=(ok===true)?'ok':((ok===false)?'ng':'');}
+  var dot=$('acctDot'); if(dot) dot.className='net-dot '+((ok===true)?'ok':((ok===false)?'':'busy'));
+}
+function acctApi(path,opts){
+  opts=opts||{};
+  var headers={'Content-Type':'application/json'};
+  var token=opts.token||acct.token;
+  if(token)headers['Authorization']='Bearer '+token;
+  return fetch(API_BASE+path,{method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined,keepalive:!!opts.keepalive}).then(function(res){
+    return res.json().catch(function(){return {};}).then(function(data){return {status:res.status,data:data};});
+  });
+}
+function acctErrorText(code){
+  switch(code){
+    case 'accounts_not_configured': return 'アカウント機能はサーバー側の設定待ちです（保存先データベースの接続がまだ完了していません）。今はゲストとしてそのまま遊べます。';
+    case 'username_taken': return 'そのユーザー名はすでに使われています。別の名前で作成するか、ログインしてください。';
+    case 'bad_username': return 'ユーザー名は英小文字・数字・アンダースコアで3〜16文字にしてください。';
+    case 'bad_password': return 'パスワードは6〜64文字にしてください。';
+    case 'wrong_credentials': return 'ユーザー名またはパスワードが違います。';
+    case 'too_many_attempts': return 'ログイン試行が多すぎます。5分ほど待ってから再試行してください。';
+    case 'not_logged_in': return 'ログインの有効期限が切れました。再度ログインしてください。';
+    default: return 'サーバーでエラーが発生しました。少し待って再試行してください。';
+  }
+}
+function acctMsg(text,isErr){var m=$('acctMsg');if(!m)return;m.textContent=text||'';m.style.color=isErr?'#f0a3a8':'#8fe3ae';}
+function refreshAcctUI(){
+  var form=$('acctForm'),box=$('acctLoggedIn'); if(!form||!box)return;
+  var loggedIn=!!acct.token;
+  form.style.display=loggedIn?'none':'block';
+  box.style.display=loggedIn?'block':'none';
+  if(loggedIn){
+    $('acctName').textContent='@'+acct.username;
+    var info=$('acctCharInfo'),cont=$('acctContinueBtn');
+    if(acct.character&&acct.character.player){
+      var p=acct.character.player;
+      info.textContent='保存済みキャラクター: '+p.name+'（'+((CLASSES[p.cls]||{}).name||'')+' Lv.'+p.lv+'）—「つづきから冒険する」でそのまま再開できます。進捗は自動保存されます。';
+      if(cont)cont.style.display='';
+    }else{
+      info.textContent='まだキャラクターがありません。下のフォームでキャラクターを作って開始すると、そのままサーバーに自動保存されます。';
+      if(cont)cont.style.display='none';
+    }
+    $('startBtn').textContent='▶ 新しいキャラクターで冒険開始（自動保存ON）';
+  }else{
+    $('startBtn').textContent='▶ ゲストでゲームスタート（アカウントなし）';
+  }
+  var ssb=$('serverSaveBtn'); if(ssb) ssb.style.display=loggedIn?'':'none';
+}
+function acctSetMode(mode){
+  acct.mode=mode;
+  $('tabLogin').classList.toggle('on',mode==='login');
+  $('tabRegister').classList.toggle('on',mode==='register');
+  $('acctSubmitBtn').textContent=(mode==='login')?'ログインして続きから始める':'アカウントを作成して始める';
+  $('acctPass').setAttribute('autocomplete',(mode==='login')?'current-password':'new-password');
+  acctMsg('');
+}
+function acctOnAuth(data){
+  acct.token=data.token||null; acct.username=data.username||''; acct.character=data.character||null;
+  acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0;
+  refreshAcctUI(); refreshSaveUI();
+}
+function acctStartFromCharacter(){
+  if(!acct.character)return;
+  try{ applySaveData(acct.character); }
+  catch(e){ acctMsg('保存済みキャラクターを読み込めませんでした。新しいキャラクターで開始できます。',true); return; }
+  acct.savedKey=progressKey();
+  startFromSave('server');
+}
+function acctSubmit(){
+  var username=($('acctUser').value||'').trim().toLowerCase();
+  var password=$('acctPass').value||'';
+  if(!/^[a-z0-9_]{3,16}$/.test(username)){acctMsg('ユーザー名は英小文字・数字・アンダースコアで3〜16文字にしてください。',true);return;}
+  if(password.length<6||password.length>64){acctMsg('パスワードは6〜64文字にしてください。',true);return;}
+  var btn=$('acctSubmitBtn'); var old=btn.textContent;
+  btn.disabled=true; btn.textContent='サーバーに接続中…';
+  acctMsg('サーバーに接続しています（スリープ中は最大1分ほどかかります）…');
+  acctApi(acct.mode==='login'?'/api/login':'/api/register',{method:'POST',body:{username:username,password:password}}).then(function(r){
+    btn.disabled=false; btn.textContent=old;
+    if(r.data&&r.data.ok){
+      var wasRegister=(acct.mode==='register');
+      acctOnAuth(r.data);
+      $('acctPass').value='';
+      if(acct.character&&acct.character.player){
+        acctMsg('ログインしました。保存済みキャラクターで再開します…');
+        acctStartFromCharacter();
+      }else{
+        acctMsg(wasRegister?'アカウントを作成しました！下のフォームでキャラクターを作って開始してください。':'ログインしました。下のフォームでキャラクターを作って開始してください。');
+        toast(wasRegister?'☁ アカウントを作成しました':'☁ ログインしました — 自動保存ON');
+        var ni=$('nameInput'); if(ni)ni.focus();
+      }
+    }else{
+      acctMsg(acctErrorText(r.data&&r.data.error),true);
+    }
+  }).catch(function(){
+    btn.disabled=false; btn.textContent=old;
+    acctMsg('サーバーに接続できませんでした。サーバーがスリープしている場合は、1分ほど待ってからもう一度お試しください。',true);
+  });
+}
+function serverSave(manual){
+  if(!acct.token||!player||!started)return;
+  if(acct.saving)return;
+  acct.saving=true; refreshSaveUI();
+  var data=buildSaveData();
+  acctApi('/api/save',{method:'POST',body:{character:data},keepalive:true}).then(function(r){
+    acct.saving=false;
+    if(r.data&&r.data.ok){
+      acct.character=data; acct.lastAt=new Date(); acct.savedKey=progressKey(); acct.dirtySince=0;
+      lastSaveAt=acct.lastAt; lastSavedKey=acct.savedKey;
+      if(manual)toast('☁ サーバーに保存しました');
+    }else if(r.status===401){
+      acct.token=null; acct.username=null; acct.character=null;
+      refreshAcctUI();
+      toast('ログインの有効期限が切れました。タイトルに戻って再ログインすると自動保存が再開します',4200);
+    }else if(manual){
+      toast('サーバー保存に失敗しました。少し待って再試行してください',3600);
+    }
+    refreshSaveUI();
+  }).catch(function(){
+    acct.saving=false;
+    if(manual)toast('サーバー保存に失敗しました。接続を確認してください',3600);
+    refreshSaveUI();
+  });
+}
+function acctTick(now){
+  if(!acct.token||!started||!player||player.dead)return;
+  if(progressKey()!==acct.savedKey){
+    if(!acct.dirtySince)acct.dirtySince=now;
+    if(now-acct.dirtySince>4000)serverSave(false);
+  }
+}
+function acctLogout(){
+  var token=acct.token;
+  acct.token=null; acct.username=null; acct.character=null; acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0;
+  refreshAcctUI(); refreshSaveUI();
+  acctSetMode('login');
+  acctMsg('ログアウトしました。');
+  if(token){ try{ fetch(API_BASE+'/api/logout',{method:'POST',headers:{'Authorization':'Bearer '+token}}).catch(function(){}); }catch(e){} }
+}
+$('tabLogin').addEventListener('click',function(){acctSetMode('login');});
+$('tabRegister').addEventListener('click',function(){acctSetMode('register');});
+$('acctSubmitBtn').addEventListener('click',acctSubmit);
+$('acctUser').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('acctPass').focus();}});
+$('acctPass').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();acctSubmit();}});
+$('acctContinueBtn').addEventListener('click',function(){acctStartFromCharacter();});
+$('acctLogoutBtn').addEventListener('click',acctLogout);
+$('serverSaveBtn').addEventListener('click',function(){serverSave(true);});
+window.addEventListener('pagehide',function(){
+  if(acct.token&&started&&player){ try{ acctApi('/api/save',{method:'POST',body:{character:buildSaveData()},keepalive:true}); }catch(e){} }
+});
+refreshAcctUI();
+
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,questIdx,questCount,Math.round(player.x),Math.round(player.y)].join('|');}
@@ -1242,7 +1457,13 @@ function buildSaveData(){
 }
 function refreshSaveUI(){
   var dirty=player&&lastSavedKey&&progressKey()!==lastSavedKey;
-  var label=!player?'未保存':(lastSaveAt?(dirty?'変更あり（未保存）':'保存済み '+lastSaveAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})):'未保存');
+  var label;
+  if(acct.token&&player){
+    label=acct.saving?'☁ 保存中…':(acct.lastAt?((progressKey()!==acct.savedKey)?'☁ 自動保存まち':'☁ 自動保存済み '+acct.lastAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})):'☁ 自動保存 ON');
+  }else{
+    label=!player?'未保存':(lastSaveAt?(dirty?'変更あり（未保存）':'保存済み '+lastSaveAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})):'未保存');
+  }
+  var qsBtn=$('quickSaveBtn'); if(qsBtn) qsBtn.textContent=acct.token?'今すぐ同期':'今すぐセーブ';
   var st=$('saveStatusText');if(st)st.textContent=label;
   var sum=$('saveSummary');
   if(sum){
@@ -1254,6 +1475,7 @@ function refreshSaveUI(){
   }
   var note=$('lastSaveNote');
   if(note&&lastSaveAt)note.textContent='前回の保存: '+lastSaveAt.toLocaleString('ja-JP')+(dirty?' — そのあと進捗が進んでいます。再度保存すると最新になります。':'');
+  if(note&&acct.token)note.textContent='☁ @'+acct.username+' でログイン中 — 進捗はサーバーへ自動保存されます'+(acct.lastAt?'（前回の保存: '+acct.lastAt.toLocaleString('ja-JP')+'）':'')+'。下のボタンはバックアップ用のファイル書き出しです。';
 }
 function downloadSave(){
   if(!player){toast('ゲームを開始してからセーブできます');return;}
@@ -1296,7 +1518,7 @@ function applySaveData(data){
   if(data.savedAt){var d=new Date(data.savedAt);if(!isNaN(d.getTime()))lastSaveAt=d;}
   lastSavedKey=progressKey();
 }
-function startFromSave(){
+function startFromSave(source){
   setupSkillUI(player.cls);
   genWorld();populate();makeBots();
   // genWorld rebuilt obstacles; if saved position now collides, fall back to town
@@ -1305,10 +1527,10 @@ function startFromSave(){
   $('startScreen').style.display='none';$('saveModal').style.display='none';
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
   netConnect();
-  chat('— セーブデータを読み込みました —','sys');
-  chat('💾 <b>'+escHtml(player.name)+'</b> Lv.'+player.lv+' でログインしました。クエスト「'+QUESTS[questIdx].title+'」の続きから再開します。','sys');
+  chat(source==='server'?'— サーバーからキャラクターを読み込みました —':'— セーブデータを読み込みました —','sys');
+  chat((source==='server'?'☁ ':'💾 ')+'<b>'+escHtml(player.name)+'</b> Lv.'+player.lv+' でログインしました。クエスト「'+QUESTS[questIdx].title+'」の続きから再開します。'+(source==='server'?'進捗は自動保存されます。':''),'sys');
   chat('<b>案内人リア</b>: おかえりなさい、'+escHtml(player.name)+'さん！冒険の続きをどうぞ。','world');
-  toast('つづきから再開しました — Lv.'+player.lv,3200);
+  toast(source==='server'?'サーバーの続きから再開しました — Lv.'+player.lv:'つづきから再開しました — Lv.'+player.lv,3200);
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
 }
 function openSavePicker(ctx){saveLoadContext=ctx||'title';var inp=$('saveFileInput');inp.value='';inp.click();}
@@ -2049,7 +2271,7 @@ function loop(now){
     }
     if(THREE_OK){render3D(now);}else{draw();}
     if(now-miniT>180){miniT=now;drawMini();}
-    if(now-listT>900){listT=now;updatePlayerList();updateHUD();refreshSaveUI();$('hudZone').textContent=zoneAt(player.x,player.y);}
+    if(now-listT>900){listT=now;updatePlayerList();updateHUD();refreshSaveUI();acctTick(now);$('hudZone').textContent=zoneAt(player.x,player.y);}
     updateSkillUI(now);
     // mp/hp bars smooth
     $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
@@ -2073,7 +2295,7 @@ document.addEventListener('keydown',function(e){
   if(menuOpen||$('bagModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&e.code.indexOf('Arrow')===0&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput'))e.preventDefault();
-  if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started)downloadSave();return;}
+  if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started){if(acct.token)serverSave(true);else downloadSave();}return;}
   if(!started)return;
   if(document.activeElement===$('chatInput'))return;
   var b=settings.binds;
@@ -2101,7 +2323,7 @@ $('respawnBtn').addEventListener('click',function(){
   netSendPos(true);
 });
 $('saveBtn').addEventListener('click',function(){if(!started){toast('ゲームを開始してからセーブできます');return;}returnToMenu=false;refreshSaveUI();$('saveModal').style.display='grid';});
-$('quickSaveBtn').addEventListener('click',function(){downloadSave();});
+$('quickSaveBtn').addEventListener('click',function(){if(acct.token){serverSave(true);}else{downloadSave();}});
 $('downloadSaveBtn').addEventListener('click',function(){downloadSave();});
 $('loadSaveBtn2').addEventListener('click',function(){openSavePicker('ingame');});
 $('closeSaveBtn').addEventListener('click',function(){closeSubModal('saveModal');});
@@ -2220,7 +2442,8 @@ $('startBtn').addEventListener('click',function(){
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
   netConnect();
   chat('— AETHERIA ONLINE にログインしました —','sys');
-  chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、攻撃は Space、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。区切りのいいところで右上の 💾 からセーブできます。','world');
+  chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、攻撃は Space、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで右上の 💾 からセーブできます。'),'world');
+  if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
   setTimeout(function(){chat('<b class="who-mag">ユナ</b>: あ、新しい人だ！よろしくね〜');},1600);
   setTimeout(function(){chat('<b class="who-war">カイト</b>: 草原なら俺も今から行くところだよ');},3400);
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
@@ -2235,7 +2458,8 @@ document.querySelectorAll('[data-scrollto]').forEach(function(btn){
 });
 var heroPlayBtn=$('heroPlayBtn');
 if(heroPlayBtn) heroPlayBtn.addEventListener('click',function(){
-  var f=document.getElementById('nameInput'); if(f){ f.focus(); f.scrollIntoView({behavior:'smooth',block:'center'}); }
+  var f=acct.token?document.getElementById('nameInput'):document.getElementById('acctUser');
+  if(f){ f.focus(); f.scrollIntoView({behavior:'smooth',block:'center'}); }
 });
 function checkServerHealth(manual){
   var st=$('siteServerStatus'),dot=$('siteNetDot');
@@ -2248,6 +2472,9 @@ function checkServerHealth(manual){
     if(data&&data.ok){
       if(st){st.textContent='サーバー応答OK — 現在 '+((typeof data.players==='number')?data.players:0)+' 人が接続中（protocol '+(data.protocol||'?')+'）';st.className='ok';}
       if(dot)dot.className='net-dot ok';
+      acct.enabled=(data.accounts==='on');
+      if(acct.enabled){ acctSetStatus('アカウント利用OK — ログイン／新規作成ができます',true); }
+      else{ acctSetStatus('アカウントはサーバー設定待ちです（ゲストプレイは可能）',false); }
       if(manual) toast('同期サーバーは応答しています');
     }else{
       if(st){st.textContent='サーバーから想定外の応答がありました';st.className='ng';}
@@ -2257,6 +2484,7 @@ function checkServerHealth(manual){
     if(timer)clearTimeout(timer);
     if(st){st.textContent='応答なし — サーバーがスリープ中の可能性があります。ゲーム開始時に自動で再接続します';st.className='ng';}
     if(dot)dot.className='net-dot';
+    acctSetStatus('サーバー応答なし — スリープ中の可能性があります（1分ほど待って再試行）');
     if(manual) toast('サーバーの応答がありません（スリープ中の可能性）',3200);
   });
 }
