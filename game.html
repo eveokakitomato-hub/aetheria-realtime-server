@@ -520,6 +520,41 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   .hero-frame img{height:230px}
   .quest-chain .q-reward{display:none}
 }
+/* ===== TERRAIN / BUILDING EDITOR (gamemaster only) ===== */
+#editorPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:520px;max-width:calc(100vw - 16px);z-index:66;background:rgba(10,15,13,.96);border:1px solid var(--gold2);border-radius:12px;padding:12px 14px;box-shadow:0 18px 50px rgba(0,0,0,.6);max-height:52vh;overflow-y:auto}
+#editorPanel h2{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+#editorPanel h2 .gm-tag{font-size:10px;background:#2a2413;border:1px solid var(--gold2);color:var(--gold);border-radius:999px;padding:2px 8px;letter-spacing:.08em}
+#edCloseBtn{margin-left:auto;background:var(--gold);color:#1c1503;border:0;border-radius:6px;padding:7px 13px;font-weight:900;font-size:12px}
+.ed-tabs{display:flex;gap:6px;margin:10px 0 4px}
+.ed-tabs button{flex:1;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);border-radius:7px;padding:9px;font-weight:900;font-size:13px}
+.ed-tabs button.on{background:#2a2413;border-color:var(--gold);color:var(--gold)}
+.ed-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.ed-tools button,.ed-pal button{background:var(--panel2);border:1px solid var(--line2);color:var(--paper);border-radius:7px;padding:9px 4px;font-weight:900;font-size:12px;line-height:1.35}
+.ed-tools button.on,.ed-pal button.on{border-color:var(--gold);background:#2a2413;color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.ed-pal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.ed-pal button span{display:block;font-size:19px}
+.ed-row{display:flex;align-items:center;gap:9px;margin-top:9px;font-size:12px}
+.ed-row label{width:86px;flex-shrink:0;font-weight:700;color:var(--muted)}
+.ed-row input[type=range]{flex:1;accent-color:var(--gold);min-height:28px}
+.ed-row .ed-val{font-weight:900;color:var(--gold);min-width:52px;text-align:right}
+.ed-actions{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+.ed-actions button{flex:1;border-radius:7px;padding:11px 6px;font-weight:900;font-size:13px;border:1px solid var(--line2);background:var(--panel2);color:var(--paper);min-width:100px}
+.ed-actions button.primary{background:var(--gold);border-color:var(--gold);color:#1c1503}
+.ed-actions button.danger{border-color:#5a2b2e;color:#f0a3a8}
+.ed-actions button.danger.armed{background:#7a1f22;color:#fff;border-color:#e5484d}
+.ed-actions button:disabled{opacity:.38}
+#edApplyBtn{touch-action:none;user-select:none;-webkit-user-select:none}
+#edApplyBtn.holding{background:#f2d07e}
+#edStatus{font-size:11px;color:var(--muted);line-height:1.6;margin:9px 0 0}
+#edStatus b{color:var(--gold)}
+#hoverBanner{display:none;margin:0 auto 8px;width:fit-content;max-width:100%;padding:6px 14px;border-radius:99px;background:rgba(46,32,8,.92);border:1px solid var(--gold2);color:#ffe9a8;font-size:12px;font-weight:700;text-align:center}
+.ed-note{font-size:11px;color:var(--dim);line-height:1.6;margin:6px 0 0}
+@media(max-width:900px){
+  #editorPanel{bottom:6px;max-height:56vh;padding:10px 11px}
+  .ed-tools{grid-template-columns:repeat(4,1fr)}
+  .ed-pal{grid-template-columns:repeat(4,1fr)}
+  .ed-actions button{min-width:84px;padding:12px 4px}
+}
 </style>
 </head>
 <body>
@@ -547,6 +582,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <!-- HUD -->
     <div id="hud">
       <div id="swimBanner" role="status"></div>
+      <div id="hoverBanner" role="status">🕊 浮遊中 — ジャンプキーを2回すばやく押すと降りられます</div>
       <div class="char-card">
         <div class="char-top">
           <div class="avatar" id="hudAvatar">⚔️</div>
@@ -620,6 +656,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
         <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
+        <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を2回すばやく押す（ダブルタップ）と浮遊が解除され、地面へ降ります。着地すると通常状態に戻ります</td></tr>
+        <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木などの配置ができ、編集はセーブデータに保存されます</td></tr>
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
@@ -673,6 +711,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span></button>
         <button type="button" class="menu-item" id="menuPlayersBtn"><span class="mi-ico">◆</span><span class="mi-body"><b>オンラインプレイヤー</b><small>今つながっている実プレイヤーの一覧を見る</small></span></button>
         <button type="button" class="menu-item" id="menuMapBtn"><span class="mi-ico">🗺️</span><span class="mi-body"><b>全体マップ</b><small>探索済みエリアの地図を見る（歩いた場所だけが描かれる）</small></span><span class="mi-key">M</span></button>
+        <button type="button" class="menu-item" id="menuEditorBtn" style="display:none"><span class="mi-ico">🏗️</span><span class="mi-body"><b>地形エディター</b><small>地形を掘ったり盛ったり、建物や木を置いて街並みを作る（ゲームマスター専用）</small></span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSoundBtn"><span class="mi-ico">♪</span><span class="mi-body"><b>サウンド設定</b><small>効果音の ON / OFF と音量（全体・効果音）を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>自動保存の状態確認・手動同期とファイル書き出し</small></span></button>
@@ -695,6 +734,51 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div id="playersList"></div>
       <div class="bag-actions"><button id="closePlayersBtn" type="button">閉じる</button></div>
     </div></div>
+
+    <div id="editorPanel" style="display:none" role="dialog" aria-label="地形エディター">
+      <h2>🏗️ 地形エディター <span class="gm-tag">GAMEMASTER</span><button type="button" id="edCloseBtn">閉じてゲームに戻る</button></h2>
+      <div class="ed-tabs">
+        <button type="button" id="edTabTerrain" class="on">⛰ 地形を編集</button>
+        <button type="button" id="edTabBuild">🏠 建物を置く</button>
+      </div>
+      <div id="edTerrainBox">
+        <div class="ed-tools" role="group" aria-label="地形ツール">
+          <button type="button" class="ed-tool on" data-tool="raise">▲<br>上げる</button>
+          <button type="button" class="ed-tool" data-tool="lower">▼<br>下げる</button>
+          <button type="button" class="ed-tool" data-tool="flatten">＝<br>平らにする</button>
+          <button type="button" class="ed-tool" data-tool="smooth">〜<br>なだらかに</button>
+        </div>
+        <div class="ed-row"><label for="edBrushRange">ブラシの大きさ</label><input type="range" id="edBrushRange" min="50" max="320" step="10" value="130"/><span class="ed-val" id="edBrushVal">130</span></div>
+        <div class="ed-row"><label for="edStrRange">強さ</label><input type="range" id="edStrRange" min="1" max="10" step="1" value="5"/><span class="ed-val" id="edStrVal">5</span></div>
+        <div class="ed-actions">
+          <button type="button" class="primary" id="edApplyBtn">⛏ 照準の場所を編集（長押し）</button>
+        </div>
+        <p class="ed-note">照準（画面中央）がブラシの中心です。PCでは画面をクリック／ドラッグしながらでも編集できます。視点はドラッグ、移動は WASD のまま使えます。</p>
+      </div>
+      <div id="edBuildBox" style="display:none">
+        <div class="ed-pal" role="group" aria-label="置く物">
+          <button type="button" class="ed-pal-btn on" data-type="house"><span>🏠</span>木組みの家</button>
+          <button type="button" class="ed-pal-btn" data-type="tree_b"><span>🌳</span>木（広葉樹）</button>
+          <button type="button" class="ed-pal-btn" data-type="tree_p"><span>🌲</span>木（針葉樹）</button>
+          <button type="button" class="ed-pal-btn" data-type="wall"><span>🧱</span>石壁</button>
+          <button type="button" class="ed-pal-btn" data-type="lamp"><span>🏮</span>街灯</button>
+          <button type="button" class="ed-pal-btn" data-type="fence"><span>🚧</span>柵</button>
+          <button type="button" class="ed-pal-btn" data-type="rock"><span>🪨</span>岩</button>
+          <button type="button" class="ed-pal-btn" data-type="bridge"><span>🌉</span>橋</button>
+        </div>
+        <div class="ed-row"><label>向き</label><button type="button" class="sound-toggle off" id="edRotL" style="min-width:52px">⟲ -15°</button><span class="ed-val" id="edRotVal" style="min-width:44px">0°</span><button type="button" class="sound-toggle off" id="edRotR" style="min-width:52px">⟳ +15°</button><span style="font-size:11px;color:var(--muted)">キー: R / Shift+R</span></div>
+        <div class="ed-actions">
+          <button type="button" id="edPlaceModeBtn">モード: 配置</button>
+          <button type="button" class="primary" id="edPlaceBtn">📌 照準の場所に置く</button>
+        </div>
+        <p class="ed-note">半透明のプレビューが照準の場所に出ます。「モード: 削除」に切り替えると、照準に一番近い置いた物が赤く光り、「削除する」で消せます。置いた物には当たり判定が付きます。</p>
+      </div>
+      <div class="ed-actions">
+        <button type="button" id="edUndoBtn">↩ 元に戻す</button>
+        <button type="button" class="danger" id="edResetBtn">🗑 編集を全部リセット</button>
+      </div>
+      <p id="edStatus">エディター起動中は敵が湧かず、攻撃もできません（安全な作業モード）。編集は自動保存の対象です。</p>
+    </div>
 
     <div id="saveModal"><div class="save-card">
       <h2>💾 セーブ</h2>
@@ -987,6 +1071,7 @@ var mini=document.getElementById('minimap'),mctx=mini.getContext('2d');
 var started=false, soundOn=true, audioCtx=null;
 var keys={}, joyVec={x:0,y:0};
 var jumpY=0, jumpVY=0; // jump height above terrain / vertical velocity (Space)
+var hovering=false, hoverTapT=0; // float mode (gamemaster only): gravity stopped mid-air
 var cam={x:0,y:0};
 var viewW=960, viewH=640;
 /* 3D camera state (first-person) */
@@ -1215,6 +1300,7 @@ function isAnyOverlayOpen(){
    body.hide-cursor の CSS でカーソルは表示されない（次のクリックでロックされる）。 */
 var _cursorHideState=null;
 function shouldHideCursor(){
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return false; /* editor: cursor needed for the panel */
   if(!started||!player||player.dead)return false;
   if(menuOpen||isAnyOverlayOpen())return false;
   if($('gameMenu').style.display==='grid')return false;
@@ -1238,6 +1324,7 @@ function relockPointer(){
 function openGameMenu(){
   if(!started||!player||player.dead)return;
   menuOpen=true;keys={};joyVec.x=0;joyVec.y=0;
+  var edBtn=$('menuEditorBtn'); if(edBtn)edBtn.style.display=isGameMaster()?'':'none'; /* editor entry: gamemaster only */
   $('menuCharLine').textContent=player.name+' ／ '+CLASSES[player.cls].name+' Lv.'+player.lv+' ／ '+zoneAt(player.x,player.y);
   $('gameMenu').style.display='grid';
   if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
@@ -1273,6 +1360,7 @@ function closeSubModal(id){
   else{relockPointer();}
 }
 function handleEscape(){
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active){closeEditor();return true;}
   if(menuOpen){closeGameMenu();return true;}
   if($('worldMapModal').style.display==='grid'){closeWorldMap();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
@@ -1315,7 +1403,9 @@ function refreshPlayersUI(){
   list.innerHTML=html;
 }
 function doLogout(){
-  if(acct.token)serverSave(false);
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active){editorState.active=false;editorState.applying=false;var ep=$('editorPanel');if(ep)ep.style.display='none';}
+  if(acct.token)serverSave(false); /* save FIRST (buildSaveData runs synchronously), then clear */
+  clearWorldEditSilent(); hovering=false; /* world edits never leak into the next session */
   returnToMenu=false;closeGameMenu(true);
   ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
@@ -1850,6 +1940,7 @@ function tooCrowded(x,y){
    the player. Called from the main loop roughly every 2.6 seconds. */
 function trySpawnNear(immediate){
   if(!player)return;
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: no spawns */
   var now=performance.now(), made=0;
   for(var i=0;i<spawnPoints.length;i++){
     var sp=spawnPoints[i];
@@ -2010,6 +2101,7 @@ var BOW_FULL_MS=900;
 var bowDraw={active:false,start:0,power:0,fullPinged:false};
 function bowPower(){ if(!bowDraw.active)return 0; return Math.min(1,(performance.now()-bowDraw.start)/BOW_FULL_MS); }
 function startBowDraw(){
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return false;
   if(!started||!player||player.dead||player.cls!=='archer')return false;
   if(bowDraw.active)return true;
   if(menuOpen||isAnyOverlayOpen())return false;
@@ -2047,6 +2139,7 @@ function fireArrow(power,mult,full){
 }
 function playerAttack(mult,skillKey){
   if(!started||player.dead)return;
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: no attacks */
   var now=performance.now(),c=CLASSES[player.cls];
   if(!skillKey){if(now-lastAttack<380)return;lastAttack=now;}
   /* ARCHER skills fire instantly at a solid draw; the BASIC attack goes
@@ -2081,6 +2174,7 @@ function swingFx(){
 }
 function useSkill(n){
   if(!started||player.dead)return;
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
   var c=CLASSES[player.cls],key='s'+n,sk=c[key],now=performance.now();
   if(now<skillCd[key])return;
   if(player.mp<sk.mp){toast('MPが足りません');beep(140,0.1,'square',0.04);return;}
@@ -2114,6 +2208,7 @@ function usePotion(){
 }
 function hurtPlayer(dmg,src){
   if(player.dead||isSafe(player.x,player.y))return;
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: invulnerable */
   var real=Math.max(1,dmg-player.def);
   player.hp-=real;addDmg(player.x,player.y,'-'+real,'#ff8a8a');
   burst(player.x,player.y,'#e5484d',5);
@@ -2325,13 +2420,14 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey(),worldEditKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
     player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills},
     quest:{idx:questIdx,count:questCount},
     explored:exploredToString(),
+    worldEdit:serializeWorldEdit(),
     settings:snapshotSettings()};
 }
 function refreshSaveUI(){
@@ -2380,6 +2476,7 @@ function setupSkillUI(clsKey){
 function applySaveData(data){
   if(!data||data.app!=='AETHERIA ONLINE'||!data.player||!CLASSES[data.player.cls])throw new Error('invalid save');
   if(data.settings)applySettingsData(data.settings);
+  applyWorldEditFromSave(data); /* terrain/building edits: applied ONLY for gamemaster */
   var p=data.player;
   function num(v,fallback,min,max){var n=Number(v);if(!isFinite(n))n=fallback;return Math.max(min,Math.min(max,n));}
   var np=makePlayer(String(p.name||'冒険者').slice(0,12),p.cls);
@@ -2402,6 +2499,7 @@ function applySaveData(data){
 function startFromSave(source){
   setupSkillUI(player.cls);
   genWorld();populate();
+  syncPlacedObstacles(); placedSig='__dirty__'; refreshGroundAll(); /* world edits (gamemaster) re-applied */
   // genWorld rebuilt obstacles; if saved position now collides, fall back to town
   if(collide(player.x,player.y,player.r)){player.x=SPAWN_X;player.y=SPAWN_Y;lastSavedKey=progressKey();}
   started=true;
@@ -2500,6 +2598,34 @@ function updateSwimBanner(){
   if(player.mp<=0){b.className='danger';b.textContent='⚠ MPが尽きた！溺れています ― 急いで岸（浅瀬）へ戻って！';}
   else{b.className='';b.textContent='🏊 泳ぎ中 ― MPを消費しています（水深 約'+(player.swimDepth/10).toFixed(1)+'m）';}
 }
+/* ================= HOVER / FLIGHT (gamemaster only) =================
+   Ground Space = normal jump (everyone). Space again mid-air starts the
+   float ONLY for the gamemaster account; other players just fall as
+   usual. While floating, a double-tap of Space (two presses within
+   350ms) cancels the float and gravity resumes. Landing resets it. */
+function updateHoverBanner(){
+  var b=$('hoverBanner'); if(!b)return;
+  b.style.display=(hovering&&player&&!player.dead)?'block':'none';
+}
+function handleJumpKey(){
+  if(!started||!player||player.dead)return;
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
+  if(player.swimming){hovering=false;updateHoverBanner();return;}
+  var now=performance.now();
+  if(hovering){
+    if(now-hoverTapT<350){
+      hovering=false;hoverTapT=0;jumpVY=0;
+      toast('浮遊を解除しました — 地面へ降りています');
+      beep(420,0.07,'sine',0.03);updateHoverBanner();
+    }else hoverTapT=now;
+    return;
+  }
+  if(jumpY<=0&&jumpVY===0){jumpVY=0.17;return;} /* grounded: normal jump for everyone */
+  if(!isGameMaster())return; /* mid-air press: only gamemaster can float */
+  hovering=true;jumpVY=0;hoverTapT=0;
+  toast('🕊 浮遊モード — 空中をそのまま移動できます（Spaceを2回すばやく押すと解除）',3200);
+  beep(880,0.08,'sine',0.04);updateHoverBanner();
+}
 
 /* ================= UPDATE ================= */
 function update(dt,now){
@@ -2559,12 +2685,18 @@ function update(dt,now){
     player.walk+=dt*0.02;
   }
   // jump physics (Space): gravity pulls the player back down onto the terrain height;
-  // horizontal movement above keeps working while airborne
-  if(jumpVY!==0||jumpY>0){
+  // horizontal movement above keeps working while airborne.
+  // HOVER (gamemaster only): gravity stops and the player floats at this
+  // height until a double-tap of Space cancels it or they land.
+  if(hovering){
+    jumpVY=0;
+    if(player.swimming)hovering=false;
+  }else if(jumpVY!==0||jumpY>0){
     jumpY+=jumpVY*dt;
     jumpVY-=0.00045*dt;
-    if(jumpY<=0){jumpY=0;jumpVY=0;}
+    if(jumpY<=0){jumpY=0;jumpVY=0;hovering=false;}
   }
+  updateHoverBanner();
   // mp regen (paused while dashing or swimming); safe-zone heal below
   if(!dashingNow&&!player.swimming)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
   // crosshair identification + eyesight: the enemy captured by the center
@@ -2992,7 +3124,7 @@ function townTerrain(x,y,h){
 /* Rolling terrain height (world units) at game coords x,y: gentle hills and dips,
    smoothly flattened around the spawn clearing, the lakes and the ruins floors
    so key areas stay easy to walk. Everything standing on the ground follows this. */
-function terrainH(x,y){
+function terrainHBase(x,y){
   var h=Math.sin(x*0.0042+1.7)*Math.cos(y*0.0036+0.4)*9
        +Math.sin(x*0.0016-0.6)*Math.sin(y*0.0021+2.0)*8
        +Math.sin((x+y)*0.0063+0.9)*3.2
@@ -3017,6 +3149,542 @@ function terrainH(x,y){
   if(x>260&&x<2340&&y>360&&y<2440) base=townTerrain(x,y,base); // the town of Luminas and its mountain
   return base;
 }
+
+/* ================= TERRAIN EDITOR + BUILDING PLACEMENT (gamemaster only) =================
+   Access rule: the whole feature exists ONLY while the logged-in account's
+   username is exactly "gamemaster". The Esc-menu entry is hidden for
+   everyone else, openEditor() refuses, and world-edit data inside a save
+   is applied only when isGameMaster() is true at load time.
+   Terrain edits live in a delta layer over terrainHBase(): a 111x111
+   vertex grid (matching the ground plane's 110x110 segments). terrainH()
+   = base + bilinear(delta). Only non-zero vertices are serialised
+   (sparse), inside the character save (buildSaveData().worldEdit), so
+   they ride the account autosave and the file export like everything
+   else. Placed buildings are a sparse list too, with real collision. */
+function isGameMaster(){
+  return !!(typeof acct!=='undefined'&&acct&&acct.token&&acct.username==='gamemaster');
+}
+var EDIT_SEG=110, EDIT_STEP=W/EDIT_SEG, EDIT_N=EDIT_SEG+1;
+var terrainDelta=new Float32Array(EDIT_N*EDIT_N);
+var terrainChanged={}; /* idx -> true, for sparse serialisation */
+var placedObjects=[];  /* {id,t,x,y,rot(deg)} */
+var placedSeq=0;
+var editSeq=0;         /* bumped on any world edit; part of progressKey() */
+var undoStack=[];
+var editorState={active:false,mode:'terrain',tool:'raise',brush:130,strength:5,
+  applying:false,stroke:null,flatTarget:0,buildType:'house',rot:0,placeMode:'place',
+  aim:null,lastEditBump:0,statusT:0};
+var groundGeo3D=null, groundMesh3D=null, vertexGameX=null, vertexGameY=null;
+var placedGroup=null, placedSig='', brushRing=null, ghostGroup=null, ghostKey='';
+var PLACED_TYPES={house:1,tree_b:1,tree_p:1,wall:1,lamp:1,fence:1,rock:1,bridge:1};
+var terrainHasEdits=false;
+function terrainH(x,y){
+  return terrainHBase(x,y)+editDeltaAt(x,y);
+}
+function editDeltaAt(x,y){
+  if(!terrainHasEdits)return 0;
+  var fx=x/EDIT_STEP, fy=y/EDIT_STEP;
+  var x0=Math.max(0,Math.min(EDIT_SEG-1,Math.floor(fx))), y0=Math.max(0,Math.min(EDIT_SEG-1,Math.floor(fy)));
+  var tx=Math.max(0,Math.min(1,fx-x0)), ty=Math.max(0,Math.min(1,fy-y0));
+  var i00=y0*EDIT_N+x0, i10=i00+1, i01=i00+EDIT_N, i11=i01+1;
+  var d00=terrainDelta[i00],d10=terrainDelta[i10],d01=terrainDelta[i01],d11=terrainDelta[i11];
+  if(d00===0&&d10===0&&d01===0&&d11===0)return 0;
+  return (d00*(1-tx)+d10*tx)*(1-ty)+(d01*(1-tx)+d11*tx)*ty;
+}
+function markEditChanged(){
+  editSeq++;
+  if(typeof refreshSaveUI==='function')refreshSaveUI();
+}
+function worldEditKey(){
+  var n=0; for(var k in terrainChanged)n++;
+  return 'WE'+editSeq+':'+n+':'+placedObjects.length;
+}
+function serializeWorldEdit(){
+  var n=0; for(var k in terrainChanged)n++;
+  if(n===0&&placedObjects.length===0)return null;
+  var terr=[];
+  for(var idx in terrainChanged){
+    var d=terrainDelta[Number(idx)];
+    if(Math.abs(d)>0.05)terr.push([Number(idx),Math.round(d*10)/10]);
+  }
+  var pl=placedObjects.map(function(o){return {t:o.t,x:Math.round(o.x),y:Math.round(o.y),rot:Math.round(o.rot)};});
+  return {v:1,terrain:terr,placed:pl};
+}
+function clearWorldEditSilent(){
+  terrainDelta=new Float32Array(EDIT_N*EDIT_N);
+  terrainChanged={}; terrainHasEdits=false; placedObjects=[]; placedSeq=0; undoStack=[];
+  editorState.stroke=null; editorState.applying=false;
+  placedSig='__dirty__';
+  if(typeof obstacles!=='undefined')syncPlacedObstacles();
+  refreshGroundAll();
+}
+function loadWorldEdit(we){
+  clearWorldEditSilent();
+  if(!we||typeof we!=='object')return;
+  if(Array.isArray(we.terrain)){
+    we.terrain.forEach(function(pair){
+      if(!Array.isArray(pair))return;
+      var idx=Math.floor(Number(pair[0])), d=Number(pair[1]);
+      if(!(idx>=0&&idx<EDIT_N*EDIT_N)||!isFinite(d))return;
+      d=Math.max(-500,Math.min(500,d));
+      if(Math.abs(d)>0.05){terrainDelta[idx]=d;terrainChanged[idx]=true;terrainHasEdits=true;}
+    });
+  }
+  if(Array.isArray(we.placed)){
+    we.placed.slice(0,300).forEach(function(o){
+      if(!o||!PLACED_TYPES[o.t])return;
+      var x=Number(o.x),y=Number(o.y),rot=Number(o.rot)||0;
+      if(!isFinite(x)||!isFinite(y))return;
+      x=Math.max(30,Math.min(W-30,x)); y=Math.max(30,Math.min(H-30,y));
+      placedObjects.push({id:++placedSeq,t:o.t,x:x,y:y,rot:((rot%360)+360)%360});
+    });
+  }
+  editSeq++;
+  refreshGroundAll();
+  syncPlacedObstacles();
+  placedSig='__dirty__';
+}
+/* Called from applySaveData(): the save's world edits are honoured ONLY
+   for gamemaster. Anyone else's client ignores them completely. */
+function applyWorldEditFromSave(data){
+  if(isGameMaster()&&data&&data.worldEdit)loadWorldEdit(data.worldEdit);
+  else clearWorldEditSilent();
+}
+/* ---- ground mesh refresh ---- */
+function refreshGroundVertices(cx,cy,r){
+  if(!groundGeo3D||!vertexGameX)return;
+  var pos=groundGeo3D.attributes.position;
+  var x0=cx-r,x1=cx+r,y0=cy-r,y1=cy+r;
+  for(var i=0;i<pos.count;i++){
+    var gx=vertexGameX[i], gy=vertexGameY[i];
+    if(gx<x0||gx>x1||gy<y0||gy>y1)continue;
+    pos.setZ(i,terrainH(gx,gy));
+  }
+  pos.needsUpdate=true;
+}
+function refreshGroundAll(){
+  if(!groundGeo3D||!vertexGameX)return;
+  var pos=groundGeo3D.attributes.position;
+  for(var i=0;i<pos.count;i++)pos.setZ(i,terrainH(vertexGameX[i],vertexGameY[i]));
+  pos.needsUpdate=true;
+  groundGeo3D.computeVertexNormals();
+}
+/* ---- aim: ray-march the centre crosshair onto the terrain ---- */
+function computeEditorAim(){
+  if(!player)return null;
+  var eyeY=terrainH(player.x,player.y)+54+jumpY;
+  if(player.swimming)eyeY=terrainH(player.x,player.y)+30;
+  var cp=Math.cos(camPitch);
+  var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
+  var px=player.x, py=player.y, pz=eyeY;
+  var prevT=0, prevAbove=true;
+  for(var t=8;t<=1100;t+=8){
+    var x=px+dx*t, y=py+dy*t, z=pz+dz*t;
+    if(x<0||y<0||x>W||y>H)break;
+    var g=terrainH(x,y);
+    var above=z>g;
+    if(!above&&prevAbove){
+      var lo=prevT, hi=t;
+      for(var it=0;it<7;it++){
+        var mid=(lo+hi)/2, mx=px+dx*mid, my=py+dy*mid, mz=pz+dz*mid;
+        if(mz>terrainH(mx,my))lo=mid; else hi=mid;
+      }
+      var fx=px+dx*hi, fy=py+dy*hi;
+      return {x:fx,y:fy,z:terrainH(fx,fy)};
+    }
+    prevT=t; prevAbove=above;
+  }
+  var bx=px+dx*420, by=py+dy*420;
+  bx=Math.max(20,Math.min(W-20,bx)); by=Math.max(20,Math.min(H-20,by));
+  return {x:bx,y:by,z:terrainH(bx,by)};
+}
+/* ---- brush ---- */
+function strokeRecord(idx){
+  var s=editorState.stroke;
+  if(s&&!(idx in s.backup))s.backup[idx]=terrainDelta[idx];
+}
+function beginStroke(){
+  if(editorState.stroke)endStroke();
+  editorState.stroke={backup:{}};
+  var aim=editorState.aim||computeEditorAim();
+  editorState.flatTarget=aim?terrainH(aim.x,aim.y):0;
+}
+function endStroke(){
+  var s=editorState.stroke; editorState.stroke=null;
+  if(!s)return;
+  var changes=[];
+  for(var idx in s.backup){
+    var i=Number(idx);
+    if(terrainDelta[i]!==s.backup[idx])changes.push([i,s.backup[idx],terrainDelta[i]]);
+  }
+  if(changes.length){
+    undoStack.push({kind:'terrain',changes:changes});
+    if(undoStack.length>60)undoStack.shift();
+    terrainHasEdits=Object.keys(terrainChanged).length>0;
+    markEditChanged();
+    if(groundGeo3D)groundGeo3D.computeVertexNormals();
+    placedSig='__dirty__'; /* reseat placed objects on the new ground */
+  }
+  refreshEditorUI();
+}
+function applyBrush(dt){
+  var aim=editorState.aim; if(!aim)return;
+  if(!editorState.stroke)beginStroke();
+  var cx=aim.x, cy=aim.y, radius=editorState.brush, str=editorState.strength;
+  var gx0=Math.max(0,Math.floor((cx-radius)/EDIT_STEP)), gx1=Math.min(EDIT_SEG,Math.ceil((cx+radius)/EDIT_STEP));
+  var gy0=Math.max(0,Math.floor((cy-radius)/EDIT_STEP)), gy1=Math.min(EDIT_SEG,Math.ceil((cy+radius)/EDIT_STEP));
+  var amt=str*dt/90;
+  var tool=editorState.tool;
+  var snap=null;
+  if(tool==='smooth'){
+    snap={};
+    for(var gy2=gy0;gy2<=gy1;gy2++)for(var gx2=gx0;gx2<=gx1;gx2++){
+      var ii=gy2*EDIT_N+gx2; snap[ii]=terrainHBase(gx2*EDIT_STEP,gy2*EDIT_STEP)+terrainDelta[ii];
+    }
+  }
+  var touchedBounds=false;
+  for(var gy=gy0;gy<=gy1;gy++)for(var gx=gx0;gx<=gx1;gx++){
+    var wx=gx*EDIT_STEP, wy=gy*EDIT_STEP;
+    var d=Math.hypot(wx-cx,wy-cy);
+    if(d>radius)continue;
+    var w=0.5+0.5*Math.cos(Math.PI*d/radius);
+    var idx=gy*EDIT_N+gx;
+    strokeRecord(idx);
+    if(tool==='raise')terrainDelta[idx]+=amt*w;
+    else if(tool==='lower')terrainDelta[idx]-=amt*w;
+    else if(tool==='flatten'){
+      var cur=terrainHBase(wx,wy)+terrainDelta[idx];
+      var k=Math.min(1,w*(0.05+str*0.022)*(dt/16.7));
+      terrainDelta[idx]+=(editorState.flatTarget-cur)*k;
+    }else if(tool==='smooth'){
+      var curH=snap[idx], sum=0, cnt=0;
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(off){
+        var nx=gx+off[0], ny=gy+off[1];
+        if(nx<0||ny<0||nx>EDIT_SEG||ny>EDIT_SEG)return;
+        var ni=ny*EDIT_N+nx;
+        sum+=(snap[ni]!=null?snap[ni]:terrainHBase(nx*EDIT_STEP,ny*EDIT_STEP)+terrainDelta[ni]); cnt++;
+      });
+      if(cnt){
+        var avg=sum/cnt;
+        var k2=Math.min(1,w*(0.05+str*0.02)*(dt/16.7));
+        terrainDelta[idx]+=(avg-curH)*k2;
+      }
+    }
+    terrainDelta[idx]=Math.max(-500,Math.min(500,terrainDelta[idx]));
+    if(Math.abs(terrainDelta[idx])>0.05){terrainChanged[idx]=true;terrainHasEdits=true;} else delete terrainChanged[idx];
+    touchedBounds=true;
+  }
+  if(touchedBounds){
+    refreshGroundVertices(cx,cy,radius+EDIT_STEP*1.6);
+    var now=performance.now();
+    if(now-editorState.lastEditBump>600){editorState.lastEditBump=now;markEditChanged();}
+  }
+}
+/* ---- placed objects: models + collision ---- */
+function buildPlacedModel(o){
+  var g=new THREE.Group();
+  var STONE=0x8a8172, STONE_D=0x776f61, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
+  if(o.t==='house'){
+    box(110,58,95,CREAM,0,29,0,g);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(9,58,9,WOOD_D,c[0]*51,29,c[1]*43,g);});
+    box(114,9,99,WOOD_D,0,55,0,g);
+    var roof=prism(132,55,115,0x7a4a30); roof.position.y=58; g.add(roof);
+    box(17,32,5,WOOD_D,0,16,49,g);
+    box(13,13,4,0xffd98a,-30,36,49,g); box(13,13,4,0xffd98a,30,36,49,g);
+    box(13,26,13,STONE_D,30,72,-18,g);
+  }else if(o.t==='tree_b'){
+    cyl(5,8,52,0x6b4a2c,0,26,0,g,7);
+    sph(34,0x3e7a3e,0,74,0,g,{flatShading:true});
+    sph(24,0x2c5a30,-22,58,6,g,{flatShading:true});
+    sph(24,0x477d43,22,60,-6,g,{flatShading:true});
+    sph(20,0x548c46,0,96,0,g,{flatShading:true});
+  }else if(o.t==='tree_p'){
+    cyl(4.5,7,64,0x5d3f27,0,32,0,g,7);
+    cone(30,52,0x2c5a30,0,72,0,g,9);
+    cone(23,44,0x356b38,0,102,0,g,9);
+    cone(15,36,0x3e7a3e,0,128,0,g,9);
+  }else if(o.t==='wall'){
+    box(96,72,24,STONE,0,36,0,g);
+    box(102,10,30,STONE_D,0,76,0,g);
+    box(14,12,14,STONE,-32,86,0,g); box(14,12,14,STONE,32,86,0,g);
+  }else if(o.t==='lamp'){
+    cyl(2.6,3.4,52,0x3a3f45,0,26,0,g,6);
+    box(16,4,16,0x3a3f45,0,54,0,g);
+    var lb=sph(6.5,0xffd98a,0,48,0,g,{emissive:0xcf9a3a}); lb.castShadow=false;
+  }else if(o.t==='fence'){
+    [-44,0,44].forEach(function(px){box(7,30,7,WOOD_D,px,15,0,g);});
+    box(100,7,4,WOOD,0,24,3,g); box(100,7,4,WOOD,0,11,3,g);
+  }else if(o.t==='rock'){
+    var r=new THREE.Mesh(new THREE.DodecahedronGeometry(26,0),M(0x8d9299));
+    r.position.y=12; r.rotation.set(0.7,1.9,0.3); r.castShadow=true; r.receiveShadow=true; g.add(r);
+    var r2=new THREE.Mesh(new THREE.DodecahedronGeometry(15,0),M(0x7d848c));
+    r2.position.set(24,7,10); r2.rotation.set(1.7,0.4,0.9); r2.castShadow=true; g.add(r2);
+  }else if(o.t==='bridge'){
+    box(150,7,66,0x8a6a44,0,16,0,g);
+    box(150,5,5,WOOD_D,0,30,30,g); box(150,5,5,WOOD_D,0,30,-30,g);
+    [-58,-20,20,58].forEach(function(px){cyl(3,3,13,WOOD_D,px,23,30,g,5);cyl(3,3,13,WOOD_D,px,23,-30,g,5);});
+    box(16,20,60,STONE,-64,2,0,g); box(16,20,60,STONE,64,2,0,g);
+  }
+  g.position.set(WX(o.x),terrainH(o.x,o.y)-1,WZ(o.y));
+  g.rotation.y=-(o.rot*Math.PI/180);
+  return g;
+}
+function placedObstaclesFor(o){
+  var rad=o.rot*Math.PI/180, dirx=Math.sin(rad), diry=Math.cos(rad);
+  var out=[];
+  function circ(x,y,r,extra){var ob={type:'circle',x:x,y:y,r:r,placed:true,_pid:o.id};if(extra)for(var k in extra)ob[k]=extra[k];out.push(ob);}
+  if(o.t==='house'){
+    var snap=((o.rot%90)+90)%90;
+    if(snap<2||snap>88){
+      var swap=(((o.rot%180)+180)%180)>45;
+      var w=swap?95:110, h=swap?110:95;
+      out.push({type:'rect',x:o.x-w/2,y:o.y-h/2,w:w,h:h,c:'#8a8172',house:true,placed:true,_pid:o.id});
+    }else circ(o.x,o.y,58,{house:true});
+  }else if(o.t==='tree_b'||o.t==='tree_p'){
+    circ(o.x,o.y,11,{ref:{kind:'tree'}});
+  }else if(o.t==='wall'){
+    [-32,0,32].forEach(function(off){circ(o.x+dirx*off,o.y+diry*off,17,{});});
+  }else if(o.t==='lamp'){
+    circ(o.x,o.y,6,{pillar:true});
+  }else if(o.t==='fence'){
+    [-36,0,36].forEach(function(off){circ(o.x+dirx*off,o.y+diry*off,10,{});});
+  }else if(o.t==='rock'){
+    circ(o.x,o.y,22,{});
+  }else if(o.t==='bridge'){
+    [-52,0,52].forEach(function(off){
+      circ(o.x+dirx*off-diry*30,o.y+diry*off+dirx*30,8,{});
+      circ(o.x+dirx*off+diry*30,o.y+diry*off-dirx*30,8,{});
+    });
+  }
+  return out;
+}
+function syncPlacedObstacles(){
+  for(var i=obstacles.length-1;i>=0;i--)if(obstacles[i].placed)obstacles.splice(i,1);
+  placedObjects.forEach(function(o){placedObstaclesFor(o).forEach(function(ob){obstacles.push(ob);});});
+  _losSrc=null;
+}
+function rebuildPlaced3D(){
+  if(!THREE_OK||!scene)return;
+  if(!placedGroup){placedGroup=new THREE.Group();scene.add(placedGroup);}
+  while(placedGroup.children.length)placedGroup.remove(placedGroup.children[0]);
+  placedObjects.forEach(function(o){placedGroup.add(buildPlacedModel(o));});
+  placedSig=placedObjects.map(function(o){return o.id+':'+o.t+':'+Math.round(o.x)+':'+Math.round(o.y)+':'+o.rot;}).join('|')+'#'+editSeq;
+}
+function currentPlacedSig(){
+  return placedObjects.map(function(o){return o.id+':'+o.t+':'+Math.round(o.x)+':'+Math.round(o.y)+':'+o.rot;}).join('|')+'#'+editSeq;
+}
+function nearestPlaced(x,y,maxD){
+  var best=null,bd=maxD;
+  placedObjects.forEach(function(o){var d=Math.hypot(o.x-x,o.y-y);if(d<bd){bd=d;best=o;}});
+  return best;
+}
+function placeObjectAtAim(){
+  if(placedObjects.length>=300){toast('置ける物の上限（300個）に達しました');return;}
+  var aim=editorState.aim||computeEditorAim(); if(!aim)return;
+  var o={id:++placedSeq,t:editorState.buildType,x:Math.round(aim.x),y:Math.round(aim.y),rot:editorState.rot};
+  placedObjects.push(o);
+  undoStack.push({kind:'place',id:o.id});
+  if(undoStack.length>60)undoStack.shift();
+  syncPlacedObstacles(); placedSig='__dirty__';
+  markEditChanged(); refreshEditorUI();
+  beep(660,0.07,'triangle',0.04);
+  toast('置きました（合計 '+placedObjects.length+' 個）');
+}
+function deletePlacedAtAim(){
+  var aim=editorState.aim||computeEditorAim(); if(!aim)return;
+  var o=nearestPlaced(aim.x,aim.y,130);
+  if(!o){toast('近くに消せる物がありません');return;}
+  var idx=placedObjects.indexOf(o);
+  placedObjects.splice(idx,1);
+  undoStack.push({kind:'delete',obj:o,index:idx});
+  if(undoStack.length>60)undoStack.shift();
+  syncPlacedObstacles(); placedSig='__dirty__';
+  markEditChanged(); refreshEditorUI();
+  beep(330,0.07,'square',0.04);
+  toast('削除しました（残り '+placedObjects.length+' 個）');
+}
+function editorUndo(){
+  var u=undoStack.pop();
+  if(!u){toast('戻せる編集がありません');return;}
+  if(u.kind==='terrain'){
+    var minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+    u.changes.forEach(function(ch){
+      terrainDelta[ch[0]]=ch[1];
+      if(Math.abs(ch[1])>0.05){terrainChanged[ch[0]]=true;terrainHasEdits=true;} else delete terrainChanged[ch[0]];
+      var gx=(ch[0]%EDIT_N)*EDIT_STEP, gy=Math.floor(ch[0]/EDIT_N)*EDIT_STEP;
+      if(gx<minx)minx=gx; if(gx>maxx)maxx=gx; if(gy<miny)miny=gy; if(gy>maxy)maxy=gy;
+    });
+    if(maxx>=minx)refreshGroundVertices((minx+maxx)/2,(miny+maxy)/2,Math.max(maxx-minx,maxy-miny)/2+EDIT_STEP*2);
+    if(groundGeo3D)groundGeo3D.computeVertexNormals();
+    placedSig='__dirty__';
+  }else if(u.kind==='place'){
+    for(var i=0;i<placedObjects.length;i++)if(placedObjects[i].id===u.id){placedObjects.splice(i,1);break;}
+    syncPlacedObstacles(); placedSig='__dirty__';
+  }else if(u.kind==='delete'){
+    placedObjects.splice(Math.min(u.index,placedObjects.length),0,u.obj);
+    syncPlacedObstacles(); placedSig='__dirty__';
+  }
+  markEditChanged(); refreshEditorUI();
+  beep(520,0.06,'triangle',0.04);
+  toast('↩ 元に戻しました');
+}
+function editorResetAll(){
+  clearWorldEditSilent();
+  editSeq++; markEditChanged();
+  refreshGroundAll(); syncPlacedObstacles();
+  refreshEditorUI();
+  toast('編集を全部リセットしました');
+}
+/* ---- editor visuals: brush ring + translucent ghost ---- */
+function ensureEditorVisuals(){
+  if(!THREE_OK||!scene)return;
+  if(!brushRing){
+    brushRing=new THREE.Mesh(new THREE.RingGeometry(0.93,1,44),new THREE.MeshBasicMaterial({color:0xe8c268,transparent:true,opacity:0.95,side:THREE.DoubleSide,depthWrite:false}));
+    brushRing.rotation.x=-Math.PI/2; brushRing.visible=false; scene.add(brushRing);
+  }
+}
+function setGhostFor(type,rot){
+  var key=type+':'+rot;
+  if(ghostGroup&&ghostKey===key)return;
+  if(ghostGroup){scene.remove(ghostGroup);ghostGroup=null;}
+  var tmp={id:-1,t:type,x:0,y:0,rot:rot};
+  ghostGroup=buildPlacedModel(tmp);
+  ghostGroup.traverse(function(m){
+    if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=0.55;m.material.depthWrite=false;m.castShadow=false;m.receiveShadow=false;}
+  });
+  ghostKey=key;
+  scene.add(ghostGroup);
+}
+function updateEditorVisuals(){
+  ensureEditorVisuals();
+  if(!editorState.active||!editorState.aim){
+    if(brushRing)brushRing.visible=false;
+    if(ghostGroup)ghostGroup.visible=false;
+    return;
+  }
+  var aim=editorState.aim;
+  if(editorState.mode==='terrain'){
+    if(ghostGroup)ghostGroup.visible=false;
+    if(brushRing){
+      brushRing.visible=true;
+      brushRing.material.color.setHex(0xe8c268);
+      brushRing.position.set(WX(aim.x),aim.z+2.5,WZ(aim.y));
+      brushRing.scale.set(editorState.brush,editorState.brush,editorState.brush);
+    }
+  }else if(editorState.placeMode==='place'){
+    if(brushRing)brushRing.visible=false;
+    setGhostFor(editorState.buildType,editorState.rot);
+    if(ghostGroup){
+      ghostGroup.visible=true;
+      ghostGroup.position.set(WX(aim.x),terrainH(aim.x,aim.y)-1,WZ(aim.y));
+      ghostGroup.rotation.y=-(editorState.rot*Math.PI/180);
+    }
+  }else{ /* delete mode: highlight nearest placed object */
+    if(ghostGroup)ghostGroup.visible=false;
+    var o=nearestPlaced(aim.x,aim.y,130);
+    if(brushRing){
+      if(o){
+        brushRing.visible=true;
+        brushRing.material.color.setHex(0xff5560);
+        brushRing.position.set(WX(o.x),terrainH(o.x,o.y)+3,WZ(o.y));
+        brushRing.scale.set(64,64,64);
+      }else brushRing.visible=false;
+    }
+  }
+}
+/* ---- editor open / close / tick / UI ---- */
+function openEditor(){
+  if(!isGameMaster()){toast('地形エディターはゲームマスター専用です');return;}
+  if(!started||!player||player.dead)return;
+  returnToMenu=false; closeGameMenu(true);
+  editorState.active=true;
+  /* safe work mode: clear the field; spawns & attacks are blocked while active */
+  enemies.forEach(function(e){if(e._sp){e._sp.e=null;e._sp.coolUntil=performance.now()+90000;}});
+  enemies=[]; target=null; aimTarget=null; projectiles=[];
+  if(bowDraw.active)cancelBowDraw();
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  $('editorPanel').style.display='block';
+  editorState.aim=computeEditorAim();
+  refreshEditorUI();
+  syncCursorHide();
+  chat('🏗️ <b>地形エディター</b> — 安全な作業モードです。編集は自動保存されます','sys');
+  beep(700,0.07,'triangle',0.04);
+}
+function closeEditor(){
+  if(editorState.applying||editorState.stroke)endStroke();
+  editorState.applying=false; editorState.active=false;
+  $('editorPanel').style.display='none';
+  if(brushRing)brushRing.visible=false;
+  if(ghostGroup)ghostGroup.visible=false;
+  markEditChanged(); /* make sure the autosave picks the final state up */
+  relockPointer();
+  toast('エディターを閉じました — 編集は保存されます');
+}
+function editorTick(now,dt){
+  if(!editorState.active)return;
+  editorState.aim=computeEditorAim();
+  if(editorState.applying&&editorState.mode==='terrain')applyBrush(dt);
+  if(now-editorState.statusT>200){
+    editorState.statusT=now;
+    refreshEditorStatus();
+  }
+}
+function refreshEditorStatus(){
+  var st=$('edStatus'); if(!st||!editorState.active)return;
+  var n=0; for(var k in terrainChanged)n++;
+  var aim=editorState.aim;
+  var pos=aim?('照準: '+Math.round(aim.x)+', '+Math.round(aim.y)+'（高さ '+Math.round(aim.z)+'）'):'';
+  st.innerHTML='作業モード中は敵が湧かず攻撃できません。 '+pos+'<br>編集中の地形セル <b>'+n+'</b> ／ 置いた物 <b>'+placedObjects.length+'</b> 個 ／ 編集はキャラクターと一緒に自動保存されます。';
+  var ub=$('edUndoBtn'); if(ub)ub.disabled=undoStack.length===0;
+}
+function refreshEditorUI(){
+  document.querySelectorAll('.ed-tool').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tool')===editorState.tool);});
+  document.querySelectorAll('.ed-pal-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-type')===editorState.buildType);});
+  var tt=$('edTabTerrain'),tb=$('edTabBuild');
+  if(tt)tt.classList.toggle('on',editorState.mode==='terrain');
+  if(tb)tb.classList.toggle('on',editorState.mode==='build');
+  var bx1=$('edTerrainBox'),bx2=$('edBuildBox');
+  if(bx1)bx1.style.display=editorState.mode==='terrain'?'block':'none';
+  if(bx2)bx2.style.display=editorState.mode==='build'?'block':'none';
+  var bv=$('edBrushVal'); if(bv)bv.textContent=editorState.brush;
+  var sv=$('edStrVal'); if(sv)sv.textContent=editorState.strength;
+  var rv=$('edRotVal'); if(rv)rv.textContent=editorState.rot+'°';
+  var pm=$('edPlaceModeBtn'); if(pm)pm.textContent='モード: '+(editorState.placeMode==='place'?'配置':'削除');
+  var pb=$('edPlaceBtn'); if(pb)pb.textContent=editorState.placeMode==='place'?'📌 照準の場所に置く':'🗑 照準に近い物を削除する';
+  var rb=$('edResetBtn'); if(rb){rb.classList.remove('armed');rb.textContent='🗑 編集を全部リセット';}
+  ghostKey=''; /* force ghost rebuild after palette/rotation changes */
+  refreshEditorStatus();
+}
+/* editor UI wiring (DOM exists: this script runs after the markup) */
+(function wireEditor(){
+  var closeBtn=$('edCloseBtn'); if(closeBtn)closeBtn.addEventListener('click',closeEditor);
+  var menuBtn=$('menuEditorBtn'); if(menuBtn)menuBtn.addEventListener('click',function(){openEditor();});
+  var tt=$('edTabTerrain'),tb=$('edTabBuild');
+  if(tt)tt.addEventListener('click',function(){editorState.mode='terrain';refreshEditorUI();});
+  if(tb)tb.addEventListener('click',function(){editorState.mode='build';if(editorState.stroke)endStroke();editorState.applying=false;refreshEditorUI();});
+  document.querySelectorAll('.ed-tool').forEach(function(b){b.addEventListener('click',function(){editorState.tool=b.getAttribute('data-tool');refreshEditorUI();beep(600,0.05,'square',0.03);});});
+  document.querySelectorAll('.ed-pal-btn').forEach(function(b){b.addEventListener('click',function(){editorState.buildType=b.getAttribute('data-type');editorState.placeMode='place';refreshEditorUI();beep(600,0.05,'square',0.03);});});
+  var br=$('edBrushRange'); if(br)br.addEventListener('input',function(){editorState.brush=Number(this.value);var v=$('edBrushVal');if(v)v.textContent=this.value;});
+  var sr=$('edStrRange'); if(sr)sr.addEventListener('input',function(){editorState.strength=Number(this.value);var v=$('edStrVal');if(v)v.textContent=this.value;});
+  var rl=$('edRotL'),rr=$('edRotR');
+  if(rl)rl.addEventListener('click',function(){editorState.rot=((editorState.rot-15)%360+360)%360;refreshEditorUI();});
+  if(rr)rr.addEventListener('click',function(){editorState.rot=(editorState.rot+15)%360;refreshEditorUI();});
+  var pm=$('edPlaceModeBtn'); if(pm)pm.addEventListener('click',function(){editorState.placeMode=editorState.placeMode==='place'?'delete':'place';refreshEditorUI();});
+  var pb=$('edPlaceBtn'); if(pb)pb.addEventListener('click',function(){if(editorState.placeMode==='place')placeObjectAtAim();else deletePlacedAtAim();});
+  var ab=$('edApplyBtn');
+  if(ab){
+    ab.addEventListener('pointerdown',function(e){e.preventDefault();editorState.aim=computeEditorAim();beginStroke();editorState.applying=true;ab.classList.add('holding');});
+    var stop=function(){if(editorState.applying){editorState.applying=false;endStroke();}ab.classList.remove('holding');};
+    ab.addEventListener('pointerup',stop); ab.addEventListener('pointerleave',stop); ab.addEventListener('pointercancel',stop);
+  }
+  var ub=$('edUndoBtn'); if(ub)ub.addEventListener('click',editorUndo);
+  var rb=$('edResetBtn');
+  if(rb)rb.addEventListener('click',function(){
+    if(!rb.classList.contains('armed')){rb.classList.add('armed');rb.textContent='本当に全部消しますか？ もう一度押すとリセット';setTimeout(function(){rb.classList.remove('armed');rb.textContent='🗑 編集を全部リセット';},3200);return;}
+    editorResetAll();
+  });
+})();
+
 /* first-person weapon viewmodel (attached to the camera) */
 var viewModel=null, vmCls='';
 /* archer draw rig: string segments + the nocked arrow are rebuilt every frame
@@ -3148,6 +3816,11 @@ function init3D(){
   groundGeo.computeVertexNormals();
   var ground=new THREE.Mesh(groundGeo,M(0x3a5c38));
   ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;staticGroup.add(ground);
+  /* editor: keep references so brush edits can rewrite the ground in place */
+  groundGeo3D=groundGeo; groundMesh3D=ground;
+  vertexGameX=new Float32Array(gp.count); vertexGameY=new Float32Array(gp.count);
+  for(var vi=0;vi<gp.count;vi++){vertexGameX[vi]=gp.getX(vi)+W/2;vertexGameY[vi]=H/2-gp.getY(vi);}
+  if(terrainHasEdits)refreshGroundAll();
   // clouds
   for(var i=0;i<11;i++){
     var cl=new THREE.Group();
@@ -3691,6 +4364,8 @@ function render3D(now){
   if(!_pv)_pv=new THREE.Vector3();
   var sig=obstacles.length+'_'+decorations.length;
   if(sig!==staticSig){staticSig=sig;buildWorld3D();}
+  if(typeof currentPlacedSig==='function'&&placedSig!==currentPlacedSig())rebuildPlaced3D();
+  if(typeof updateEditorVisuals==='function')updateEditorVisuals();
   // entities
   var seen={};
   /* first-person: the player's own body is not rendered (camera sits at eye level) */
@@ -3861,7 +4536,7 @@ function setupCameraControls(){
   /* while locked, pressing is an attack (aim is the center crosshair);
      for the archer, pressing STARTS the draw and releasing looses the arrow */
   document.addEventListener('pointerdown',function(e){
-    if(isLocked()&&e.target===el&&started&&player&&!player.dead){
+    if(isLocked()&&e.target===el&&started&&player&&!player.dead&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
       if(player.cls==='archer')startBowDraw(); else playerAttack(1);
     }
   });
@@ -3876,6 +4551,11 @@ function setupCameraControls(){
   el.addEventListener('pointerdown',function(e){
     dragging=true;moved=0;lx=e.clientX;ly=e.clientY;downT=performance.now();
     try{el.setPointerCapture(e.pointerId);}catch(err){}
+    /* editor (gamemaster): pressing on the view paints with the brush at the crosshair */
+    if(typeof editorState!=='undefined'&&editorState&&editorState.active&&started&&player&&!player.dead){
+      if(editorState.mode==='terrain'){editorState.aim=computeEditorAim();beginStroke();editorState.applying=true;}
+      return;
+    }
     /* archer: pressing on the view starts the draw (aim can still be dragged) */
     if(started&&player&&!player.dead&&player.cls==='archer'&&!isLocked())startBowDraw();
   });
@@ -3888,6 +4568,11 @@ function setupCameraControls(){
   });
   function up(e){
     if(!dragging)return;dragging=false;
+    if(typeof editorState!=='undefined'&&editorState&&editorState.active){
+      if(editorState.mode==='terrain'){if(editorState.applying){editorState.applying=false;endStroke();}}
+      else if(moved<7){editorState.aim=computeEditorAim();if(editorState.placeMode==='place')placeObjectAtAim();else deletePlacedAtAim();}
+      return;
+    }
     if(isLocked())return;
     if(player&&player.cls==='archer'&&bowDraw.active){
       /* releasing looses the drawn arrow; no pointer-lock request mid-shot */
@@ -3950,6 +4635,7 @@ function loop(now){
   syncCursorHide();
   if(started){
     update(dt,now);
+    if(typeof editorTick==='function')editorTick(now,dt);
     /* mob population maintenance is deliberately infrequent (~1.4s):
        spawn near mobs in small batches and despawn far ones */
     if(now-spawnT>2600){spawnT=now;despawnFar();trySpawnNear(false);}
@@ -4003,6 +4689,10 @@ window.addEventListener('resize',resize);
 document.addEventListener('keydown',function(e){
   if(captureBind){handleBindCapture(e);return;}
   if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active&&started&&document.activeElement!==$('chatInput')){
+    if(e.code==='KeyR'){e.preventDefault();editorState.rot=((editorState.rot+(e.shiftKey?-15:15))%360+360)%360;refreshEditorUI();return;}
+    if(e.code==='KeyZ'&&(e.ctrlKey||e.metaKey)){e.preventDefault();editorUndo();return;}
+  }
   if(started&&e.code==='KeyM'&&$('worldMapModal').style.display==='grid'){closeWorldMap();e.preventDefault();return;}
   if($('settingsModal').style.display==='grid')return;
   if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid')return;
@@ -4013,7 +4703,7 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started){if(acct.token)serverSave(true);else downloadSave();}return;}
   if(!started)return;
   if(document.activeElement===$('chatInput'))return;
-  if(e.code==='Space'){e.preventDefault();if(!e.repeat&&player&&!player.dead&&!player.swimming&&jumpY<=0&&jumpVY===0)jumpVY=0.17;}
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat)handleJumpKey();}
   var b=settings.binds;
   if(e.code===b.attack){e.preventDefault();if(player&&player.cls==='archer'){if(!e.repeat)startBowDraw();}else playerAttack(1);}
   if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
@@ -4041,7 +4731,7 @@ $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
 $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
-  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;
+  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;updateHoverBanner();
   $('deathScreen').style.display='none';updateHUD();toast('スポーン地点で復活した');
   relockPointer();
   netSendPos(true);
@@ -4210,6 +4900,7 @@ $('startBtn').addEventListener('click',function(){
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
   resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
+  clearWorldEditSilent(); hovering=false; jumpY=0; jumpVY=0; /* a fresh character starts on a fresh world */
   setupSkillUI(selectedClass);
   genWorld();populate();
   started=true;
