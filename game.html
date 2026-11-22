@@ -217,6 +217,38 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .settings-actions button{border-radius:7px;padding:12px;font-weight:900;font-size:14px;border:1px solid var(--line2)}
 #resetSettingsBtn{background:var(--panel2);color:var(--paper)}
 #closeSettingsBtn{background:var(--gold);color:#1c1503;border-color:var(--gold)}
+#gameMenu{position:absolute;inset:0;z-index:62;background:rgba(0,0,0,.62);display:none;place-items:center;padding:18px}
+.menu-card{background:var(--panel);border:1px solid var(--line2);border-radius:12px;max-width:440px;width:100%;padding:22px;max-height:86vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.menu-card h2{margin:0;font-family:Cinzel,serif;letter-spacing:.14em;font-size:20px}
+.menu-card h2 span{color:var(--gold)}
+.menu-char{font-size:12px;color:var(--muted);margin:6px 0 14px;line-height:1.6}
+.menu-list{display:grid;gap:8px}
+.menu-item{display:flex;align-items:center;gap:12px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;color:var(--paper);width:100%}
+.menu-item:hover{border-color:var(--gold)}
+.menu-item .mi-ico{font-size:20px;width:26px;text-align:center;flex-shrink:0}
+.menu-item .mi-body{flex:1;min-width:0}
+.menu-item b{display:block;font-size:14px}
+.menu-item small{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.5}
+.menu-item .mi-key{font-size:10px;color:var(--dim);border:1px solid var(--line2);border-radius:4px;padding:2px 6px;flex-shrink:0}
+.menu-item.danger{border-color:#5a2b2e}
+.menu-item.danger:hover{border-color:var(--red)}
+.menu-item.danger b{color:#f0a3a8}
+.menu-note{font-size:11px;color:var(--dim);line-height:1.6;margin:12px 0 0}
+#bagModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+.bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
+.bag-card h2{margin:0 0 4px;font-size:18px}
+.bag-card .sub{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 6px}
+.bag-row{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line)}
+.bag-ico{font-size:22px;width:30px;text-align:center;flex-shrink:0}
+.bag-info{flex:1;min-width:0}
+.bag-info b{display:block;font-size:13px}
+.bag-info small{color:var(--muted);font-size:11px;line-height:1.5;display:block;margin-top:2px}
+.bag-count{font-weight:900;color:var(--gold);font-size:13px;white-space:nowrap}
+.bag-tag{font-size:10px;font-weight:900;color:#8fe3ae;border:1px solid #2f5d3f;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.bag-use{background:var(--gold);border:0;border-radius:6px;padding:7px 14px;font-weight:900;font-size:12px;color:#1c1503;flex-shrink:0}
+.bag-use:disabled{opacity:.35;cursor:default}
+.bag-actions{margin-top:14px}
+.bag-actions button{width:100%;background:var(--gold);border:0;border-radius:6px;padding:11px;font-weight:900;color:#1c1503}
 
 /* ===== PRODUCTION / OFFICIAL SITE ===== */
 #startScreen{flex-direction:column;align-items:center;justify-content:flex-start;padding:0;background:linear-gradient(180deg,#0a120d 0%,#070b09 100%)}
@@ -362,7 +394,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="labels"></div>
     <div id="dmgLayer"></div>
     <div id="crosshair"><i></i></div>
-    <div id="camHint">見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃</div>
+    <div id="camHint">見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃 ・ Esc：メニュー</div>
 
     <!-- TOP -->
     <div id="topbar">
@@ -370,6 +402,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end">
         <div class="online-pill"><span class="dot" id="netDot"></span><span id="onlineCount">接続中…</span><span class="srv-sep" style="color:var(--dim)">|</span><span class="srv-name" id="srvName" style="color:var(--muted)">公開サーバー: ルミナス</span></div>
         <div class="top-actions">
+          <button class="icon-btn" id="menuBtn" title="メニュー（Esc）">☰</button>
           <button class="icon-btn" id="saveBtn" title="セーブ">💾</button>
           <button class="icon-btn" id="soundBtn" title="サウンド ON/OFF">♪</button>
           <button class="icon-btn" id="settingsBtn" title="設定（キー・感度）">⚙</button>
@@ -443,6 +476,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>攻撃</td><td><kbd>Space</kbd> または右下の剣ボタン。近くの敵を自動で狙います</td></tr>
         <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
+        <tr><td>メニュー</td><td><kbd>Esc</kbd> キー（または右上の ☰ ボタン）でメニューを開きます。設定・バッグ・セーブ・遊び方・ログアウトを選べます</td></tr>
         <tr><td>設定</td><td>右上の ⚙ ボタンで、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
         <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
         <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はNPC冒険者と遊ぶモードになります</td></tr>
@@ -455,7 +489,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="settingsModal"><div class="settings-card">
       <h2>⚙ 設定</h2>
-      <p class="set-note">技や攻撃のキー割り当てと、視点の感度を調整できます。変更はすぐに反映され、この端末に保存されます（再読み込みしても残ります）。移動の WASD とカーソルキーの視点移動は固定です。</p>
+      <p class="set-note">技や攻撃のキー割り当てと、視点の感度を調整できます。変更はすぐに反映されます（移動の WASD とカーソルキーの視点移動は固定です）。</p>
       <h3>キー割り当て</h3>
       <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー</div></div><button type="button" class="key-btn" data-bind="attack">Space</button></div>
       <div class="set-row"><div><div class="set-label">スキル1</div><div class="set-desc" id="bindDesc1">強撃 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s1">1</button></div>
@@ -469,6 +503,27 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button id="resetSettingsBtn" type="button">初期設定に戻す</button>
         <button id="closeSettingsBtn" type="button">閉じる</button>
       </div>
+    </div></div>
+
+    <div id="gameMenu"><div class="menu-card">
+      <h2>MENU <span>— メニュー</span></h2>
+      <p class="menu-char" id="menuCharLine">—</p>
+      <div class="menu-list">
+        <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
+        <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span></button>
+        <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
+        <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>冒険の記録をファイルに保存する</small></span></button>
+        <button type="button" class="menu-item" id="menuHelpBtn"><span class="mi-ico">❓</span><span class="mi-body"><b>遊び方</b><small>操作方法と冒険のヒントを見る</small></span></button>
+        <button type="button" class="menu-item danger" id="menuLogoutBtn"><span class="mi-ico">🚪</span><span class="mi-body"><b>ログアウト</b><small>タイトル画面に戻る（先にセーブがおすすめ）</small></span></button>
+      </div>
+      <p class="menu-note">Escキーでも閉じられます。オンライン中はメニューを開いても世界の時間は進み続けます。</p>
+    </div></div>
+
+    <div id="bagModal"><div class="bag-card">
+      <h2>🎒 バッグ</h2>
+      <p class="sub" id="bagSub">持ち物</p>
+      <div id="bagList"></div>
+      <div class="bag-actions"><button id="closeBagBtn" type="button">閉じる</button></div>
     </div></div>
 
     <div id="saveModal"><div class="save-card">
@@ -708,24 +763,6 @@ var obstacles=[], decorations=[];
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
 var DEFAULT_BINDS={attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
 var settings={binds:{attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1};
-var SETTINGS_KEY='aetheria-settings-v1';
-function saveSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){}}
-function loadSettings(){
-  try{
-    var raw=localStorage.getItem(SETTINGS_KEY); if(!raw)return;
-    var s=JSON.parse(raw); if(!s||typeof s!=='object')return;
-    if(s.binds&&typeof s.binds==='object'){
-      var used={};
-      for(var k2 in DEFAULT_BINDS){
-        var code=s.binds[k2];
-        if(typeof code==='string'&&code&&!used[code]){settings.binds[k2]=code;used[code]=1;}
-      }
-    }
-    if(typeof s.sens==='number')settings.sens=Math.max(0.3,Math.min(2.5,s.sens));
-    if(typeof s.keySens==='number')settings.keySens=Math.max(0.3,Math.min(2.5,s.keySens));
-  }catch(e){}
-}
-loadSettings();
 var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1};
 var captureBind=null; // action name currently waiting for a key press
 function keyLabel(code){
@@ -783,7 +820,72 @@ function handleBindCapture(e){
     }
   }
   refreshKeyLabels();
-  saveSettings();
+}
+
+/* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
+var menuOpen=false, returnToMenu=false;
+function isAnyOverlayOpen(){
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid';
+}
+function openGameMenu(){
+  if(!started||!player||player.dead)return;
+  menuOpen=true;keys={};joyVec.x=0;joyVec.y=0;
+  $('menuCharLine').textContent=player.name+' ／ '+CLASSES[player.cls].name+' Lv.'+player.lv+' ／ '+zoneAt(player.x,player.y);
+  $('gameMenu').style.display='grid';
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  beep(500,0.05,'triangle',0.03);
+}
+function closeGameMenu(){
+  menuOpen=false;$('gameMenu').style.display='none';
+}
+function openFromMenu(id){
+  returnToMenu=true;closeGameMenu();
+  if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshBindDescs();}
+  if(id==='saveModal')refreshSaveUI();
+  if(id==='bagModal')refreshBagUI();
+  $(id).style.display='grid';
+}
+function closeSubModal(id){
+  $(id).style.display='none';
+  if(returnToMenu){returnToMenu=false;openGameMenu();}
+}
+function handleEscape(){
+  if(menuOpen){closeGameMenu();return true;}
+  if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
+  if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
+  if($('saveModal').style.display==='grid'){closeSubModal('saveModal');return true;}
+  if($('helpModal').style.display==='grid'){closeSubModal('helpModal');return true;}
+  if(document.activeElement===$('chatInput')){$('chatInput').blur();return true;}
+  if(started&&player&&!player.dead){openGameMenu();return true;}
+  return false;
+}
+function refreshBagUI(){
+  var sub=$('bagSub'),list=$('bagList');if(!list)return;
+  if(!player){if(sub)sub.textContent='ゲームを開始すると持ち物が表示されます';list.innerHTML='';return;}
+  var c=CLASSES[player.cls];
+  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物';
+  var weapon=player.cls==='warrior'?['🗡️','鉄の剣','近接攻撃の基本武器']:player.cls==='mage'?['🪄','魔法の杖','魔法攻撃の基本武器']:['🏹','狩人の弓','遠距離攻撃の基本武器'];
+  var hpFull=player.hp>=player.maxHp;
+  var html='';
+  html+='<div class="bag-row"><span class="bag-ico">🧪</span><div class="bag-info"><b>回復ポーション</b><small>使うとHPを45回復</small></div><span class="bag-count">× '+player.potions+'</span><button type="button" class="bag-use" data-use="potion"'+((player.potions<=0||hpFull)?' disabled':'')+'>使う</button></div>';
+  html+='<div class="bag-row"><span class="bag-ico">'+weapon[0]+'</span><div class="bag-info"><b>'+weapon[1]+'</b><small>'+weapon[2]+'</small></div><span class="bag-tag">装備中</span></div>';
+  html+='<div class="bag-row"><span class="bag-ico">💰</span><div class="bag-info"><b>ゴールド</b><small>冒険で集めたお金</small></div><span class="bag-count">'+player.gold+' G</span></div>';
+  html+='<div class="bag-row"><span class="bag-ico">🏅</span><div class="bag-info"><b>討伐記録</b><small>これまでに倒したモンスター</small></div><span class="bag-count">'+player.kills+' 体</span></div>';
+  list.innerHTML=html;
+}
+function doLogout(){
+  returnToMenu=false;closeGameMenu();
+  ['settingsModal','saveModal','helpModal','bagModal'].forEach(function(id){$(id).style.display='none';});
+  $('deathScreen').style.display='none';
+  netClosed=true;clearTimeout(netRetryTimer);
+  if(netWs){try{netWs.close();}catch(e){}netWs=null;}
+  remoteTracks={};remotes=[];
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  started=false;keys={};joyVec.x=0;joyVec.y=0;target=null;
+  $('startScreen').style.display='flex';
+  $('startScreen').scrollTop=0;
+  resize();drawPreview();
+  chat('— ログアウトしました —','sys');
 }
 
 /* ================= REALTIME SYNC (public server) =================
@@ -1858,7 +1960,7 @@ function syncDmgTexts(now){
    - click once to lock the pointer: moving the mouse cursor itself turns
      the view (FPS-style mouse look), click attacks, Esc releases the lock
    - cursor (arrow) keys also turn the view (handled in update()) */
-var CAM_HINT_DEFAULT='見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃';
+var CAM_HINT_DEFAULT='見回す：ドラッグ ／ クリックでマウスロック→カーソル移動 ／ カーソルキー ・ ズーム：ホイール ・ 照準を合わせてクリックで攻撃 ・ Esc：メニュー';
 function setupCameraControls(){
   var el=renderer.domElement;
   var dragging=false,moved=0,lx=0,ly=0,downT=0;
@@ -1966,7 +2068,9 @@ function resize(){
 window.addEventListener('resize',resize);
 document.addEventListener('keydown',function(e){
   if(captureBind){handleBindCapture(e);return;}
+  if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
   if($('settingsModal').style.display==='grid')return;
+  if(menuOpen||$('bagModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&e.code.indexOf('Arrow')===0&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput'))e.preventDefault();
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started)downloadSave();return;}
@@ -1996,11 +2100,11 @@ $('respawnBtn').addEventListener('click',function(){
   $('deathScreen').style.display='none';updateHUD();toast('ルミナスの町で復活した');
   netSendPos(true);
 });
-$('saveBtn').addEventListener('click',function(){if(!started){toast('ゲームを開始してからセーブできます');return;}refreshSaveUI();$('saveModal').style.display='grid';});
+$('saveBtn').addEventListener('click',function(){if(!started){toast('ゲームを開始してからセーブできます');return;}returnToMenu=false;refreshSaveUI();$('saveModal').style.display='grid';});
 $('quickSaveBtn').addEventListener('click',function(){downloadSave();});
 $('downloadSaveBtn').addEventListener('click',function(){downloadSave();});
 $('loadSaveBtn2').addEventListener('click',function(){openSavePicker('ingame');});
-$('closeSaveBtn').addEventListener('click',function(){$('saveModal').style.display='none';});
+$('closeSaveBtn').addEventListener('click',function(){closeSubModal('saveModal');});
 $('continueBtn').addEventListener('click',function(){openSavePicker('title');});
 $('saveFileInput').addEventListener('change',function(){
   var f=this.files&&this.files[0];if(!f)return;
@@ -2012,6 +2116,7 @@ $('saveFileInput').addEventListener('change',function(){
       applySaveData(data);
       if(wasStarted){
         setupSkillUI(player.cls);
+        returnToMenu=false;
         $('saveModal').style.display='none';
         updateHUD();updateQuest();updatePlayerList();refreshSaveUI();
         netSendPos(true);
@@ -2025,25 +2130,50 @@ $('saveFileInput').addEventListener('change',function(){
   reader.onerror=function(){toast('ファイルの読み込みに失敗しました');};
   reader.readAsText(f);
 });
-$('settingsBtn').addEventListener('click',function(){captureBind=null;refreshKeyLabels();refreshSensUI();refreshBindDescs();$('settingsModal').style.display='grid';});
-$('closeSettingsBtn').addEventListener('click',function(){captureBind=null;refreshKeyLabels();$('settingsModal').style.display='none';});
+$('settingsBtn').addEventListener('click',function(){returnToMenu=false;captureBind=null;refreshKeyLabels();refreshSensUI();refreshBindDescs();$('settingsModal').style.display='grid';});
+$('closeSettingsBtn').addEventListener('click',function(){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');});
 document.querySelectorAll('.key-btn[data-bind]').forEach(function(btn){
   btn.addEventListener('click',function(){
     captureBind=(captureBind===btn.getAttribute('data-bind'))?null:btn.getAttribute('data-bind');
     refreshKeyLabels();
   });
 });
-$('sensRange').addEventListener('input',function(){settings.sens=this.value/100;refreshSensUI();saveSettings();});
-$('keySensRange').addEventListener('input',function(){settings.keySens=this.value/100;refreshSensUI();saveSettings();});
+$('sensRange').addEventListener('input',function(){settings.sens=this.value/100;refreshSensUI();});
+$('keySensRange').addEventListener('input',function(){settings.keySens=this.value/100;refreshSensUI();});
 $('resetSettingsBtn').addEventListener('click',function(){
   settings.binds={attack:DEFAULT_BINDS.attack,s1:DEFAULT_BINDS.s1,s2:DEFAULT_BINDS.s2,s3:DEFAULT_BINDS.s3,potion:DEFAULT_BINDS.potion};
   settings.sens=1;settings.keySens=1;captureBind=null;
-  refreshKeyLabels();refreshSensUI();saveSettings();
+  refreshKeyLabels();refreshSensUI();
   toast('設定を初期状態に戻しました');beep(600,0.06,'square',0.03);
 });
 refreshKeyLabels();
-$('helpBtn').addEventListener('click',function(){$('helpModal').style.display='grid';});
-$('closeHelp').addEventListener('click',function(){$('helpModal').style.display='none';});
+$('helpBtn').addEventListener('click',function(){returnToMenu=false;$('helpModal').style.display='grid';});
+$('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');});
+/* game menu (Esc) wiring */
+$('menuBtn').addEventListener('click',function(){if(started){openGameMenu();}else{toast('ゲームを開始するとメニューが開けます');}});
+$('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
+$('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
+$('menuSettingsBtn').addEventListener('click',function(){openFromMenu('settingsModal');});
+$('menuSaveBtn').addEventListener('click',function(){openFromMenu('saveModal');});
+$('menuHelpBtn').addEventListener('click',function(){openFromMenu('helpModal');});
+$('menuLogoutBtn').addEventListener('click',function(){doLogout();});
+$('closeBagBtn').addEventListener('click',function(){closeSubModal('bagModal');});
+$('bagList').addEventListener('click',function(e){
+  var btn=e.target&&e.target.closest?e.target.closest('[data-use="potion"]'):null;
+  if(!btn||btn.disabled)return;
+  usePotion();refreshBagUI();
+});
+var plWasLocked=false;
+document.addEventListener('pointerlockchange',function(){
+  var locked=!!document.pointerLockElement;
+  var was=plWasLocked;plWasLocked=locked;
+  if(was&&!locked){
+    /* Esc in pointer-lock exits the lock without a keydown: treat it as "open menu" */
+    if(!started||!player||player.dead)return;
+    if(menuOpen||isAnyOverlayOpen())return;
+    openGameMenu();
+  }
+});
 $('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'♪':'✕';toast(soundOn?'サウンド ON':'サウンド OFF');});
 /* joystick */
 (function(){
