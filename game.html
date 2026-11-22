@@ -1434,37 +1434,88 @@ function makePlayer(name,clsKey){
     lv:1,exp:0,gold:120,potions:3,arrows:(clsKey==='archer'?30:0),kills:0,dir:1,walk:0,dead:false};
 }
 function expNeed(lv){return 80+lv*55;}
-/* per-type population caps: nothing may spawn past these, so mobs can never flood the world */
-var SPAWN_CAPS={slime:18,goblin:13,wolf:10,orc:8,boss:1,frostwolf:8,icegolem:6,scorpion:10,sandworm:7,treant:7,magma:9,lavagolem:6,ifrit:1};
+/* ============ MOB POPULATION CONTROL (lag fix) ============
+   The world is 128x128 tiles (1 tile ≈ 40.6 world units), so pre-spawning
+   every zone at once meant ~90 live mobs — each with AI + a 3D model — even
+   in zones nobody is visiting. Instead:
+   - populate() only records spawn POINTS; nothing is created up front.
+   - A throttled spawner (see loop, ~every 1.4s) materialises a point only
+     when it is within SPAWN_RANGE of the player (~45 tiles).
+   - Mobs farther than DESPAWN_RANGE (~52 tiles) are removed (despawn);
+     their point can respawn them when the player comes back.
+   - Hard caps: MAX_ALIVE total across the whole world, plus small per-type
+     caps — far below the old ~104 combined cap. */
+var SPAWN_RANGE=1830;   /* ≈45 tiles: spawn only near the player */
+var DESPAWN_RANGE=2110; /* ≈52 tiles: beyond this, mobs are removed */
+var MAX_ALIVE=26;       /* global cap on simultaneously existing mobs */
+var SPAWN_CAPS={slime:6,goblin:5,wolf:4,orc:4,boss:1,frostwolf:4,icegolem:3,scorpion:5,sandworm:3,treant:4,magma:5,lavagolem:3,ifrit:1};
+var spawnPoints=[]; /* {type,x,y,e:liveEnemy|null,coolUntil:timestamp} */
 function countAlive(type){var n=0;for(var i=0;i<enemies.length;i++)if(enemies[i].type===type&&!enemies[i].dead)n++;return n;}
-function spawnEnemy(type,x,y){
-  if(countAlive(type)>=(SPAWN_CAPS[type]||8))return null;
+function aliveTotal(){var n=0;for(var i=0;i<enemies.length;i++)if(!enemies[i].dead)n++;return n;}
+function spawnEnemy(type,x,y,sp){
+  if(aliveTotal()>=MAX_ALIVE)return null;
+  if(countAlive(type)>=(SPAWN_CAPS[type]||4))return null;
   var t=ETYPES[type];
-  var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6,seen:false};
+  var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6,seen:false,_sp:(sp||null)};
   enemies.push(e); return e;
 }
+function addSpawnPoint(type,x,y){spawnPoints.push({type:type,x:x,y:y,e:null,coolUntil:0});}
 function populate(){
-  enemies=[];
-  for(var i=0;i<14;i++) spawnEnemy('slime',500+Math.random()*1600,250+Math.random()*600);
-  for(var i=0;i<10;i++) spawnEnemy('goblin',1750+Math.random()*650,900+Math.random()*1000);
-  for(var i=0;i<7;i++) spawnEnemy('wolf',1700+Math.random()*700,700+Math.random()*700);
-  for(var i=0;i<5;i++) spawnEnemy('orc',1850+Math.random()*600,1100+Math.random()*800);
-  spawnEnemy('boss',2220,420);
+  enemies=[]; spawnPoints=[];
+  for(var i=0;i<14;i++) addSpawnPoint('slime',500+Math.random()*1600,250+Math.random()*600);
+  for(var i=0;i<10;i++) addSpawnPoint('goblin',1750+Math.random()*650,900+Math.random()*1000);
+  for(var i=0;i<7;i++) addSpawnPoint('wolf',1700+Math.random()*700,700+Math.random()*700);
+  for(var i=0;i<5;i++) addSpawnPoint('orc',1850+Math.random()*600,1100+Math.random()*800);
+  addSpawnPoint('boss',2220,420);
   // forgotten ruins guards (north, new lands)
-  for(var i=0;i<4;i++) spawnEnemy('orc',2800+Math.random()*600,300+Math.random()*550);
+  for(var i=0;i<4;i++) addSpawnPoint('orc',2800+Math.random()*600,300+Math.random()*550);
   // snowfield (far north-east)
-  for(var i=0;i<7;i++) spawnEnemy('frostwolf',3550+Math.random()*1400,220+Math.random()*950);
-  for(var i=0;i<5;i++) spawnEnemy('icegolem',3650+Math.random()*1250,280+Math.random()*900);
+  for(var i=0;i<7;i++) addSpawnPoint('frostwolf',3550+Math.random()*1400,220+Math.random()*950);
+  for(var i=0;i<5;i++) addSpawnPoint('icegolem',3650+Math.random()*1250,280+Math.random()*900);
   // desert (east)
-  for(var i=0;i<9;i++) spawnEnemy('scorpion',3450+Math.random()*1450,1600+Math.random()*1550);
-  for(var i=0;i<6;i++) spawnEnemy('sandworm',3500+Math.random()*1350,1800+Math.random()*1350);
+  for(var i=0;i<9;i++) addSpawnPoint('scorpion',3450+Math.random()*1450,1600+Math.random()*1550);
+  for(var i=0;i<6;i++) addSpawnPoint('sandworm',3500+Math.random()*1350,1800+Math.random()*1350);
   // deep forest (far south-west)
-  for(var i=0;i<6;i++) spawnEnemy('treant',220+Math.random()*1150,3450+Math.random()*1400);
-  for(var i=0;i<4;i++) spawnEnemy('wolf',300+Math.random()*1000,3500+Math.random()*1200);
+  for(var i=0;i<6;i++) addSpawnPoint('treant',220+Math.random()*1150,3450+Math.random()*1400);
+  for(var i=0;i<4;i++) addSpawnPoint('wolf',300+Math.random()*1000,3500+Math.random()*1200);
   // volcano (far south-east)
-  for(var i=0;i<8;i++) spawnEnemy('magma',3950+Math.random()*1050,3950+Math.random()*1050);
-  for(var i=0;i<5;i++) spawnEnemy('lavagolem',4000+Math.random()*950,4000+Math.random()*950);
-  spawnEnemy('ifrit',4600,4600);
+  for(var i=0;i<8;i++) addSpawnPoint('magma',3950+Math.random()*1050,3950+Math.random()*1050);
+  for(var i=0;i<5;i++) addSpawnPoint('lavagolem',4000+Math.random()*950,4000+Math.random()*950);
+  addSpawnPoint('ifrit',4600,4600);
+  trySpawnNear(true); /* fill the area around the start position right away */
+}
+/* Throttled spawner: at most 2 new mobs per call, and only for points near
+   the player. Called from the main loop roughly every 1.4 seconds. */
+function trySpawnNear(immediate){
+  if(!player)return;
+  var now=performance.now(), made=0;
+  for(var i=0;i<spawnPoints.length;i++){
+    if(aliveTotal()>=MAX_ALIVE)break;
+    if(made>=(immediate?8:2))break;
+    var sp=spawnPoints[i];
+    if(sp.e&&!sp.e.dead)continue;               /* point already has a live mob */
+    if(sp.e&&sp.e.dead){sp.e=null;}              /* corpse cleanup finished it */
+    if(now<sp.coolUntil)continue;                /* respawn cooldown */
+    if(Math.hypot(sp.x-player.x,sp.y-player.y)>SPAWN_RANGE)continue;
+    var e=spawnEnemy(sp.type,sp.x+(Math.random()*80-40),sp.y+(Math.random()*80-40),sp);
+    if(e){sp.e=e;made++;}
+  }
+}
+/* Despawn sweep: mobs too far from the player are removed entirely, so AI
+   and 3D rendering only ever cover the neighbourhood. Their spawn point
+   gets a short cooldown so border oscillation can't thrash create/delete. */
+function despawnFar(){
+  if(!player)return;
+  var now=performance.now();
+  for(var i=enemies.length-1;i>=0;i--){
+    var e=enemies[i];
+    if(e.dead)continue;
+    if(Math.hypot(e.x-player.x,e.y-player.y)<=DESPAWN_RANGE)continue;
+    if(e._sp){e._sp.e=null;e._sp.coolUntil=now+2500;}
+    if(target===e)target=null;
+    if(aimTarget===e)aimTarget=null;
+    enemies.splice(i,1);
+  }
 }
 
 /* ================= UI HELPERS ================= */
@@ -1522,11 +1573,11 @@ function killEnemy(e){
     var idx=enemies.indexOf(e);if(idx>=0)enemies.splice(idx,1);
     if(target===e) target=null;
   },600);
-  // respawn after a proper interval; spawnEnemy re-checks the per-type cap at that moment,
-  // so a crowded world simply skips the respawn instead of growing past the cap
-  setTimeout(function(){
-    if(started) spawnEnemy(e.type,e.homeX+(Math.random()*80-40),e.homeY+(Math.random()*80-40));
-  }, e.boss?20000:5000+Math.random()*4000);
+  // respawn is handled by the throttled spawner: the dead mob's spawn point
+  // goes on cooldown, and a fresh mob only appears if the player is still
+  // (or again) near that point when the cooldown ends — no timers per kill,
+  // and a crowded or distant area simply never respawns.
+  if(e._sp){e._sp.coolUntil=performance.now()+(e.boss?30000:9000+Math.random()*5000);}
   updateHUD();
 }
 function gainExp(n){
@@ -2054,25 +2105,32 @@ function update(dt,now){
   });
   if(aimTarget)aimTarget.seen=true;
   if(isSafe(player.x,player.y)&&player.hp<player.maxHp){player.hp=Math.min(player.maxHp,player.hp+dt*0.03);}
-  // enemies AI
+  // enemies AI — distant mobs (>~1100 units, far off-screen) tick at a
+  // reduced rate (~3 times/sec) so phones don't burn frames on them
   enemies.forEach(function(e){
     if(e.dead)return;
     if(e.hitFlash>0)e.hitFlash--;
     var dp=Math.hypot(player.x-e.x,player.y-e.y);
+    var edt=dt, slowTick=false;
+    if(dp>1100){
+      if(e._slowT&&now-e._slowT<330)return;
+      edt=e._slowT?Math.min(400,now-e._slowT):dt;
+      e._slowT=now; slowTick=true;
+    }
     var inSafe=isSafe(e.x,e.y);
     if(dp<210&&!isSafe(player.x,player.y)) e.state='chase'; else if(dp>340) e.state='return';
     if(e.state==='chase'&&dp>e.r+player.r-4){
       var a=Math.atan2(player.y-e.y,player.x-e.x);
       var ex=e.x+Math.cos(a)*e.speed,ey=e.y+Math.sin(a)*e.speed;
       if(!collide(ex,e.y,e.r*0.7))e.x=ex; if(!collide(e.x,ey,e.r*0.7))e.y=ey;
-      e.walk+=dt*0.015;
+      e.walk+=edt*0.015;
     }else if(e.state==='chase'&&dp<=e.r+player.r+6){
       if(!e.atkT||now-e.atkT>(e.boss?900:1100)){e.atkT=now;hurtPlayer(e.atk*(0.85+Math.random()*0.3),e);beep(120,0.06,'square',0.03);}
     }else{
-      e.wt-=dt;
+      e.wt-=edt;
       if(e.wt<=0){e.wt=1600+Math.random()*2200;e.tx=e.homeX+(Math.random()*130-65);e.ty=e.homeY+(Math.random()*130-65);}
-      if(e.tx){var d2=Math.hypot(e.tx-e.x,e.ty-e.y);if(d2>4){e.x+=(e.tx-e.x)/d2*e.speed*0.45;e.y+=(e.ty-e.y)/d2*e.speed*0.45;e.walk+=dt*0.01;}}
-      if(e.state==='return'){e.hp=Math.min(e.maxHp,e.hp+dt*0.02);}
+      if(e.tx){var d2=Math.hypot(e.tx-e.x,e.ty-e.y);if(d2>4){var wsp=e.speed*0.45*(slowTick?(edt/16.7):1);e.x+=(e.tx-e.x)/d2*wsp;e.y+=(e.ty-e.y)/d2*wsp;e.walk+=edt*0.01;}}
+      if(e.state==='return'){e.hp=Math.min(e.maxHp,e.hp+edt*0.02);}
     }
     if(inSafe){e.x+=(e.x-1300)*0.02;e.y+=(e.y-1300)*0.02;} // push out of town
   });
@@ -2909,7 +2967,10 @@ function render3D(now){
   var seen={};
   /* first-person: the player's own body is not rendered (camera sits at eye level) */
   remotes.forEach(function(r){ if(r.angle!==undefined) r._face=Math.atan2(-Math.sin(r.angle),-Math.cos(r.angle)); syncEntity(r,'r',now); seen[r._eid]=1; });
-  enemies.forEach(function(e){if(!e.dead){syncEntity(e,'e',now);seen[e._eid]=1;}});
+  /* enemies: only build/sync 3D models for mobs within render range of the
+     player (~1600 units); farther ones (kept for the neighbourhood sim)
+     get no mesh at all, which keeps draw calls low on phones */
+  enemies.forEach(function(e){if(!e.dead&&player&&Math.hypot(e.x-player.x,e.y-player.y)<1600){syncEntity(e,'e',now);seen[e._eid]=1;}});
   for(var id in entRegistry){
     if(!seen[id]){var r=entRegistry[id];dynGroup.remove(r.mesh);if(r.label&&r.label.parentNode)r.label.parentNode.removeChild(r.label);delete entRegistry[id];}
   }
@@ -3131,11 +3192,14 @@ function drawPreview(){
 }
 
 /* ================= LOOP ================= */
-var lastT=performance.now(),miniT=0,listT=0,exploreT=0;
+var lastT=performance.now(),miniT=0,listT=0,exploreT=0,spawnT=0;
 function loop(now){
   var dt=Math.min(50,now-lastT);lastT=now;
   if(started){
     update(dt,now);
+    /* mob population maintenance is deliberately infrequent (~1.4s):
+       spawn near mobs in small batches and despawn far ones */
+    if(now-spawnT>1400){spawnT=now;despawnFar();trySpawnNear(false);}
     if(now-exploreT>350){exploreT=now;markExplored();
       // stuck arrows expire after a while
       for(var si=stuckArrows.length-1;si>=0;si--)if(now>stuckArrows[si].until)stuckArrows.splice(si,1);
