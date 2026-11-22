@@ -44,6 +44,36 @@ canvas{display:block}
 #crosshair::before{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%);clip-path:polygon(0 0,100% 0,100% 32%,0 32%,0 68%,100% 68%,100% 100%,0 100%)}
 #crosshair::after{top:50%;left:0;height:2px;width:100%;transform:translateY(-50%);clip-path:polygon(0 0,32% 0,32% 100%,0 100%,68% 0,100% 0,100% 100%,68% 100%)}
 #crosshair i{position:absolute;left:50%;top:50%;width:3px;height:3px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%)}
+#crosshair.on::before,#crosshair.on::after{background:#ff6b6b}
+#crosshair.on i{background:#ff6b6b;width:5px;height:5px}
+.hud-arrows{flex-shrink:0;text-align:center;background:#0b100e;border:1px solid var(--line2);border-radius:6px;padding:6px 9px;min-width:64px}
+.hud-arrows b{display:block;font-size:15px;color:var(--gold);line-height:1.1}
+.hud-arrows span{font-size:9px;color:var(--muted);letter-spacing:.08em}
+.hud-arrows.empty{border-color:#7a1f22}
+.hud-arrows.empty b{color:#f08a8a}
+#interactPrompt{position:absolute;left:50%;transform:translateX(-50%);bottom:238px;z-index:24;display:none;background:rgba(10,14,12,.92);border:1px solid var(--gold2);color:var(--paper);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer}
+#interactPrompt b{color:var(--gold)}
+#interactPrompt:hover{border-color:var(--gold)}
+#worldMapModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.7);display:none;place-items:center;padding:14px}
+.map-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:600px;width:100%;padding:18px;max-height:92vh;overflow-y:auto;text-align:center}
+.map-card h2{margin:0 0 4px;font-size:18px;text-align:left}
+.map-card .sub{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 10px;text-align:left}
+#worldMapCanvas{width:100%;max-width:512px;height:auto;border:1px solid var(--line2);border-radius:6px;background:#0b0f0c}
+.map-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:9px;text-align:left}
+.map-legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
+.map-card .bag-actions button{background:var(--gold)}
+#shopModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+.shop-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
+.shop-card h2{margin:0 0 4px;font-size:18px}
+.shop-card .sub{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 6px}
+.shop-wallet{display:flex;gap:8px;margin:10px 0 4px}
+.shop-wallet div{flex:1;background:#0b100e;border:1px solid var(--line);border-radius:8px;padding:9px;text-align:center}
+.shop-wallet b{display:block;font-size:16px;color:var(--gold)}
+.shop-wallet span{font-size:10px;color:var(--muted)}
+.shop-row{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line)}
+.shop-row .bag-info b{font-size:13px}
+.shop-buy{background:var(--gold);border:0;border-radius:6px;padding:8px 13px;font-weight:900;font-size:12px;color:#1c1503;flex-shrink:0;white-space:nowrap}
+.shop-buy:disabled{opacity:.35;cursor:default}
 
 /* ===== TOP BAR ===== */
 #topbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;pointer-events:none;z-index:20;gap:8px}
@@ -474,6 +504,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <div class="name" id="hudName">冒険者</div>
             <div class="sub"><span class="lv-badge" id="hudLv">Lv.1</span><span id="hudClass">ウォーリアー</span><span id="hudZone">ルミナスの町</span></div>
           </div>
+          <div class="hud-arrows" id="hudArrows"><b>🏹 × <span id="hudArrowCount">0</span></b><span>矢の所持数</span></div>
         </div>
         <div class="bar-row"><label>HP</label><div class="bar hp"><i id="hpBar" style="width:100%"></i><em id="hpText">100 / 100</em></div></div>
         <div class="bar-row"><label>MP</label><div class="bar mp"><i id="mpBar" style="width:100%"></i><em id="mpText">50 / 50</em></div></div>
@@ -489,7 +520,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <!-- RIGHT: minimap (top-right) / quest under it / nearby real players -->
     <div id="rightPanel">
-      <div id="minimapWrap"><canvas id="minimap" width="182" height="182"></canvas><div id="minimapLabel">AETHERIA — ルミナス地方</div></div>
+      <div id="minimapWrap"><canvas id="minimap" width="182" height="182"></canvas><div id="minimapLabel">MINIMAP — 周辺（M：全体マップ）</div></div>
       <aside id="quest">
         <h3>◆ メインクエスト</h3>
         <div id="questTitle">スライム討伐</div>
@@ -510,6 +541,28 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     </div>
 
     <div id="joystick"><div id="stick"></div></div>
+    <button type="button" id="interactPrompt"><b>E</b>：商人マーロウと話す</button>
+
+    <div id="worldMapModal"><div class="map-card">
+      <h2>🗺️ 全体マップ <span style="color:var(--gold);font-size:12px">— ルミナス地方</span></h2>
+      <p class="sub" id="worldMapSub">探索済み 0% — 歩いた場所だけが地図に描かれます。未探索のエリアは闇に隠れています。</p>
+      <canvas id="worldMapCanvas" width="512" height="512"></canvas>
+      <div class="map-legend"><span><i style="background:#ffd34d"></i>現在地</span><span><i style="background:#8d8574"></i>町</span><span><i style="background:#3a5c38"></i>草原・平原</span><span><i style="background:#2f5a30"></i>森</span><span><i style="background:#2e5f7a"></i>湖</span><span><i style="background:#e0c084"></i>砂漠</span><span><i style="background:#dfe9f2"></i>雪原</span><span><i style="background:#b0503a"></i>火山</span><span><i style="background:#5d5a68"></i>遺跡</span></div>
+      <div class="bag-actions"><button id="closeWorldMapBtn" type="button">閉じる（M）</button></div>
+    </div></div>
+
+    <div id="shopModal"><div class="shop-card">
+      <h2>🏪 マーロウ商店</h2>
+      <p class="sub">「いらっしゃい！旅の道具なら何でも揃うよ。矢はアーチャーの命綱だ、切らさないようにな。」</p>
+      <div class="shop-wallet"><div><b id="shopGold">0 G</b><span>所持ゴールド</span></div><div><b>🏹 × <span id="shopArrows">0</span></b><span>矢の所持数</span></div></div>
+      <div id="shopList">
+        <div class="shop-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢 ×10</b><small>アーチャーの射撃に使う矢（1本 2G）</small></div><button type="button" class="shop-buy" data-buy="10">20 G で買う</button></div>
+        <div class="shop-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢 ×50</b><small>たっぷり補充（1本 2G）</small></div><button type="button" class="shop-buy" data-buy="50">100 G で買う</button></div>
+        <div class="shop-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢 ×100</b><small>遠征用の大束（1本 2G）</small></div><button type="button" class="shop-buy" data-buy="100">200 G で買う</button></div>
+        <div class="shop-row"><span class="bag-ico">🧪</span><div class="bag-info"><b>回復ポーション ×1</b><small>使うとHPを45回復</small></div><button type="button" class="shop-buy" data-buy-potion="1">30 G で買う</button></div>
+      </div>
+      <div class="bag-actions"><button id="closeShopBtn" type="button">店を出る</button></div>
+    </div></div>
 
     <div id="levelUp"><div class="big">LEVEL UP!</div><p id="levelUpText">レベルが上がった！</p></div>
 
@@ -522,6 +575,11 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>視点（一人称）</td><td>自分の目線で冒険できます。画面をクリックするとカーソルがロックされ、<b>マウスカーソルを動かすだけ</b>で上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグでも見回せて、<b>カーソルキー</b> <kbd>←</kbd><kbd>→</kbd> で左右、<kbd>↑</kbd><kbd>↓</kbd> で上下の視点移動もできます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
         <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
+        <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
+        <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
+        <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
+        <tr><td>買い物</td><td>町の広場の商人マーロウに近づいて <kbd>E</kbd> キー（または表示されるボタン）で話しかけると、矢やポーションを買えます</td></tr>
+        <tr><td>矢（アーチャー）</td><td>アーチャーの射撃は矢を1本ずつ消費し、矢が0本だと攻撃できません。矢は放った方向へ放物線を描いて飛び、地形に刺さった矢は近づいて <kbd>E</kbd> キーで回収できます。町の商人でも買えます</td></tr>
         <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
@@ -531,7 +589,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はソロプレイになります</td></tr>
         <tr><td>セーブ</td><td>アカウントでログイン中は<b>自動保存</b>されます（操作不要）。手動同期とバックアップ用のファイル書き出しは Escメニューの「セーブ」から行えます</td></tr>
         <tr><td>クエスト</td><td>右上のクエストを進めると報酬GET。最終目標は北東の森のボス討伐！</td></tr>
-        <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）</td></tr>
+        <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）。さらに遠くには雪原・砂漠・深淵の森・紅蓮火山（最強・炎魔イフリート）が広がります</td></tr>
       </table>
       <button id="closeHelp">閉じる</button>
     </div></div>
@@ -566,6 +624,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span></button>
         <button type="button" class="menu-item" id="menuPlayersBtn"><span class="mi-ico">◆</span><span class="mi-body"><b>オンラインプレイヤー</b><small>今つながっている実プレイヤーの一覧を見る</small></span></button>
+        <button type="button" class="menu-item" id="menuMapBtn"><span class="mi-ico">🗺️</span><span class="mi-body"><b>全体マップ</b><small>探索済みエリアの地図を見る（歩いた場所だけが描かれる）</small></span><span class="mi-key">M</span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSoundBtn"><span class="mi-ico">♪</span><span class="mi-body"><b>サウンド設定</b><small>効果音の ON / OFF と音量（全体・効果音）を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>自動保存の状態確認・手動同期とファイル書き出し</small></span></button>
@@ -721,21 +780,22 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.22</time><span class="news-tag update">ワールド</span><span><b>世界が4倍に拡張！</b>ルミナス地方が128×128タイルへ拡大し、白銀の雪原・灼熱の砂漠・深淵の森と翠玉湖・忘れられた遺跡・紅蓮火山が新たに開放。各エリア専用のモンスターと、火山の炎魔イフリート討伐クエストを追加しました。あわせて、周辺ズーム式ミニマップ（視認した敵だけ表示）、Mキー全体マップ（探索済みエリアのみ表示）、Shiftダッシュ、町の商人と矢の売買・回収も実装。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">役職</span><span><b>役職はアカウントごとに最初に1回だけ選択。</b>アカウントにキャラクターがない最初の1回だけ役職を選べます。一度決めると変更できず、保存済みキャラクターがあるアカウントでは選び直す画面は表示されません。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">アカウント</span><span><b>サーバーアカウント＆自動保存を開始。</b>ホーム画面でアカウントを作ると進捗がサーバーへ自動保存され、どの端末からでも続きが遊べるようになりました。セーブ操作は不要です。</span></li>
             <li><time>2026.11.22</time><span class="news-tag notice">お知らせ</span><span><b>公開リンク版をリリース。</b>このページのURLを送るだけで、友だちも同じブラウザで冒険に参加できるようになりました。</span></li>
             <li><time>2026.11.22</time><span class="news-tag update">オンライン</span><span><b>実プレイヤー同期が稼働中。</b>Render上の同期サーバーに接続し、位置とチャットのリアルタイム同期に対応しました。</span></li>
-            <li><time>2026.11.22</time><span class="news-tag update">アップデート</span><span><b>一人称3D＆公式サイトを刷新。</b>自分の目線で歩く3Dワールドと、全5章のメインクエストを実装しました。</span></li>
+            <li><time>2026.11.22</time><span class="news-tag update">アップデート</span><span><b>一人称3D＆公式サイトを刷新。</b>自分の目線で歩く3Dワールドと、全6章のメインクエストを実装しました。</span></li>
             <li><time>2026.11.22</time><span class="news-tag event">イベント</span><span><b>ボス討伐チャレンジ開催中。</b>古代遺跡の守護者ゴーレムを倒して、伝説の冒険者の称号を目指そう。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
           <h2>ルミナス地方へようこそ</h2>
-          <p>噴水の広場を中心に家々が並ぶルミナスの町。北にはスライムの跳ねる草原、東には獣の潜む深い森、そして北東の丘には守護者ゴーレムの眠る古代遺跡が待っています。</p>
+          <p>噴水の広場を中心に家々が並ぶルミナスの町。北にはスライムの跳ねる草原、東には獣の潜む深い森、北東の丘には守護者ゴーレムの眠る古代遺跡。さらに世界の果てには、白銀の雪原、灼熱の砂漠、深淵の森と翠玉湖、そして炎魔イフリートの君臨する紅蓮火山が広がっています。</p>
           <div class="world-stats">
-            <div><b>5</b><span>エリア</span></div>
+            <div><b>10</b><span>エリア</span></div>
             <div><b>3</b><span>クラス</span></div>
-            <div><b>5</b><span>メインクエスト</span></div>
+            <div><b>6</b><span>メインクエスト</span></div>
           </div>
         </section>
       </div>
@@ -746,20 +806,25 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <div class="feat-grid">
             <div class="feat"><div class="f-ico">👁️</div><h3>一人称で歩く世界</h3><p>カメラはあなたの目線そのもの。右手に武器を構え、町並み・森・遺跡を自分の足で歩き回る没入感。</p></div>
             <div class="feat"><div class="f-ico">◆</div><h3>リンクで友だちと合流</h3><p>このページのリンクを送るだけ。同じリンクを開いた実プレイヤーが ◆ マークで現れ、動きとチャットが同期します。</p></div>
-            <div class="feat"><div class="f-ico">🗺️</div><h3>王道の冒険の1日目</h3><p>スライム討伐から始まる全5章のメインクエスト。最終目標は遺跡に眠る守護者ゴーレムの討伐。</p></div>
+            <div class="feat"><div class="f-ico">🗺️</div><h3>王道の冒険の1日目</h3><p>スライム討伐から始まる全6章のメインクエスト。最終目標は紅蓮火山の炎魔イフリートの討伐。</p></div>
             <div class="feat"><div class="f-ico">☁️</div><h3>サーバー自動保存</h3><p>ホーム画面でアカウントを作るだけ。進捗はサーバーへ自動保存され、どの端末からでもログインすれば続きから再開できます。セーブ操作は不要です。</p></div>
           </div>
         </section>
 
         <section class="sec-panel" id="secWorld" aria-label="ワールド紹介">
           <h2>WORLD <span>— 舞台はルミナス地方</span></h2>
-          <p class="sec-sub">5つのエリアが1つの世界につながっている</p>
+          <p class="sec-sub">10のエリアが1つの世界につながっている（128×128タイル）</p>
           <div class="zone-grid">
             <div class="zone-card"><b>🏘️ ルミナスの町</b><p>噴水の広場を中心に家々が並ぶ、冒険の拠点。安全地帯で、HPも回復する。ここからすべての物語が始まる。</p></div>
             <div class="zone-card"><b>🌿 始まりの草原</b><p>町の北に広がる穏やかな草原。スライムが跳ねる、駆け出し冒険者の狩り場。</p></div>
             <div class="zone-card"><b>🌲 ささやきの森</b><p>町の東に広がる深い森。ゴブリン、フォレストウルフ、オークが巣くう。レベルを上げてから挑もう。</p></div>
             <div class="zone-card"><b>💧 月影湖</b><p>南西にたたずむ静かな湖。世界のほころびを感じる、不思議な場所。</p></div>
             <div class="zone-card"><b>🏛️ 古代遺跡</b><p>北東の丘に眠る古代の遺跡。守護者ゴーレム（Lv.10）と、宙に浮かぶ蒼いクリスタルが待つ。</p></div>
+            <div class="zone-card"><b>❄️ 白銀の雪原</b><p>北東の果ての雪原。フロストウルフとアイスゴーレムが徘徊する、吹雪の大地。</p></div>
+            <div class="zone-card"><b>🏜️ 灼熱の砂漠</b><p>東の彼方の砂漠。デザートスコーピオンとサンドワームが砂に潜む。オアシスが憩いの場。</p></div>
+            <div class="zone-card"><b>🌋 紅蓮火山</b><p>南東の果ての活火山。マグマスライムとラーヴァゴーレム、そして炎魔イフリート（Lv.14）が君臨する最難関エリア。</p></div>
+            <div class="zone-card"><b>🌳 深淵の森と翠玉湖</b><p>南西の奥地に広がる古い森と、エメラルド色に光る湖。古木のトレントが森を守る。</p></div>
+            <div class="zone-card"><b>🗿 忘れられた遺跡</b><p>北の大地に埋もれたもうひとつの遺跡。番人のオークたちが今も見張りを続ける。</p></div>
             <div class="zone-card"><b>◆ 実プレイヤー</b><p>リンクを開いた実プレイヤーが ◆ マークでこの世界に加わります。町の広場で落ち合って、一緒に冒険しよう。</p></div>
           </div>
         </section>
@@ -775,12 +840,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         </section>
 
         <section class="sec-panel" id="secQuest" aria-label="メインクエスト">
-          <h2>MAIN QUEST <span>— 全5章の物語</span></h2>
+          <h2>MAIN QUEST <span>— 全6章の物語</span></h2>
           <ol class="quest-chain">
             <li><span class="q-num">1</span><div><b>スライム討伐</b><small>始まりの草原（町の北）のスライムを5体倒そう。</small></div><span class="q-reward">報酬 80 EXP / 50 G</span></li>
             <li><span class="q-num">2</span><div><b>ゴブリン退治</b><small>東の森に巣くうゴブリンを5体退治しよう。少し強いのでレベルを上げてから。</small></div><span class="q-reward">報酬 180 EXP / 120 G</span></li>
             <li><span class="q-num">3</span><div><b>森の脅威</b><small>フォレストウルフとオークを合わせて6体倒して森に平和を。</small></div><span class="q-reward">報酬 320 EXP / 220 G</span></li>
             <li><span class="q-num">4</span><div><b>遺跡の守護者</b><small>北東の遺跡に眠るボス「守護者ゴーレム」を討伐せよ！</small></div><span class="q-reward">報酬 800 EXP / 600 G</span></li>
+            <li><span class="q-num">5</span><div><b>火山の炎魔</b><small>南東の果て・紅蓮火山に君臨する炎魔イフリートを討伐せよ！</small></div><span class="q-reward">報酬 1500 EXP / 1200 G</span></li>
             <li><span class="q-num">★</span><div><b>伝説の冒険者</b><small>すべてのクエストを達成！自由に世界を冒険しよう。ボスは復活するので周回もできるよ。</small></div></li>
           </ol>
         </section>
@@ -792,6 +858,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>視点（一人称）</td><td>画面をクリックするとカーソルがロックされ、マウスカーソルを動かすだけで上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグ、またはカーソルキー <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> でも視点移動できます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
             <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
             <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
+            <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動でダッシュ。MPを毎秒1消費し、尽きるとダッシュできません</td></tr>
+            <tr><td>全体マップ</td><td><kbd>M</kbd> キー。歩いて探索したエリアだけが表示される全体マップ（探索記録はセーブに残ります）</td></tr>
+            <tr><td>買い物・矢</td><td>町の商人マーロウに近づいて <kbd>E</kbd> で買い物。アーチャーの射撃は矢を消費し、矢は放物線を描いて飛びます。地形に刺さった矢は近づいて <kbd>E</kbd> で回収できます</td></tr>
             <tr><td>スキル</td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
             <tr><td>ポーション</td><td><kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
             <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
@@ -842,18 +911,27 @@ var ETYPES={
   goblin:{name:"ゴブリン",emoji:"👺",hp:75,atk:11,exp:42,gold:18,lv:3,speed:1.55,size:19,color:"#8a9a3a"},
   wolf:{name:"フォレストウルフ",emoji:"🐺",hp:110,atk:16,exp:68,gold:26,lv:5,speed:2.3,size:20,color:"#8d99a6"},
   orc:{name:"オークウォリアー",emoji:"👹",hp:185,atk:22,exp:110,gold:44,lv:7,speed:1.5,size:24,color:"#b0623a"},
-  boss:{name:"遺跡の守護者ゴーレム",emoji:"🗿",hp:720,atk:30,exp:600,gold:500,lv:10,speed:1.25,size:38,color:"#9a8fb0",boss:true}
+  boss:{name:"遺跡の守護者ゴーレム",emoji:"🗿",hp:720,atk:30,exp:600,gold:500,lv:10,speed:1.25,size:38,color:"#9a8fb0",boss:true},
+  frostwolf:{name:"フロストウルフ",emoji:"🐺",hp:150,atk:20,exp:95,gold:34,lv:7,speed:2.4,size:20,color:"#bcd8ea"},
+  icegolem:{name:"アイスゴーレム",emoji:"🧊",hp:300,atk:26,exp:170,gold:70,lv:10,speed:1.2,size:26,color:"#9fd0e8"},
+  scorpion:{name:"デザートスコーピオン",emoji:"🦂",hp:210,atk:25,exp:120,gold:52,lv:8,speed:1.9,size:20,color:"#c98a3a"},
+  sandworm:{name:"サンドワーム",emoji:"🪱",hp:260,atk:28,exp:150,gold:60,lv:9,speed:1.6,size:26,color:"#d8b36a"},
+  treant:{name:"古木のトレント",emoji:"🌲",hp:320,atk:27,exp:175,gold:66,lv:9,speed:1.1,size:30,color:"#4a7a3a"},
+  magma:{name:"マグマスライム",emoji:"🔥",hp:240,atk:30,exp:160,gold:64,lv:10,speed:1.3,size:22,color:"#ff7a3c"},
+  lavagolem:{name:"ラーヴァゴーレム",emoji:"🌋",hp:420,atk:34,exp:240,gold:95,lv:12,speed:1.15,size:32,color:"#a03a2a"},
+  ifrit:{name:"火山の炎魔イフリート",emoji:"👿",hp:1250,atk:38,exp:1000,gold:900,lv:14,speed:1.35,size:40,color:"#e5484d",boss:true}
 };
 var QUESTS=[
   {title:"スライム討伐",desc:"始まりの草原（町の北）のスライムを倒そう。",target:"slime",need:5,exp:80,gold:50},
   {title:"ゴブリン退治",desc:"東の森に巣くうゴブリンを退治しよう。少し強いのでレベルを上げてから。",target:"goblin",need:5,exp:180,gold:120},
   {title:"森の脅威",desc:"フォレストウルフとオークを倒して森に平和を。",target:"any_mid",need:6,exp:320,gold:220},
   {title:"遺跡の守護者",desc:"北東の遺跡に眠るボス「守護者ゴーレム」を討伐せよ！",target:"boss",need:1,exp:800,gold:600},
+  {title:"火山の炎魔",desc:"南東の果て・紅蓮火山に君臨する炎魔イフリートを討伐せよ！",target:"ifrit",need:1,exp:1500,gold:1200},
   {title:"伝説の冒険者",desc:"すべてのクエストを達成！自由に世界を冒険しよう。ボスは復活するので周回もできるよ。",target:"none",need:1,exp:0,gold:0,done:true}
 ];
 
 /* ================= STATE ================= */
-var W=2600,H=2600;
+var W=5200,H=5200; /* world is 128x128 tiles (was 64x64) — existing areas kept, new lands added east & south */
 var canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 var mini=document.getElementById('minimap'),mctx=mini.getContext('2d');
 var started=false, soundOn=true, audioCtx=null;
@@ -869,6 +947,17 @@ var skillCd={s1:0,s2:0,s3:0};
 var selectedClass='warrior';
 var lastSaveAt=null, lastSavedKey='', saveLoadContext='title';
 var obstacles=[], decorations=[];
+/* crosshair identification: the one enemy currently captured by the center crosshair.
+   Only this enemy's name / level / HP are ever shown. */
+var aimTarget=null;
+/* exploration (fog of war): 64x64 cells over the 128x128-tile world; a cell becomes
+   explored once it enters the minimap's view radius. Saved with the character. */
+var EXP_N=64, explored=[], exploredCount=0;
+/* arrows stuck in the terrain: they stay for a while and can be picked back up with E */
+var stuckArrows=[];
+/* the town merchant (shop) */
+var MERCHANT={x:1470,y:1330,name:"商人マーロウ",r:16};
+var ARROW_PRICE=2;
 
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
 var DEFAULT_BINDS={attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
@@ -1005,7 +1094,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('shopModal').style.display==='grid';
 }
 function openGameMenu(){
   if(!started||!player||player.dead)return;
@@ -1024,6 +1113,7 @@ function openFromMenu(id,anchor){
   if(id==='saveModal')refreshSaveUI();
   if(id==='bagModal')refreshBagUI();
   if(id==='playersModal')refreshPlayersUI();
+  if(id==='worldMapModal')drawWorldMap();
   $(id).style.display='grid';
   if(id==='settingsModal'&&anchor==='sound'){
     setTimeout(function(){
@@ -1038,6 +1128,8 @@ function closeSubModal(id){
 }
 function handleEscape(){
   if(menuOpen){closeGameMenu();return true;}
+  if($('worldMapModal').style.display==='grid'){closeWorldMap();return true;}
+  if($('shopModal').style.display==='grid'){closeShop();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
@@ -1056,6 +1148,7 @@ function refreshBagUI(){
   var hpFull=player.hp>=player.maxHp;
   var html='';
   html+='<div class="bag-row"><span class="bag-ico">🧪</span><div class="bag-info"><b>回復ポーション</b><small>使うとHPを45回復</small></div><span class="bag-count">× '+player.potions+'</span><button type="button" class="bag-use" data-use="potion"'+((player.potions<=0||hpFull)?' disabled':'')+'>使う</button></div>';
+  html+='<div class="bag-row"><span class="bag-ico">🏹</span><div class="bag-info"><b>矢</b><small>アーチャーの射撃で1本ずつ消費。町の商人で買える／地形に刺さった矢はEキーで回収</small></div><span class="bag-count">× '+player.arrows+'</span></div>';
   html+='<div class="bag-row"><span class="bag-ico">'+weapon[0]+'</span><div class="bag-info"><b>'+weapon[1]+'</b><small>'+weapon[2]+'</small></div><span class="bag-tag">装備中</span></div>';
   html+='<div class="bag-row"><span class="bag-ico">💰</span><div class="bag-info"><b>ゴールド</b><small>冒険で集めたお金</small></div><span class="bag-count">'+player.gold+' G</span></div>';
   html+='<div class="bag-row"><span class="bag-ico">🏅</span><div class="bag-info"><b>討伐記録</b><small>これまでに倒したモンスター</small></div><span class="bag-count">'+player.kills+' 体</span></div>';
@@ -1079,7 +1172,7 @@ function refreshPlayersUI(){
 function doLogout(){
   if(acct.token)serverSave(false);
   returnToMenu=false;closeGameMenu();
-  ['settingsModal','saveModal','helpModal','bagModal','playersModal'].forEach(function(id){$(id).style.display='none';});
+  ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal','shopModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
   netClosed=true;clearTimeout(netRetryTimer);
   if(netWs){try{netWs.close();}catch(e){}netWs=null;}
@@ -1095,14 +1188,14 @@ function doLogout(){
 
 /* ================= REALTIME SYNC (public server) =================
    Protocol 2 client for the deployed sync server. Positions are sent in
-   tile coordinates (world is 64x64 tiles over W x H pixels). When the
+   tile coordinates (world is 128x128 tiles over W x H pixels). When the
    server is unreachable or asleep, the game runs offline (solo). */
 var NET_URL='wss://aetheria-realtime-server.onrender.com';
 var NET_HEALTH_URL='https://aetheria-realtime-server.onrender.com/health';
 var netWs=null, netStatus='idle', netMyId=null, netRetry=0, netClosed=false, netRetryTimer=null, netLastPosSent=0;
 var remoteTracks={}, remotes=[];
-function pxToTile(v){return v/(W/64);}
-function tileToPx(v){return v*(W/64);}
+function pxToTile(v){return v/(W/128);}
+function tileToPx(v){return v*(W/128);}
 function netSetStatus(s){
   netStatus=s;
   var dot=$('netDot'); if(dot) dot.style.background=(s==='online')?'#43d17c':(s==='connecting'||s==='reconnecting')?'#e8913a':'#8a97a0';
@@ -1203,28 +1296,52 @@ function netChat(text){
 }
 
 /* world gen */
+function regionAt(x,y){
+  if(x>3850&&y>3850) return 'volcano';
+  if(x>3250&&y>=1400&&y<=3400) return 'desert';
+  if(x>3350&&y<1350) return 'snow';
+  if(x<1500&&y>3250) return 'deepforest';
+  return 'green';
+}
 function genWorld(){
   obstacles=[];decorations=[];
   // town plaza buildings (center)
   var houses=[{x:1060,y:1060,w:150,h:110,c:"#8a5a3a"},{x:1420,y:1060,w:150,h:110,c:"#6a7a8a"},{x:1060,y:1420,w:150,h:110,c:"#7a6a4a"},{x:1420,y:1420,w:150,h:110,c:"#8a4a4a"},{x:1230,y:1000,w:140,h:100,c:"#5a6e5a"}];
   houses.forEach(function(h){obstacles.push({type:'rect',x:h.x,y:h.y,w:h.w,h:h.h,c:h.c,house:true});});
   obstacles.push({type:'circle',x:1300,y:1300,r:52,fountain:true}); // fountain
-  // ruins NE
+  obstacles.push({type:'circle',x:MERCHANT.x,y:MERCHANT.y,r:30,stall:true}); // merchant stall
+  // ruins NE (original)
   for(var i=0;i<7;i++) obstacles.push({type:'rect',x:2050+ (i%3)*130,y:280+Math.floor(i/3)*150,w:56,h:90,c:"#6f6a7d",ruin:true});
-  // trees & rocks scattered (avoid town center)
+  // forgotten ruins (north, in the new lands)
+  for(var j=0;j<7;j++) obstacles.push({type:'rect',x:2780+(j%3)*170,y:300+Math.floor(j/3)*190,w:56,h:90,c:"#7a7466",ruin:true});
+  // trees & rocks scattered (avoid town center), vegetation follows the region
   var tries=0;
-  while(decorations.length<240 && tries<3000){
+  while(decorations.length<620 && tries<9000){
     tries++;
     var x=60+Math.random()*(W-120), y=60+Math.random()*(H-120);
     if(Math.hypot(x-1300,y-1300)<300) continue;
-    if(x>1950&&y<650) continue;
-    var kind=Math.random()<0.72?'tree':(Math.random()<0.5?'rock':'flower');
-    var d={x:x,y:y,kind:kind,s:kind==='tree'?20+Math.random()*14:10+Math.random()*8,seed:Math.random()*10};
+    if(x>1950&&x<2620&&y<650) continue;
+    if(x>2650&&x<3500&&y<1000) continue;              // forgotten ruins floor
+    if(Math.hypot(x-420,y-2150)<300) continue;          // lake 1
+    if(Math.hypot(x-700,y-4300)<330) continue;          // lake 2 (翠玉湖)
+    if(Math.hypot(x-4200,y-2400)<200) continue;         // desert oasis
+    if(Math.hypot(x-4750,y-4100)<210) continue;         // lava lake
+    if(Math.hypot(x-4600,y-4600)<330) continue;         // ifrit arena
+    var reg=regionAt(x,y), kind, roll=Math.random();
+    if(reg==='desert') kind=roll<0.42?'cactus':'rock';
+    else if(reg==='snow') kind=roll<0.68?'snowtree':'rock';
+    else if(reg==='volcano') kind='rock';
+    else if(reg==='deepforest') kind=roll<0.82?'tree':(roll<0.92?'rock':'flower');
+    else kind=roll<0.72?'tree':(roll<0.86?'rock':'flower');
+    var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+Math.random()*14:10+Math.random()*8,seed:Math.random()*10};
     decorations.push(d);
     if(kind!=='flower') obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});
   }
-  // lake SW
+  // lakes: 月影湖 (SW, original) / 翠玉湖 (deep south-west) / desert oasis
   decorations.push({x:420,y:2150,kind:'lake',s:230});
+  decorations.push({x:700,y:4300,kind:'lake',s:260});
+  decorations.push({x:4200,y:2400,kind:'lake',s:130});
+  decorations.push({x:4750,y:4100,kind:'lava',s:150});
 }
 function collide(nx,ny,r){
   if(nx<r||ny<r||nx>W-r||ny>H-r) return true;
@@ -1236,13 +1353,64 @@ function collide(nx,ny,r){
 }
 function zoneAt(x,y){
   if(Math.hypot(x-1300,y-1300)<330) return "ルミナスの町（安全地帯）";
-  if(x>1900&&y<750) return "古代遺跡（危険）";
-  if(x>1550) return "ささやきの森";
+  if(x>3850&&y>3850) return "紅蓮火山（危険）";
+  if(x>3250&&y>=1400&&y<=3400) return "灼熱の砂漠";
+  if(x>3350&&y<1350) return "白銀の雪原";
+  if(Math.hypot(x-700,y-4300)<390) return "翠玉湖";
+  if(x<1500&&y>3250) return "深淵の森";
+  if(x>2650&&x<3500&&y<1000) return "忘れられた遺跡";
+  if(x>1900&&x<2650&&y<750) return "古代遺跡（危険）";
+  if(Math.hypot(x-420,y-2150)<300) return "月影湖";
+  if(x>1550&&x<=2650) return "ささやきの森";
   if(y<950) return "始まりの草原";
-  if(x<700&&y>1800) return "月影湖";
+  if(x>=2650) return "東の大平原";
+  if(y>=2650) return "南の大平原";
   return "ルミナス平原";
 }
+function zoneColorAt(x,y){
+  var z=zoneAt(x,y);
+  if(z.indexOf('町')>=0) return '#8d8574';
+  if(z.indexOf('雪原')>=0) return '#dfe9f2';
+  if(z.indexOf('砂漠')>=0) return '#e0c084';
+  if(z.indexOf('火山')>=0) return '#b0503a';
+  if(z.indexOf('湖')>=0) return '#2e5f7a';
+  if(z.indexOf('深淵')>=0) return '#24482a';
+  if(z.indexOf('森')>=0) return '#2f5a30';
+  if(z.indexOf('遺跡')>=0) return '#5d5a68';
+  return '#3a5c38';
+}
 function isSafe(x,y){return Math.hypot(x-1300,y-1300)<330;}
+
+/* ================= EXPLORATION (fog of war) =================
+   The minimap shows a zoomed radius of ~18 tiles (MINI_VIEW_R world units).
+   Any exploration cell whose center comes within that radius of the player
+   is marked explored forever (and saved). The M-key world map draws only
+   explored cells. */
+var MINI_VIEW_R=730; /* ≈18 tiles at 40.625 units/tile */
+function resetExplored(){explored=[];for(var i=0;i<EXP_N*EXP_N;i++)explored.push(0);exploredCount=0;}
+resetExplored();
+function markExplored(){
+  if(!player)return;
+  var cell=W/EXP_N, r=Math.ceil(MINI_VIEW_R/cell);
+  var pcx=Math.floor(player.x/cell), pcy=Math.floor(player.y/cell);
+  for(var gy=pcy-r;gy<=pcy+r;gy++){
+    if(gy<0||gy>=EXP_N)continue;
+    for(var gx=pcx-r;gx<=pcx+r;gx++){
+      if(gx<0||gx>=EXP_N)continue;
+      var idx=gy*EXP_N+gx;
+      if(explored[idx])continue;
+      var cx=(gx+0.5)*cell, cy=(gy+0.5)*cell;
+      if(Math.hypot(cx-player.x,cy-player.y)<=MINI_VIEW_R){explored[idx]=1;exploredCount++;}
+    }
+  }
+}
+function exploredToString(){var s='';for(var i=0;i<EXP_N*EXP_N;i++)s+=explored[i]?'1':'0';return s;}
+function exploredFromString(s){
+  resetExplored();
+  if(typeof s!=='string')return;
+  var n=Math.min(s.length,EXP_N*EXP_N);
+  for(var i=0;i<n;i++){if(s.charAt(i)==='1'){explored[i]=1;exploredCount++;}}
+}
 
 /* ================= AUDIO ================= */
 function beep(f,d,type,v){
@@ -1263,16 +1431,16 @@ function beep(f,d,type,v){
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
   return {name:name,cls:clsKey,x:1300,y:1470,r:16,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
-    lv:1,exp:0,gold:120,potions:3,kills:0,dir:1,walk:0,dead:false};
+    lv:1,exp:0,gold:120,potions:3,arrows:(clsKey==='archer'?30:0),kills:0,dir:1,walk:0,dead:false};
 }
 function expNeed(lv){return 80+lv*55;}
 /* per-type population caps: nothing may spawn past these, so mobs can never flood the world */
-var SPAWN_CAPS={slime:16,goblin:11,wolf:8,orc:6,boss:1};
+var SPAWN_CAPS={slime:18,goblin:13,wolf:10,orc:8,boss:1,frostwolf:8,icegolem:6,scorpion:10,sandworm:7,treant:7,magma:9,lavagolem:6,ifrit:1};
 function countAlive(type){var n=0;for(var i=0;i<enemies.length;i++)if(enemies[i].type===type&&!enemies[i].dead)n++;return n;}
 function spawnEnemy(type,x,y){
   if(countAlive(type)>=(SPAWN_CAPS[type]||8))return null;
   var t=ETYPES[type];
-  var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6};
+  var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6,seen:false};
   enemies.push(e); return e;
 }
 function populate(){
@@ -1282,6 +1450,21 @@ function populate(){
   for(var i=0;i<7;i++) spawnEnemy('wolf',1700+Math.random()*700,700+Math.random()*700);
   for(var i=0;i<5;i++) spawnEnemy('orc',1850+Math.random()*600,1100+Math.random()*800);
   spawnEnemy('boss',2220,420);
+  // forgotten ruins guards (north, new lands)
+  for(var i=0;i<4;i++) spawnEnemy('orc',2800+Math.random()*600,300+Math.random()*550);
+  // snowfield (far north-east)
+  for(var i=0;i<7;i++) spawnEnemy('frostwolf',3550+Math.random()*1400,220+Math.random()*950);
+  for(var i=0;i<5;i++) spawnEnemy('icegolem',3650+Math.random()*1250,280+Math.random()*900);
+  // desert (east)
+  for(var i=0;i<9;i++) spawnEnemy('scorpion',3450+Math.random()*1450,1600+Math.random()*1550);
+  for(var i=0;i<6;i++) spawnEnemy('sandworm',3500+Math.random()*1350,1800+Math.random()*1350);
+  // deep forest (far south-west)
+  for(var i=0;i<6;i++) spawnEnemy('treant',220+Math.random()*1150,3450+Math.random()*1400);
+  for(var i=0;i<4;i++) spawnEnemy('wolf',300+Math.random()*1000,3500+Math.random()*1200);
+  // volcano (far south-east)
+  for(var i=0;i<8;i++) spawnEnemy('magma',3950+Math.random()*1050,3950+Math.random()*1050);
+  for(var i=0;i<5;i++) spawnEnemy('lavagolem',4000+Math.random()*950,4000+Math.random()*950);
+  spawnEnemy('ifrit',4600,4600);
 }
 
 /* ================= UI HELPERS ================= */
@@ -1333,7 +1516,8 @@ function killEnemy(e){
     if(hit){questCount++;updateQuest();
       if(questCount>=q.need){completeQuest();}}
   }
-  if(e.boss){chat('★☆★ <b>'+player.name+'</b> が遺跡の守護者ゴーレムを討伐しました！ ★☆★','sys');toast('ボス討伐！おめでとうございます！',4200);}
+  if(e.type==='boss'){chat('★☆★ <b>'+player.name+'</b> が遺跡の守護者ゴーレムを討伐しました！ ★☆★','sys');toast('ボス討伐！おめでとうございます！',4200);}
+  if(e.type==='ifrit'){chat('★☆★ <b>'+player.name+'</b> が火山の炎魔イフリートを討伐しました！ ★☆★','sys');toast('炎魔討伐！おめでとうございます！',4200);}
   setTimeout(function(){
     var idx=enemies.indexOf(e);if(idx>=0)enemies.splice(idx,1);
     if(target===e) target=null;
@@ -1373,10 +1557,28 @@ function updateQuest(){
   $('questBar').style.width=q.done?'100%':Math.min(100,questCount/q.need*100)+'%';
   $('questReward').textContent=q.done?'自由に冒険しよう！':('報酬: '+q.exp+' EXP / '+q.gold+' G');
 }
+function noArrows(){
+  toast('矢がない！町の商人マーロウから矢を買おう（地形に刺さった矢はEキーで回収できる）',3400);
+  beep(140,0.12,'square',0.04);
+  var chip=$('hudArrows'); if(chip){chip.classList.remove('empty');void chip.offsetWidth;chip.classList.add('empty');}
+}
 function playerAttack(mult,skillKey){
   if(!started||player.dead)return;
   var now=performance.now(),c=CLASSES[player.cls];
   if(!skillKey){if(now-lastAttack<380)return;lastAttack=now;}
+  /* ARCHER: every shot consumes one arrow and flies physically toward the
+     crosshair (gravity arc) — no auto-aim, no arrows = no attack. */
+  if(player.cls==='archer'){
+    if(player.arrows<=0){noArrows();return;}
+    player.arrows--; atkAnimT=now;
+    var spd=13.5, cp2=Math.cos(camPitch);
+    projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
+      z:terrainH(player.x,player.y)+54+jumpY,vz:Math.sin(camPitch)*spd,
+      dmg:Math.round(player.atk*(mult||1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:110});
+    beep(700,0.06,'sawtooth',0.025);
+    updateHUD();
+    return;
+  }
   atkAnimT=now;
   var range=c.range+(mult>1?30:0);
   var e=nearestEnemy(range+70);
@@ -1406,6 +1608,11 @@ function useSkill(n){
   var c=CLASSES[player.cls],key='s'+n,sk=c[key],now=performance.now();
   if(now<skillCd[key])return;
   if(player.mp<sk.mp){toast('MPが足りません');beep(140,0.1,'square',0.04);return;}
+  if(player.cls==='archer'&&!sk.aoe&&player.arrows<=0){noArrows();return;}
+  if(player.cls==='archer'&&sk.aoe){ /* アローレインは矢を3本消費する */
+    if(player.arrows<3){noArrows();return;}
+    player.arrows-=3; updateHUD();
+  }
   player.mp-=sk.mp;skillCd[key]=now+sk.cd;
   if(sk.aoe){
     var hit=0;
@@ -1642,12 +1849,13 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,questIdx,questCount,Math.round(player.x),Math.round(player.y),settingsKey()].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
-    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,kills:player.kills},
+    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills},
     quest:{idx:questIdx,count:questCount},
+    explored:exploredToString(),
     settings:snapshotSettings()};
 }
 function refreshSaveUI(){
@@ -1704,6 +1912,8 @@ function applySaveData(data){
   np.atk=num(p.atk,np.atk,1,999);np.def=num(p.def,np.def,0,999);
   np.lv=Math.floor(num(p.lv,1,1,99));np.exp=num(p.exp,0,0,99999);
   np.gold=Math.floor(num(p.gold,0,0,999999));np.potions=Math.floor(num(p.potions,0,0,999));np.kills=Math.floor(num(p.kills,0,0,999999));
+  np.arrows=Math.floor(num(p.arrows,(p.cls==='archer'?30:0),0,9999));
+  exploredFromString(data.explored);
   np.x=num(p.x,1300,40,W-40);np.y=num(p.y,1470,40,H-40);
   if(collide(np.x,np.y,np.r)){np.x=1300;np.y=1470;}
   player=np;selectedClass=np.cls;
@@ -1720,6 +1930,7 @@ function startFromSave(source){
   if(collide(player.x,player.y,player.r)){player.x=1300;player.y=1470;lastSavedKey=progressKey();}
   started=true;
   $('startScreen').style.display='none';$('saveModal').style.display='none';
+  markExplored();
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
   netConnect();
   chat(source==='server'?'— サーバーからキャラクターを読み込みました —':'— セーブデータを読み込みました —','sys');
@@ -1741,14 +1952,21 @@ function updateHUD(){
   $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
   var pct=Math.floor(player.exp/expNeed(player.lv)*100);
   $('xpBar').style.width=pct+'%';$('xpText').textContent=pct+'%';
+  /* 矢の所持数はステータス右側に常時表示（アーチャーの射撃で消費される） */
+  var ac=$('hudArrowCount'); if(ac)ac.textContent=player.arrows;
+  var chip=$('hudArrows'); if(chip)chip.classList.toggle('empty',player.cls==='archer'&&player.arrows<=0);
   /* 所持金・ポーション数・討伐数はステータス表示に出さない（バッグ画面で確認できる） */
 }
 function updateTargetUI(){
+  /* Enemy identity (name / level / HP) is revealed ONLY for the enemy the
+     center crosshair currently captures. */
   var box=$('targetInfo');
-  if(target&&!target.dead&&Math.hypot(target.x-player.x,target.y-player.y)<420){
-    box.style.display='block';$('targetName').textContent=target.name+'  Lv.'+target.lv+(target.boss?' — BOSS':'');
-    $('targetHp').style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
+  var e=aimTarget;
+  if(e&&!e.dead){
+    box.style.display='block';$('targetName').textContent=e.name+'  Lv.'+e.lv+(e.boss?' — BOSS':'');
+    $('targetHp').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';
   }else box.style.display='none';
+  var ch=$('crosshair'); if(ch)ch.classList.toggle('on',!!(e&&!e.dead));
 }
 function updatePlayerList(){
   var rows=remotes.map(function(r){
@@ -1772,6 +1990,7 @@ function updateSkillUI(now){
 /* ================= UPDATE ================= */
 function update(dt,now){
   if(!player||player.dead){return;}
+  var dashingNow=false;
   // cursor (arrow) keys rotate the camera view instead of moving
   var typing=document.activeElement===$('chatInput')||document.activeElement===$('nameInput')||document.activeElement===$('sensRange')||document.activeElement===$('keySensRange');
   if(!typing){
@@ -1794,7 +2013,13 @@ function update(dt,now){
     var fx=-sy,fz=-cy,rx=cy,rz=-sy;
     var wmx=rx*mx+fx*(-my), wmy=rz*mx+fz*(-my);
     mx=wmx;my=wmy;
-    var sp=CLASSES[player.cls].speed;
+    /* DASH (Shift): +60% speed while held, drains 1 MP per second;
+       passive MP regen pauses while dashing, and at 0 MP dashing is impossible. */
+    if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0){
+      dashingNow=true;
+      player.mp=Math.max(0,player.mp-dt*0.001);
+    }
+    var sp=CLASSES[player.cls].speed*(dashingNow?1.6:1);
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     if(!collide(nx,player.y,player.r)) player.x=nx;
     if(!collide(player.x,ny,player.r)) player.y=ny;
@@ -1808,8 +2033,26 @@ function update(dt,now){
     jumpVY-=0.00045*dt;
     if(jumpY<=0){jumpY=0;jumpVY=0;}
   }
-  // mp regen, town heal
-  player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
+  // mp regen (paused while dashing), town heal
+  if(!dashingNow)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
+  // crosshair identification + eyesight: the enemy captured by the center
+  // crosshair is the only one whose name/level/HP are revealed; any enemy
+  // that enters the player's field of view counts as "seen" for the minimap.
+  aimTarget=null;
+  var fvx=-Math.sin(camYaw), fvy=-Math.cos(camYaw), bestAimScore=1e9;
+  enemies.forEach(function(e){
+    if(e.dead)return;
+    var dx=e.x-player.x, dy=e.y-player.y, d=Math.hypot(dx,dy);
+    if(d<1)return;
+    var dot=(dx*fvx+dy*fvy)/d;
+    var ang=Math.acos(Math.max(-1,Math.min(1,dot)));
+    if(!e.seen&&d<640&&(d<150||ang<1.0))e.seen=true;
+    if(d<760){
+      var thresh=0.13+Math.atan2(e.r+12,d);
+      if(ang<thresh&&d<bestAimScore){bestAimScore=d;aimTarget=e;}
+    }
+  });
+  if(aimTarget)aimTarget.seen=true;
   if(isSafe(player.x,player.y)&&player.hp<player.maxHp){player.hp=Math.min(player.maxHp,player.hp+dt*0.03);}
   // enemies AI
   enemies.forEach(function(e){
@@ -1833,8 +2076,24 @@ function update(dt,now){
     }
     if(inSafe){e.x+=(e.x-1300)*0.02;e.y+=(e.y-1300)*0.02;} // push out of town
   });
-  // projectiles
+  // projectiles — mage bolts fly straight (legacy); ARROWS are physical:
+  // they arc under gravity toward the crosshair, stop in terrain (and can be
+  // picked back up), and damage the first enemy they actually touch.
   projectiles=projectiles.filter(function(p){
+    if(p.arrow){
+      p.x+=p.vx;p.y+=p.vy;p.vz-=0.32;p.z+=p.vz;p.life--;
+      if(p.life<=0)return false;
+      var groundZ=terrainH(p.x,p.y);
+      if(p.z<=groundZ+3){
+        stuckArrows.push({x:p.x,y:p.y,z:groundZ,vx:p.vx,vy:p.vy,until:performance.now()+120000});
+        burst(p.x,p.y,'#c9b98a',3);
+        return false;
+      }
+      for(var ai=0;ai<enemies.length;ai++){var ae=enemies[ai];
+        if(!ae.dead&&Math.hypot(ae.x-p.x,ae.y-p.y)<ae.r+8&&p.z<groundZ+ae.r*2+52&&p.z>groundZ-6){
+          var acrit=Math.random()<0.15;damageEnemy(ae,Math.round(p.dmg*(acrit?1.7:1)),acrit);beep(300,0.06,'square',0.04);return false;}}
+      return true;
+    }
     p.x+=p.vx;p.y+=p.vy;p.life--;
     if(p.life<=0)return false;
     if(p.from==='player'){
@@ -1861,15 +2120,24 @@ function draw(){
     ctx.fillStyle=h<2?'#375735':(h<4?'#3a5c38':'#33502f');
     ctx.fillRect(gx-cam.x,gy-cam.y,64,64);
   }
-  // lake
-  decorations.forEach(function(d){if(d.kind==='lake'){ctx.fillStyle='#2e5f7a';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.72,0,0,7);ctx.fill();ctx.fillStyle='#3a7291';ctx.beginPath();ctx.ellipse(d.x-cam.x-20,d.y-cam.y-14,d.s*0.7,d.s*0.45,0,0,7);ctx.fill();}});
+  // region tints for the new lands
+  ctx.fillStyle='#cfdce8';ctx.fillRect(3350-cam.x,0-cam.y,W-3350,1350);
+  ctx.fillStyle='#c9a86a';ctx.fillRect(3250-cam.x,1400-cam.y,W-3250,2000);
+  ctx.fillStyle='#6e3a30';ctx.fillRect(3850-cam.x,3850-cam.y,W-3850,H-3850);
+  ctx.fillStyle='#24482a';ctx.fillRect(0-cam.x,3250-cam.y,1500,H-3250);
+  ctx.fillStyle='#5d5a68';ctx.fillRect(2650-cam.x,150-cam.y,850,850);
+  // lakes & lava
+  decorations.forEach(function(d){
+    if(d.kind==='lake'){ctx.fillStyle='#2e5f7a';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.72,0,0,7);ctx.fill();ctx.fillStyle='#3a7291';ctx.beginPath();ctx.ellipse(d.x-cam.x-20,d.y-cam.y-14,d.s*0.7,d.s*0.45,0,0,7);ctx.fill();}
+    else if(d.kind==='lava'){ctx.fillStyle='#c33d10';ctx.beginPath();ctx.ellipse(d.x-cam.x,d.y-cam.y,d.s,d.s*0.78,0,0,7);ctx.fill();ctx.fillStyle='#ff7a3c';ctx.beginPath();ctx.ellipse(d.x-cam.x-16,d.y-cam.y-10,d.s*0.66,d.s*0.45,0,0,7);ctx.fill();}
+  });
   // town plaza
   ctx.fillStyle='#8d8574';ctx.fillRect(1300-330-cam.x,1300-330-cam.y,660,660);
   ctx.fillStyle='#9a917e';ctx.fillRect(1300-330-cam.x,1300-14-cam.y,660,28);ctx.fillRect(1300-14-cam.x,1300-330-cam.y,28,660);
   ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1;
   for(var px=1300-330;px<1300+330;px+=42){ctx.beginPath();ctx.moveTo(px-cam.x,1300-330-cam.y);ctx.lineTo(px-cam.x,1300+330-cam.y);ctx.stroke();}
-  // dirt path north & east
-  ctx.fillStyle='#7d6b4d';ctx.fillRect(1272-cam.x,0-cam.y,56,970);ctx.fillRect(1630-cam.x,1272-cam.y,W-1630,56);
+  // dirt paths: north, east (extended) & south (new)
+  ctx.fillStyle='#7d6b4d';ctx.fillRect(1272-cam.x,0-cam.y,56,970);ctx.fillRect(1630-cam.x,1272-cam.y,W-1630,56);ctx.fillRect(1272-cam.x,1630-cam.y,56,H-1630);
   // ruins floor
   ctx.fillStyle='#5d5a68';ctx.fillRect(1980-cam.x,180-cam.y,620,560);
   // obstacles: houses / ruins / fountain
@@ -1889,18 +2157,39 @@ function draw(){
   });
   // decorations sorted-ish
   decorations.forEach(function(d){
-    if(d.kind==='lake')return;
+    if(d.kind==='lake'||d.kind==='lava')return;
     var sx=d.x-cam.x,sy=d.y-cam.y;if(sx<-60||sy<-60||sx>vw+60||sy>vh+60)return;
-    ctx.font=((d.kind==='tree'?d.s*2.4:d.s*1.7))+'px serif';ctx.textAlign='center';
+    ctx.font=(((d.kind==='tree'||d.kind==='snowtree')?d.s*2.4:d.s*1.7))+'px serif';ctx.textAlign='center';
     if(d.kind==='tree')ctx.fillText('🌲',sx,sy+6);
+    else if(d.kind==='snowtree')ctx.fillText('🎄',sx,sy+6);
+    else if(d.kind==='cactus')ctx.fillText('🌵',sx,sy+5);
     else if(d.kind==='rock')ctx.fillText('🪨',sx,sy+4);
     else ctx.fillText(Math.floor(d.seed)%2?'🌼':'🌷',sx,sy+3);
   });
+  // merchant stall in the town plaza
+  (function(){
+    var sx=MERCHANT.x-cam.x, sy=MERCHANT.y-cam.y;
+    if(sx>-80&&sy>-80&&sx<vw+80&&sy<vh+80){
+      ctx.font='34px serif';ctx.textAlign='center';ctx.fillText('🏪',sx,sy+8);
+      ctx.font='700 11px "Noto Sans JP"';var nm='商人マーロウ';
+      var w2=ctx.measureText(nm).width+14;
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(sx-w2/2,sy-38,w2,15);
+      ctx.fillStyle='#ffd873';ctx.fillText(nm,sx,sy-27);
+    }
+  })();
+  // stuck arrows (pick-up-able)
+  ctx.fillStyle='#d8c9a3';
+  stuckArrows.forEach(function(a){var sx=a.x-cam.x,sy=a.y-cam.y;if(sx<-10||sy<-10||sx>vw+10||sy>vh+10)return;ctx.fillRect(sx-1.5,sy-6,3,7);});
   // zone label for ruins boss area marker
   ctx.font='700 13px "Noto Sans JP"';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.fillText('— 古代遺跡 —',2290-cam.x,205-cam.y);
   ctx.fillText('— ルミナスの町 —',1300-cam.x,1000-cam.y);
   ctx.fillText('— 始まりの草原 —',1300-cam.x,180-cam.y);
+  ctx.fillText('— 忘れられた遺跡 —',3075-cam.x,205-cam.y);
+  ctx.fillText('— 白銀の雪原 —',4300-cam.x,180-cam.y);
+  ctx.fillText('— 灼熱の砂漠 —',4250-cam.x,1560-cam.y);
+  ctx.fillText('— 深淵の森 —',750-cam.x,3450-cam.y);
+  ctx.fillText('— 紅蓮火山 —',4550-cam.x,4050-cam.y);
 
   // entities sorted by y
   var ents=[];
@@ -1948,31 +2237,171 @@ function drawEnemy(e){
   if(e.hitFlash>0){ctx.globalAlpha=0.55;ctx.fillStyle='#ff5a5a';ctx.beginPath();ctx.arc(sx,sy,e.r+4,0,7);ctx.fill();ctx.globalAlpha=1;}
   ctx.font=(e.r*1.55)+'px serif';ctx.textAlign='center';
   ctx.fillText(e.emoji,sx,sy+e.r*0.55+bob*0.4);
-  nameTag(sx,sy-e.r-20,e.name,e.lv,e.boss?'#ff9d9d':(e.state==='chase'?'#ffb3b3':'#e8e2cf'));
-  // hp bar — only when the player is close (or the enemy is targeted)
-  if(target===e||Math.hypot(e.x-player.x,e.y-player.y)<=400){
+  // name / level / HP — only for the enemy captured by the crosshair
+  if(aimTarget===e){
+    nameTag(sx,sy-e.r-20,e.name,e.lv,e.boss?'#ff9d9d':'#ffb3b3');
     var w=e.boss?110:52;
     ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(sx-w/2,sy-e.r-8,w,6);
     ctx.fillStyle=e.boss?'#c0392b':'#e5484d';ctx.fillRect(sx-w/2+1,sy-e.r-7,(w-2)*Math.max(0,e.hp/e.maxHp),4);
   }
   if(target===e){ctx.strokeStyle='#ffd34d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx,sy,e.r+9+Math.sin(performance.now()/150)*2,0,7);ctx.stroke();}
 }
+/* Minimap: a ZOOMED local view — the player stays in the center and only the
+   surrounding ~18 tiles radius (MINI_VIEW_R) are shown, never the whole world.
+   Enemies appear only after they have been seen (entered the field of view). */
 function drawMini(){
-  var s=182/W;
-  mctx.fillStyle='#22371f';mctx.fillRect(0,0,182,182);
-  mctx.fillStyle='#2e5f7a';mctx.beginPath();mctx.ellipse(420*s,2150*s,26,19,0,0,7);mctx.fill();
-  mctx.fillStyle='#8d8574';mctx.fillRect((1300-330)*s,(1300-330)*s,660*s,660*s);
-  mctx.fillStyle='#5d5a68';mctx.fillRect(1980*s,180*s,620*s,560*s);
-  mctx.fillStyle='#3a5c38';mctx.fillRect(1550*s,600*s,1050*s,1400*s);
-  enemies.forEach(function(e){if(e.dead)return;mctx.fillStyle=e.boss?'#ff3b30':'#e5484d';mctx.fillRect(e.x*s-2,e.y*s-2,e.boss?6:3,e.boss?6:3);});
-  remotes.forEach(function(r){mctx.fillStyle='#2fbfa5';mctx.fillRect(r.x*s-2,r.y*s-2,4,4);});
-  if(player){mctx.fillStyle='#ffd34d';mctx.beginPath();mctx.arc(player.x*s,player.y*s,4,0,7);mctx.fill();mctx.strokeStyle='#fff';mctx.stroke();}
+  if(!player)return;
+  var S=182,C=S/2,s=S/(MINI_VIEW_R*2);
+  function MX(x){return C+(x-player.x)*s;}
+  function MY(y){return C+(y-player.y)*s;}
+  mctx.fillStyle='#22371f';mctx.fillRect(0,0,S,S);
+  // zone ground patches (only the part inside the view is ever visible)
+  function patch(x0,y0,x1,y1,col){var a=MX(x0),b=MY(y0),c2=MX(x1),d2=MY(y1);if(c2<0||d2<0||a>S||b>S)return;mctx.fillStyle=col;mctx.fillRect(a,b,c2-a,d2-b);}
+  patch(3350,0,W,1350,'#cfdce8');            // snowfield
+  patch(3250,1400,W,3400,'#c9a86a');         // desert
+  patch(3850,3850,W,H,'#6e3a30');            // volcano
+  patch(0,3250,1500,H,'#24482a');            // deep forest
+  patch(1550,600,2600,2000,'#2f5a30');       // whispering forest
+  patch(1950,150,2650,770,'#5d5a68');        // ruins
+  patch(2650,150,3500,1000,'#5d5a68');       // forgotten ruins
+  patch(1300-330,1300-330,1300+330,1300+330,'#8d8574'); // town plaza
+  // lakes
+  decorations.forEach(function(d){
+    if(d.kind!=='lake')return;
+    var lx=MX(d.x),ly=MY(d.y);if(lx<-40||ly<-40||lx>S+40||ly>S+40)return;
+    mctx.fillStyle='#2e5f7a';mctx.beginPath();mctx.ellipse(lx,ly,Math.max(3,d.s*s),Math.max(2,d.s*0.72*s),0,0,7);mctx.fill();
+  });
+  // roads (east / south from town)
+  mctx.fillStyle='#7d6b4d';
+  mctx.fillRect(MX(1630),MY(1272),S,MY(1328)-MY(1272));
+  mctx.fillRect(MX(1272),MY(1630),MX(1328)-MX(1272),S);
+  mctx.fillRect(MX(1272),0,MX(1328)-MX(1272),MY(970));
+  // merchant
+  var mxp=MX(MERCHANT.x),myp=MY(MERCHANT.y);
+  if(mxp>=-4&&myp>=-4&&mxp<=S+4&&myp<=S+4){mctx.fillStyle='#ffd34d';mctx.fillRect(mxp-2.5,myp-2.5,5,5);}
+  // real players in range
+  remotes.forEach(function(r){var rx=MX(r.x),ry=MY(r.y);if(rx<0||ry<0||rx>S||ry>S)return;mctx.fillStyle='#2fbfa5';mctx.fillRect(rx-2,ry-2,4,4);});
+  // enemies — ONLY ones the player has actually seen
+  enemies.forEach(function(e){
+    if(e.dead||!e.seen)return;
+    var ex=MX(e.x),ey=MY(e.y);if(ex<0||ey<0||ex>S||ey>S)return;
+    mctx.fillStyle=e.boss?'#ff3b30':'#e5484d';mctx.fillRect(ex-2,ey-2,e.boss?6:3,e.boss?6:3);
+  });
+  // stuck arrows in range (faint)
+  mctx.fillStyle='rgba(216,201,163,.8)';
+  stuckArrows.forEach(function(a){var ax=MX(a.x),ay=MY(a.y);if(ax<0||ay<0||ax>S||ay>S)return;mctx.fillRect(ax-1,ay-1,2,2);});
+  // player: center, with a facing tick
+  mctx.fillStyle='#ffd34d';mctx.beginPath();mctx.arc(C,C,4,0,7);mctx.fill();mctx.strokeStyle='#fff';mctx.stroke();
+  mctx.strokeStyle='#ffd34d';mctx.lineWidth=2;mctx.beginPath();mctx.moveTo(C,C);mctx.lineTo(C-Math.sin(camYaw)*10,C-Math.cos(camYaw)*10);mctx.stroke();mctx.lineWidth=1;
+  // north indicator
+  mctx.fillStyle='rgba(255,255,255,.75)';mctx.font='700 9px "Noto Sans JP"';mctx.textAlign='right';mctx.fillText('N ↑',S-5,12);
+}
+
+/* ================= WORLD MAP (M key) — explored areas only ================= */
+function drawWorldMap(){
+  var cv=$('worldMapCanvas'); if(!cv||!player)return;
+  var g=cv.getContext('2d'), S=512, cellPx=S/EXP_N;
+  g.fillStyle='#0b0f0c'; g.fillRect(0,0,S,S);
+  for(var gy=0;gy<EXP_N;gy++)for(var gx=0;gx<EXP_N;gx++){
+    if(!explored[gy*EXP_N+gx])continue; /* unexplored stays hidden */
+    var cx=(gx+0.5)*(W/EXP_N), cy=(gy+0.5)*(H/EXP_N);
+    g.fillStyle=zoneColorAt(cx,cy);
+    g.fillRect(gx*cellPx,gy*cellPx,cellPx+0.5,cellPx+0.5);
+  }
+  function lbl(x,y,text){
+    var px=x/W*S, py=y/H*S;
+    var cell=explored[Math.floor(y/H*EXP_N)*EXP_N+Math.floor(x/W*EXP_N)];
+    if(!cell)return;
+    g.font='700 10px "Noto Sans JP"';g.textAlign='center';
+    g.fillStyle='rgba(0,0,0,.55)';var w=g.measureText(text).width+8;g.fillRect(px-w/2,py-8,w,14);
+    g.fillStyle='#fff';g.fillText(text,px,py+3);
+  }
+  lbl(1300,1300,'ルミナスの町'); lbl(1300,500,'始まりの草原'); lbl(2050,1300,'ささやきの森');
+  lbl(2290,460,'古代遺跡'); lbl(420,2150,'月影湖'); lbl(3150,550,'忘れられた遺跡');
+  lbl(4300,700,'白銀の雪原'); lbl(4250,2400,'灼熱の砂漠'); lbl(750,3900,'深淵の森');
+  lbl(700,4300,'翠玉湖'); lbl(4550,4550,'紅蓮火山');
+  // player marker
+  var px=player.x/W*S, py=player.y/H*S;
+  g.fillStyle='#ffd34d';g.beginPath();g.arc(px,py,5,0,7);g.fill();
+  g.strokeStyle='#fff';g.lineWidth=1.5;g.stroke();
+  g.font='700 9px "Noto Sans JP"';g.textAlign='center';g.fillStyle='#ffd34d';g.fillText('現在地',px,py-9);
+  var pct=Math.round(exploredCount/(EXP_N*EXP_N)*100);
+  var sub=$('worldMapSub');
+  if(sub)sub.textContent='探索済み '+pct+'%（'+exploredCount+' / '+(EXP_N*EXP_N)+' エリア）— 歩いた場所だけが地図に描かれます。現在地：'+zoneAt(player.x,player.y);
+}
+function openWorldMap(){ if(!started||!player)return; drawWorldMap(); $('worldMapModal').style.display='grid'; if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}} }
+function closeWorldMap(){ $('worldMapModal').style.display='none'; if(returnToMenu){returnToMenu=false;openGameMenu();} }
+
+/* ================= MERCHANT / SHOP ================= */
+function nearMerchant(){ return player&&Math.hypot(player.x-MERCHANT.x,player.y-MERCHANT.y)<120; }
+function nearestStuckArrow(maxD){
+  var best=null,bd=maxD||95;
+  stuckArrows.forEach(function(a){var d=Math.hypot(a.x-player.x,a.y-player.y);if(d<bd){bd=d;best=a;}});
+  return best;
+}
+function refreshShopUI(){
+  if(!player)return;
+  $('shopGold').textContent=player.gold+' G';
+  $('shopArrows').textContent=player.arrows;
+  document.querySelectorAll('#shopList .shop-buy[data-buy]').forEach(function(b){
+    var n=parseInt(b.getAttribute('data-buy'),10);
+    b.disabled=player.gold<n*ARROW_PRICE;
+    b.textContent=(n*ARROW_PRICE)+' G で買う';
+  });
+  document.querySelectorAll('#shopList .shop-buy[data-buy-potion]').forEach(function(b){
+    b.disabled=player.gold<30; b.textContent='30 G で買う';
+  });
+}
+function openShop(){
+  if(!player)return;
+  refreshShopUI();
+  $('shopModal').style.display='grid';
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  chat('<b>商人マーロウ</b>: いらっしゃい、'+escHtml(player.name)+'さん！矢は1本2ゴールドだよ。','world');
+}
+function closeShop(){ $('shopModal').style.display='none'; }
+function buyArrows(n){
+  if(!player)return;
+  var cost=n*ARROW_PRICE;
+  if(player.gold<cost){toast('ゴールドが足りません');beep(140,0.1,'square',0.04);return;}
+  player.gold-=cost; player.arrows+=n;
+  beep(784,0.09,'triangle',0.05);setTimeout(function(){beep(1046,0.13,'triangle',0.05);},80);
+  toast('矢 ×'+n+' を買った（所持 '+player.arrows+' 本）');
+  refreshShopUI(); updateHUD();
+}
+function buyPotion(){
+  if(!player)return;
+  if(player.gold<30){toast('ゴールドが足りません');beep(140,0.1,'square',0.04);return;}
+  player.gold-=30; player.potions++;
+  beep(659,0.09,'triangle',0.05);
+  toast('回復ポーションを買った（所持 '+player.potions+'）');
+  refreshShopUI(); updateHUD();
+}
+function tryInteract(){
+  if(!started||!player||player.dead)return;
+  if(nearMerchant()){ openShop(); return; }
+  var a=nearestStuckArrow(95);
+  if(a){
+    stuckArrows.splice(stuckArrows.indexOf(a),1);
+    player.arrows++;
+    addDmg(player.x,player.y-10,'矢 +1','#d8c9a3');
+    beep(880,0.07,'triangle',0.04);
+    toast('刺さっていた矢を回収した（所持 '+player.arrows+' 本）');
+    updateHUD();
+  }
+}
+function refreshInteractPrompt(){
+  var el=$('interactPrompt'); if(!el)return;
+  if(!started||!player||player.dead||menuOpen||isAnyOverlayOpen()){el.style.display='none';return;}
+  if(nearMerchant()){el.innerHTML='<b>E</b>：商人マーロウと話す';el.style.display='block';return;}
+  if(nearestStuckArrow(95)){el.innerHTML='<b>E</b>：刺さった矢を回収する';el.style.display='block';return;}
+  el.style.display='none';
 }
 
 /* ================= 3D ENGINE (Three.js) ================= */
 var THREE_OK=(typeof THREE!=='undefined');
 var renderer=null, scene=null, camera3d=null, sunLight=null, staticGroup=null, dynGroup=null;
-var clouds=[], staticSig='', entRegistry={}, projMeshes={}, partMeshes={}, eidSeq=0, hintT0=0;
+var clouds=[], staticSig='', entRegistry={}, projMeshes={}, partMeshes={}, stuckMeshes={}, eidSeq=0, hintT0=0;
 var matCache={}, geoCache={};
 function M(color,opts){
   var key=color+JSON.stringify(opts||{});
@@ -2006,14 +2435,25 @@ function terrainH(x,y){
        +Math.sin(x*0.0016-0.6)*Math.sin(y*0.0021+2.0)*8
        +Math.sin((x+y)*0.0063+0.9)*3.2
        +Math.cos(Math.hypot(x-2050,y-2050)*0.004)*4;
+  // the volcano massif rises toward the far south-east corner
+  var vx=Math.max(0,Math.min(1,(x-3600)/1600)), vy=Math.max(0,Math.min(1,(y-3600)/1600));
+  h+=vx*vy*16;
+  // snowfield drifts roll a little higher
+  if(x>3350&&y<1350)h+=Math.sin(x*0.003+0.8)*Math.cos(y*0.0035+1.9)*4;
   function flatC(cx,cy,r0,r1){var d=Math.hypot(x-cx,y-cy);if(d<=r0)return 0;if(d>=r1)return 1;var t=(d-r0)/(r1-r0);return t*t*(3-2*t);}
   function flatR(x0,y0,x1,y1,m0,m1){var dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1);var d=Math.hypot(dx,dy);if(d<=m0)return 0;if(d>=m1)return 1;var t=(d-m0)/(m1-m0);return t*t*(3-2*t);}
   var f=1;
   f*=flatC(1300,1300,400,760);        // town plaza + spawn point (1300,1470)
-  f*=flatC(420,2150,300,560);         // lake surface stays level
+  f*=flatC(420,2150,300,560);         // lake 1 surface stays level
+  f*=flatC(700,4300,330,600);         // lake 2 （翠玉湖）
+  f*=flatC(4200,2400,180,420);        // desert oasis
+  f*=flatC(4750,4100,190,420);        // lava lake
+  f*=flatC(4600,4600,320,620);        // ifrit arena
   f*=flatR(1240,0,1360,1010,10,240);  // north road
-  f*=flatR(1590,1240,2600,1360,10,240); // east road
-  f*=flatR(1950,150,2600,770,10,220); // ruins floor
+  f*=flatR(1590,1240,5200,1360,10,240); // east road (extended across the new lands)
+  f*=flatR(1240,1590,1360,5200,10,240); // south road (new)
+  f*=flatR(1950,150,2650,770,10,220); // ruins floor
+  f*=flatR(2650,150,3500,1000,10,220); // forgotten ruins floor
   return h*f;
 }
 
@@ -2034,10 +2474,47 @@ function buildViewModel(){
     sph(5,0xff7a3c,8,30,0,g);
     g.rotation.set(-0.35,0,-0.15);
   }else{
-    var b1=box(3,30,3,0x8a5a3a,0,8,0,g);b1.rotation.z=0.5;
-    var b2=box(3,30,3,0x8a5a3a,0,8,0,g);b2.rotation.z=-0.5;b2.position.y=22;
-    box(2,26,1,0xe9e2cf,-6,15,0,g);
-    g.rotation.set(-0.3,0.3,0);
+    /* ARCHER — a realistic recurve bow: a curved wooden limb (tube along a
+       recurve spline) with wood-tone shading, leather grip wrap, a taut
+       two-segment string, and a nocked arrow with metal head + fletching. */
+    function strut(a,b,r,color,parent){
+      var dir=new THREE.Vector3().subVectors(b,a);
+      var len=dir.length();
+      var m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,6),M(color));
+      m.position.copy(a).addScaledVector(dir,0.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());
+      parent.add(m);return m;
+    }
+    var V3=function(x,y,z){return new THREE.Vector3(x,y,z);};
+    // limbs: recurve profile — tips sweep forward (away from the archer, -z)
+    var curve=new THREE.CatmullRomCurve3([
+      V3(0,-31,-5),V3(-2.2,-22,-1),V3(-3.8,-12,0.6),V3(-4.4,-4,1.1),
+      V3(-4.4,4,1.1),V3(-3.8,12,0.6),V3(-2.2,22,-1),V3(0,31,-5)
+    ]);
+    var limb=new THREE.Mesh(new THREE.TubeGeometry(curve,32,1.55,8),M(0x7a4a26,{flatShading:true}));
+    limb.castShadow=false;g.add(limb);
+    var limbIn=new THREE.Mesh(new THREE.TubeGeometry(curve,32,1.05,8),M(0x9a6a3a,{flatShading:true}));
+    limbIn.position.z=0.55;g.add(limbIn);   // lighter inner wood face
+    // horn tips
+    sph(1.9,0x3a2a1a,0,31,-5,g);sph(1.9,0x3a2a1a,0,-31,-5,g);
+    // riser + leather grip
+    var riser=box(3.4,11,3,0x5d3a20,-4.4,0,1.1,g);riser.rotation.x=0.05;
+    for(var gi2=0;gi2<4;gi2++){var wrap=new THREE.Mesh(new THREE.TorusGeometry(1.95,0.5,6,12),M(0x8a2f2a));wrap.position.set(-4.4,-3.3+gi2*2.2,1.1);wrap.rotation.x=Math.PI/2;g.add(wrap);}
+    sph(2.1,0xe8c268,-4.4,6.4,1.1,g);      // gold riser caps
+    sph(2.1,0xe8c268,-4.4,-6.4,1.1,g);
+    // string: tip → nock (pulled to the arrow) → tip
+    var nock=V3(-4.4,0,7.5);
+    strut(V3(0,31,-5),nock,0.34,0xe9e2cf,g);
+    strut(nock,V3(0,-31,-5),0.34,0xe9e2cf,g);
+    strut(V3(-4.4,2.6,4.4),V3(-4.4,-2.6,4.4),0.55,0xb03a30,g); // serving wrap at nock point
+    // nocked arrow: wooden shaft along -z, steel broadhead, red/white fletching
+    var shaft2=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,37,7),M(0xc9a86a));
+    shaft2.rotation.x=Math.PI/2;shaft2.position.set(-4.4,0,-9);g.add(shaft2);
+    var head2=new THREE.Mesh(new THREE.ConeGeometry(1.5,6.5,6),M(0xd8dde2));
+    head2.rotation.x=-Math.PI/2;head2.position.set(-4.4,0,-30.5);g.add(head2);
+    var fl1=box(0.35,4.6,6.5,0xe5484d,-4.4,0,5.6,g);
+    var fl2=box(4.6,0.35,6.5,0xf2ead8,-4.4,0,5.6,g);
+    g.rotation.set(0.02,0.06,0.03);
   }
   g.traverse(function(c){c.castShadow=false;c.receiveShadow=false;});
   g.scale.setScalar(0.02);
@@ -2085,7 +2562,7 @@ function init3D(){
     var cl=new THREE.Group();
     var n=3+Math.floor(Math.random()*3);
     for(var j=0;j<n;j++){var s=sph(26+Math.random()*30,0xffffff,(j-1.5)*44,Math.random()*8,(Math.random()-0.5)*30,cl,{transparent:true,opacity:0.92});s.castShadow=false;s.scale.y=0.45;}
-    cl.position.set((Math.random()-0.5)*2400,300+Math.random()*140,(Math.random()-0.5)*2400);
+    cl.position.set((Math.random()-0.5)*4800,300+Math.random()*140,(Math.random()-0.5)*4800);
     scene.add(cl);clouds.push(cl);
   }
   setupCameraControls();
@@ -2101,23 +2578,56 @@ function buildWorld3D(){
   }
   // grass patches (stable pseudo-random)
   var seed=12345;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
-  for(var i=0;i<170;i++){
+  for(var i=0;i<340;i++){
     var px=rnd()*W,pz=rnd()*H;
     if(Math.hypot(px-1300,pz-1300)<345)continue;
+    if(regionAt(px,pz)!=='green')continue;   // no grass patches in desert / snow / volcano / deep forest floor pads
     var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
     p.rotation.x=-Math.PI/2;p.rotation.z=rnd()*3;p.position.set(WX(px),terrainH(px,pz)+0.6,WZ(pz));p.receiveShadow=true;staticGroup.add(p);
   }
+  // region ground pads for the new lands
+  flat(1850,1350,0xdfe9f2,4275,675);        // snowfield
+  flat(1950,2000,0xe0c084,4225,2400);       // desert
+  flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
+  flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
   // town plaza + roads
   flat(660,660,0x8d8574,1300,1300);
   flat(56,970,0x7d6b4d,1300,485);           // north road
-  flat(970,56,0x7d6b4d,2115,1300);          // east road
-  // ruins floor
+  flat(3570,56,0x7d6b4d,3415,1300);         // east road (extended to the new lands)
+  flat(56,3570,0x7d6b4d,1300,3415);         // south road (new)
+  // ruins floors
   flat(620,560,0x5d5a68,2290,460);
-  // lake
+  flat(850,850,0x6a6455,3075,575);
+  // lakes
   var lake=new THREE.Mesh(G('lake',function(){return new THREE.CircleGeometry(230,36);}),M(0x2e6f92));
   lake.rotation.x=-Math.PI/2;lake.scale.y=0.72;lake.position.set(WX(420),1.2,WZ(2150));lake.receiveShadow=true;staticGroup.add(lake);
   var lake2=new THREE.Mesh(G('lake2',function(){return new THREE.CircleGeometry(160,32);}),M(0x3a7ea6,{transparent:true,opacity:0.8}));
   lake2.rotation.x=-Math.PI/2;lake2.scale.y=0.7;lake2.position.set(WX(400),1.8,WZ(2136));staticGroup.add(lake2);
+  var lake3=new THREE.Mesh(G('lake3',function(){return new THREE.CircleGeometry(260,36);}),M(0x2e7a6f));
+  lake3.rotation.x=-Math.PI/2;lake3.scale.y=0.74;lake3.position.set(WX(700),1.2,WZ(4300));lake3.receiveShadow=true;staticGroup.add(lake3);
+  var oasis=new THREE.Mesh(G('oasis',function(){return new THREE.CircleGeometry(130,28);}),M(0x3a7ea6));
+  oasis.rotation.x=-Math.PI/2;oasis.scale.y=0.74;oasis.position.set(WX(4200),1.2,WZ(2400));oasis.receiveShadow=true;staticGroup.add(oasis);
+  var lava=new THREE.Mesh(G('lava',function(){return new THREE.CircleGeometry(150,30);}),M(0xff5a1f,{emissive:0xcc3300}));
+  lava.rotation.x=-Math.PI/2;lava.scale.y=0.78;lava.position.set(WX(4750),1.4,WZ(4100));staticGroup.add(lava);
+  // merchant stall + the merchant himself (town plaza, east of the fountain)
+  (function(){
+    var mg=new THREE.Group();mg.position.set(WX(MERCHANT.x),terrainH(MERCHANT.x,MERCHANT.y),WZ(MERCHANT.y));staticGroup.add(mg);
+    box(64,6,40,0x6b4a2c,0,20,0,mg);                       // counter
+    box(58,16,34,0x8a5a3a,0,10,0,mg);
+    cyl(3,3,44,0x5d3f27,-30,22,-16,mg,6);cyl(3,3,44,0x5d3f27,30,22,-16,mg,6);
+    cyl(3,3,44,0x5d3f27,-30,22,16,mg,6);cyl(3,3,44,0x5d3f27,30,22,16,mg,6);
+    var awn=box(76,3,52,0xb03a30,0,46,0,mg);awn.rotation.z=0.06;
+    box(76,3,52,0xe9e2cf,0,44.4,0,mg).rotation.z=0.06;
+    // goods on the counter: arrow bundles + potion bottles
+    cyl(1.4,1.4,20,0xc9a86a,-16,32,4,mg,5);cyl(1.4,1.4,20,0xc9a86a,-12,32,6,mg,5);cyl(1.4,1.4,20,0xc9a86a,-20,32,6,mg,5);
+    sph(4,0xe5484d,14,28,-4,mg);sph(4,0x3e9be9,22,28,2,mg);sph(4,0x4caf7d,10,28,8,mg);
+    // merchant body (behind the counter)
+    var bg=new THREE.Group();bg.position.set(0,0,-26);mg.add(bg);
+    cyl(8,10,26,0x7a4a8a,0,30,0,bg,10);
+    sph(10,0xf2c89b,0,52,0,bg);
+    cone(13,10,0xe8c268,0,63,0,bg,10);                      // straw hat brim look
+    cyl(4,4,20,0x7a4a8a,-14,36,0,bg,7);cyl(4,4,20,0x7a4a8a,14,36,0,bg,7);
+  })();
   // obstacles
   obstacles.forEach(function(o){
     if(o.type==='rect'){
@@ -2144,9 +2654,16 @@ function buildWorld3D(){
   });
   // decorations
   decorations.forEach(function(d){
-    if(d.kind==='lake')return;
+    if(d.kind==='lake'||d.kind==='lava')return;
     var x=WX(d.x),z=WZ(d.y);
-    if(d.kind==='tree'){
+    if(d.kind==='cactus'){
+      var cg=new THREE.Group();cg.position.set(x,terrainH(d.x,d.y),z);staticGroup.add(cg);
+      var cS=d.s;
+      cyl(cS*0.16,cS*0.2,cS*2.2,0x3e7a3e,0,cS*1.1,0,cg,7);
+      var arm1=cyl(cS*0.1,cS*0.12,cS*0.9,0x3e7a3e,-cS*0.42,cS*1.35,0,cg,6);arm1.rotation.z=0.5;
+      var arm2=cyl(cS*0.1,cS*0.12,cS*0.7,0x477d43,cS*0.4,cS*1.6,0,cg,6);arm2.rotation.z=-0.5;
+      sph(cS*0.16,0xff8fb3,0,cS*2.25,0,cg);
+    }else if(d.kind==='tree'||d.kind==='snowtree'){
       var tg=new THREE.Group();tg.position.set(x,terrainH(d.x,d.y)-1.5,z);staticGroup.add(tg);
       var sd=d.seed, S=d.s;
       var sr=function(n){var v=Math.sin(sd*127.1+n*311.7)*43758.5453;return v-Math.floor(v);};
@@ -2156,7 +2673,7 @@ function buildWorld3D(){
       tg.rotation.z=(sr(21)-0.5)*0.10;            // lean
       tg.rotation.x=(sr(22)-0.5)*0.08;
       var bark=[0x6b4a2c,0x5d3f27,0x74522f][Math.floor(sr(2)*3)];
-      var greens=[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43,0x548c46,0x24482a,0x3f7048];
+      var greens=d.kind==='snowtree'?[0x9fc4d8,0xbcd8ea,0x8fb8cc,0xd4e6f2,0xa8ccdf,0x9fc4d8,0xcfe2ee,0x8fb8cc]:[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43,0x548c46,0x24482a,0x3f7048];
       var gpick=function(n){return greens[Math.floor(sr(n)*greens.length)];};
       if(sr(1)<0.42){
         // pine: very tall straight trunk + five dense, drooping tiers and a spire tip
@@ -2229,7 +2746,7 @@ function humanoid(clsKey){
 function enemyModel(type){
   var t=ETYPES[type],g=new THREE.Group();
   var col=parseInt(t.color.slice(1),16);
-  if(type==='slime'){
+  if(type==='slime'||type==='magma'){
     var b=sph(t.size,col,0,t.size*0.55,0,g,{transparent:true,opacity:0.88});b.scale.y=0.62;
     sph(3,0x1c2b1a,-6,t.size*0.8,10,g);sph(3,0x1c2b1a,6,t.size*0.8,10,g);
     g.userData.squash=b;
@@ -2259,6 +2776,61 @@ function enemyModel(type){
     box(18,40,18,0x6f6a7d,-16,20,0,g);box(18,40,18,0x6f6a7d,16,20,0,g);
     cone(20,26,0xe8c268,0,132,0,g,6);
     box(64,10,44,0x5d5a68,0,6,0,g);
+  }else if(type==='frostwolf'){
+    box(20,16,38,0xbcd8ea,0,24,0,g);
+    box(13,13,16,0xa8c6da,0,32,20,g);
+    cone(4,10,0x9ab8cc,-6,42,16,g,5);cone(4,10,0x9ab8cc,6,42,16,g,5);
+    cyl(3.5,3.5,18,0xaecfe2,-7,9,-12,g,6);cyl(3.5,3.5,18,0xaecfe2,7,9,-12,g,6);
+    cyl(3.5,3.5,18,0xaecfe2,-7,9,12,g,6);cyl(3.5,3.5,18,0xaecfe2,7,9,12,g,6);
+    var ftail=cyl(2.5,1.2,20,0xbcd8ea,0,32,-24,g,6);ftail.rotation.x=0.7;
+    sph(2.4,0x3e9be9,-4,34,27,g);sph(2.4,0x3e9be9,4,34,27,g);
+  }else if(type==='icegolem'){
+    box(40,48,28,0x9fd0e8,0,44,0,g);
+    box(28,24,24,0xbcd8ea,0,80,0,g);
+    sph(5,0x2a6a9a,-6,84,13,g);sph(5,0x2a6a9a,6,84,13,g);
+    box(12,40,12,0x8fc0dc,-28,40,0,g);box(12,40,12,0x8fc0dc,28,40,0,g);
+    box(13,30,13,0x8fc0dc,-11,15,0,g);box(13,30,13,0x8fc0dc,11,15,0,g);
+    cone(8,26,0xd4e6f2,-14,106,0,g,5);cone(8,30,0xd4e6f2,10,108,0,g,5);
+    g.userData.groundOff=-20;
+  }else if(type==='scorpion'){
+    var sb=sph(20,0xc98a3a,0,16,-2,g);sb.scale.set(1,0.62,1.25);
+    sph(9,0xb87a30,0,20,16,g);
+    var st=cyl(3,1.4,26,0xa86a28,0,34,-24,g,6);st.rotation.x=-0.9;
+    sph(4.5,0x7a1f22,0,47,-32,g);
+    cyl(2.4,2.4,16,0xb87a30,-13,8,-8,g,5);cyl(2.4,2.4,16,0xb87a30,13,8,-8,g,5);
+    cyl(2.4,2.4,16,0xb87a30,-13,8,6,g,5);cyl(2.4,2.4,16,0xb87a30,13,8,6,g,5);
+    cone(5,14,0xd8a04a,-16,18,20,g,5);cone(5,14,0xd8a04a,16,18,20,g,5);
+    g.userData.groundOff=-6;
+  }else if(type==='sandworm'){
+    for(var wi=0;wi<5;wi++){var ws=sph(17-wi*1.6,wi%2?0xd8b36a:0xc9a45a,0,13,-wi*17+20,g);ws.scale.y=0.8;}
+    sph(3,0x7a1f22,-6,20,32,g);sph(3,0x7a1f22,6,20,32,g);
+    cone(3.4,9,0xe9e2cf,-5,10,36,g,5);cone(3.4,9,0xe9e2cf,5,10,36,g,5);
+    g.userData.groundOff=-4;
+  }else if(type==='treant'){
+    cyl(11,16,52,0x5d3f27,0,26,0,g,8);
+    cyl(5,7,30,0x5d3f27,-20,44,0,g,6);cyl(5,7,30,0x5d3f27,20,44,0,g,6);
+    sph(24,0x3e7a3e,0,74,0,g,{flatShading:true});sph(17,0x2c5a30,-16,62,0,g,{flatShading:true});sph(17,0x477d43,16,62,0,g,{flatShading:true});
+    sph(3.4,0xffd34d,-6,34,13,g);sph(3.4,0xffd34d,6,34,13,g);
+    g.userData.groundOff=-24;
+  }else if(type==='lavagolem'){
+    box(46,54,30,0x5a2e26,0,48,0,g);
+    box(32,26,26,0x6e3a2c,0,88,0,g);
+    sph(6,0xffa53c,-8,92,14,g,{emissive:0xff5a00});sph(6,0xffa53c,8,92,14,g,{emissive:0xff5a00});
+    box(14,44,14,0x4a2620,-32,44,0,g);box(14,44,14,0x4a2620,32,44,0,g);
+    box(15,34,15,0x4a2620,-13,17,0,g);box(15,34,15,0x4a2620,13,17,0,g);
+    box(48,7,32,0xff7a3c,0,66,0,g).material=M(0xff7a3c,{emissive:0xcc3300});
+    g.userData.groundOff=-17;
+  }else if(type==='ifrit'){
+    cyl(17,21,46,0x8a2a20,0,48,0,g,10);
+    sph(15,0xc98a5a,0,82,0,g);
+    cone(6,22,0xe8c268,-13,100,-2,g,6);cone(6,22,0xe8c268,13,100,-2,g,6);
+    sph(4.5,0xffd34d,-6,86,12,g,{emissive:0xff8800});sph(4.5,0xffd34d,6,86,12,g,{emissive:0xff8800});
+    cyl(6,6,30,0x8a2a20,-24,52,0,g,7);cyl(6,6,30,0x8a2a20,24,52,0,g,7);
+    var wingL=box(34,20,3,0xa03a2a,-26,66,-10,g);wingL.rotation.z=0.5;wingL.rotation.y=0.5;
+    var wingR=box(34,20,3,0xa03a2a,26,66,-10,g);wingR.rotation.z=-0.5;wingR.rotation.y=-0.5;
+    cone(16,20,0xff7a3c,0,112,0,g,7).material=M(0xff7a3c,{emissive:0xcc3300});
+    cyl(8,10,24,0x6e1f16,-10,12,0,g,7);cyl(8,10,24,0x6e1f16,10,12,0,g,7);
+    g.userData.groundOff=-24;
   }
   return g;
 }
@@ -2309,16 +2881,16 @@ function syncEntity(ent,kind,now){
   if(ent.hitFlash>0){mesh.traverse(function(c){if(c.userData._m)c.material=M(0xff5a5a);});rec._flash=true;}
   else if(rec._flash){
     mesh.traverse(function(c){if(c.userData._m)c.material=c.userData._m;});rec._flash=false;}
-  // label
+  // label — for enemies, name/level/HP are revealed ONLY while the center
+  // crosshair captures them (aimTarget). All other enemies stay anonymous.
   var hgt=(kind==='e')?(ent.boss?165:ent.r*2.6+44):86;
-  var sp=projectToScreen(WX(ent.x),groundY+hgt,WZ(ent.y),_pv);
+  var identified=(kind!=='e')||(aimTarget===ent);
+  var sp=identified?projectToScreen(WX(ent.x),groundY+hgt,WZ(ent.y),_pv):null;
   if(sp){rec.label.style.display='block';rec.label.style.transform='translate(-50%,-100%) translate('+sp.x.toFixed(1)+'px,'+sp.y.toFixed(1)+'px)';}
   else rec.label.style.display='none';
   if(kind==='e'&&rec.label._bar){
     rec.label._bar.style.width=Math.max(0,ent.hp/ent.maxHp*100)+'%';
-    // HP bar only appears when the player is close (or has the enemy targeted)
-    var nearE=!player||target===ent||Math.hypot(ent.x-player.x,ent.y-player.y)<=400;
-    if(rec.label._barWrap)rec.label._barWrap.style.display=nearE?'block':'none';
+    if(rec.label._barWrap)rec.label._barWrap.style.display=identified?'block':'none';
   }
   rec._seen=now;
   return rec;
@@ -2341,20 +2913,66 @@ function render3D(now){
   for(var id in entRegistry){
     if(!seen[id]){var r=entRegistry[id];dynGroup.remove(r.mesh);if(r.label&&r.label.parentNode)r.label.parentNode.removeChild(r.label);delete entRegistry[id];}
   }
-  // projectiles
+  // projectiles — arrows render as a shaft aligned to their velocity (they arc)
   var pSeen={};
   projectiles.forEach(function(p,i){
-    var key='pr'+i+'_'+p.x.toFixed(0);
     if(!p._mid)p._mid='p'+(++eidSeq);
     pSeen[p._mid]=1;
     var m=projMeshes[p._mid];
     if(!m){
-      m=new THREE.Mesh(G('proj',function(){return new THREE.SphereGeometry(6,10,8);}),M(p.from==='player'?0xffa53c:0xffffff,{emissive:0xcc5a00}));
+      if(p.arrow){
+        m=new THREE.Group();
+        var shaft=new THREE.Mesh(G('arrowShaft',function(){var gg=new THREE.CylinderGeometry(1.1,1.1,30,6);gg.rotateX(Math.PI/2);return gg;}),M(0xc9a86a));
+        shaft.position.z=-2;m.add(shaft);
+        var head=new THREE.Mesh(G('arrowHead',function(){var gg=new THREE.ConeGeometry(2.6,8,6);gg.rotateX(-Math.PI/2);return gg;}),M(0xb9c0c7));
+        head.position.z=-20;m.add(head);
+        var fl=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.6,7,7);}),M(0xe5484d));
+        fl.position.z=11;m.add(fl);
+      }else{
+        m=new THREE.Mesh(G('proj',function(){return new THREE.SphereGeometry(6,10,8);}),M(p.from==='player'?0xffa53c:0xffffff,{emissive:0xcc5a00}));
+      }
       dynGroup.add(m);projMeshes[p._mid]=m;
     }
-    m.position.set(WX(p.x),terrainH(p.x,p.y)+26,WZ(p.y));
+    if(p.arrow){
+      m.position.set(WX(p.x),p.z,WZ(p.y));
+      _pv.set(WX(p.x)+p.vx,p.z+p.vz,WZ(p.y)+p.vy);
+      m.lookAt(_pv);
+    }else{
+      m.position.set(WX(p.x),terrainH(p.x,p.y)+26,WZ(p.y));
+    }
   });
   for(var k in projMeshes){if(!pSeen[k]){dynGroup.remove(projMeshes[k]);delete projMeshes[k];}}
+  // arrows stuck in the terrain (stay ~2 min, E key picks them back up)
+  var stSeen={};
+  stuckArrows.forEach(function(a){
+    if(!a._mid)a._mid='s'+(++eidSeq);
+    stSeen[a._mid]=1;
+    var sm=stuckMeshes[a._mid];
+    if(!sm){
+      sm=new THREE.Group();
+      var sh2=new THREE.Mesh(G('arrowShaft',function(){var gg=new THREE.CylinderGeometry(1.1,1.1,30,6);gg.rotateX(Math.PI/2);return gg;}),M(0xc9a86a));
+      sh2.position.z=-2;sm.add(sh2);
+      var fl2=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.6,7,7);}),M(0xe5484d));
+      fl2.position.z=11;sm.add(fl2);
+      dynGroup.add(sm);stuckMeshes[a._mid]=sm;
+      // stick into the ground along the impact direction, tip buried
+      sm.position.set(WX(a.x),a.z+7,WZ(a.y));
+      _pv.set(WX(a.x)+a.vx,a.z+7-14,WZ(a.y)+a.vy);
+      sm.lookAt(_pv);
+    }
+  });
+  for(var sk in stuckMeshes){if(!stSeen[sk]){dynGroup.remove(stuckMeshes[sk]);delete stuckMeshes[sk];}}
+  // merchant name label
+  if(!render3D._merchLabel){
+    render3D._merchLabel=document.createElement('div');
+    render3D._merchLabel.className='nametag';
+    render3D._merchLabel.style.color='#ffd873';
+    render3D._merchLabel.textContent='🏪 商人マーロウ';
+    document.getElementById('labels').appendChild(render3D._merchLabel);
+  }
+  var msp=projectToScreen(WX(MERCHANT.x),terrainH(MERCHANT.x,MERCHANT.y)+96,WZ(MERCHANT.y),_pv);
+  if(msp&&Math.hypot(MERCHANT.x-player.x,MERCHANT.y-player.y)<900){render3D._merchLabel.style.display='block';render3D._merchLabel.style.transform='translate(-50%,-100%) translate('+msp.x.toFixed(1)+'px,'+msp.y.toFixed(1)+'px)';}
+  else render3D._merchLabel.style.display='none';
   // particles
   var ptSeen={};
   particles.forEach(function(p){
@@ -2396,14 +3014,15 @@ function render3D(now){
     var sw=(now-atkAnimT)/220;
     var swing=0,swingZ=0;
     if(sw>=0&&sw<1){var s2=Math.sin(sw*Math.PI);swing=-s2*0.9;swingZ=-s2*0.55;}
-    viewModel.position.set(0.48+bobX,-0.46+bobY,-0.95);
-    var baseRx=(player.cls==='warrior'?-0.5:player.cls==='mage'?-0.35:-0.3);
-    var baseRz=(player.cls==='warrior'?-0.25:player.cls==='mage'?-0.15:0);
-    viewModel.rotation.set(baseRx+swing,player.cls==='archer'?0.3:0,baseRz+swingZ);
+    if(player.cls==='archer'){viewModel.position.set(-0.06+bobX,-0.30+bobY,-0.9);}
+    else viewModel.position.set(0.48+bobX,-0.46+bobY,-0.95);
+    var baseRx=(player.cls==='warrior'?-0.5:player.cls==='mage'?-0.35:0.02);
+    var baseRz=(player.cls==='warrior'?-0.25:player.cls==='mage'?-0.15:0.03);
+    viewModel.rotation.set(baseRx+swing,player.cls==='archer'?0.06:0,baseRz+swingZ);
   }
   // sun follows player for tight shadows
   sunLight.position.set(tx+260,420,tz+160);sunLight.target.position.set(tx,0,tz);
-  clouds.forEach(function(c,i){c.position.x+=0.14+i*0.012;if(c.position.x>1500)c.position.x=-1500;});
+  clouds.forEach(function(c,i){c.position.x+=0.14+i*0.012;if(c.position.x>2700)c.position.x=-2700;});
   // hint fade
   if(!hintT0)hintT0=now;
   var hint=document.getElementById('camHint');
@@ -2512,11 +3131,17 @@ function drawPreview(){
 }
 
 /* ================= LOOP ================= */
-var lastT=performance.now(),miniT=0,listT=0;
+var lastT=performance.now(),miniT=0,listT=0,exploreT=0;
 function loop(now){
   var dt=Math.min(50,now-lastT);lastT=now;
   if(started){
     update(dt,now);
+    if(now-exploreT>350){exploreT=now;markExplored();
+      // stuck arrows expire after a while
+      for(var si=stuckArrows.length-1;si>=0;si--)if(now>stuckArrows[si].until)stuckArrows.splice(si,1);
+      refreshInteractPrompt();
+      if($('worldMapModal').style.display==='grid')drawWorldMap();
+    }
     if(netStatus==='online'){
       netRefreshRemotes(now);
       if(now-netLastPosSent>100){ netLastPosSent=now; netSendPos(false); }
@@ -2543,9 +3168,12 @@ window.addEventListener('resize',resize);
 document.addEventListener('keydown',function(e){
   if(captureBind){handleBindCapture(e);return;}
   if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
+  if(started&&e.code==='KeyM'&&$('worldMapModal').style.display==='grid'){closeWorldMap();e.preventDefault();return;}
   if($('settingsModal').style.display==='grid')return;
-  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid')return;
+  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('shopModal').style.display==='grid')return;
   keys[e.code]=true;
+  if(started&&player&&e.code==='KeyM'&&document.activeElement!==$('chatInput')){e.preventDefault();openWorldMap();return;}
+  if(started&&player&&e.code==='KeyE'&&document.activeElement!==$('chatInput')){e.preventDefault();tryInteract();return;}
   if(started&&e.code.indexOf('Arrow')===0&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput'))e.preventDefault();
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(started){if(acct.token)serverSave(true);else downloadSave();}return;}
   if(!started)return;
@@ -2640,6 +3268,16 @@ $('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');})
 $('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
 $('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
 $('menuPlayersBtn').addEventListener('click',function(){openFromMenu('playersModal');});
+$('menuMapBtn').addEventListener('click',function(){openFromMenu('worldMapModal');});
+$('closeWorldMapBtn').addEventListener('click',function(){closeWorldMap();});
+$('closeShopBtn').addEventListener('click',function(){closeShop();});
+$('interactPrompt').addEventListener('click',function(){tryInteract();});
+document.querySelectorAll('#shopList .shop-buy[data-buy]').forEach(function(b){
+  b.addEventListener('click',function(){buyArrows(parseInt(b.getAttribute('data-buy'),10));});
+});
+document.querySelectorAll('#shopList .shop-buy[data-buy-potion]').forEach(function(b){
+  b.addEventListener('click',function(){buyPotion();});
+});
 $('closePlayersBtn').addEventListener('click',function(){closeSubModal('playersModal');});
 $('menuSettingsBtn').addEventListener('click',function(){openFromMenu('settingsModal');});
 $('menuSoundBtn').addEventListener('click',function(){openFromMenu('settingsModal','sound');});
@@ -2709,6 +3347,7 @@ $('startBtn').addEventListener('click',function(){
   var name=$('nameInput').value.trim()||'冒険者';
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
+  resetExplored(); stuckArrows=[]; aimTarget=null; markExplored();
   setupSkillUI(selectedClass);
   genWorld();populate();
   started=true;
@@ -2717,6 +3356,8 @@ $('startBtn').addEventListener('click',function(){
   netConnect();
   chat('— AETHERIA ONLINE にログインしました —','sys');
   chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、ジャンプは Space、攻撃は F、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで Escメニューの「セーブ」からセーブできます。'),'world');
+  chat('<b>案内人リア</b>: 世界は大きく広がりました。Mキーで全体マップ（探索した場所だけ表示）、Shiftでダッシュができます。町の広場の商人マーロウ（噴水の東）では矢やポーションが買えますよ。','world');
+  if(selectedClass==='archer')chat('<b>案内人リア</b>: アーチャーは矢を消費して戦います。最初に30本持たせてあります。矢は放物線を描いて飛び、地形に刺さった矢は近づいてEキーで回収できます。','world');
   if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
 });
