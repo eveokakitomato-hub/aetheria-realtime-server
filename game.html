@@ -4767,22 +4767,22 @@ function init3D(){
   holder.appendChild(renderer.domElement);
   canvas.style.display='none';
   scene=new THREE.Scene();
-  /* gradient sky: warm at the horizon, deep blue overhead */
+  /* gradient sky: bright daytime blue, pale at the horizon */
   var skyCv=document.createElement('canvas'); skyCv.width=4; skyCv.height=256;
   var sctx=skyCv.getContext('2d'); var sgr=sctx.createLinearGradient(0,0,0,256);
-  sgr.addColorStop(0,'#4573b4'); sgr.addColorStop(0.45,'#8fb0dc'); sgr.addColorStop(0.72,'#e8d2ac'); sgr.addColorStop(0.88,'#ffd9a0'); sgr.addColorStop(1,'#ffc384');
+  sgr.addColorStop(0,'#2e6cd2'); sgr.addColorStop(0.45,'#69a8ec'); sgr.addColorStop(0.75,'#a9d6f7'); sgr.addColorStop(1,'#e8f6ff');
   sctx.fillStyle=sgr; sctx.fillRect(0,0,4,256);
   var skyTex=new THREE.CanvasTexture(skyCv);
   if(THREE.SRGBColorSpace!==undefined)skyTex.colorSpace=THREE.SRGBColorSpace;
   scene.background=skyTex;
-  scene.fog=new THREE.Fog(0xf2d7b4,1100,3100); /* warm evening haze: far ridges fade into the dusk sky without dulling the town's colours */
+  scene.fog=new THREE.Fog(0xdceef8,1100,3100); /* pale daytime haze: far ridges fade into the bright sky without dulling the town's colours */
   // near 0.3 / far 3200 (was 0.1 / 5000): a tighter depth range gives the
   // depth buffer far more precision, which stops distant surfaces shimmering
   camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,3200);
   scene.add(camera3d);
   buildViewModel();
-  var hemi=new THREE.HemisphereLight(0xffe2bd,0x77683f,1.08);scene.add(hemi); /* warm dusk sky fill: shadows stay soft and colours stay vivid */
-  sunLight=new THREE.DirectionalLight(0xffbe78,1.38); /* low evening sun: warm amber light, longer shadows */
+  var hemi=new THREE.HemisphereLight(0xcfe5ff,0x7d8f66,1.05);scene.add(hemi); /* bright daytime sky fill: shadows stay soft and colours stay vivid */
+  sunLight=new THREE.DirectionalLight(0xfff6e6,1.55); /* high midday sun: bright near-white light, shorter shadows */
   sunLight.castShadow=true;
   if(sunLight.shadow.normalBias!==undefined)sunLight.shadow.normalBias=1.5; /* softens texture acne without peter-panning */
   sunLight.shadow.mapSize.set(1536,1536);
@@ -4916,7 +4916,7 @@ function waterMats(){
       transparent:true, depthWrite:false,
       uniforms:{ uTime:waterTimeU, uPlunge:{value:plunge?1:0},
         uDeep:{value:new THREE.Color(0x1c8cd4)}, uShallow:{value:new THREE.Color(0x9feaf8)},
-        uSky:{value:new THREE.Color(0xffe9c4)}, uSunDir:{value:new THREE.Vector3(0.74,0.53,0.42).normalize()} },
+        uSky:{value:new THREE.Color(0xcfe8ff)}, uSunDir:{value:new THREE.Vector3(0.5,0.82,0.29).normalize()} },
       vertexShader:'varying vec3 vW; varying vec2 vP;\nvoid main(){vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
       fragmentShader:[
         'uniform float uTime; uniform float uPlunge;',
@@ -4939,7 +4939,7 @@ function waterMats(){
         ' col=mix(col,uSky,0.22+0.52*fres);',
         ' vec3 R=reflect(-V,N);',
         ' float sd=max(dot(R,uSunDir),0.0);',
-        ' col+=vec3(1.0,0.84,0.58)*(pow(sd,140.0)*1.5+pow(sd,36.0)*0.35*(0.6+0.4*n3));',
+        ' col+=vec3(1.0,0.98,0.92)*(pow(sd,140.0)*1.5+pow(sd,36.0)*0.35*(0.6+0.4*n3));',
         ' col+=vec3(1.0)*smoothstep(0.93,1.0,n3)*0.12;',
         ' float foamN=noise(p*6.0+vec2(t*0.25,0.0));',
         ' float foam=smoothstep(0.90,0.995,r+(foamN-0.5)*0.05)*(0.55+0.45*sin(t*1.7+r*40.0+foamN*6.0));',
@@ -4949,7 +4949,7 @@ function waterMats(){
         ' float alpha=mix(0.86,0.97,fres);',
         ' alpha=mix(alpha,0.98,clamp(foam,0.0,1.0));',
         ' float fogF=smoothstep(1100.0,3100.0,distance(cameraPosition,vW));',
-        ' col=mix(col,vec3(0.96,0.87,0.72),fogF);',
+        ' col=mix(col,vec3(0.85,0.93,0.97),fogF);',
         ' gl_FragColor=vec4(col,alpha);',
         '}'
       ].join('\n')
@@ -5082,7 +5082,7 @@ function updateWaterFx(now){
 
 /* ============ CHIMNEY SMOKE — the town is lived in ============
    One soft Points cloud for the whole town: six recycled puffs per
-   house chimney, rising, swelling and drifting east on the evening
+   house chimney, rising, swelling and drifting east on the daytime
    breeze. Positions are rewritten per frame (a few hundred points —
    negligible on a Chromebook). Rebuilt with the town, so editor house
    deletions take their smoke with them. */
@@ -5127,7 +5127,7 @@ function updateSmoke(now){
   pos.needsUpdate=true;
 }
 
-/* ============ TOWNSFOLK — people going about their evening ============
+/* ============ TOWNSFOLK — people going about their day ============
    A handful of villagers strolling the streets and the plaza: each
    walks to a nearby waypoint (so their paths stay on the lanes), pauses
    a while, then ambles on. They are pure townsfolk — no combat, no
@@ -5211,7 +5211,7 @@ function riverMats(){
     transparent:true, depthWrite:false,
     uniforms:{ uTime:waterTimeU,
       uDeep:{value:new THREE.Color(0x1c8cd4)}, uShallow:{value:new THREE.Color(0x9feaf8)},
-      uSky:{value:new THREE.Color(0xffe9c4)}, uSunDir:{value:new THREE.Vector3(0.74,0.53,0.42).normalize()} },
+      uSky:{value:new THREE.Color(0xcfe8ff)}, uSunDir:{value:new THREE.Vector3(0.5,0.82,0.29).normalize()} },
     vertexShader:[
       'attribute float aPhase; attribute float aRapid;',
       'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp;',
@@ -5239,7 +5239,7 @@ function riverMats(){
       ' col=mix(col,uSky,0.22+0.52*fres);',
       ' vec3 R=reflect(-V,N);',
       ' float sd=max(dot(R,uSunDir),0.0);',
-      ' col+=vec3(1.0,0.84,0.58)*(pow(sd,150.0)*1.6+pow(sd,36.0)*0.32*(0.6+0.4*n3));',
+      ' col+=vec3(1.0,0.98,0.92)*(pow(sd,150.0)*1.6+pow(sd,36.0)*0.32*(0.6+0.4*n3));',
       ' col+=vec3(1.0)*smoothstep(0.94,1.0,n3)*0.10;',
       ' float foamN=noise(vec2(vUv.x*9.0,flow*4.5));',
       ' float foam=smoothstep(0.90,0.995,abs(across)+(foamN-0.5)*0.07)*(0.5+0.5*sin(t*1.6+vPh*160.0+foamN*7.0));',
@@ -5248,7 +5248,7 @@ function riverMats(){
       ' foam=max(foam,vRp*smoothstep(0.40,0.70,streak*0.65+streak2*0.35)*(0.7+0.3*sin(t*5.0+vPh*300.0)));',
       ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.88);',
       ' float fogF=smoothstep(1100.0,3100.0,distance(cameraPosition,vW));',
-      ' col=mix(col,vec3(0.96,0.87,0.72),fogF);',
+      ' col=mix(col,vec3(0.85,0.93,0.97),fogF);',
       ' gl_FragColor=vec4(col,0.94);',
       '}'
     ].join('\n')
@@ -6304,7 +6304,7 @@ function render3D(now){
     if(Math.abs(camera3d.fov-wantFov)>0.05){camera3d.fov+=(wantFov-camera3d.fov)*0.35;camera3d.updateProjectionMatrix();}
   }
   // sun follows player for tight shadows
-  sunLight.position.set(tx+330,235,tz+185);sunLight.target.position.set(tx,0,tz);
+  sunLight.position.set(tx+260,430,tz+150);sunLight.target.position.set(tx,0,tz);
   clouds.forEach(function(c,i){c.position.x+=0.14+i*0.012;if(c.position.x>2700)c.position.x=-2700;});
   // hint fade
   if(!hintT0)hintT0=now;
