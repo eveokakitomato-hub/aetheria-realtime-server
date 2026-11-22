@@ -745,7 +745,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
         <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります。<b>弓を装備していない（バッグで外した）状態では、弓の通常攻撃も弓スキルも使えません</b>。バッグで「狩人の弓」をクリックすると装備／外すを切り替えます</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
-        <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を<b>長押しすると上昇</b>します（押すたびにも少し上がります）。浮遊の解除は、<kbd>Space</kbd> を<b>短く2回すばやく押す</b>（ダブルタップ）ときだけです。長押しでは解除されず、上昇し続けます。着地すると通常状態に戻ります</td></tr>
+        <tr><td>しゃがむ</td><td><kbd>Q</kbd> でしゃがみます。視点（目の高さ）が下がって背が低くなり、移動は少し遅くなりますが、<b>敵に発見される距離が半分</b>になるので、近づきすぎなければ気づかれずにそばを通れます。<kbd>Q</kbd> を短く押すともう一度押すまでしゃがんだまま、長押しすると離したときに立ち上がります。ジャンプ・泳ぎ・浮遊では自動で立ち上がります</td></tr>
+        <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を<b>長押しすると上昇</b>します（押すたびにも少し上がります）。<kbd>Q</kbd> を<b>長押しすると、浮遊を解除せずに下降</b>できます（地面に着くと着地します）。浮遊の解除は、<kbd>Space</kbd> を<b>短く2回すばやく押す</b>（ダブルタップ）ときだけです。長押しでは解除されず、上昇し続けます。着地すると通常状態に戻ります</td></tr>
         <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木・橋・石段・水（池）などの配置（大きさの変更つき）ができ、削除モードでは町の家・城壁・木・岩に加えて川・池の水、橋、石段など既存の物も消せます。編集も削除の記録もセーブデータに保存され、「全リセット」で元に戻ります</td></tr>
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
@@ -769,7 +770,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="settingsModal"><div class="settings-card">
       <h2>⚙ 設定</h2>
-      <p class="set-note">技や攻撃のキー割り当て、視点の感度、描画解像度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD、ジャンプの Space、カーソルキーの視点移動は固定です。</p>
+      <p class="set-note">技や攻撃のキー割り当て、視点の感度、描画解像度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD、ジャンプの Space、しゃがみ／浮遊中の下降の Q、カーソルキーの視点移動は固定です。</p>
       <h3>キー割り当て</h3>
       <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー（Spaceはジャンプ専用）</div></div><button type="button" class="key-btn" data-bind="attack">F</button></div>
       <div class="set-row"><div><div class="set-label">スキル1</div><div class="set-desc" id="bindDesc1">強撃 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s1">1</button></div>
@@ -1102,6 +1103,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
             <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程になります</td></tr>
             <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
+            <tr><td>しゃがむ</td><td><kbd>Q</kbd> でしゃがみます。視点（目の高さ）が下がって背が低くなり、移動は少し遅くなりますが、<b>敵に発見される距離が半分</b>になるので、近づきすぎなければ気づかれずにそばを通れます。<kbd>Q</kbd> を短く押すともう一度押すまでしゃがんだまま、長押しすると離したときに立ち上がります。ジャンプ・泳ぎ・浮遊では自動で立ち上がります</td></tr>
             <tr><td>浮遊（飛行）</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）のみ。空中でもう一度 <kbd>Space</kbd> で浮遊し、浮遊中は <kbd>Space</kbd> 長押しで上昇、短く2回押すと解除されて降ります</td></tr>
             <tr><td>高速移動</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）のみ。歩行・ダッシュ・浮遊中の移動・泳ぎの速度がすべて4倍になります（歩行モーションも速さに合わせて速くなります）</td></tr>
             <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動でダッシュ。MPを毎秒1消費し、尽きるとダッシュできません</td></tr>
@@ -1193,6 +1195,17 @@ var jumpY=0, jumpVY=0; // jump height above terrain / vertical velocity (Space)
    impulse, the step-up tolerance in collide() and SWIM_DEPTH are all
    tuned to this body; buildings and terrain keep the world scale. */
 var EYE_H=16; // eye height above the feet (1.6m on a 1.7m body)
+/* CROUCH (Q): the eyes drop to 0.9m and the body gets low — movement
+   slows (up to 40%, eased with crouchAmt) and mobs notice the player
+   at half the usual range. Q is one key with the usual two feels:
+   a short TAP latches the crouch until Q is pressed again, a long
+   HOLD keeps it only while held (release stands up). Jumping,
+   swimming and floating all stand the player back up; while floating,
+   Q becomes the descend key instead (held, in update()). */
+var CROUCH_EYE_H=9; // crouched eye height (0.9m)
+var crouching=false, crouchLatch=false, crouchPressT=0, crouchAmt=0; // crouchAmt: smoothed 0..1, drives eye height + speed
+function eyeHNow(){return EYE_H-(EYE_H-CROUCH_EYE_H)*crouchAmt;}
+function standUpCrouch(){crouching=false;crouchLatch=false;}
 var topLift=0; // extra ground height while standing ON TOP of a wall / rock / house roof (0 = on the terrain)
 var hovering=false, hoverTapT=0; // float mode (gamemaster only): gravity stopped mid-air
 var hoverPressT=0, hoverPressWasSecond=false; // current Space press while floating: its start time + whether it began soon after a short tap
@@ -1236,7 +1249,7 @@ var stuckArrows=[];
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
 var DEFAULT_BINDS={attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'Digit4'}; /* hotbar slots 1-4: skills on 1-3, potion on 4 */
 var settings={binds:{attack:'KeyF',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'Digit4'},sens:1,keySens:1,masterVol:1,seVol:1,resMode:'auto',resScale:1};
-var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1,Space:1};
+var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1,Space:1,KeyQ:1};
 var captureBind=null; // action name currently waiting for a key press
 function keyLabel(code){
   if(!code)return '—';
@@ -3598,10 +3611,10 @@ function handleJumpKey(){
     jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_TAP_NUDGE);
     return;
   }
-  if(jumpY<=0&&jumpVY===0){jumpVY=0.118;return;} /* grounded: normal jump for everyone — impulse raised so the apex is ~15.5 units (≈1.55m): ledges, rocks and low roofs are now reachable by jumping */
+  if(jumpY<=0&&jumpVY===0){standUpCrouch();jumpVY=0.118;return;} /* grounded: normal jump for everyone — impulse raised so the apex is ~15.5 units (≈1.55m): ledges, rocks and low roofs are now reachable by jumping. Jumping stands the player up out of a crouch */
   if(!isGameMaster())return; /* mid-air press: only gamemaster can float */
-  hovering=true;jumpVY=0;hoverTapT=0;clearHoverPress();
-  toast('🕊 浮遊モード — Space長押しで上昇／短く2回押すと解除',3600);
+  hovering=true;jumpVY=0;hoverTapT=0;clearHoverPress();standUpCrouch();
+  toast('🕊 浮遊モード — Space長押しで上昇／Q長押しで下降／短く2回押すと解除',3600);
   beep(880,0.08,'sine',0.04);updateHoverBanner();
 }
 function handleJumpRelease(){
@@ -3619,6 +3632,25 @@ function handleJumpRelease(){
   }else{
     hoverTapT=now; /* first short tap: remember it in case a second short tap follows quickly */
   }
+}
+
+/* ============ CROUCH (Q) ============
+   Ground only, and never while floating (there Q is held to descend).
+   Tap vs hold is decided on release, exactly like the float's Space:
+   a short tap latches the crouch on until the next Q press; a long
+   hold crouches only while the key is down. */
+function handleCrouchKey(){
+  if(!started||!player||player.dead)return;
+  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
+  if(hovering)return; /* Q while floating = descend (held) — update() reads keys['KeyQ'] */
+  if(player.swimming||jumpY>0||jumpVY!==0)return; /* grounded and on dry land only */
+  if(crouchLatch){standUpCrouch();return;} /* latched: press Q again to stand */
+  if(!crouching){crouching=true;crouchPressT=performance.now();}
+}
+function handleCrouchRelease(){
+  if(hovering||!crouching||crouchLatch)return;
+  if(performance.now()-crouchPressT>=260)crouching=false; /* it was a hold: stand on release */
+  else crouchLatch=true; /* it was a tap: stay crouched until Q is pressed again */
 }
 
 /* ============ GOBLIN RANGED AI (archer / shaman) ============
@@ -3646,7 +3678,7 @@ function goblinRangedAI(e,dp,now,edt){
     for(var i=0;i<enemies.length;i++){var o=enemies[i];
       if(o!==e&&!o.dead&&o.fam==='gob'&&o.hp<o.maxHp*worst&&Math.hypot(o.x-e.x,o.y-e.y)<290){ally=o;worst=o.hp/o.maxHp;}}
     if(ally){
-      e.healT=now;
+      e.healT=now; e.atkAnim={t0:now}; /* the shaman waves its staff to mend — syncEntity plays the cast motion */
       var amt=Math.min(30,ally.maxHp-ally.hp); ally.hp+=amt;
       addDmg(ally.x+(Math.random()*16-8),ally.y-12,'+'+amt,'#7de08d');
       burst(ally.x,ally.y,'#7de08d',8);
@@ -3655,7 +3687,7 @@ function goblinRangedAI(e,dp,now,edt){
     }
   }
   if(dp<=range&&(!e.atkT||now-e.atkT>(e.type==='goblinShaman'?2100:1700))){
-    e.atkT=now;
+    e.atkT=now; e.atkAnim={t0:now}; /* stamp the shot: syncEntity plays the bow draw / staff wave */
     var spd=7.2, isSh=(e.type==='goblinShaman');
     projectiles.push({x:e.x,y:e.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,dmg:Math.round(e.atk*(0.85+Math.random()*0.3)),from:'enemy',src:e,life:Math.ceil(dp/spd)+16,color3:isSh?0x63e6a8:0xd8c9a3,emoji:isSh?'✦':'➤'});
     beep(isSh?520:300,0.06,'sawtooth',0.018);
@@ -3687,7 +3719,7 @@ function update(dt,now){
        leaked in (a jump that landed in deep water, a cancelled hover)
        is cleared here, so the player can never hang in the air while
        the swim state is on — the eyes ride at swimSurfaceZ() instead */
-    topLift=0; jumpY=0; jumpVY=0;
+    topLift=0; jumpY=0; jumpVY=0; standUpCrouch();
     if(hovering){hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();}
   }
   if(player.swimming&&!wasSwimming)chat('🏊 深い水に入った ― 泳いでいる間はMPを消費します','sys');
@@ -3703,6 +3735,12 @@ function update(dt,now){
     }
   }
   updateSwimBanner();
+  /* crouch amount eases toward its target (~170ms), so the eyes sink
+     and rise smoothly instead of snapping; it also scales the speed
+     penalty and is forced to 0 while swimming / floating / airborne */
+  var crouchTarget=(crouching&&!player.swimming&&!hovering&&jumpY<=0&&jumpVY===0)?1:0;
+  crouchAmt+=Math.max(-dt/170,Math.min(dt/170,crouchTarget-crouchAmt));
+  if(Math.abs(crouchTarget-crouchAmt)<0.02)crouchAmt=crouchTarget;
   // cursor (arrow) keys rotate the camera view instead of moving
   var typing=document.activeElement===$('chatInput')||document.activeElement===$('nameInput')||document.activeElement===$('sensRange')||document.activeElement===$('keySensRange');
   if(!typing){
@@ -3727,11 +3765,12 @@ function update(dt,now){
     mx=wmx;my=wmy;
     /* DASH (Shift): about 2x normal speed while held, drains 1 MP per second;
        passive MP regen pauses while dashing, and at 0 MP dashing is impossible. */
-    if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0&&!player.swimming){
+    if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0&&!player.swimming&&crouchAmt<0.5){
       dashingNow=true;
       player.mp=Math.max(0,player.mp-dt*0.001);
     }
     var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
+    if(crouchAmt>0)sp*=1-0.4*crouchAmt; /* crouching: up to 40% slower, easing in with the lowered eyes */
     if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
     sp*=gmSpeedMul(); /* gamemaster account only: walk / dash / float-move / swim all 4x (1x for everyone else) */
     if(player.jellySlowUntil&&now<player.jellySlowUntil)sp*=0.95; /* slime jelly: the awful taste slows movement 5% for 10 seconds */
@@ -3756,6 +3795,14 @@ function update(dt,now){
     else if(keys['Space']&&hoverPressT&&now-hoverPressT>=HOVER_HOLD_MS&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
       hoverTapT=0;hoverPressWasSecond=false; /* this press is a hold now, not a tap */
       jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_RISE_PER_MS*gmSpeedMul()*dt); /* float rise is gamemaster-only, so it takes the same 4x */
+    }
+    if(hovering&&keys['KeyQ']&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
+      /* Q while floating: descend at the same speed as the rise,
+         WITHOUT cancelling the float — altitude only. Reaching the
+         ground is an ordinary landing (which ends the float, as
+         landing always has). */
+      jumpY-=HOVER_RISE_PER_MS*gmSpeedMul()*dt;
+      if(jumpY<=0){jumpY=0;hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();}
     }
   }else if(jumpVY!==0||jumpY>0){
     var gZf=standH(player.x,player.y);
@@ -3814,7 +3861,7 @@ function update(dt,now){
            eyes (riding at jumpY) to the enemy, pitch included — so
            aiming down at a mob mid-jump / mid-fall / while floating
            identifies it (name / HP / crosshair) exactly as on ground */
-        var eyeZ=playerGroundZ()+EYE_H+jumpY;
+        var eyeZ=playerGroundZ()+eyeHNow()+jumpY;
         var vz3=(terrainH(e.x,e.y)+e.r+8)-eyeZ;
         var d3=Math.sqrt(dx*dx+dy*dy+vz3*vz3)||1;
         var cp3=Math.cos(camPitch);
@@ -3859,7 +3906,7 @@ function update(dt,now){
       e._slowT=now; slowTick=true;
     }
     if(pHover){if(e.state==='chase')e.state='idle';} /* untargetable while floating: the mob drops the chase and wanders */
-    else if(dp<210&&!isSafe(player.x,player.y)) e.state='chase';
+    else if(dp<(crouching?105:210)&&!isSafe(player.x,player.y)) e.state='chase'; /* crouching halves the range at which a mob first notices the player (210 → 105 units ≈ 21m → 10.5m): stay low and keep some distance and you slip past unnoticed. Once a mob is chasing, the usual leash rules apply unchanged */
     else if(e.linkUntil&&now<e.linkUntil&&!isSafe(player.x,player.y)) e.state='chase'; /* goblin pack link: stays on the attacker past the usual leash while the alert is fresh */
     else if(dp>340) e.state='return';
     var isSlime=(e.type==='slime'||e.type==='magma');
@@ -3911,7 +3958,7 @@ function update(dt,now){
           e.atkAnim={t0:now,dx:Math.cos(sa),dy:Math.sin(sa),len:Math.max(10,dp-4),dmg:e.atk*(0.85+Math.random()*0.3),hitDone:false,landed:false};
           e._face=Math.atan2(player.x-e.x,player.y-e.y);
         }
-      }else if(!e.atkT||now-e.atkT>(e.boss?900:1100)){e.atkT=now;hurtPlayer(e.atk*(0.85+Math.random()*0.3),e);beep(120,0.06,'square',0.03);}
+      }else if(!e.atkT||now-e.atkT>(e.boss?900:1100)){e.atkT=now;if(e.fam==='gob'||e.type==='goblinChief'){e.atkAnim={t0:now};e._face=Math.atan2(player.x-e.x,player.y-e.y);}hurtPlayer(e.atk*(0.85+Math.random()*0.3),e);beep(120,0.06,'square',0.03);} /* goblins: stamp the attack so syncEntity plays the claw swipe / club slam, and turn (smoothly) to face the player */
     }else{
       e.wt-=edt;
       if(e.wt<=0){e.wt=1600+Math.random()*2200;e.tx=e.homeX+(Math.random()*130-65);e.ty=e.homeY+(Math.random()*130-65);
@@ -4649,7 +4696,7 @@ function refreshGroundAll(){
 /* ---- aim: ray-march the centre crosshair onto the terrain ---- */
 function computeEditorAim(){
   if(!player)return null;
-  var eyeY=playerGroundZ()+EYE_H+jumpY;
+  var eyeY=playerGroundZ()+eyeHNow()+jumpY;
   if(player.swimming){var swZ2=swimSurfaceZ(player.x,player.y);eyeY=(swZ2>-Infinity?swZ2:terrainH(player.x,player.y))+1;}
   var cp=Math.cos(camPitch);
   var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
@@ -5640,16 +5687,16 @@ function waterMats(){
       uniforms:{ uTime:waterTimeU, uPlunge:{value:plunge?1:0},
         uDeep:{value:new THREE.Color(deep)}, uShallow:{value:new THREE.Color(shallow)},
         uSky:{value:new THREE.Color(0xcfe8ff)}, uSunDir:{value:new THREE.Vector3(0.5,0.82,0.29).normalize()} },
-      vertexShader:'varying vec3 vW; varying vec2 vP;\nvoid main(){vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
+      vertexShader:'attribute float aR; varying float vR; varying vec3 vW; varying vec2 vP;\nvoid main(){vR=aR; vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
       fragmentShader:[
         'uniform float uTime; uniform float uPlunge;',
         'uniform vec3 uDeep; uniform vec3 uShallow; uniform vec3 uSky; uniform vec3 uSunDir;',
-        'varying vec3 vW; varying vec2 vP;',
+        'varying vec3 vW; varying vec2 vP; varying float vR;',
         'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
         'float noise(vec2 p){vec2 i=floor(p); vec2 f=fract(p); f=f*f*(3.0-2.0*f);',
         ' return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),f.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),f.x),f.y);}',
         'void main(){',
-        ' float r=length(vP);',
+        ' float r=vR; /* normalised radius from the aR vertex attribute (0 = centre, 1 = rim): for a plain disc that equals length(vP), but for a merged outline (月影湖) it follows the outer shore, so the shallow gradient and rim foam only ever appear at the true edge — never on a seam inside the lake */',
         ' float t=uTime;',
         ' vec2 p=vW.xz*0.045;',
         ' float n1=noise(p*1.6+vec2(t*0.11,t*0.07));',
@@ -5691,7 +5738,7 @@ function waterMats(){
 }
 function waterSurfaceMesh(r,plunge,vivid,dark){
   waterMats();
-  if(!WATER_GEO_UNIT)WATER_GEO_UNIT=new THREE.CircleGeometry(1,44);
+  if(!WATER_GEO_UNIT){WATER_GEO_UNIT=new THREE.CircleGeometry(1,44); var wpos=WATER_GEO_UNIT.attributes.position, warr=[]; for(var wi0=0;wi0<wpos.count;wi0++)warr.push(Math.hypot(wpos.getX(wi0),wpos.getY(wi0))); WATER_GEO_UNIT.setAttribute('aR',new THREE.Float32BufferAttribute(warr,1));} /* aR: normalised radius per vertex (0 at the centre vertex, 1 on the rim) — the shader's shore gradient / foam read it instead of length(vP) */
   var m=new THREE.Mesh(WATER_GEO_UNIT,dark?WATER_MAT_DARK:(vivid?WATER_MAT_VIVID:(plunge?WATER_MAT_PLUNGE:WATER_MAT)));
   m.rotation.x=-Math.PI/2; m.scale.set(r,r,1); m.renderOrder=2;
   return m;
@@ -5705,6 +5752,38 @@ function clearWaterGroup(){ if(waterGroup)while(waterGroup.children.length)water
 function addWaterDisc(x,y2d,z,r,plunge,vivid,dark){
   var g=ensureWaterGroup(); if(!g)return null;
   var m=waterSurfaceMesh(r,plunge,vivid,dark);
+  m.position.set(WX(x),z,WZ(y2d));
+  g.add(m); return m;
+}
+/* ONE water surface whose outline is the UNION of several overlapping
+   circles (offsets/radii in game units, relative to the centre): a fan
+   mesh whose rim vertices sit on the union outline, each carrying
+   aR = 1 (centre aR = 0), so the shader draws its shallow gradient and
+   foam lace only along the true outer shore. This replaces the old
+   stack of overlapping discs for 月影湖: every disc in that stack drew
+   its OWN rim gradient and foam ring, and the two offset lobes floated
+   0.08 above the main disc, so their rings showed up INSIDE the lake —
+   the "lake inside a lake" the user reported. */
+function addWaterBlob(x,y2d,z,circles,dark){
+  waterMats();
+  var g=ensureWaterGroup(); if(!g)return null;
+  var SEG=96, pos=[0,0,0], ar=[0], idx=[];
+  for(var i=0;i<=SEG;i++){
+    var th=i/SEG*Math.PI*2, ux=Math.cos(th), uy=Math.sin(th), t=0;
+    for(var ci=0;ci<circles.length;ci++){
+      var c=circles[ci], b=ux*c.dx+uy*c.dy, cc=c.dx*c.dx+c.dy*c.dy-c.r*c.r, disc=b*b-cc;
+      if(disc<0)continue;
+      var tt=b+Math.sqrt(disc); if(tt>t)t=tt; /* far exit of the ray through this circle; the union rim is the largest */
+    }
+    pos.push(ux*t,-uy*t,0); ar.push(1); /* local (dx,-dy): the -PI/2 X-rotation maps local +Y to world -Z, and WZ() maps game +Y to world +Z */
+  }
+  for(var j=1;j<=SEG;j++)idx.push(0,j+1,j); /* winding flipped to match CircleGeometry (face up after the -PI/2 rotation) */
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('aR',new THREE.Float32BufferAttribute(ar,1));
+  geo.setIndex(idx);
+  var m=new THREE.Mesh(geo,dark?WATER_MAT_DARK:WATER_MAT);
+  m.rotation.x=-Math.PI/2; m.renderOrder=2;
   m.position.set(WX(x),z,WZ(y2d));
   g.add(m); return m;
 }
@@ -6578,7 +6657,7 @@ function buildWorld3D(){
   // decoration exists (a gamemaster can delete these water bodies in the
   // editor, and then both the swimming and the surface go away)
   function lakeAlive(x,y){for(var li=0;li<decorations.length;li++){var ld2=decorations[li];if(ld2.kind==='lake'&&Math.abs(ld2.x-x)<3&&Math.abs(ld2.y-y)<3)return true;}return false;}
-  if(lakeAlive(420,2150)){addWaterDisc(420,2150,-0.8,232,false,false,true); addWaterDisc(330,2060,-0.72,120,false,false,true); addWaterDisc(505,2235,-0.72,118,false,false,true);} /* 月影湖 in the muted dark material, with two offset lobes so its outline is an irregular shore, not a perfect ellipse (its forest-and-boulder ring is planted in genWorld) */
+  if(lakeAlive(420,2150))addWaterBlob(420,2150,-0.8,[{dx:0,dy:0,r:232},{dx:-90,dy:-90,r:120},{dx:85,dy:85,r:118}],true); /* 月影湖 in the muted dark material: ONE surface whose outline is the union of the main disc and two offset lobes, so the shore stays irregular (its forest-and-boulder ring is planted in genWorld) without any disc rims showing inside the lake */
   if(lakeAlive(700,4300))addWaterDisc(700,4300,-0.8,262,false);
   if(lakeAlive(4200,2400))addWaterDisc(4200,2400,-0.8,132,false);
   if(lakeAlive(7800,7800))addWaterDisc(7800,7800,-0.8,262,false);
@@ -6833,73 +6912,89 @@ function enemyModel(type){
        size with a heavy club; the archer keeps its bow and quiver,
        the shaman its orb staff. Feet sit at local y=0. */
     var chief=(type==='goblinChief'), sc=chief?1.5:1;
-    var skin=chief?0x74963c:(type==='goblinShaman'?0x7d9a52:(type==='goblinArcher'?0x86a047:(Math.random()<0.5?0x7f9c40:0x8ba344)));
-    var skinDk=0x5f7a2e, wartC=0x688636, clawC=0xe6dcc2;
-    /* lean sinewy legs, bare feet */
-    var legL=cyl(2.1*sc,2.7*sc,11*sc,skin,-4.3*sc,5.5*sc,0,g,6); legL.rotation.z=0.05;
-    var legR=cyl(2.1*sc,2.7*sc,11*sc,skin,4.3*sc,5.5*sc,0,g,6); legR.rotation.z=-0.05;
-    box(4.6*sc,1.7*sc,8.5*sc,skin,-4.3*sc,0.85*sc,2.2*sc,g); box(4.6*sc,1.7*sc,8.5*sc,skin,4.3*sc,0.85*sc,2.2*sc,g); /* feet */
+    var skin=chief?0x84a03c:(type==='goblinShaman'?0x87a04a:(type==='goblinArcher'?0x90a843:(Math.random()<0.5?0x8aa83e:0x96ad42))); /* yellow-green, like the photo */
+    var skinDk=0x667f2c, wartC=0x718c38, clawC=0xe6dcc2;
+    /* thin, slightly bent legs and big flat bare feet with toes */
+    var legL=cyl(1.7*sc,2.3*sc,11.5*sc,skin,-4.6*sc,5.75*sc,0.4*sc,g,6); legL.rotation.z=0.06; legL.rotation.x=0.10;
+    var legR=cyl(1.7*sc,2.3*sc,11.5*sc,skin,4.6*sc,5.75*sc,0.4*sc,g,6); legR.rotation.z=-0.06; legR.rotation.x=0.10;
+    box(5.4*sc,1.5*sc,10.5*sc,skin,-4.6*sc,0.75*sc,3.0*sc,g); box(5.4*sc,1.5*sc,10.5*sc,skin,4.6*sc,0.75*sc,3.0*sc,g); /* big flat feet */
+    for(var tix=-1;tix<=1;tix++){var toe1=sph(1.05*sc,skin,-4.6*sc+tix*1.7*sc,0.7*sc,8.2*sc,g); toe1.scale.set(1,0.62,1.25); var toe2=sph(1.05*sc,skin,4.6*sc+tix*1.7*sc,0.7*sc,8.2*sc,g); toe2.scale.set(1,0.62,1.25);} /* toes */
+    sph(0.9*sc,skinDk,-5.6*sc,8.6*sc,1.8*sc,g); sph(0.7*sc,wartC,5.8*sc,7.4*sc,1.6*sc,g); sph(0.8*sc,skinDk,5.2*sc,9.8*sc,-1.8*sc,g); /* spots and a wart on the legs */
     /* the patterned loincloth: waistband, skirt, and a woven front
        flap with stripes and diamond squares in black / cream / rust */
-    cyl(7.6*sc,8.6*sc,3.6*sc,0x4a3520,0,11.6*sc,0,g,8); /* waistband */
-    cyl(8.4*sc,10.6*sc,6.5*sc,chief?0x6e3a24:0x5d4126,0,8.6*sc,0,g,8); /* skirt */
-    var flapG=new THREE.Group(); flapG.position.set(0,10.8*sc,7.2*sc); flapG.rotation.x=0.12; g.add(flapG);
-    box(7.6*sc,9.5*sc,1.1*sc,chief?0x7a3220:0x6e4a26,0,-4.75*sc,0,flapG); /* front flap */
-    box(7.6*sc,1.5*sc,0.4*sc,0x2a2018,0,-1.6*sc,0.7*sc,flapG);
-    box(7.6*sc,1.1*sc,0.4*sc,0xd8c9a3,0,-3.4*sc,0.7*sc,flapG);
-    box(1.7*sc,1.7*sc,0.4*sc,0xc46a26,-2.5*sc,-5.6*sc,0.7*sc,flapG);box(1.7*sc,1.7*sc,0.4*sc,0xc46a26,0,-5.6*sc,0.7*sc,flapG);box(1.7*sc,1.7*sc,0.4*sc,0xc46a26,2.5*sc,-5.6*sc,0.7*sc,flapG); /* rust diamonds */
-    box(7.6*sc,1.3*sc,0.4*sc,0x8a2f22,0,-7.6*sc,0.7*sc,flapG);
-    box(7.6*sc,1.0*sc,0.4*sc,0x2a2018,0,-9.0*sc,0.7*sc,flapG);
-    var torso=new THREE.Group(); torso.position.set(0,10.5*sc,0); torso.rotation.x=0.42; g.add(torso); /* the deep hunch */
+    cyl(7.6*sc,8.6*sc,3.6*sc,0x3a2a18,0,11.6*sc,0,g,8); /* waistband */
+    cyl(8.4*sc,10.6*sc,6.5*sc,0x8a4a1e,0,8.6*sc,0,g,8); /* skirt in rust orange */
+    var flapG=new THREE.Group(); flapG.position.set(0,10.9*sc,7.0*sc); flapG.rotation.x=0.14; g.add(flapG);
+    box(7.8*sc,11.5*sc,1.1*sc,0xc46a26,0,-5.75*sc,0,flapG); /* the long front flap: orange ground, like the photo's cloth */
+    box(7.8*sc,1.5*sc,0.4*sc,0x241a10,0,-1.5*sc,0.7*sc,flapG); /* black band */
+    box(7.8*sc,1.1*sc,0.4*sc,0xd8c9a3,0,-3.1*sc,0.7*sc,flapG); /* cream band */
+    box(1.7*sc,1.7*sc,0.4*sc,0x241a10,-2.6*sc,-5.3*sc,0.7*sc,flapG);box(1.7*sc,1.7*sc,0.4*sc,0x241a10,0,-5.3*sc,0.7*sc,flapG);box(1.7*sc,1.7*sc,0.4*sc,0x241a10,2.6*sc,-5.3*sc,0.7*sc,flapG); /* black diamonds on the orange */
+    box(7.8*sc,1.2*sc,0.4*sc,0xd8c9a3,0,-7.3*sc,0.7*sc,flapG); /* cream band */
+    box(7.8*sc,1.6*sc,0.4*sc,0x241a10,0,-9.2*sc,0.7*sc,flapG); /* black band */
+    box(7.8*sc,0.9*sc,0.4*sc,0x8a2f22,0,-10.9*sc,0.7*sc,flapG); /* dark red hem */
+    var torso=new THREE.Group(); torso.position.set(0,10.5*sc,0); torso.rotation.x=0.55; g.add(torso); /* the DEEP hunch — the whole upper body pitches far forward, as in the photo */
     cyl(6.0*sc,7.6*sc,15*sc,skin,0,7.5*sc,0,torso,8); /* lean bare chest — no armour, no shirt */
     var belly=sph(6.4*sc,skin,0,2.2*sc,1.8*sc,torso); belly.scale.set(0.95,1.05,0.9); /* slight pot belly */
     var hump=sph(5.6*sc,skinDk,0,14.6*sc,-3.4*sc,torso); hump.scale.set(1.1,0.8,0.9); /* the hunched back */
     for(var rb2=0;rb2<2;rb2++){var rib=new THREE.Mesh(new THREE.TorusGeometry((6.95-rb2*0.5)*sc,0.5*sc,5,14),M(skinDk)); rib.position.set(0,(8.4+rb2*3.1)*sc,0.3*sc); rib.rotation.x=Math.PI/2; rib.castShadow=true; torso.add(rib);} /* ribs showing through the skin */
     /* spots and warts on the bare skin */
-    var spots=[[3.6,12.4,5.6,1.1],[-4.4,9.2,5.2,0.9],[4.8,5.6,4.8,0.8],[-3.2,14.6,-4.2,1.2],[4.4,15,-3.6,0.9],[-5.6,11.8,-3.8,0.8]];
+    var spots=[[3.6,12.4,5.6,1.1],[-4.4,9.2,5.2,0.9],[4.8,5.6,4.8,0.8],[-3.2,14.6,-4.2,1.2],[4.4,15,-3.6,0.9],[-5.6,11.8,-3.8,0.8],[5.8,13.2,3.4,0.85],[-5.9,6.8,3.9,0.95],[0.8,16.4,-4.6,1.0],[-1.8,3.4,5.9,0.75]];
     for(var sp3=0;sp3<spots.length;sp3++){var spt=spots[sp3]; sph(spt[3]*sc,(sp3%2?wartC:skinDk),spt[0]*sc,spt[1]*sc,spt[2]*sc,torso);}
-    /* long arms hanging low, big hands with clawed fingers */
+    /* arms as long as the legs, hanging so low the clawed fingers
+       nearly brush the ground. The shoulder / elbow / hand groups are
+       kept in userData.gob (below) so syncEntity can swing them for
+       the walk cycle and the per-kind attack motions. */
+    var shL=null,shR=null,elL=null,elR=null,hdL=null,hdR=null;
     for(var as2=-1;as2<=1;as2+=2){
-      var sh2=new THREE.Group(); sh2.position.set(8.2*sc*as2,14.2*sc,0.5*sc); sh2.rotation.z=0.14*as2; torso.add(sh2);
+      var sh2=new THREE.Group(); sh2.position.set(8.4*sc*as2,13.8*sc,0.8*sc); sh2.rotation.z=0.16*as2; torso.add(sh2);
       sph(3.1*sc,skin,0,0,0,sh2); /* shoulder knob */
-      cyl(1.9*sc,2.2*sc,10.5*sc,skin,0,-5*sc,0,sh2,6); /* upper arm */
+      cyl(1.8*sc,2.1*sc,12*sc,skin,0,-5.8*sc,0,sh2,6); /* upper arm — long and thin */
       sph(0.9*sc,wartC,1.4*sc,-4*sc,1.2*sc,sh2); /* wart on the arm */
-      var el2=new THREE.Group(); el2.position.set(0,-10.5*sc,0); el2.rotation.x=-0.3; sh2.add(el2); /* elbow — forearm swings a little forward */
-      cyl(1.6*sc,1.9*sc,10.5*sc,skin,0,-5*sc,0,el2,6); /* forearm */
-      var hd2=new THREE.Group(); hd2.position.set(0,-10.8*sc,0.6*sc); el2.add(hd2);
+      sph(0.8*sc,skinDk,-1.2*sc,-8.5*sc,1.4*sc,sh2); /* spot on the arm */
+      var el2=new THREE.Group(); el2.position.set(0,-12*sc,0); el2.rotation.x=-0.34; sh2.add(el2); /* elbow — forearm swings a little forward */
+      cyl(1.5*sc,1.8*sc,12.5*sc,skin,0,-6*sc,0,el2,6); /* forearm — as long again */
+      var hd2=new THREE.Group(); hd2.position.set(0,-12.8*sc,0.6*sc); el2.add(hd2);
       var palm=sph(2.7*sc,skin,0,0,0,hd2); palm.scale.set(1.15,0.62,1.35); /* big flat hand */
-      for(var fi2=0;fi2<3;fi2++){var fg2=cone(0.62*sc,4.6*sc,clawC,(-1.6+fi2*1.6)*sc,-1.1*sc,(1.9+(fi2===1?0.7:0))*sc,hd2,5); fg2.rotation.x=Math.PI/2+0.55;} /* long clawed fingers, curling down-forward */
+      for(var fi2=0;fi2<3;fi2++){var fg2=cone(0.62*sc,5.4*sc,clawC,(-1.6+fi2*1.6)*sc,-1.1*sc,(1.9+(fi2===1?0.7:0))*sc,hd2,5); fg2.rotation.x=Math.PI/2+0.55;} /* long clawed fingers, curling down-forward */
       var th2=cone(0.6*sc,3.6*sc,clawC,-2.4*sc*as2,-0.7*sc,0.9*sc,hd2,5); th2.rotation.x=Math.PI/2+0.3; th2.rotation.z=-0.5*as2; /* thumb claw */
+      if(as2<0){shL=sh2;elL=el2;hdL=hd2;}else{shR=sh2;elR=el2;hdR=hd2;}
     }
-    var head=new THREE.Group(); head.position.set(0,17.8*sc,3.2*sc); head.rotation.x=0.16; torso.add(head);
-    var skull=sph(8.3*sc,skin,0,0,0,head); skull.scale.set(1,0.96,1.04); /* bald head */
-    sph(1.1*sc,wartC,2.8*sc,7.6*sc,-1*sc,head); sph(0.85*sc,wartC,-4.5*sc,6.4*sc,2*sc,head); /* warts on the scalp */
+    var head=new THREE.Group(); head.position.set(0,17.2*sc,5.4*sc); head.rotation.x=0.22; torso.add(head); /* the head thrusts FAR forward off the hunched back, low over the ground */
+    var skull=sph(8.8*sc,skin,0,0,0,head); skull.scale.set(1,0.94,1.05); /* bald head */
+    sph(1.1*sc,wartC,2.8*sc,7.6*sc,-1*sc,head); sph(0.85*sc,wartC,-4.5*sc,6.4*sc,2*sc,head); sph(0.7*sc,skinDk,5.9*sc,4.2*sc,3.4*sc,head); /* warts and a spot on the scalp */
     var jaw=sph(6.4*sc,skin,0,-4.6*sc,2.2*sc,head); jaw.scale.set(1.02,0.72,0.95); /* heavy jaw */
-    var brow=box(13.4*sc,3.2*sc,3.6*sc,skinDk,0,2.6*sc,6.4*sc,head); brow.rotation.x=-0.3; /* heavy brow ridge */
+    var brow=box(13.8*sc,3.9*sc,3.9*sc,skinDk,0,2.8*sc,6.6*sc,head); brow.rotation.x=-0.3; /* HEAVY brow ridge, shadowing the eyes */
     var brL=box(5.6*sc,1.1*sc,1.2*sc,0x3d5220,-3.3*sc,4.7*sc,7.7*sc,head); brL.rotation.z=0.5; brL.rotation.x=-0.3;
     var brR=box(5.6*sc,1.1*sc,1.2*sc,0x3d5220,3.3*sc,4.7*sc,7.7*sc,head); brR.rotation.z=-0.5; brR.rotation.x=-0.3; /* angled angry brows */
-    sph(1.9*sc,0xffc23d,-3.2*sc,0.6*sc,7.3*sc,head,{emissive:0x8a4d00});sph(1.9*sc,0xffc23d,3.2*sc,0.6*sc,7.3*sc,head,{emissive:0x8a4d00}); /* deep-set eyes under the brow */
+    sph(1.9*sc,0xffc23d,-3.2*sc,0.1*sc,7.5*sc,head,{emissive:0x8a4d00});sph(1.9*sc,0xffc23d,3.2*sc,0.1*sc,7.5*sc,head,{emissive:0x8a4d00}); /* angry eyes sunk deep under the brow */
     var nose2=sph(3.1*sc,skin,0,-1.4*sc,7.6*sc,head); nose2.scale.set(1.15,0.8,0.8); /* broad nose */
     sph(0.62*sc,0x2e2416,-1.5*sc,-2.3*sc,9.7*sc,head);sph(0.62*sc,0x2e2416,1.5*sc,-2.3*sc,9.7*sc,head); /* nostrils */
-    box(8.6*sc,3.4*sc,1.4*sc,0x38120e,0,-4.9*sc,6.9*sc,head); /* wide open mouth */
-    var fgL=cone(0.95*sc,3.0*sc,clawC,-2.9*sc,-6.6*sc,7.2*sc,head,5); fgL.rotation.z=Math.PI;
-    var fgR=cone(0.95*sc,3.0*sc,clawC,2.9*sc,-6.6*sc,7.2*sc,head,5); fgR.rotation.z=Math.PI; /* upper fangs */
-    var fgC=cone(0.7*sc,2.2*sc,clawC,0,-6.5*sc,7.2*sc,head,5); fgC.rotation.z=Math.PI; /* middle tooth */
-    cone(0.8*sc,2.4*sc,clawC,-1.5*sc,-3.3*sc,7.2*sc,head,5);cone(0.8*sc,2.4*sc,clawC,1.5*sc,-3.3*sc,7.2*sc,head,5); /* lower fangs */
-    var earL=cone(3.4*sc,17*sc,skin,-12.6*sc,3.2*sc,-0.6*sc,head,7); earL.rotation.z=Math.PI/2+0.12; earL.rotation.x=-0.12;
-    var earR=cone(3.4*sc,17*sc,skin,12.6*sc,3.2*sc,-0.6*sc,head,7); earR.rotation.z=-Math.PI/2-0.12; earR.rotation.x=-0.12; /* HUGE ears straight out sideways */
-    var inL=cone(2.0*sc,11*sc,0x9a7a52,-10.8*sc,3.0*sc,0.9*sc,head,6); inL.rotation.z=Math.PI/2+0.12; inL.rotation.x=-0.12;
-    var inR=cone(2.0*sc,11*sc,0x9a7a52,10.8*sc,3.0*sc,0.9*sc,head,6); inR.rotation.z=-Math.PI/2-0.12; inR.rotation.x=-0.12; /* inner ears */
+    box(9.6*sc,3.6*sc,1.4*sc,0x38120e,0,-4.9*sc,6.9*sc,head); /* wide snarling mouth */
+    var fgL=cone(0.95*sc,3.6*sc,clawC,-3.1*sc,-6.8*sc,7.2*sc,head,5); fgL.rotation.z=Math.PI;
+    var fgR=cone(0.95*sc,3.6*sc,clawC,3.1*sc,-6.8*sc,7.2*sc,head,5); fgR.rotation.z=Math.PI; /* long upper fangs */
+    var fgC=cone(0.7*sc,2.6*sc,clawC,0,-6.7*sc,7.2*sc,head,5); fgC.rotation.z=Math.PI; /* middle tooth */
+    cone(0.8*sc,2.8*sc,clawC,-1.5*sc,-3.2*sc,7.2*sc,head,5);cone(0.8*sc,2.8*sc,clawC,1.5*sc,-3.2*sc,7.2*sc,head,5); /* lower fangs */
+    var earL=cone(3.6*sc,19.5*sc,skin,-13.2*sc,3.2*sc,-0.6*sc,head,7); earL.rotation.z=Math.PI/2+0.05; earL.rotation.x=-0.08;
+    var earR=cone(3.6*sc,19.5*sc,skin,13.2*sc,3.2*sc,-0.6*sc,head,7); earR.rotation.z=-Math.PI/2-0.05; earR.rotation.x=-0.08; /* HUGE pointed ears straight out sideways, barely any droop */
+    var inL=cone(2.1*sc,12.5*sc,0x9a7a52,-11.4*sc,3.0*sc,0.9*sc,head,6); inL.rotation.z=Math.PI/2+0.05; inL.rotation.x=-0.08;
+    var inR=cone(2.1*sc,12.5*sc,0x9a7a52,11.4*sc,3.0*sc,0.9*sc,head,6); inR.rotation.z=-Math.PI/2-0.05; inR.rotation.x=-0.08; /* inner ears */
+    /* weapons are carried IN THE HANDS, so the attack motions move
+       them: the archer's bow in its left hand, the shaman's staff and
+       the chief's club in the right — syncEntity swings the arms and
+       the weapons follow */
+    var bowM=null,staffG=null,orbM=null,clubM=null;
     if(type==='goblinArcher'){
-      var bowM=new THREE.Mesh(new THREE.TorusGeometry(11*sc,1.5*sc,6,14,Math.PI*0.95),M(0x7a4a26));
-      bowM.position.set(-14.5*sc,5*sc,6*sc); bowM.rotation.z=Math.PI*0.52; bowM.castShadow=true; torso.add(bowM);
+      bowM=new THREE.Mesh(new THREE.TorusGeometry(11*sc,1.5*sc,6,14,Math.PI*0.95),M(0x7a4a26));
+      bowM.position.set(0,6.5*sc,2*sc); bowM.rotation.z=Math.PI*0.52; bowM.castShadow=true; hdL.add(bowM);
       var quiv=box(5*sc,12*sc,5*sc,0x5d4a2c,-3*sc,10*sc,-10.5*sc,torso); quiv.rotation.x=-0.25; /* quiver on the back */
     }else if(type==='goblinShaman'){
-      cyl(1.6*sc,1.6*sc,30*sc,0x5d3f27,13.5*sc,7*sc,4*sc,torso,6);
-      sph(4*sc,0x63e6a8,13.5*sc,23.5*sc,4*sc,torso,{emissive:0x1f8a52}); /* glowing staff orb */
+      staffG=new THREE.Group(); hdR.add(staffG);
+      cyl(1.6*sc,1.6*sc,30*sc,0x5d3f27,0,11*sc,0,staffG,6); /* staff shaft rising from the hand */
+      orbM=sph(4*sc,0x63e6a8,0,27.5*sc,0,staffG,{emissive:0x1f8a52}); /* glowing staff orb */
     }else if(chief){
-      var club=cyl(3*sc,4.6*sc,21*sc,0x6b4a2c,14*sc,-1*sc,5*sc,torso,7); club.rotation.x=0.45; /* heavy club */
+      clubM=cyl(3*sc,4.6*sc,21*sc,0x6b4a2c,0,-3*sc,2.5*sc,hdR,7); clubM.rotation.x=0.5; /* heavy club gripped in the right hand */
     }
+    g.userData.gob={torso:torso,head:head,shL:shL,shR:shR,elL:elL,elR:elR,legL:legL,legR:legR,bow:bowM,staffG:staffG,orb:orbM,club:clubM,baseTorsoX:0.55,baseHeadX:0.22,baseElX:-0.34,baseShZL:shL.rotation.z,baseShZR:shR.rotation.z,amp:0};
     g.userData.groundOff=-1;
   }else if(type==='wolf'){
     var bd=box(20,16,38,0x8d99a6,0,24,0,g);
@@ -7022,7 +7117,22 @@ function syncEntity(ent,kind,now){
   var bob=(kind==='e'&&(ent.type==='slime'||ent.type==='magma'))?Math.abs(Math.sin(now/700+(ent.walk||0)*0.4))*4:Math.abs(Math.sin(ent.walk||0))*(kind==='e'?2.2:0.7); /* slime bob: same height, ~2.5x slower cycle (ブヨブヨをゆっくりに) — player bob scaled to the 1.7m body */
   var groundY=terrainH(ent.x,ent.y);
   mesh.position.set(WX(ent.x),groundY+bob+(mesh.userData.groundOff||0),WZ(ent.y));
-  if(ent._face!==undefined)mesh.rotation.y=ent._face;
+  if(ent._face!==undefined){
+    if(kind==='e'&&mesh.userData.gob){
+      /* GOBLIN SMOOTH TURNING: the mesh eases toward the target facing
+         at a capped rate instead of snapping — a half-turn takes about
+         a third of a second. Every facing change (walking, chasing,
+         attacking, the ranged AI's aim) flows through ent._face, so
+         they all turn smoothly. */
+      if(ent._faceS===undefined)ent._faceS=ent._face;
+      var dfT=ent._face-ent._faceS;
+      while(dfT>Math.PI)dfT-=Math.PI*2; while(dfT<-Math.PI)dfT+=Math.PI*2;
+      var sdtT=ent._turnT?Math.min(80,now-ent._turnT):16.7; ent._turnT=now;
+      var maxTurn=0.0095*sdtT;
+      ent._faceS+=Math.max(-maxTurn,Math.min(maxTurn,dfT));
+      mesh.rotation.y=ent._faceS;
+    }else mesh.rotation.y=ent._face;
+  }
   var sl=mesh.userData.slime;
   if(sl&&kind==='e'){
     /* squash & stretch + skirt ripple: the jelly squashes and stretches
@@ -7067,6 +7177,64 @@ function syncEntity(ent,kind,now){
     }
     posA.needsUpdate=true;
     sl.core.position.y=sl.size*0.55+Math.sin(now/800+(ent.walk||0)*0.4+sl.ph)*sl.size*0.05; /* the core bobs gently inside the jelly — same range, ~2.5x slower */
+  }
+  var gb=mesh.userData.gob;
+  if(gb&&kind==='e'){
+    /* GOBLIN ANIMATION — a hunched, knuckle-dragging walk: the legs
+       stride, the over-long arms swing against them and dangle with a
+       loose sway, and the torso rocks over its deep hunch (all eased
+       in/out with gb.amp so starting and stopping never pop). On top
+       of that, a readable attack motion per kind, driven by
+       ent.atkAnim (stamped where each attack actually fires):
+       goblin = claw swipe, chief = two-handed club slam, archer =
+       bow draw and release, shaman = staff wave with a flaring orb. */
+    var sdtG=ent._animT?Math.min(80,now-ent._animT):16.7; ent._animT=now;
+    var movingG=(Math.abs(dx)+Math.abs(dy))>0.05;
+    gb.amp+=((movingG?1:0)-gb.amp)*Math.min(1,sdtG/110);
+    var phG=ent.walk||0, ampG=gb.amp, swG=Math.sin(phG)*ampG;
+    gb.legL.rotation.x=-swG*0.5; gb.legR.rotation.x=swG*0.5; /* stride (base leg tilt is overwritten here — it was a fixed 0.10 lean; the stride covers it) */
+    gb.shL.rotation.x=swG*0.4; gb.shR.rotation.x=-swG*0.4; /* arms swing against the legs */
+    gb.shL.rotation.z=gb.baseShZL+Math.sin(phG)*0.05*ampG+Math.sin(now/760)*0.02;
+    gb.shR.rotation.z=gb.baseShZR-Math.sin(phG)*0.05*ampG-Math.sin(now/760+1.3)*0.02; /* loose dangling sway */
+    gb.elL.rotation.x=gb.baseElX-Math.abs(Math.cos(phG))*0.16*ampG;
+    gb.elR.rotation.x=gb.baseElX-Math.abs(Math.sin(phG))*0.16*ampG;
+    gb.torso.rotation.x=gb.baseTorsoX+Math.sin(phG*2)*0.05*ampG+Math.sin(now/1150)*0.012; /* rock over the hunch + idle breathing */
+    gb.torso.rotation.z=Math.sin(phG)*0.055*ampG;
+    gb.torso.rotation.y=0;
+    gb.head.rotation.x=gb.baseHeadX+Math.sin(phG*2+0.7)*0.05*ampG;
+    if(gb.staffG)gb.staffG.rotation.z=Math.sin(now/900)*0.03;
+    if(gb.orb&&!ent.atkAnim)gb.orb.scale.setScalar(1);
+    if(ent.atkAnim){
+      var aDur=(ent.type==='goblinArcher')?620:(ent.type==='goblinShaman')?640:430;
+      var ap=(now-ent.atkAnim.t0)/aDur;
+      if(ap>=1){ent.atkAnim=null; if(gb.orb)gb.orb.scale.setScalar(1);}
+      else{
+        var env=Math.sin(Math.min(1,ap)*Math.PI); /* 0 → 1 → 0 envelope */
+        if(ent.type==='goblinArcher'){
+          var dr=ap<0.55?(ap/0.55):1; /* draw phase */
+          var rel=ap<0.55?1:Math.max(0,1-(ap-0.55)/0.16); /* the release snaps the drawing hand back */
+          var hold=ap<0.72?dr:Math.max(0,1-(ap-0.72)/0.28); /* bow arm stays up through the shot, then lowers */
+          gb.shL.rotation.x=-1.3*hold; /* bow arm thrust forward */
+          gb.shR.rotation.x=-0.5*dr*rel;
+          gb.elR.rotation.x=gb.baseElX+0.85*dr*rel; /* drawing hand pulled back to the cheek */
+          gb.torso.rotation.y=-0.18*hold;
+        }else if(ent.type==='goblinShaman'){
+          gb.shR.rotation.x=-1.95*env; /* staff arm raised high */
+          if(gb.staffG)gb.staffG.rotation.z=Math.sin(ap*Math.PI*3)*0.3*env; /* waving the staff */
+          if(gb.orb)gb.orb.scale.setScalar(1+0.55*env); /* the orb flares as the bolt / mend leaves */
+          gb.torso.rotation.x-=0.1*env;
+        }else{ /* goblin claw swipe / chief club slam */
+          var wu=ap<0.36?(ap/0.36):Math.max(0,1-(ap-0.36)/0.22); /* windup: the arm hauls back and up */
+          var st=ap<0.36?0:(ap<0.58?(ap-0.36)/0.22:Math.max(0,1-(ap-0.58)/0.42)); /* the slash itself */
+          var wTop=(ent.type==='goblinChief')?-2.45:-2.1;
+          gb.shR.rotation.x=wTop*wu*(1-st)-0.15*st;
+          gb.shL.rotation.x=-0.85*st; /* the off claw rakes in after it */
+          gb.elR.rotation.x=gb.baseElX-0.3*wu+0.25*st;
+          gb.torso.rotation.y=0.3*st-0.12*wu; /* twist into the swipe */
+          if(ent.type==='goblinChief')gb.torso.rotation.x+=0.22*st; /* the chief's whole hunch slams down with the club */
+        }
+      }
+    }
   }
   if(ent.hitFlash>0){mesh.traverse(function(c){if(c.userData._m)c.material=M(0xff5a5a);});rec._flash=true;}
   else if(rec._flash){
@@ -7192,7 +7360,7 @@ function render3D(now){
   }else if(render3D._ring)render3D._ring.visible=false;
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
-  var eyeY=playerGroundZ()+EYE_H+jumpY;
+  var eyeY=playerGroundZ()+eyeHNow()+jumpY; /* crouching lowers the camera with the body (eyeHNow eases between 1.6m and 0.9m) */
   /* swimming: the eyes ride low at the ACTUAL water surface (never at
      terrain + the abstract depth scale — that floated the camera high
      above wild lakes), with a gentle bob */
@@ -7452,6 +7620,7 @@ document.addEventListener('keydown',function(e){
   if(!started)return;
   if(document.activeElement===$('chatInput'))return;
   if(e.code==='Space'){e.preventDefault();if(!e.repeat)handleJumpKey();}
+  if(e.code==='KeyQ'&&!e.repeat)handleCrouchKey(); /* Q: crouch on the ground (tap = latch, hold = while held); while floating, Q is the held descend key and update() reads keys['KeyQ'] directly */
   var b=settings.binds;
   if(e.code===b.attack){e.preventDefault();if(player&&player.cls==='archer'){if(!e.repeat)startBowDraw();}else playerAttack(1);}
   if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
@@ -7464,6 +7633,7 @@ document.addEventListener('keydown',function(e){
 });
 document.addEventListener('keyup',function(e){keys[e.code]=false;
   if(e.code==='Space')handleJumpRelease(); /* float: a release decides tap (double-tap cancel) vs hold (rise) */
+  if(e.code==='KeyQ')handleCrouchRelease(); /* crouch: a short tap latches on, a long hold ends on release */
   if(player&&player.cls==='archer'&&e.code===settings.binds.attack)releaseBow();
 });
 canvas.addEventListener('pointerdown',function(e){
