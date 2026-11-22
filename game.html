@@ -657,7 +657,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
         <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を<b>長押しすると上昇</b>します（押すたびにも少し上がります）。浮遊の解除は、<kbd>Space</kbd> を<b>短く2回すばやく押す</b>（ダブルタップ）ときだけです。長押しでは解除されず、上昇し続けます。着地すると通常状態に戻ります</td></tr>
-        <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木などの配置ができ、削除モードでは町の家・城壁・木・岩など既存の物も消せます。編集も削除の記録もセーブデータに保存され、「全リセット」で元に戻ります</td></tr>
+        <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木・橋・石段・水（池）などの配置（大きさの変更つき）ができ、削除モードでは町の家・城壁・木・岩に加えて川・池の水、橋、石段など既存の物も消せます。編集も削除の記録もセーブデータに保存され、「全リセット」で元に戻ります</td></tr>
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
@@ -765,13 +765,16 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <button type="button" class="ed-pal-btn" data-type="fence"><span>🚧</span>柵</button>
           <button type="button" class="ed-pal-btn" data-type="rock"><span>🪨</span>岩</button>
           <button type="button" class="ed-pal-btn" data-type="bridge"><span>🌉</span>橋</button>
+          <button type="button" class="ed-pal-btn" data-type="steps"><span>🪜</span>石段</button>
+          <button type="button" class="ed-pal-btn" data-type="water"><span>💧</span>水（池）</button>
         </div>
         <div class="ed-row"><label>向き</label><button type="button" class="sound-toggle off" id="edRotL" style="min-width:52px">⟲ -15°</button><span class="ed-val" id="edRotVal" style="min-width:44px">0°</span><button type="button" class="sound-toggle off" id="edRotR" style="min-width:52px">⟳ +15°</button><span style="font-size:11px;color:var(--muted)">キー: R / Shift+R</span></div>
+        <div class="ed-row"><label for="edSizeRange">大きさ</label><input type="range" id="edSizeRange" min="50" max="250" step="5" value="100"/><span class="ed-val" id="edSizeVal">100%</span><span style="font-size:11px;color:var(--muted)">キー: [ / ]</span></div>
         <div class="ed-actions">
           <button type="button" id="edPlaceModeBtn">モード: 配置</button>
           <button type="button" class="primary" id="edPlaceBtn">📌 照準の場所に置く</button>
         </div>
-        <p class="ed-note">半透明のプレビューが照準の場所に出ます。「モード: 削除」に切り替えると、照準に一番近い物が赤く光り、「削除する」で消せます。消せるのは置いた物だけでなく、町の家・城壁・門・時計塔・礼拝堂・城・噴水・街灯・露店や、木・岩・遺跡などの既存の物も対象です（川や橋などの水まわりは消せません）。既存の物を消した記録も自動保存され、次回も消えたままになります。「編集を全部リセット」で元に戻ります。置いた物には当たり判定が付きます。</p>
+        <p class="ed-note">半透明のプレビューが照準の場所に出ます。プレビューの段階で「大きさ」も変えられ、当たり判定も大きさに合わせて変わります。「モード: 削除」に切り替えると、照準に一番近い物が赤く光り、「削除する」で消せます。消せるのは置いた物だけでなく、町の家・城壁・門・時計塔・礼拝堂・城・噴水・街灯・露店や、木・岩・遺跡などの既存の物に加えて、川・池の水（つながった水場ごと）、橋、石段も対象です。水を消すと泳げなくなります。既存の物を消した記録も自動保存され、次回も消えたままになります。「編集を全部リセット」で元に戻ります。置いた物には当たり判定が付きます。置いた橋は上を歩いて渡れ、置いた石段は歩いて登れます。置いた水（池）は、水面の高さと広さを持ち、深い場所では泳げます。</p>
       </div>
       <div class="ed-actions">
         <button type="button" id="edUndoBtn">↩ 元に戻す</button>
@@ -2140,7 +2143,7 @@ function fireArrow(power,mult,full){
   player.arrows--; atkAnimT=performance.now();
   var spd=8.5+power*11.5, cp2=Math.cos(camPitch);   // 8.5 (tap) → 20 (full draw): range grows with draw
   projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
-    z:terrainH(player.x,player.y)+54+jumpY,vz:Math.sin(camPitch)*spd,
+    z:standH(player.x,player.y)+54+jumpY,vz:Math.sin(camPitch)*spd,
     dmg:Math.round(player.atk*(mult||1)*(full?1.15:1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:Math.round(50+power*95)});
   beep(full?980:640+power*260,0.07,'sawtooth',0.03);
   if(full)flashCrosshair(null);
@@ -2596,7 +2599,16 @@ function waterDepthAt(x,y){
   for(var i=0;i<decorations.length;i++){var o=decorations[i];
     if(o.kind!=='lake')continue;
     var dist=Math.hypot(x-o.x,y-o.y);
-    if(dist<o.s){var dep=(1-dist/o.s)*120;if(dep>d)d=dep;}
+    if(dist<o.s){
+      if(o.placedWater){
+        /* placed ponds: real depth = water level (o.wz) minus the ground
+           underfoot, faded out at the rim — dig deeper to swim deeper */
+        var pd=Math.max(0,Math.min(120,o.wz-terrainH(x,y)))*(1-dist/o.s);
+        if(pd>d)d=pd;
+      }else{
+        var dep=(1-dist/o.s)*120;if(dep>d)d=dep;
+      }
+    }
   }
   return d;
 }
@@ -2669,6 +2681,12 @@ function update(dt,now){
   var dashingNow=false;
   /* water state for this frame: depth at the player's feet */
   player.swimDepth=waterDepthAt(player.x,player.y);
+  /* standing on a placed bridge / stair platform whose top is at or above
+     the water surface means dry feet, however deep the water below is */
+  if(player.swimDepth>0&&typeof platformTopAt==='function'){
+    var pTop=platformTopAt(player.x,player.y);
+    if(pTop>-1e8&&pTop>=waterLevelAt(player.x,player.y))player.swimDepth=0;
+  }
   var wasSwimming=!!player.swimming;
   player.swimming=player.swimDepth>=SWIM_DEPTH;
   if(player.swimming&&!wasSwimming)chat('🏊 深い水に入った ― 泳いでいる間はMPを消費します','sys');
@@ -3217,11 +3235,11 @@ var builtinsFiltered=false; /* true while the live obstacles/decorations/townFea
 var editSeq=0;         /* bumped on any world edit; part of progressKey() */
 var undoStack=[];
 var editorState={active:false,mode:'terrain',tool:'raise',brush:130,strength:5,
-  applying:false,stroke:null,flatTarget:0,buildType:'house',rot:0,placeMode:'place',
+  applying:false,stroke:null,flatTarget:0,buildType:'house',rot:0,placeMode:'place',size:1,
   aim:null,lastEditBump:0,statusT:0};
 var groundGeo3D=null, groundMesh3D=null, vertexGameX=null, vertexGameY=null;
 var placedGroup=null, placedSig='', brushRing=null, ghostGroup=null, ghostKey='';
-var PLACED_TYPES={house:1,tree_b:1,tree_p:1,wall:1,lamp:1,fence:1,rock:1,bridge:1};
+var PLACED_TYPES={house:1,tree_b:1,tree_p:1,wall:1,lamp:1,fence:1,rock:1,bridge:1,steps:1,water:1};
 var terrainHasEdits=false;
 function terrainH(x,y){
   return terrainHBase(x,y)+editDeltaAt(x,y);
@@ -3252,7 +3270,12 @@ function serializeWorldEdit(){
     var d=terrainDelta[Number(idx)];
     if(Math.abs(d)>0.05)terr.push([Number(idx),Math.round(d*10)/10]);
   }
-  var pl=placedObjects.map(function(o){return {t:o.t,x:Math.round(o.x),y:Math.round(o.y),rot:Math.round(o.rot)};});
+  var pl=placedObjects.map(function(o){
+    var p={t:o.t,x:Math.round(o.x),y:Math.round(o.y),rot:Math.round(o.rot)};
+    if(o.s&&Math.abs(o.s-1)>0.01)p.s=Math.round(o.s*100)/100;   /* placement size scale */
+    if(o.t==='water'&&isFinite(o.wl))p.wl=Math.round(o.wl);      /* placed water: surface height */
+    return p;
+  });
   return {v:1,terrain:terr,placed:pl,del:deletedBuiltins.slice()};
 }
 function clearWorldEditSilent(){
@@ -3287,7 +3310,10 @@ function loadWorldEdit(we){
       var x=Number(o.x),y=Number(o.y),rot=Number(o.rot)||0;
       if(!isFinite(x)||!isFinite(y))return;
       x=Math.max(30,Math.min(W-30,x)); y=Math.max(30,Math.min(H-30,y));
-      placedObjects.push({id:++placedSeq,t:o.t,x:x,y:y,rot:((rot%360)+360)%360});
+      var po={id:++placedSeq,t:o.t,x:x,y:y,rot:((rot%360)+360)%360};
+      var sc=Number(o.s); if(isFinite(sc)&&sc>=0.4&&sc<=3&&Math.abs(sc-1)>0.01)po.s=Math.round(sc*100)/100;
+      if(o.t==='water'){var wl=Number(o.wl); po.wl=isFinite(wl)?wl:terrainH(x,y)+1;}
+      placedObjects.push(po);
     });
   }
   /* deleted pre-existing objects: validated bid strings, re-applied to
@@ -3333,7 +3359,7 @@ function refreshGroundAll(){
 /* ---- aim: ray-march the centre crosshair onto the terrain ---- */
 function computeEditorAim(){
   if(!player)return null;
-  var eyeY=terrainH(player.x,player.y)+54+jumpY;
+  var eyeY=standH(player.x,player.y)+54+jumpY;
   if(player.swimming)eyeY=terrainH(player.x,player.y)+30;
   var cp=Math.cos(camPitch);
   var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
@@ -3485,6 +3511,23 @@ function buildPlacedModel(o){
     box(150,5,5,WOOD_D,0,30,30,g); box(150,5,5,WOOD_D,0,30,-30,g);
     [-58,-20,20,58].forEach(function(px){cyl(3,3,13,WOOD_D,px,23,30,g,5);cyl(3,3,13,WOOD_D,px,23,-30,g,5);});
     box(16,20,60,STONE,-64,2,0,g); box(16,20,60,STONE,64,2,0,g);
+  }else if(o.t==='steps'){
+    /* stone staircase: six treads climbing toward local +X; the matching
+       walkable ramp lives in platformTopAt() */
+    box(126,5,98,STONE_D,0,-2,0,g);
+    for(var si2=0;si2<6;si2++){
+      var sh=9*(si2+1);
+      box(20,sh,90,si2%2?STONE:STONE_D,-50+si2*20,sh/2,0,g);
+    }
+  }else if(o.t==='water'){
+    /* a placed pond: a shader water disc whose surface sits at o.wl (the
+       water level captured at placement). The matching 'lake' decoration
+       (syncPlacedWater) drives waterDepthAt(), so deep spots are swimmable. */
+    var wsc=o.s||1;
+    var wlv=(o.wl!=null&&isFinite(o.wl))?o.wl:terrainH(o.x,o.y)+1;
+    var wdisc2=waterSurfaceMesh(85*wsc,false);
+    wdisc2.position.y=wlv-terrainH(o.x,o.y)+1; /* group origin is terrainH-1, so this lands the disc exactly on wlv */
+    g.add(wdisc2);
   }
   g.position.set(WX(o.x),terrainH(o.x,o.y)-1,WZ(o.y));
   g.rotation.y=-(o.rot*Math.PI/180);
@@ -3492,47 +3535,114 @@ function buildPlacedModel(o){
 }
 function placedObstaclesFor(o){
   var rad=o.rot*Math.PI/180, dirx=Math.sin(rad), diry=Math.cos(rad);
+  var sc=o.s||1; /* placement size scale: every footprint grows/shrinks with it */
   var out=[];
   function circ(x,y,r,extra){var ob={type:'circle',x:x,y:y,r:r,placed:true,_pid:o.id};if(extra)for(var k in extra)ob[k]=extra[k];out.push(ob);}
   if(o.t==='house'){
     var snap=((o.rot%90)+90)%90;
     if(snap<2||snap>88){
       var swap=(((o.rot%180)+180)%180)>45;
-      var w=swap?95:110, h=swap?110:95;
+      var w=(swap?95:110)*sc, h=(swap?110:95)*sc;
       out.push({type:'rect',x:o.x-w/2,y:o.y-h/2,w:w,h:h,c:'#8a8172',house:true,placed:true,_pid:o.id});
-    }else circ(o.x,o.y,58,{house:true});
+    }else circ(o.x,o.y,58*sc,{house:true});
   }else if(o.t==='tree_b'||o.t==='tree_p'){
-    circ(o.x,o.y,11,{ref:{kind:'tree'}});
+    circ(o.x,o.y,11*sc,{ref:{kind:'tree'}});
   }else if(o.t==='wall'){
-    [-32,0,32].forEach(function(off){circ(o.x+dirx*off,o.y+diry*off,17,{});});
+    [-32,0,32].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,17*sc,{});});
   }else if(o.t==='lamp'){
-    circ(o.x,o.y,6,{pillar:true});
+    circ(o.x,o.y,6*sc,{pillar:true});
   }else if(o.t==='fence'){
-    [-36,0,36].forEach(function(off){circ(o.x+dirx*off,o.y+diry*off,10,{});});
+    [-36,0,36].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,10*sc,{});});
   }else if(o.t==='rock'){
-    circ(o.x,o.y,22,{});
+    circ(o.x,o.y,22*sc,{});
   }else if(o.t==='bridge'){
     [-52,0,52].forEach(function(off){
-      circ(o.x+dirx*off-diry*30,o.y+diry*off+dirx*30,8,{});
-      circ(o.x+dirx*off+diry*30,o.y+diry*off-dirx*30,8,{});
+      circ(o.x+dirx*off*sc-diry*30*sc,o.y+diry*off*sc+dirx*30*sc,8*sc,{});
+      circ(o.x+dirx*off*sc+diry*30*sc,o.y+diry*off*sc-dirx*30*sc,8*sc,{});
     });
   }
+  /* steps and water get NO collision: steps are climbed, water is waded/swum */
   return out;
 }
 function syncPlacedObstacles(){
   for(var i=obstacles.length-1;i>=0;i--)if(obstacles[i].placed)obstacles.splice(i,1);
   placedObjects.forEach(function(o){placedObstaclesFor(o).forEach(function(ob){obstacles.push(ob);});});
   _losSrc=null;
+  syncPlacedWater();
 }
+/* Placed ponds live in the decorations array as 'lake' entries (flagged
+   placedWater, with wz = the water level captured at placement), so the
+   ordinary waterDepthAt() / minimap / 2D lake rendering pick them up with
+   no special cases. Rebuilt from placedObjects on every sync, exactly
+   like the placed obstacles above. */
+function syncPlacedWater(){
+  if(typeof decorations==='undefined')return;
+  for(var i=decorations.length-1;i>=0;i--)if(decorations[i].placedWater)decorations.splice(i,1);
+  placedObjects.forEach(function(o){
+    if(o.t!=='water')return;
+    decorations.push({x:o.x,y:o.y,kind:'lake',s:85*(o.s||1),wz:(o.wl!=null&&isFinite(o.wl))?o.wl:terrainH(o.x,o.y)+1,placedWater:true,pid:o.id});
+  });
+}
+/* ---- walkable platforms: placed bridges & stairs ----
+   The player is glued to terrainH(); placed bridges and stairs add a
+   deck / ramp top above the terrain, and standH() (used for the player's
+   eye height and projectiles) takes the higher of the two, so a placed
+   bridge can be walked across and placed stairs can be climbed. The
+   local axes follow the MODEL's true orientation: local +X maps to game
+   (cos rot, sin rot), local +Z to (-sin rot, cos rot). */
+function platformTopAt(x,y){
+  var best=-Infinity;
+  for(var i=0;i<placedObjects.length;i++){
+    var o=placedObjects[i];
+    if(o.t!=='bridge'&&o.t!=='steps')continue;
+    var sc=o.s||1, dx=x-o.x, dy=y-o.y;
+    if(Math.abs(dx)>170*sc||Math.abs(dy)>170*sc)continue;
+    var rad=o.rot*Math.PI/180, ca=Math.cos(rad), sa=Math.sin(rad);
+    var u=dx*ca+dy*sa, v=-dx*sa+dy*ca;
+    var base=terrainH(o.x,o.y)-1; /* buildPlacedModel seats groups at terrainH-1 */
+    if(o.t==='bridge'){
+      if(Math.abs(u)<=75*sc&&Math.abs(v)<=33*sc){var tb=base+19.5*sc; if(tb>best)best=tb;}
+    }else{ /* steps: a smooth ramp through the six tread tops */
+      if(Math.abs(u)<=60*sc&&Math.abs(v)<=45*sc){var ts=base+4.5*sc+((u+60*sc)/(120*sc))*54*sc; if(ts>best)best=ts;}
+    }
+  }
+  return best;
+}
+function standH(x,y){
+  var t=terrainH(x,y), p=platformTopAt(x,y);
+  return p>t?p:t;
+}
+/* water surface height at a point (for "standing on a bridge over water
+   is not swimming"): the highest surface among lakes covering the point */
+function waterLevelAt(x,y){
+  var lv=-Infinity;
+  for(var i=0;i<decorations.length;i++){
+    var o=decorations[i];
+    if(o.kind!=='lake')continue;
+    if(Math.hypot(x-o.x,y-o.y)<o.s){
+      var z=(o.wz!=null)?o.wz:(o.townWater?2.4:1.2);
+      if(z>lv)lv=z;
+    }
+  }
+  return lv;
+}
+function placedObjSig(o){return o.id+':'+o.t+':'+Math.round(o.x)+':'+Math.round(o.y)+':'+o.rot+':'+(o.s||1)+':'+(o.t==='water'?Math.round(o.wl||0):'');}
 function rebuildPlaced3D(){
   if(!THREE_OK||!scene)return;
   if(!placedGroup){placedGroup=new THREE.Group();scene.add(placedGroup);}
   while(placedGroup.children.length)placedGroup.remove(placedGroup.children[0]);
-  placedObjects.forEach(function(o){placedGroup.add(buildPlacedModel(o));});
-  placedSig=placedObjects.map(function(o){return o.id+':'+o.t+':'+Math.round(o.x)+':'+Math.round(o.y)+':'+o.rot;}).join('|')+'#'+editSeq;
+  placedObjects.forEach(function(o){
+    var g=buildPlacedModel(o);
+    /* size scale: grow/shrink the whole model from its ground seat. Water
+       is exempt — its disc radius and level are handled inside the model
+       so the surface stays exactly at o.wl. */
+    if(o.t!=='water'&&(o.s||1)!==1)g.scale.setScalar(o.s);
+    placedGroup.add(g);
+  });
+  placedSig=placedObjects.map(placedObjSig).join('|')+'#'+editSeq;
 }
 function currentPlacedSig(){
-  return placedObjects.map(function(o){return o.id+':'+o.t+':'+Math.round(o.x)+':'+Math.round(o.y)+':'+o.rot;}).join('|')+'#'+editSeq;
+  return placedObjects.map(placedObjSig).join('|')+'#'+editSeq;
 }
 function nearestPlaced(x,y,maxD){
   var best=null,bd=maxD;
@@ -3548,12 +3658,16 @@ function nearestPlaced(x,y,maxD){
    its collision obstacle(s); the bid list is serialised in the save
    (worldEdit.del) and re-applied after each world rebuild. Restoring
    (undo / 全リセット) regenerates the pristine world and re-applies
-   whatever deletions remain. Water, bridges, terrace steps/skirts and
-   the waterfall are NOT deletable: other systems (swimming, crossing,
-   terrain support) depend on them. */
-var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1};
-var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱'};
-var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:105,castle:125,fountain:55,lamp:26,stall:48,ruin:62};
+   whatever deletions remain. Bridges and terrace steps ARE deletable
+   (they are pure render features; the bridge fords are terrain and stay
+   wadeable). Rivers and ponds are deletable too, one connected WATER
+   BODY at a time: every 'lake' decoration in the body is removed, which
+   also removes its water surface and its swimming depth. Only the
+   retaining skirts and the waterfall sheets stay fixed — the terrain
+   itself depends on them. */
+var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1,bridge:1,steps:1};
+var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱',bridge:'橋',steps:'石段',water:'川・池の水'};
+var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:105,castle:125,fountain:55,lamp:26,stall:48,ruin:62,bridge:85,steps:78};
 function builtinBid(kind,x,y){return kind+'@'+Math.round(x)+','+Math.round(y);}
 function builtinTargets(){
   var out=[];
@@ -3567,6 +3681,28 @@ function builtinTargets(){
   });
   obstacles.forEach(function(o){
     if(o.ruin&&!o.town&&o.type==='rect')out.push({bid:builtinBid('ruin',o.x+o.w/2,o.y+o.h/2),kind:'ruin',x:o.x+o.w/2,y:o.y+o.h/2,r:BUILTIN_RADIUS.ruin});
+  });
+  /* water bodies: group the 'lake' decorations into connected bodies
+     (discs that overlap belong to the same river / pond system). A body
+     is deleted as one target carrying every member's bid. Placed ponds
+     (placedWater) are NOT built-ins — they are deleted as placed objects. */
+  var lakes=decorations.filter(function(d){return d.kind==='lake'&&!d.placedWater;});
+  var seenL={};
+  lakes.forEach(function(l0){
+    var k0=l0.x+','+l0.y;
+    if(seenL[k0])return;
+    var body=[],queue=[l0]; seenL[k0]=true;
+    while(queue.length){
+      var cur=queue.pop(); body.push(cur);
+      lakes.forEach(function(l2){
+        var k2=l2.x+','+l2.y;
+        if(seenL[k2])return;
+        if(Math.hypot(cur.x-l2.x,cur.y-l2.y)<(cur.s+l2.s)*0.92){seenL[k2]=true;queue.push(l2);}
+      });
+    }
+    var rep=body[0];
+    body.forEach(function(l3){if(l3.s>rep.s)rep=l3;});
+    out.push({bid:builtinBid('lake',rep.x,rep.y),bids:body.map(function(l4){return builtinBid('lake',l4.x,l4.y);}),kind:'water',x:rep.x,y:rep.y,r:rep.s});
   });
   return out;
 }
@@ -3605,6 +3741,11 @@ function removeBuiltinNow(bid){
     }
   }else if(kind==='ruin'){
     for(var k=obstacles.length-1;k>=0;k--){var ro=obstacles[k];if(ro.ruin&&!ro.town&&ro.type==='rect'&&near(ro.x+ro.w/2,ro.y+ro.h/2,3)){obstacles.splice(k,1);removed=true;}}
+  }else if(kind==='lake'){
+    /* one member of a water body: dropping the decoration removes its
+       water surface (rendering derives from decorations) and its
+       swimming depth (waterDepthAt reads the same array) */
+    for(var q=decorations.length-1;q>=0;q--){var ld=decorations[q];if(ld.kind==='lake'&&!ld.placedWater&&near(ld.x,ld.y,3)){decorations.splice(q,1);removed=true;}}
   }else{ /* decoration kinds: tree / snowtree / cactus / rock */
     for(var m=decorations.length-1;m>=0;m--){var d=decorations[m];
       if(d.kind===kind&&near(d.x,d.y,3)){
@@ -3627,11 +3768,14 @@ function restoreBuiltinsWorld(){
   placedSig='__dirty__';
 }
 function deleteBuiltinTarget(t){
-  if(deletedBuiltins.indexOf(t.bid)>=0)return;
-  deletedBuiltins.push(t.bid);
-  removeBuiltinNow(t.bid);
+  /* a target may carry several bids (a whole water body); all of them are
+     recorded and removed together, and one undo entry restores them all */
+  var bids=t.bids||[t.bid];
+  var fresh=bids.filter(function(b){return deletedBuiltins.indexOf(b)<0;});
+  if(!fresh.length)return;
+  fresh.forEach(function(b){deletedBuiltins.push(b);removeBuiltinNow(b);});
   builtinsFiltered=true;
-  undoStack.push({kind:'builtin',bid:t.bid});
+  undoStack.push({kind:'builtin',bids:fresh});
   if(undoStack.length>60)undoStack.shift();
   markEditChanged(); refreshEditorUI();
   beep(330,0.07,'square',0.04);
@@ -3641,6 +3785,10 @@ function placeObjectAtAim(){
   if(placedObjects.length>=300){toast('置ける物の上限（300個）に達しました');return;}
   var aim=editorState.aim||computeEditorAim(); if(!aim)return;
   var o={id:++placedSeq,t:editorState.buildType,x:Math.round(aim.x),y:Math.round(aim.y),rot:editorState.rot};
+  if(Math.abs(editorState.size-1)>0.01)o.s=Math.round(editorState.size*100)/100;
+  /* placed water captures its surface level at placement time: the pond
+     keeps this level (and its radius) whatever the terrain does later */
+  if(o.t==='water')o.wl=Math.round(terrainH(aim.x,aim.y)+1);
   placedObjects.push(o);
   undoStack.push({kind:'place',id:o.id});
   if(undoStack.length>60)undoStack.shift();
@@ -3685,8 +3833,8 @@ function editorUndo(){
     placedObjects.splice(Math.min(u.index,placedObjects.length),0,u.obj);
     syncPlacedObstacles(); placedSig='__dirty__';
   }else if(u.kind==='builtin'){
-    var bi=deletedBuiltins.indexOf(u.bid);
-    if(bi>=0)deletedBuiltins.splice(bi,1);
+    var ubids=u.bids||(u.bid?[u.bid]:[]);
+    ubids.forEach(function(b){var bi=deletedBuiltins.indexOf(b);if(bi>=0)deletedBuiltins.splice(bi,1);});
     restoreBuiltinsWorld(); /* regenerate the pristine world, then re-apply the deletions that remain */
   }
   markEditChanged(); refreshEditorUI();
@@ -3709,11 +3857,12 @@ function ensureEditorVisuals(){
   }
 }
 function setGhostFor(type,rot){
-  var key=type+':'+rot;
+  var key=type+':'+rot+':'+editorState.size;
   if(ghostGroup&&ghostKey===key)return;
   if(ghostGroup){scene.remove(ghostGroup);ghostGroup=null;}
-  var tmp={id:-1,t:type,x:0,y:0,rot:rot};
+  var tmp={id:-1,t:type,x:0,y:0,rot:rot,s:editorState.size};
   ghostGroup=buildPlacedModel(tmp);
+  if(type!=='water'&&editorState.size!==1)ghostGroup.scale.setScalar(editorState.size);
   ghostGroup.traverse(function(m){
     if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=0.55;m.material.depthWrite=false;m.castShadow=false;m.receiveShadow=false;}
   });
@@ -3751,9 +3900,11 @@ function updateEditorVisuals(){
       if(pick){
         var tx=pick.builtin?pick.builtin.x:pick.placed.x, ty=pick.builtin?pick.builtin.y:pick.placed.y;
         var tr=pick.builtin?Math.max(30,pick.builtin.r):64;
+        var th2=terrainH(tx,ty)+3;
+        if(pick.builtin&&pick.builtin.kind==='water')th2=waterLevelAt(tx,ty)+3; /* ring floats on the water surface, not the pond bed */
         brushRing.visible=true;
         brushRing.material.color.setHex(0xff5560);
-        brushRing.position.set(WX(tx),terrainH(tx,ty)+3,WZ(ty));
+        brushRing.position.set(WX(tx),th2,WZ(ty));
         brushRing.scale.set(tr,tr,tr);
       }else brushRing.visible=false;
     }
@@ -3816,6 +3967,8 @@ function refreshEditorUI(){
   var bv=$('edBrushVal'); if(bv)bv.textContent=editorState.brush;
   var sv=$('edStrVal'); if(sv)sv.textContent=editorState.strength;
   var rv=$('edRotVal'); if(rv)rv.textContent=editorState.rot+'°';
+  var zv=$('edSizeVal'); if(zv)zv.textContent=Math.round(editorState.size*100)+'%';
+  var zr=$('edSizeRange'); if(zr&&Math.round(Number(zr.value))!==Math.round(editorState.size*100))zr.value=Math.round(editorState.size*100);
   var pm=$('edPlaceModeBtn'); if(pm)pm.textContent='モード: '+(editorState.placeMode==='place'?'配置':'削除');
   var pb=$('edPlaceBtn'); if(pb)pb.textContent=editorState.placeMode==='place'?'📌 照準の場所に置く':'🗑 照準に近い物を削除する';
   var rb=$('edResetBtn'); if(rb){rb.classList.remove('armed');rb.textContent='🗑 編集を全部リセット';}
@@ -3832,6 +3985,7 @@ function refreshEditorUI(){
   document.querySelectorAll('.ed-tool').forEach(function(b){b.addEventListener('click',function(){editorState.tool=b.getAttribute('data-tool');refreshEditorUI();beep(600,0.05,'square',0.03);});});
   document.querySelectorAll('.ed-pal-btn').forEach(function(b){b.addEventListener('click',function(){editorState.buildType=b.getAttribute('data-type');editorState.placeMode='place';refreshEditorUI();beep(600,0.05,'square',0.03);});});
   var br=$('edBrushRange'); if(br)br.addEventListener('input',function(){editorState.brush=Number(this.value);var v=$('edBrushVal');if(v)v.textContent=this.value;});
+  var zr2=$('edSizeRange'); if(zr2)zr2.addEventListener('input',function(){editorState.size=Number(this.value)/100;var v=$('edSizeVal');if(v)v.textContent=this.value+'%';ghostKey='';});
   var sr=$('edStrRange'); if(sr)sr.addEventListener('input',function(){editorState.strength=Number(this.value);var v=$('edStrVal');if(v)v.textContent=this.value;});
   var rl=$('edRotL'),rr=$('edRotR');
   if(rl)rl.addEventListener('click',function(){editorState.rot=((editorState.rot-15)%360+360)%360;refreshEditorUI();});
@@ -4015,6 +4169,141 @@ function rbox(w,h,d,color,x,y,z,parent,rotY,rotX,rotZ){
   m.castShadow=true; m.receiveShadow=true; (parent||staticGroup).add(m); return m;
 }
 
+/* ================= REALISTIC WATER (shader, Chromebook-friendly) =====
+   One shared ShaderMaterial for every water surface in the world: town
+   ponds / river discs, the wild lakes, the fountain basin and ponds
+   placed in the editor. A single fragment pass with procedural noise
+   normals — no render targets, no reflection probes — so it stays light
+   enough for a typical Chromebook, while still giving: a deep→shallow
+   colour gradient toward the shore, Fresnel sky sheen, sun glints, slow
+   drifting ripples, animated foam lacing at the rim, and (uPlunge)
+   churning foam in the middle for the waterfall plunge pool. All discs
+   share unit-circle geometry, so length(position.xy) is the normalised
+   radius the gradient and foam use. The waterfall sheets use a scrolling
+   streak texture, and a small Points cloud adds spray at the plunge
+   bases. Swimming / depth logic is untouched — this is looks only. */
+var waterGroup=null, waterTimeU={value:0}, WATER_MAT=null, WATER_MAT_PLUNGE=null, WATER_GEO_UNIT=null;
+var fallsMat=null, fallsSpray=null, sprayParts=null;
+function waterMats(){
+  if(WATER_MAT)return;
+  function make(plunge){
+    return new THREE.ShaderMaterial({
+      transparent:true, depthWrite:false,
+      uniforms:{ uTime:waterTimeU, uPlunge:{value:plunge?1:0},
+        uDeep:{value:new THREE.Color(0x14486b)}, uShallow:{value:new THREE.Color(0x3f9db8)},
+        uSky:{value:new THREE.Color(0xbfe3f2)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
+      vertexShader:'varying vec3 vW; varying vec2 vP;\nvoid main(){vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
+      fragmentShader:[
+        'uniform float uTime; uniform float uPlunge;',
+        'uniform vec3 uDeep; uniform vec3 uShallow; uniform vec3 uSky; uniform vec3 uSunDir;',
+        'varying vec3 vW; varying vec2 vP;',
+        'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
+        'float noise(vec2 p){vec2 i=floor(p); vec2 f=fract(p); f=f*f*(3.0-2.0*f);',
+        ' return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),f.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),f.x),f.y);}',
+        'void main(){',
+        ' float r=length(vP);',
+        ' float t=uTime;',
+        ' vec2 p=vW.xz*0.045;',
+        ' float n1=noise(p*1.6+vec2(t*0.11,t*0.07));',
+        ' float n2=noise(p*3.7-vec2(t*0.16,t*0.05));',
+        ' float n3=noise(p*9.0+vec2(t*0.35,-t*0.22));',
+        ' vec3 N=normalize(vec3((n1-0.5)*0.55+(n2-0.5)*0.35+(n3-0.5)*0.18, 1.0, (n2-0.5)*0.55+(n1-0.5)*0.30-(n3-0.5)*0.18));',
+        ' vec3 V=normalize(cameraPosition-vW);',
+        ' float fres=pow(1.0-max(dot(N,V),0.0),3.0);',
+        ' vec3 col=mix(uDeep,uShallow,smoothstep(0.45,1.0,r));',
+        ' col=mix(col,uSky,0.18+0.55*fres);',
+        ' vec3 R=reflect(-V,N);',
+        ' float sd=max(dot(R,uSunDir),0.0);',
+        ' col+=vec3(1.0,0.95,0.85)*(pow(sd,140.0)*1.5+pow(sd,36.0)*0.35*(0.6+0.4*n3));',
+        ' col+=vec3(1.0)*smoothstep(0.93,1.0,n3)*0.12;',
+        ' float foamN=noise(p*6.0+vec2(t*0.25,0.0));',
+        ' float foam=smoothstep(0.90,0.995,r+(foamN-0.5)*0.05)*(0.55+0.45*sin(t*1.7+r*40.0+foamN*6.0));',
+        ' float pfoam=uPlunge*smoothstep(0.55,0.0,r)*(0.5+0.5*noise(p*5.0-vec2(0.0,t*0.9)))*(0.7+0.3*sin(t*3.0+r*30.0));',
+        ' foam=max(foam,clamp(pfoam,0.0,1.0));',
+        ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.85);',
+        ' float alpha=mix(0.86,0.97,fres);',
+        ' alpha=mix(alpha,0.98,clamp(foam,0.0,1.0));',
+        ' float fogF=smoothstep(850.0,2000.0,distance(cameraPosition,vW));',
+        ' col=mix(col,vec3(0.62,0.78,0.91),fogF);',
+        ' gl_FragColor=vec4(col,alpha);',
+        '}'
+      ].join('\n')
+    });
+  }
+  WATER_MAT=make(false); WATER_MAT_PLUNGE=make(true);
+}
+function waterSurfaceMesh(r,plunge){
+  waterMats();
+  if(!WATER_GEO_UNIT)WATER_GEO_UNIT=new THREE.CircleGeometry(1,44);
+  var m=new THREE.Mesh(WATER_GEO_UNIT,plunge?WATER_MAT_PLUNGE:WATER_MAT);
+  m.rotation.x=-Math.PI/2; m.scale.set(r,r,1); m.renderOrder=2;
+  return m;
+}
+function ensureWaterGroup(){
+  if(!scene)return null;
+  if(!waterGroup){waterGroup=new THREE.Group();scene.add(waterGroup);}
+  return waterGroup;
+}
+function clearWaterGroup(){ if(waterGroup)while(waterGroup.children.length)waterGroup.remove(waterGroup.children[0]); }
+function addWaterDisc(x,y2d,z,r,plunge){
+  var g=ensureWaterGroup(); if(!g)return null;
+  var m=waterSurfaceMesh(r,plunge);
+  m.position.set(WX(x),z,WZ(y2d));
+  g.add(m); return m;
+}
+/* waterfall sheets: a canvas streak texture scrolling downward on a
+   Lambert sheet (merged with the static world as before; the scroll is
+   a material-level offset, so merging cannot break it) */
+function fallsSheetMaterial(){
+  if(fallsMat)return fallsMat;
+  var cv=document.createElement('canvas'); cv.width=128; cv.height=256;
+  var c2=cv.getContext('2d');
+  c2.fillStyle='rgba(205,235,250,0.55)'; c2.fillRect(0,0,128,256);
+  var sd=999; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
+  for(var i=0;i<70;i++){
+    var x=srnd()*128, w=1+srnd()*3, l=40+srnd()*160, y=srnd()*256, a=0.12+srnd()*0.4;
+    c2.fillStyle='rgba(255,255,255,'+a.toFixed(2)+')'; c2.fillRect(x,y,w,l);
+    c2.fillStyle='rgba(140,190,220,'+(a*0.7).toFixed(2)+')'; c2.fillRect(x+w+1,y,w*0.7,l*0.8);
+  }
+  var tex=new THREE.CanvasTexture(cv);
+  tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(1,2);
+  fallsMat=new THREE.MeshLambertMaterial({color:0xcfeaf7,transparent:true,opacity:0.8,map:tex});
+  return fallsMat;
+}
+/* spray: ~220 soft points arcing out of the two plunge bases, recycled
+   forever; positions are rewritten per frame (cheap) */
+function buildFallsSpray(){
+  if(!scene)return;
+  if(fallsSpray){scene.remove(fallsSpray);fallsSpray=null;sprayParts=null;}
+  var bases=[[1161,1210,6],[1167,1284,4]];
+  var N=220, pos=new Float32Array(N*3); sprayParts=[];
+  var sd=4242; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
+  for(var i=0;i<N;i++){
+    var b=bases[i%2];
+    sprayParts.push({bx:b[0],by:b[1],bz:b[2],ph:srnd(),ang:srnd()*Math.PI*2,rad:6+srnd()*20,up:16+srnd()*20,sp:0.5+srnd()*0.5});
+  }
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  var cv=document.createElement('canvas'); cv.width=cv.height=32;
+  var c2=cv.getContext('2d'); var gr=c2.createRadialGradient(16,16,2,16,16,15);
+  gr.addColorStop(0,'rgba(255,255,255,0.9)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+  c2.fillStyle=gr; c2.fillRect(0,0,32,32);
+  fallsSpray=new THREE.Points(geo,new THREE.PointsMaterial({size:7,map:new THREE.CanvasTexture(cv),transparent:true,opacity:0.75,color:0xf4fbff,depthWrite:false,sizeAttenuation:true}));
+  fallsSpray.renderOrder=3; fallsSpray.frustumCulled=false;
+  scene.add(fallsSpray);
+}
+function updateWaterFx(now){
+  waterTimeU.value=now/1000;
+  if(fallsMat&&fallsMat.map)fallsMat.map.offset.y=-((now*0.0011)%1);
+  if(!fallsSpray||!sprayParts)return;
+  var pos=fallsSpray.geometry.attributes.position, t=now/1000;
+  for(var i=0;i<sprayParts.length;i++){
+    var p=sprayParts[i], age=(t*p.sp+p.ph)%1, rr=p.rad*age;
+    pos.setXYZ(i,WX(p.bx)+Math.cos(p.ang)*rr,p.bz+Math.sin(age*Math.PI)*p.up,WZ(p.by)+Math.sin(p.ang)*rr);
+  }
+  pos.needsUpdate=true;
+}
+
 /* ============ THE TOWN OF LUMINAS — 3D builder ============
    Renders everything buildTownData() recorded: the wall ring, gatehouses,
    timber-framed houses, the clock tower, the glowing chapel, the castle,
@@ -4024,19 +4313,17 @@ function rbox(w,h,d,color,x,y,z,parent,rotY,rotX,rotZ){
 function buildTown3D(){
   if(!townFeatures.length)return;
   var STONE=0x8a8172, STONE_D=0x776f61, STONE_L=0x9a917e, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
-  var WATER_M=M(0x3d84ad,{transparent:true,opacity:0.88});
-  function wdisc(r,x,y2d,z){
-    var m=new THREE.Mesh(G('wdisc'+r,function(){return new THREE.CircleGeometry(r,28);}),WATER_M);
-    m.rotation.x=-Math.PI/2; m.position.set(WX(x),z,WZ(y2d)); m.receiveShadow=true; staticGroup.add(m); return m;
-  }
-  /* water surfaces for every town lake decoration (ponds, pools, river chain) */
-  decorations.forEach(function(d){ if(d.townWater) wdisc(d.s*1.03,d.x,d.y,d.wz||2.4); });
-  BRIDGES.forEach(function(b){ wdisc(46,b.x,b.y,2.2); }); /* water slips under each bridge deck */
+  /* water surfaces for every town lake decoration (ponds, pools, river
+     chain) — shader discs in waterGroup (never merged with the static
+     world, so their per-disc uniforms and animation survive). Deleting
+     a water body removes its decorations, so its surfaces vanish too. */
+  decorations.forEach(function(d){ if(d.townWater) addWaterDisc(d.x,d.y,d.wz||2.4,d.s*1.03,Math.hypot(d.x-POOL.x,d.y-POOL.y)<4); });
+  BRIDGES.forEach(function(b){ addWaterDisc(b.x,b.y,2.2,46,false); }); /* water slips under each bridge deck */
   /* ---- waterfall: two translucent tiers off the crag, foam at each base ---- */
   function sheet(x1,y1,z1,x2,y2,z2,w){
     var a=new THREE.Vector3(WX(x1),z1,WZ(y1)), b=new THREE.Vector3(WX(x2),z2,WZ(y2));
     var dir=new THREE.Vector3().subVectors(b,a), len=dir.length();
-    var m=new THREE.Mesh(new THREE.BoxGeometry(w,len,2.5),M(0xbfe6f7,{transparent:true,opacity:0.72}));
+    var m=new THREE.Mesh(new THREE.BoxGeometry(w,len,2.5),fallsSheetMaterial());
     m.position.copy(a).addScaledVector(dir,0.5);
     m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());
     staticGroup.add(m);
@@ -4048,6 +4335,7 @@ function buildTown3D(){
   sheet(1153,1148,106,1161,1206,56,56);
   sheet(1162,1224,52,1167,1282,0,50);
   foam(1161,1210,54,17); foam(1167,1284,2,21); foam(1150,1105,108,10);
+  buildFallsSpray(); /* animated spray mist at the two plunge bases */
   /* ---- features ---- */
   townFeatures.forEach(function(f){
     var gh=terrainH(f.x,f.y);
@@ -4140,8 +4428,7 @@ function buildTown3D(){
       cyl(172,172,3,STONE_L,0,1,0,pg,36);            /* plaza stone pavement */
       cyl(120,120,3.6,STONE,0,1.2,0,pg,32);          /* inner ring */
       cyl(54,60,15,STONE,0,9,0,pg,20);               /* basin */
-      var bw=new THREE.Mesh(G('wdisc46',function(){return new THREE.CircleGeometry(46,24);}),WATER_M);
-      bw.rotation.x=-Math.PI/2; bw.position.y=15.5; pg.add(bw);
+      addWaterDisc(f.x,f.y,gh+15.5,46,false);        /* basin water (shader disc, in waterGroup) */
       cyl(9,13,42,STONE,0,30,0,pg,10);
       cyl(26,17,9,STONE,0,52,0,pg,14);
       sph(6,0xbfe6f7,0,62,0,pg);
@@ -4185,6 +4472,7 @@ function buildWorld3D(){
   if(!THREE_OK||!staticGroup)return;
   // clear previous static meshes except ground (child 0)
   while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);if(c.userData&&c.userData._merged&&c.geometry)c.geometry.dispose();}
+  clearWaterGroup(); /* shader water surfaces are rebuilt below / in buildTown3D() */
   function flat(w,d,color,x,y2d,z,lift){
     var m=new THREE.Mesh(G('f'+w+'_'+d,function(){return new THREE.BoxGeometry(w,4,d);}),M(color));
     // overlapping pads get a small `lift` each so their top faces are never
@@ -4207,15 +4495,13 @@ function buildWorld3D(){
   // ruins floors
   flat(620,560,0x5d5a68,2290,460);
   flat(850,850,0x6a6455,3075,575);
-  // lakes
-  var lake=new THREE.Mesh(G('lake',function(){return new THREE.CircleGeometry(230,36);}),M(0x2e6f92));
-  lake.rotation.x=-Math.PI/2;lake.scale.y=0.72;lake.position.set(WX(420),1.2,WZ(2150));lake.receiveShadow=true;staticGroup.add(lake);
-  var lake2=new THREE.Mesh(G('lake2',function(){return new THREE.CircleGeometry(160,32);}),M(0x3a7ea6,{transparent:true,opacity:0.8}));
-  lake2.rotation.x=-Math.PI/2;lake2.scale.y=0.7;lake2.position.set(WX(400),1.8,WZ(2136));staticGroup.add(lake2);
-  var lake3=new THREE.Mesh(G('lake3',function(){return new THREE.CircleGeometry(260,36);}),M(0x2e7a6f));
-  lake3.rotation.x=-Math.PI/2;lake3.scale.y=0.74;lake3.position.set(WX(700),1.2,WZ(4300));lake3.receiveShadow=true;staticGroup.add(lake3);
-  var oasis=new THREE.Mesh(G('oasis',function(){return new THREE.CircleGeometry(130,28);}),M(0x3a7ea6));
-  oasis.rotation.x=-Math.PI/2;oasis.scale.y=0.74;oasis.position.set(WX(4200),1.2,WZ(2400));oasis.receiveShadow=true;staticGroup.add(oasis);
+  // lakes — shader water discs, drawn only while the matching lake
+  // decoration exists (a gamemaster can delete these water bodies in the
+  // editor, and then both the swimming and the surface go away)
+  function lakeAlive(x,y){for(var li=0;li<decorations.length;li++){var ld2=decorations[li];if(ld2.kind==='lake'&&Math.abs(ld2.x-x)<3&&Math.abs(ld2.y-y)<3)return true;}return false;}
+  if(lakeAlive(420,2150))addWaterDisc(420,2150,1.6,232,false);
+  if(lakeAlive(700,4300))addWaterDisc(700,4300,1.6,262,false);
+  if(lakeAlive(4200,2400))addWaterDisc(4200,2400,1.6,132,false);
   var lava=new THREE.Mesh(G('lava',function(){return new THREE.CircleGeometry(150,30);}),M(0xff5a1f,{emissive:0xcc3300}));
   lava.rotation.x=-Math.PI/2;lava.scale.y=0.78;lava.position.set(WX(4750),1.4,WZ(4100));staticGroup.add(lava);
   // obstacles: the ruin blocks (the only standing structures)
@@ -4533,6 +4819,7 @@ function render3D(now){
   if(sig!==staticSig){staticSig=sig;buildWorld3D();}
   if(typeof currentPlacedSig==='function'&&placedSig!==currentPlacedSig())rebuildPlaced3D();
   if(typeof updateEditorVisuals==='function')updateEditorVisuals();
+  updateWaterFx(now); /* water shader time, waterfall scroll, spray */
   // entities
   var seen={};
   /* first-person: the player's own body is not rendered (camera sits at eye level) */
@@ -4621,7 +4908,7 @@ function render3D(now){
   }else if(render3D._ring)render3D._ring.visible=false;
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
-  var eyeY=terrainH(player.x,player.y)+54+jumpY;
+  var eyeY=standH(player.x,player.y)+54+jumpY;
   /* swimming: the eyes ride low at the water surface with a gentle bob */
   if(player.swimming)eyeY=terrainH(player.x,player.y)+30+Math.sin(now/300)*1.8;
   var cp=Math.cos(camPitch);
@@ -4858,6 +5145,7 @@ document.addEventListener('keydown',function(e){
   if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
   if(typeof editorState!=='undefined'&&editorState&&editorState.active&&started&&document.activeElement!==$('chatInput')){
     if(e.code==='KeyR'){e.preventDefault();editorState.rot=((editorState.rot+(e.shiftKey?-15:15))%360+360)%360;refreshEditorUI();return;}
+    if(e.code==='BracketLeft'||e.code==='BracketRight'){e.preventDefault();editorState.size=Math.max(0.5,Math.min(2.5,Math.round((editorState.size+(e.code==='BracketRight'?0.05:-0.05))*100)/100));refreshEditorUI();return;}
     if(e.code==='KeyZ'&&(e.ctrlKey||e.metaKey)){e.preventDefault();editorUndo();return;}
   }
   if(started&&e.code==='KeyM'&&$('worldMapModal').style.display==='grid'){closeWorldMap();e.preventDefault();return;}
