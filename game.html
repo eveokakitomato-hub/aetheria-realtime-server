@@ -1628,6 +1628,29 @@ var POND_E={x:1775,y:1620,r:125};   /* the east pond: stretched E-W (terrain car
 var POOL={x:1168,y:1290,r:72};      /* plunge pool under the falls */
 var RIVER=[[1168,1290],[1218,1312],[1280,1328],[1362,1370],[1470,1452],[1548,1532],[1632,1592],[1775,1620],[1902,1662],[1988,1762],[2038,1902],[2075,2085]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall) */
 var BRIDGES=[{x:1218,y:1312,rot:1.16},{x:1590,y:1562,rot:0.95},{x:1988,y:1762,rot:0.34}]; /* arched bridge over the inlet between the plunge pool and the central pond / bridge over the river east of the grand ramp's causeway / bridge over the east pond's outlet */
+/* --- the town's streets: stone-paved lanes (t:'s') through the housing
+   blocks and dirt lanes (t:'d') elsewhere. They thread the GAPS between
+   the house rows (never a house footprint, the plaza disc or the water),
+   and are used twice: buildTownData() records them as render features
+   (chunked paving strips in buildTown3D) and init3D() tints the ground
+   vertices along them, so the town floor reads as streets, not lawn. --- */
+var STREETS=[
+  {x1:640,y1:1356,x2:1100,y2:1356,w:20,t:'s'},
+  {x1:640,y1:1467,x2:1030,y2:1467,w:20,t:'s'},
+  {x1:620,y1:1620,x2:1280,y2:1620,w:22,t:'s'},
+  {x1:640,y1:1747,x2:1030,y2:1747,w:18,t:'d'},
+  {x1:640,y1:1855,x2:1030,y2:1855,w:16,t:'d'},
+  {x1:600,y1:1280,x2:600,y2:1930,w:24,t:'s'},
+  {x1:1218,y1:1620,x2:1218,y2:1470,w:18,t:'s'},
+  {x1:880,y1:2150,x2:1480,y2:2150,w:20,t:'s'},
+  {x1:900,y1:1995,x2:1480,y2:1995,w:22,t:'d'},
+  {x1:1300,y1:1950,x2:1158,y2:1995,w:24,t:'d'},
+  {x1:1158,y1:1995,x2:1158,y2:2140,w:22,t:'d'},
+  {x1:1098,y1:2150,x2:1098,y2:2310,w:22,t:'d'},
+  {x1:1098,y1:2310,x2:1270,y2:2425,w:26,t:'d'},
+  {x1:1554,y1:1700,x2:1640,y2:1700,w:24,t:'s'},
+  {x1:1700,y1:1895,x2:1980,y2:1895,w:20,t:'s'}
+];
 var SPAWN_X=1300, SPAWN_Y=1925;     /* south edge of the fountain plaza */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
 /* ============ THE GRAND STAIRCASE (plaza → one long diagonal ramp → terrace-top fork → chapel / castle) ============
@@ -1701,6 +1724,7 @@ function buildTownData(){
   var gateA=[92*Math.PI/180,138*Math.PI/180]; /* south gate, then the south-west corner gate (its dirt road runs out diagonally) */
   var riverA=Math.atan2(RIVER[RIVER.length-2][1]-TOWN_CY,RIVER[RIVER.length-2][0]-TOWN_CX); /* direction of the river's wall crossing (its water-gate point) */
   function wallTan(a){var p1=townWallPoint(a-0.02), p2=townWallPoint(a+0.02); var dx=p2.x-p1.x, dy=p2.y-p1.y, l=Math.hypot(dx,dy)||1; return {x:dx/l,y:dy/l};}
+  var wallStep=0;
   for(var t=0;t<Math.PI*2;t+=0.048){
     var da=Math.min(Math.abs(t-gateA[0]),Math.abs(t-gateA[1]),Math.abs(t-riverA));
     da=Math.min(da,Math.PI*2-da);
@@ -1708,6 +1732,14 @@ function buildTownData(){
     var wp=townWallPoint(t);
     rect(wp.x,wp.y,58,58,{wall:true,topKind:'wall',topH:90}); /* topH = the wall walkway's visible top (cap slab, ≈9m) above the terrain: collision ends there */
     townFeatures.push({kind:'wall',x:wp.x,y:wp.y,seed:rnd()});
+    /* interval towers: a taller, wider drum of wall every tenth segment
+       (≈ every 52m, as in the photo), standing on the same wall line so
+       the existing wall collision covers its base */
+    if(wallStep%10===5){
+      circ(wp.x,wp.y,37,{tower:true,topKind:'wall',topH:122});
+      townFeatures.push({kind:'walltower',x:wp.x,y:wp.y,seed:rnd()});
+    }
+    wallStep++;
   }
   /* --- gates (south-centre & SW): twin towers flanking the opening --- */
   var gatePts=[];
@@ -1769,20 +1801,43 @@ function buildTownData(){
     [1660,1802,100,95,180],[1770,1822,105,95,185],[1905,1798,105,92,175],
     [1620,1948,115,100,-160],[1690,2072,105,90,180],
     [1870,1442,100,85,-80],[1470,1860,105,90,105]];
-  HOUSES.forEach(function(hs){
+  var ROOF_MULT=[0.42,0.36,0.50,0.44,0.38,0.54,0.40,0.48]; /* per-house roof pitch: ridges land anywhere from ≈7.4m to ≈9.5m, so no two rooftops read alike */
+  HOUSES.forEach(function(hs,hi){
     var rot=(hs[4]||0)*Math.PI/180, ca=Math.abs(Math.cos(rot)), sa=Math.abs(Math.sin(rot));
     var o=rect(hs[0],hs[1],hs[2]*ca+hs[3]*sa,hs[2]*sa+hs[3]*ca,{house:true,topKind:'house'}); /* collision = the rotated footprint's bounding box */
-    o._cx=hs[0]; o._cy=hs[1]; o._rotY=rot; o._hw=hs[2]/2; o._hd=hs[3]/2; o._eave=38; o._roofH=Math.round(hs[2]*0.42); /* roof-top surface data for obstacleTopZAt() */
-    townFeatures.push({kind:'house',x:hs[0],y:hs[1],w:hs[2],d:hs[3],rot:rot,seed:rnd()});
+    o._cx=hs[0]; o._cy=hs[1]; o._rotY=rot; o._hw=hs[2]/2; o._hd=hs[3]/2; o._eave=38; o._roofH=Math.round(hs[2]*ROOF_MULT[hi%ROOF_MULT.length]); /* roof-top surface data for obstacleTopZAt() */
+    var feat={kind:'house',x:hs[0],y:hs[1],w:hs[2],d:hs[3],rot:rot,seed:rnd(),roofH:o._roofH};
+    townFeatures.push(feat);
+    /* every fifth house grows a small side annex (a lean-to wing with its
+       own little gable): real collision + its own building pad, placed in
+       the house's local frame on the +X side */
+    if(hi%5===3){
+      var ax=hs[2]/2+15, az=8, aw=36, ad=32;
+      var wx=hs[0]+ax*Math.cos(rot)+az*Math.sin(rot), wy=hs[1]-ax*Math.sin(rot)+az*Math.cos(rot);
+      var ao=rect(wx,wy,aw*ca+ad*sa,aw*sa+ad*ca,{house:true,topKind:'house'});
+      ao._cx=wx; ao._cy=wy; ao._rotY=rot; ao._hw=aw/2; ao._hd=ad/2; ao._eave=24; ao._roofH=13;
+      feat.annex={x:ax,z:az,w:aw,d:ad};
+    }
   });
   /* --- landmarks --- */
   circ(880,1560,42,{tower:true});  townFeatures.push({kind:'clocktower',x:880,y:1560}); /* in the middle of the west housing block, as in the photo — not against the wall */
-  rect(1500,1185,170,120,{chapel:true}); townFeatures.push({kind:'chapel',x:1500,y:1185}); /* high terrace, west end, close above the river */
+  rect(1500,1185,192,134,{chapel:true}); townFeatures.push({kind:'chapel',x:1500,y:1185}); /* high terrace, west end, close above the river — the crystal cathedral, footprint matched to its enlarged nave */
   rect(1905,1225,180,180,{castle:true}); townFeatures.push({kind:'castle',x:1905,y:1225}); /* the NE corner, hard against the wall and its rock */
   circ(PLAZA.x,PLAZA.y,17,{pillar:true}); townFeatures.push({kind:'fountain',x:PLAZA.x,y:PLAZA.y});
   [[1095,1525],[1505,1525],[1095,1875],[1505,1875]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
-  /* --- market stalls around the plaza --- */
-  [[1150,1895],[1455,1895],[1062,1648],[1525,1710],[1170,1525]].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});});
+  /* --- market stalls around the plaza: a full ring of them on the
+     plaza's rim (kept clear of the spawn point, the streets, the grand
+     staircase corridor and the pond) --- */
+  [[1150,1895],[1455,1895],[1062,1648],[1525,1710],[1170,1525],
+   [1005,1705],[1588,1700],[1085,1940],[1515,1940],[1025,1490],[1680,1500],[1210,1965],[1395,1965]
+  ].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});});
+  /* --- the streets (see STREETS): render features only — the ground
+     tint along them is painted in init3D() --- */
+  STREETS.forEach(function(s){townFeatures.push({kind:'street',x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,w:s.w,t:s.t,x:(s.x1+s.x2)/2,y:(s.y1+s.y2)/2});});
+  /* --- wells & carts: the town's working furniture --- */
+  [[1120,1990],[1960,1935]].forEach(function(wp2){circ(wp2[0],wp2[1],16,{well:true});townFeatures.push({kind:'well',x:wp2[0],y:wp2[1]});});
+  townFeatures.push({kind:'cart',x:1145,y:2330,rot:0.5,seed:rnd()});
+  townFeatures.push({kind:'cart',x:1850,y:1932,rot:-0.35,seed:rnd()});
   /* --- building pads: sample every house's ground height NOW, while
      TOWN_PADS is still empty (so no pad feeds back into another pad in
      the dense blocks), plus the clock tower's; townTerrain() then
@@ -1842,11 +1897,11 @@ function buildTownData(){
       var nearBridge=false; for(var bi=0;bi<BRIDGES.length;bi++){if(Math.hypot(px-BRIDGES[bi].x,py-BRIDGES[bi].y)<78)nearBridge=true;}
       if(nearBridge)continue;
       if(stairProfileAt(px,py))continue; /* the grand staircase crosses the channel on its own causeway: no swimming depth under the ramp */
-      lake(px,py,58,0,{river:true}); /* depth only — the ribbon draws the surface */
+      lake(px,py,74,0,{river:true}); /* depth only — the ribbon draws the surface (disc widened with the widened channel) */
     }
   }
   /* --- trees & rocks that belong to the town and its mountain --- */
-  function townTree(x,y,s){var d={x:x,y:y,kind:'tree',s:s||(22+rnd()*10),seed:rnd()*10};decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});}
+  function townTree(x,y,s,conifer){var d={x:x,y:y,kind:'tree',s:s||(22+rnd()*10),seed:rnd()*10};if(conifer)d.conifer=true;decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});}
   [[678,1330],[672,1590],[680,1750],[674,1880]].forEach(function(p){townTree(p[0],p[1],24);}); /* pine row inside the west wall */
   [[850,1135],[1260,1090],[1420,1060],[1700,1065],[2050,1080]].forEach(function(p){townTree(p[0],p[1],22+rnd()*8);});
   [[420,1350],[368,1520],[445,1700],[362,1880],[455,2010],[300,1660],[345,1200]].forEach(function(p){townTree(p[0],p[1],24+rnd()*8);}); /* conifer forest outside the west wall (the photo's wooded west) */
@@ -1862,6 +1917,57 @@ function buildTownData(){
   townRock(1095,1170,26); townRock(1215,1150,22); townRock(1105,1240,20); townRock(1225,1230,18);
   townRock(1690,1090,40); townRock(1930,1420,36); townRock(1470,1080,26);
   townRock(2180,1080,34); townRock(2290,1250,26); townRock(2060,940,30); /* bare rock outside the NE wall, as in the photo */
+  /* --- dense conifer forest outside the wall (west / east / north), as
+     in the photo: jittered rows of pines filling the bands beyond the
+     wall, kept clear of the gates' dirt roads, the SW outpost, the wild
+     lakes and the ruins floors. All seeded, so the forest is identical
+     on every build (editor deletions keep working by position). --- */
+  function coniferBand(n,x0,x1,y0,y1){
+    var placedN=0, guard=0;
+    while(placedN<n&&guard<n*14){
+      guard++;
+      var fx=x0+rnd()*(x1-x0), fy=y0+rnd()*(y1-y0);
+      if(townNorm(fx,fy)<1.10)continue;                       /* outside the wall, with a small clearing */
+      if(waterDepthAt(fx,fy)>0)continue;
+      if(Math.hypot(fx-420,fy-2150)<310)continue;              /* 月影湖 stays open */
+      if(fx>1900&&fy<800)continue;                            /* ruins floor stays bare */
+      if(Math.hypot(fx-1150,fy-1105)<215)continue;            /* the falls crag */
+      var clash=false;
+      for(var ci2=0;ci2<decorations.length;ci2++){var od=decorations[ci2];if(od.kind==='tree'&&Math.hypot(od.x-fx,od.y-fy)<52){clash=true;break;}}
+      if(clash)continue;
+      townTree(fx,fy,23+rnd()*11,true);
+      placedN++;
+    }
+  }
+  coniferBand(52,150,440,980,2520);   /* west forest */
+  coniferBand(46,2180,2680,900,2450); /* east forest */
+  coniferBand(54,240,2380,330,980);   /* north forest, over the mountain skirts */
+  /* --- rocks & cliffs along the river banks and around the NE
+     terraces: boulders set back from the channel (never in the water,
+     never on a bridge or the grand staircase), and a craggy fringe
+     along the terrace edges and the castle rock --- */
+  (function(){
+    for(var rvi=1;rvi<RIVER.length-1;rvi++){
+      var ax=RIVER[rvi][0],ay=RIVER[rvi][1],bx=RIVER[rvi+1][0],by=RIVER[rvi+1][1];
+      var dx=bx-ax,dy=by-ay,dl=Math.hypot(dx,dy)||1; dx/=dl; dy/=dl;
+      for(var rj=0;rj<2;rj++){
+        var tt=0.25+rj*0.5, side=(rvi+rj)%2?1:-1;
+        var px=ax+dx*dl*tt-dy*side*(96+rnd()*36), py=ay+dy*dl*tt+dx*side*(96+rnd()*36);
+        if(Math.hypot(px-POND_C.x,py-POND_C.y)<POND_C.r+34)continue;
+        if(Math.hypot((px-POND_E.x)*0.72,py-POND_E.y)<POND_E.r+16)continue;
+        if(Math.hypot(px-POOL.x,py-POOL.y)<POOL.r+26)continue;
+        var nearB=false; for(var bi2=0;bi2<BRIDGES.length;bi2++){if(Math.hypot(px-BRIDGES[bi2].x,py-BRIDGES[bi2].y)<120)nearB=true;}
+        if(nearB||stairProfileAt(px,py))continue;
+        if(collide(px,py,26))continue;                            /* never inside a house / wall / stall footprint */
+        if(Math.hypot(px-PLAZA.x,py-PLAZA.y)<290)continue;
+        townRock(Math.round(px),Math.round(py),17+rnd()*22);
+      }
+    }
+    [[1420,1352,34],[1560,1362,42],[1720,1355,30],[1880,1360,44],[2030,1350,32],
+     [1405,985,38],[1580,975,30],[1760,990,42],[1980,985,34],[2065,1120,30],
+     [1830,1085,26],[1470,1300,24],[2100,1300,28]
+    ].forEach(function(rk2){townRock(rk2[0],rk2[1],rk2[2]);}); /* terrace-edge crags */
+  })();
 }
 function genWorld(){
   obstacles=[];decorations=[];
@@ -3320,10 +3426,10 @@ function drawMini(){
   patch(2650,150,3500,1000,'#5d5a68');       // forgotten ruins
   // the town of Luminas: wall ring, plaza disc and the NE terraces (under the water)
   function townPath(scale){mctx.beginPath();for(var mt=0;mt<=Math.PI*2+0.01;mt+=0.12){var mp=townWallPoint(mt);var px=MX(TOWN_CX+(mp.x-TOWN_CX)*scale),py=MY(TOWN_CY+(mp.y-TOWN_CY)*scale);if(mt===0)mctx.moveTo(px,py);else mctx.lineTo(px,py);}mctx.closePath();}
-  mctx.fillStyle='#6a6255';townPath(1);mctx.fill();
-  mctx.fillStyle='#3a5c38';townPath(0.955);mctx.fill();
-  mctx.fillStyle='#7d7466';mctx.fillRect(MX(1380),MY(1000),(2070-1380)*s,(1320-1000)*s);
-  mctx.fillStyle='#9a917e';mctx.beginPath();mctx.ellipse(MX(PLAZA.x),MY(PLAZA.y),165*s,165*s,0,0,7);mctx.fill();
+  mctx.fillStyle='#9c968a';townPath(1);mctx.fill();
+  mctx.fillStyle='#4a6c40';townPath(0.955);mctx.fill();
+  mctx.fillStyle='#8a8172';mctx.fillRect(MX(1380),MY(1000),(2070-1380)*s,(1320-1000)*s);
+  mctx.fillStyle='#c9c2ae';mctx.beginPath();mctx.ellipse(MX(PLAZA.x),MY(PLAZA.y),165*s,165*s,0,0,7);mctx.fill();
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
@@ -3540,10 +3646,10 @@ function grainTex(){return makeTex('grain',128,function(c,S,r){
   for(var b=0;b<10;b++){var x=r()*S,y=r()*S,rad=10+r()*26;var g=c.createRadialGradient(x,y,1,x,y,rad);g.addColorStop(0,'rgba(110,102,92,'+(0.04+r()*0.05)+')');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y,rad,0,7);c.fill();}
 },31337);}
 var TEX_BY_COLOR={};
-[0x8a8172,0x776f61,0x9a917e,0x8f887a,0x978f7d,0x7d7466,0x5d5a68,0x6a6455,0x8a8496,0x8d9299,0x6f6a7d,0x7a7466,0x847b6a,0x5d564a].forEach(function(k){TEX_BY_COLOR[k]='stone';});
+[0x8a8172,0x776f61,0x9a917e,0x8f887a,0x978f7d,0x7d7466,0x5d5a68,0x6a6455,0x8a8496,0x8d9299,0x6f6a7d,0x7a7466,0x847b6a,0x5d564a,0xb8b2a4,0xc4beb0,0xa8a294,0xbcb6a8,0xb0aa9e,0xd6d0c0,0xcac2b0,0x9c968a].forEach(function(k){TEX_BY_COLOR[k]='stone';});
 [0x6b4a2c,0x54382a,0x8a6a44,0x5d3f27,0x74522f,0x8a5a3a].forEach(function(k){TEX_BY_COLOR[k]='wood';});
 [0xe6dcc4,0xf2ead8].forEach(function(k){TEX_BY_COLOR[k]='plaster';});
-[0x8a4a28,0x9c5a2c,0x7c4023,0xa86834,0x93522a,0x845030,0x7a4a30,0x46586a,0xc9862b].forEach(function(k){TEX_BY_COLOR[k]='roof';});
+[0x8a4a28,0x9c5a2c,0x7c4023,0xa86834,0x93522a,0x845030,0x7a4a30,0x46586a,0xc9862b,0x2f5fb3,0x3a6bd5,0x5d6a72,0x8a3a30,0x4f6152,0x74584a,0x3f6fb5].forEach(function(k){TEX_BY_COLOR[k]='roof';});
 function texForColor(color){
   var n=TEX_BY_COLOR[color];
   if(n==='stone')return stoneTex(); if(n==='wood')return woodTex();
@@ -3609,8 +3715,8 @@ function townTerrain(x,y,h){
     }
   }
   h=_lerpTo(h,122,_band(Math.hypot(x-1130,y-1110),120,190));  /* falls crag (kept west, so the north wall stays clear of it) */
-  h=_lerpTo(h,80,_band(Math.hypot((x-1157)*0.55,y-1176),26,46)); /* falls upper shelf (tier 1 lands here), stretched E-W under the sheet */
-  h=_lerpTo(h,50,_band(Math.hypot((x-1162)*0.55,y-1240),26,46)); /* falls lower shelf (tier 2 lands here) */
+  h=_lerpTo(h,80,_band(Math.hypot((x-1157)*0.36,y-1176),30,56)); /* falls upper shelf (tier 1 lands here), stretched E-W under the widened sheet */
+  h=_lerpTo(h,50,_band(Math.hypot((x-1162)*0.36,y-1240),30,56)); /* falls lower shelf (tier 2 lands here) */
   h=_lerpTo(h,80,_band(_rectD(x,y,1450,1420,2030,1620),0,110));  /* mid terrace (NE): broad shoulder the long ramp climbs past */
   h=_lerpTo(h,168,_band(_rectD(x,y,1380,1000,2070,1320),0,120)); /* high terrace: chapel (west) & castle (east) */
   h=_lerpTo(h,215,_band(Math.hypot(x-1905,y-1225),110,190));  /* castle rock, at the NE corner against the wall (kept clear of the chapel terrace) */
@@ -3623,7 +3729,7 @@ function townTerrain(x,y,h){
   /* river carve starts after the falls outflow segment (segment 0), so the
      channel never eats the falls shelf above it */
   var rd=1e9; for(var i=1;i<RIVER.length-1;i++){var sd=_segD(x,y,RIVER[i][0],RIVER[i][1],RIVER[i+1][0],RIVER[i+1][1]); if(sd<rd)rd=sd;}
-  h=_lerpTo(h,-6,_band(rd,50,84)); /* the river channel: one constant-width watercourse, not a chain of ponds */
+  h=_lerpTo(h,-6,_band(rd,66,104)); /* the river channel: one constant-width watercourse, not a chain of ponds (widened with the ribbon) */
   for(var bi=0;bi<BRIDGES.length;bi++){h=_lerpTo(h,16,_band(Math.hypot(x-BRIDGES[bi].x,y-BRIDGES[bi].y),26,50));} /* bridge fords: just the banks under each arch, so the channel stays wet right up to the bridges — and the ponds stay deep (a wider ford leaked into the central pond and the plunge pool) */
   /* the grand staircase: carve every flight's corridor to the stepped-
      smooth profile, so the ground itself climbs exactly like the drawn
@@ -3640,8 +3746,8 @@ function townTerrain(x,y,h){
   var bk=0,bh=0;
   for(var hp=0;hp<TOWN_PADS.length;hp++){var pd=TOWN_PADS[hp];var pdd=_rectD(x,y,pd.x0,pd.y0,pd.x1,pd.y1);if(pdd<46){var pk=_band(pdd,0,46);if(pk>bk){bk=pk;bh=pd.h;}}}
   if(bk>0)h=_lerpTo(h,bh,bk);
-  h=_lerpTo(h,80,_band(Math.hypot((x-1157)*0.55,y-1176),22,42)); /* falls shelves re-asserted last: the pool carve must not eat them */
-  h=_lerpTo(h,50,_band(Math.hypot((x-1162)*0.55,y-1240),22,42));
+  h=_lerpTo(h,80,_band(Math.hypot((x-1157)*0.36,y-1176),26,52)); /* falls shelves re-asserted last: the pool carve must not eat them */
+  h=_lerpTo(h,50,_band(Math.hypot((x-1162)*0.36,y-1240),26,52));
   return h;
 }
 /* Rolling terrain height (world units) at game coords x,y: gentle hills and dips,
@@ -4104,13 +4210,13 @@ function fountainTopAt(x,y){
   for(var i=0;i<townFeatures.length;i++)if(townFeatures[i].kind==='fountain'){f=townFeatures[i];break;}
   if(!f)return -Infinity;
   var d=Math.hypot(x-f.x,y-f.y);
-  if(d>84)return -Infinity;
+  if(d>102)return -Infinity;
   var gh=terrainH(f.x,f.y);
-  if(d<=54)return gh+15;                 /* basin rim top */
-  if(d<=60)return gh+15-(d-54)*1.167;    /* the basin wall's sloped shoulder */
-  if(d<=70)return gh+8;                  /* second step */
-  if(d<=80)return gh+4;                  /* first step */
-  return gh+4-(d-80)*1.0;                /* feather into the plaza */
+  if(d<=66)return gh+15;                 /* basin rim top */
+  if(d<=72)return gh+15-(d-66)*1.167;    /* the basin wall's sloped shoulder */
+  if(d<=84)return gh+8;                  /* second step */
+  if(d<=98)return gh+4;                  /* first step */
+  return gh+4-(d-98)*1.0;                /* feather into the plaza */
 }
 function platformTopAt(x,y){
   var best=-Infinity;
@@ -4195,9 +4301,9 @@ function nearestPlaced(x,y,maxD){
    also removes its water surface and its swimming depth. Only the
    retaining skirts and the waterfall sheets stay fixed — the terrain
    itself depends on them. */
-var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1,bridge:1,steps:1,stairs:1,watchtower:1,tent:1};
-var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱',bridge:'橋',steps:'石段',stairs:'大階段',water:'川・池の水',watchtower:'見張り塔',tent:'テント'};
-var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:105,castle:125,fountain:55,lamp:26,stall:48,ruin:62,bridge:85,steps:78,stairs:120,watchtower:48,tent:44};
+var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1,bridge:1,steps:1,stairs:1,watchtower:1,tent:1,well:1};
+var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱',bridge:'橋',steps:'石段',stairs:'大階段',water:'川・池の水',watchtower:'見張り塔',tent:'テント',well:'井戸'};
+var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:115,castle:125,fountain:62,lamp:26,stall:48,ruin:62,bridge:85,steps:78,stairs:120,watchtower:48,tent:44,well:26};
 function builtinBid(kind,x,y){return kind+'@'+Math.round(x)+','+Math.round(y);}
 function builtinTargets(){
   var out=[];
@@ -4698,6 +4804,15 @@ function init3D(){
         if(hash2(Math.floor(gx/23)+9,Math.floor(gy/23))>0.93){gt.setHex(0x8aa653); gc.lerp(gt,0.5);}
       }
       if(reg==='green'&&townNorm(gx,gy)<1.02){gt.setHex(0x5d9046); gc.lerp(gt,0.35);}
+      /* the town's streets: vertices near a stone lane turn cobble-grey,
+         near a dirt lane packed-earth brown, so the ground itself is
+         paved between the houses (the crisp strips are drawn separately
+         in buildTown3D from the same STREETS table) */
+      if(reg==='green'&&gx>420&&gx<2180&&gy>980&&gy<2560){
+        var stD=1e9, stT='s';
+        for(var sj=0;sj<STREETS.length;sj++){var ss2=STREETS[sj];var sd4=_segD(gx,gy,ss2.x1,ss2.y1,ss2.x2,ss2.y2)-ss2.w/2;if(sd4<stD){stD=sd4;stT=ss2.t;}}
+        if(stD<20){gt.setHex(stT==='s'?0xa49d8d:0x8f795a); gc.lerp(gt,_sm01((20-stD)/20)*0.82);}
+      }
       var dp=Math.hypot(gx-PLAZA.x,gy-PLAZA.y);
       if(dp<300){gt.setHex(0x8d8574); gc.lerp(gt,_sm01((300-dp)/70)*0.8);}
       var bankD=1e9;
@@ -4775,8 +4890,8 @@ function waterMats(){
     return new THREE.ShaderMaterial({
       transparent:true, depthWrite:false,
       uniforms:{ uTime:waterTimeU, uPlunge:{value:plunge?1:0},
-        uDeep:{value:new THREE.Color(0x14486b)}, uShallow:{value:new THREE.Color(0x3f9db8)},
-        uSky:{value:new THREE.Color(0xbfe3f2)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
+        uDeep:{value:new THREE.Color(0x1a5f8a)}, uShallow:{value:new THREE.Color(0x5ec8dc)},
+        uSky:{value:new THREE.Color(0xcdeef8)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
       vertexShader:'varying vec3 vW; varying vec2 vP;\nvoid main(){vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
       fragmentShader:[
         'uniform float uTime; uniform float uPlunge;',
@@ -4865,7 +4980,7 @@ function buildFallsSpray(){
   var sd=4242; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
   for(var i=0;i<N;i++){
     var b=bases[i%3];
-    sprayParts.push({bx:b[0],by:b[1],bz:b[2],ph:srnd(),ang:srnd()*Math.PI*2,rad:6+srnd()*30,up:18+srnd()*26,sp:0.55+srnd()*0.6});
+    sprayParts.push({bx:b[0],by:b[1],bz:b[2],ph:srnd(),ang:srnd()*Math.PI*2,rad:10+srnd()*46,up:24+srnd()*34,sp:0.55+srnd()*0.6});
   }
   var geo=new THREE.BufferGeometry();
   geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
@@ -4894,7 +5009,7 @@ function buildFallsMist(){
   for(var i=0;i<spots.length;i++){
     var sm=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:0.16,depthWrite:false,color:0xf6fcff});
     var sp=new THREE.Sprite(sm);
-    var sc=64+(i%3)*26;
+    var sc=92+(i%3)*36;
     sp.scale.set(sc,sc*0.62,1);
     sp.position.set(WX(spots[i][0]),spots[i][2]+10,WZ(spots[i][1]));
     sp.renderOrder=4;
@@ -4950,8 +5065,8 @@ function riverMats(){
   RIVER_MAT=new THREE.ShaderMaterial({
     transparent:true, depthWrite:false,
     uniforms:{ uTime:waterTimeU,
-      uDeep:{value:new THREE.Color(0x14486b)}, uShallow:{value:new THREE.Color(0x3f9db8)},
-      uSky:{value:new THREE.Color(0xbfe3f2)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
+      uDeep:{value:new THREE.Color(0x1a5f8a)}, uShallow:{value:new THREE.Color(0x5ec8dc)},
+      uSky:{value:new THREE.Color(0xcdeef8)}, uSunDir:{value:new THREE.Vector3(0.48,0.78,0.30).normalize()} },
     vertexShader:[
       'attribute float aPhase; attribute float aRapid;',
       'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp;',
@@ -4985,7 +5100,7 @@ function riverMats(){
       ' float foam=smoothstep(0.90,0.995,abs(across)+(foamN-0.5)*0.07)*(0.5+0.5*sin(t*1.6+vPh*160.0+foamN*7.0));',
       ' float streak=noise(vec2(vUv.x*11.0,vPh*110.0-t*3.4));',
       ' float streak2=noise(vec2(vUv.x*23.0+7.0,vPh*190.0-t*4.6));',
-      ' foam=max(foam,vRp*smoothstep(0.52,0.78,streak*0.65+streak2*0.35)*(0.65+0.35*sin(t*5.0+vPh*300.0)));',
+      ' foam=max(foam,vRp*smoothstep(0.40,0.70,streak*0.65+streak2*0.35)*(0.7+0.3*sin(t*5.0+vPh*300.0)));',
       ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.88);',
       ' float fogF=smoothstep(1000.0,2900.0,distance(cameraPosition,vW));',
       ' col=mix(col,vec3(0.78,0.85,0.90),fogF);',
@@ -5014,10 +5129,13 @@ function buildRiver3D(){
     prev=[gx,gy];
     var rapid=0;
     var dFalls=Math.hypot(gx-1168,gy-1290);
-    if(dFalls<250)rapid=Math.max(rapid,1.0-dFalls/250);
-    if(Math.hypot(gx-1420,gy-1410)<95)rapid=Math.max(rapid,0.55); /* rocky narrows where the river leaves the central pond */
+    if(dFalls<280)rapid=Math.max(rapid,1.0-dFalls/280);
+    if(Math.hypot(gx-1420,gy-1410)<110)rapid=Math.max(rapid,0.6); /* rocky narrows where the river leaves the central pond */
+    if(Math.hypot(gx-1548,gy-1532)<100)rapid=Math.max(rapid,0.5); /* the stony run past the grand ramp's causeway */
+    if(Math.hypot(gx-1902,gy-1662)<110)rapid=Math.max(rapid,0.55); /* the east pond's outflow */
+    if(Math.hypot(gx-2038,gy-1902)<120)rapid=Math.max(rapid,0.5); /* the drop toward the water gate */
     if(inPond(gx,gy))rapid*=0.25;
-    var nx=-tan.z, nz=tan.x, hw=50;
+    var nx=-tan.z, nz=tan.x, hw=66;
     pos.push(p.x+nx*hw,2.8,p.z+nz*hw, p.x-nx*hw,2.8,p.z-nz*hw);
     uv.push(0,t*40, 1,t*40);
     ph.push(phase,phase); rp.push(rapid,rapid);
@@ -5041,7 +5159,7 @@ function buildRiver3D(){
     var bx=pp.x+W/2, by=pp.z+H/2;
     if(Math.hypot(bx-1218,by-1312)<95||Math.hypot(bx-1590,by-1562)<95||Math.hypot(bx-1988,by-1762)<95)continue; /* keep the bridges clear */
     [-1,1].forEach(function(side){
-      var off=57+rnd()*15, px=bx+(-tn.z)*side*off, py=by+(tn.x)*side*off;
+      var off=73+rnd()*16, px=bx+(-tn.z)*side*off, py=by+(tn.x)*side*off;
       if(rnd()<0.78){
         var rs=3.5+rnd()*6;
         var rk=new THREE.Mesh(G('bankrock'+Math.round(rs*2),function(){return new THREE.DodecahedronGeometry(rs,0);}),M(stoneTones[Math.floor(rnd()*4)]));
@@ -5049,7 +5167,7 @@ function buildRiver3D(){
         rk.castShadow=true; rk.receiveShadow=true; staticGroup.add(rk);
       }
       if(rnd()<0.55){
-        var toff=64+rnd()*22, tx2=bx+(-tn.z)*side*toff, ty2=by+(tn.x)*side*toff;
+        var toff=82+rnd()*24, tx2=bx+(-tn.z)*side*toff, ty2=by+(tn.x)*side*toff;
         if(terrainH(tx2,ty2)>3){
           var tu=cone(4.5+rnd()*3,9+rnd()*7,greens[Math.floor(rnd()*4)],WX(tx2),terrainH(tx2,ty2)+4,WZ(ty2),staticGroup,6);
           tu.castShadow=false;
@@ -5067,7 +5185,7 @@ function buildRiver3D(){
    staticGroup and is merged by mergeStaticMeshes() as usual. */
 function buildTown3D(){
   if(!townFeatures.length)return;
-  var STONE=0x8a8172, STONE_D=0x776f61, STONE_L=0x9a917e, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
+  var STONE=0xa8a294, STONE_D=0x8a8172, STONE_L=0xbcb6a8, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4; /* bright grey ashlar, as in the photo: the whole town's stonework reads pale against the green */
   /* water surfaces for every town lake decoration (ponds, pools, river
      chain) — shader discs in waterGroup (never merged with the static
      world, so their per-disc uniforms and animation survive). Deleting
@@ -5083,7 +5201,7 @@ function buildTown3D(){
   function sheet(x1,y1,z1,x2,y2,z2,w){
     var a=new THREE.Vector3(WX(x1),z1,WZ(y1)), b=new THREE.Vector3(WX(x2),z2,WZ(y2));
     var dir=new THREE.Vector3().subVectors(b,a), len=dir.length();
-    var m=new THREE.Mesh(new THREE.BoxGeometry(w,len,2.5),fallsSheetMaterial());
+    var m=new THREE.Mesh(new THREE.BoxGeometry(w,len,4),fallsSheetMaterial());
     m.position.copy(a).addScaledVector(dir,0.5);
     m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());
     staticGroup.add(m);
@@ -5092,22 +5210,36 @@ function buildTown3D(){
     var m=new THREE.Mesh(G('s'+r,function(){return new THREE.SphereGeometry(r,10,8);}),M(0xf4fbff));
     m.scale.y=0.35; m.position.set(WX(x),z,WZ(y2d)); staticGroup.add(m);
   }
-  sheet(1151,1142,105,1157,1174,82,94);   /* tier 1: top pool → upper shelf */
-  sheet(1158,1188,79,1162,1238,52,88);    /* tier 2: upper shelf → lower shelf */
-  sheet(1163,1250,49,1168,1298,3,82);     /* tier 3: lower shelf → plunge pool */
-  foam(1157,1178,81,20); foam(1162,1242,51,23); foam(1168,1302,4,27); foam(1150,1105,108,11);
+  sheet(1151,1142,105,1157,1174,82,142);  /* tier 1: top pool → upper shelf */
+  sheet(1158,1188,79,1162,1238,52,134);   /* tier 2: upper shelf → lower shelf */
+  sheet(1163,1250,49,1168,1298,3,126);    /* tier 3: lower shelf → plunge pool */
+  foam(1157,1178,81,30); foam(1162,1242,51,34); foam(1168,1302,4,40); foam(1150,1105,108,16);
+  foam(1120,1186,80,20); foam(1196,1186,80,20); foam(1126,1250,50,22); foam(1200,1250,50,22); /* side bursts where the widened sheets strike the shelves */
   buildFallsSpray(); /* animated spray mist at the three plunge bases */
   buildFallsMist();  /* drifting mist clouds + expanding ripple rings in the plunge pool */
   /* ---- features ---- */
   townFeatures.forEach(function(f){
     var gh=terrainH(f.x,f.y);
     if(f.kind==='wall'){
-      var wc=f.seed<0.34?STONE:(f.seed<0.67?STONE_L:0x847b6a);      /* per-segment stone tint so the ring never reads as one flat fill */
+      var wc=f.seed<0.34?0xb8b2a4:(f.seed<0.67?STONE_L:0xc4beb0);  /* bright grey stone, tinted per segment so the ring never reads as one flat fill */
       box(58,84,58,wc,WX(f.x),gh+40,WZ(f.y),staticGroup);        /* curtain wall ≈8.4m, walkway cap on top */
-      box(64,9,64,STONE_D,WX(f.x),gh+84,WZ(f.y),staticGroup);
-      box(62,10,62,0x5d564a,WX(f.x),gh+3,WZ(f.y),staticGroup);      /* dark footing course (contact shading at the base) */
-      if(f.seed>0.45)box(14,12,14,STONE,WX(f.x)-14,gh+93,WZ(f.y),staticGroup); /* merlons: total height ≈9.9m */
-      if(f.seed<0.78)box(14,12,14,STONE,WX(f.x)+14,gh+93,WZ(f.y),staticGroup);
+      box(64,9,64,0x9c968a,WX(f.x),gh+84,WZ(f.y),staticGroup);   /* pale walkway cap slab */
+      box(62,10,62,0x6e675c,WX(f.x),gh+3,WZ(f.y),staticGroup);   /* footing course (contact shading at the base) */
+      /* battlements on EVERY segment: a full merlon rhythm, not a
+         sometimes-thing — two merlons per segment, alternating tint */
+      box(14,13,14,f.seed>0.5?STONE_L:0xb8b2a4,WX(f.x)-15,gh+94,WZ(f.y),staticGroup);
+      box(14,13,14,f.seed>0.5?0xb8b2a4:STONE_L,WX(f.x)+15,gh+94,WZ(f.y),staticGroup);
+      box(58,5,60,0x8a8172,WX(f.x),gh+58,WZ(f.y),staticGroup);   /* string course: a shadow line two-thirds up the face */
+    }else if(f.kind==='walltower'){
+      /* interval tower: a wider, taller drum on the wall line with its
+         own crenellated crown and a slit window facing outward */
+      var wt=new THREE.Group(); wt.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(wt);
+      cyl(37,41,112,0xbdb6a7,0,56,0,wt,12);                       /* tower shaft ≈11.2m, proud of the curtain wall */
+      cyl(43,43,10,0x9c968a,0,114,0,wt,12);                       /* crown slab */
+      for(var wmi=0;wmi<8;wmi++){var wa=wmi*Math.PI/4;box(13,13,13,wmi%2?0xb8b2a4:STONE_L,Math.cos(wa)*36,126,Math.sin(wa)*36,wt);} /* merlon ring */
+      box(62,10,62,0x6e675c,0,4,0,wt);                            /* footing */
+      var wout=Math.atan2(f.y-TOWN_CY,f.x-TOWN_CX);
+      box(7,20,3,0x2e2a26,Math.cos(wout)*40,74,Math.sin(wout)*40,wt,false); /* arrow slit on the outer face, placed radially (local x/z = game x/y here) */
     }else if(f.kind==='gate'||f.kind==='watergate'){
       var g=new THREE.Group(); g.position.set(WX(f.x),gh-4,WZ(f.y)); g.rotation.y=Math.atan2(-f.ty,f.tx); staticGroup.add(g);
       var tw=f.kind==='gate'?58:62, tr=f.kind==='gate'?27:24, th=f.kind==='gate'?118:94; /* gate towers ≈11.8m, just proud of the wall */
@@ -5130,9 +5262,9 @@ function buildTown3D(){
       }
     }else if(f.kind==='house'){
       var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); hg.rotation.y=f.rot||0; staticGroup.add(hg);
-      var roofs=[0x8a4a28,0x9c5a2c,0x7c4023,0xa86834,0x93522a,0x845030]; /* the photo's brown-to-orange roofs */
+      var roofs=[0x8a4a28,0x9c5a2c,0x7c4023,0xa86834,0x93522a,0x845030,0x5d6a72,0x8a3a30,0x4f6152,0x74584a]; /* brown-to-orange, slate grey-blue, deep red and moss slate — no two streets alike */
       var rc=roofs[Math.floor(f.seed*roofs.length)%roofs.length];
-      var roofH=Math.round(f.w*0.42);                                  /* ridge lands at 7.4–8.6m over a 3.8m eave */
+      var roofH=f.roofH||Math.round(f.w*0.42);                         /* per-house pitch from buildTownData (matches the roof collision) */
       var plasterTints=[0xe6dcc4,0xdfd2b8,0xeee3cc,0xe8dcc6,0xdccfb4];
       var pTint=plasterTints[Math.floor(f.seed*plasterTints.length)%plasterTints.length]; /* every house its own plaster tone */
       box(f.w+9,6,f.d+9,0x4a4238,0,3,0,hg);                            /* dark foundation plinth: grounds the house, fakes AO at the base */
@@ -5146,6 +5278,29 @@ function buildTown3D(){
       box(6,5,f.d+24,WOOD_D,0,38+roofH+1,0,hg);                        /* ridge beam along the roof crest */
       box(12,30,12,STONE_D,f.w*0.26,38+roofH*0.45,-f.d*0.18,hg);       /* chimney */
       box(15,5,15,STONE_D,f.w*0.26,38+roofH*0.45+16,-f.d*0.18,hg);
+      cyl(3.4,3.4,6,0x8a4a28,f.w*0.26,38+roofH*0.45+20,-f.d*0.18,hg,6); /* chimney pot */
+      if(f.seed>0.62){ /* a second, smaller chimney on the far slope */
+        box(10,24,10,STONE_D,-f.w*0.30,38+roofH*0.40,f.d*0.16,hg);
+        box(13,4,13,STONE_D,-f.w*0.30,38+roofH*0.40+13,f.d*0.16,hg);
+      }
+      if(f.seed>0.34&&f.seed<0.78){ /* cross gable: a little perpendicular gable breaking the front slope */
+        var cgab=prism(30,Math.round(roofH*0.52),26,rc); cgab.rotation.y=Math.PI/2;
+        cgab.position.set(-f.w*0.05,38+roofH*0.30,f.d*0.16); hg.add(cgab);
+        box(10,10,3,0xffd98a,-f.w*0.05,38+roofH*0.30,f.d*0.16+14,hg);
+      }
+      if(f.annex){ /* the side annex from buildTownData: stone walls, its own little gable, a door and one lit window */
+        var ag=new THREE.Group(); ag.position.set(f.annex.x,0,f.annex.z); hg.add(ag);
+        box(f.annex.w+5,5,f.annex.d+5,0x4a4238,0,2.5,0,ag);
+        box(f.annex.w,24,f.annex.d,STONE_L,0,12,0,ag);
+        var aroof=prism(f.annex.w+12,13,f.annex.d+10,rc); aroof.position.y=24; ag.add(aroof);
+        box(11,17,3,WOOD_D,0,8.5,f.annex.d/2+1.5,ag);
+        box(9,9,3,0xffd98a,f.annex.w*0.22,14,f.annex.d/2+1.5,ag);
+      }
+      if(f.seed>0.80){ /* a corner turret: a slim stone drum with a pointed cap, tucked on the front corner */
+        cyl(10,12,38+roofH*0.55,STONE_L,-f.w/2+7,(38+roofH*0.55)/2,f.d/2-7,hg,9);
+        cone(14,20,rc,-f.w/2+7,38+roofH*0.55+10,f.d/2-7,hg,9);
+        box(6,9,3,0xffd98a,-f.w/2+7,34,f.d/2+3.5,hg);
+      }
       if(f.seed>0.45){ /* dormer window poking out of the roof slope */
         var dside=f.seed>0.72?1:-1;
         box(15,12,13,CREAM,dside*f.w*0.27,38+roofH*0.30,-f.d*0.12,hg);
@@ -5174,80 +5329,148 @@ function buildTown3D(){
         box(2,10,2,WOOD_D,25,27,f.d/2+8,hg); box(2,2,12,WOOD_D,25,31,f.d/2+13,hg);
         box(12,9,1.6,0xc9a86a,25,24.5,f.d/2+18,hg); /* hanging shop sign on its bracket */
       }
+      /* --- yard props, hugging the walls so they never leave the
+         house's own footprint: every house gets some mix of barrels,
+         crates, a wood pile, a hedge-and-flower garden strip --- */
+      if(f.seed>0.18){ /* barrel cluster at the front corner */
+        var bx=-f.w/2+11, bz=f.d/2-4;
+        cyl(5,5.6,12,0x8a6a44,bx,6,bz,hg,8); cyl(5,5.6,12,0x74522f,bx+11,6,bz-3,hg,8);
+        cyl(5.9,5.9,1.7,0x3a3128,bx,9,bz,hg,8); cyl(5.9,5.9,1.7,0x3a3128,bx+11,9,bz-3,hg,8); cyl(5.9,5.9,1.7,0x3a3128,bx,3.4,bz,hg,8); /* iron barrel hoops */
+        if(f.seed>0.5)cyl(4.6,5.2,11,0x8a6a44,bx+5.5,17,bz-1.5,hg,8); /* one stacked on top */
+      }
+      if(f.seed>0.42){ /* crates and a grain sack by the door */
+        box(12,12,12,0xc9a86a,f.w/2-13,6,f.d/2-5,hg);
+        box(10,10,10,0xb08d54,f.w/2-13,17,f.d/2-5,hg);
+        var sack=sph(6,0xa8905e,f.w/2-26,5,f.d/2-4,hg); sack.scale.y=0.85;
+      }
+      if(f.seed<0.66){ /* a neat wood pile against the side wall */
+        for(var wpi=0;wpi<5;wpi++){
+          var log=cyl(2.6,2.6,20,0x74522f,f.w/2-4,3+(wpi>2?5.4:0),(wpi%3-1)*5.6,hg,6);
+          log.rotation.x=Math.PI/2;
+        }
+      }
+      /* garden strip along the front wall: a low hedge with flowers */
+      box(f.w*0.62,5,5,0x3e7a3e,-f.w*0.10,2.5,f.d/2+4.5,hg);
+      var gfl=[0xe5484d,0xffd34d,0xff8fb3,0xf2ead8];
+      for(var gfi=0;gfi<4;gfi++)sph(2.4,gfl[gfi%4],-f.w*0.10-f.w*0.24+gfi*f.w*0.16,6.4,f.d/2+4.5,hg);
     }else if(f.kind==='clocktower'){
       var cg=new THREE.Group(); cg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(cg);
-      box(74,24,74,STONE_D,0,12,0,cg);                                 /* squat stone base */
-      box(52,96,52,STONE,0,72,0,cg);                                   /* shaft: top at 12m */
-      box(62,9,62,STONE_D,0,124,0,cg);                                 /* balcony slab */
-      box(64,42,64,CREAM,0,149,0,cg);                                  /* clock chamber */
+      box(84,26,84,STONE_D,0,13,0,cg);                                 /* squat stone base (inside the existing r42 collision) */
+      box(60,124,60,0xb8b2a4,0,88,0,cg);                               /* taller bright shaft: top at 15m */
+      box(70,8,70,STONE_D,0,110,0,cg);                                 /* string course */
+      box(72,10,72,STONE_D,0,154,0,cg);                                /* balcony slab */
+      box(76,52,76,CREAM,0,185,0,cg);                                  /* clock chamber */
       for(var fi=0;fi<4;fi++){
         var fg=new THREE.Group(); fg.rotation.y=fi*Math.PI/2; cg.add(fg);
-        var fc=new THREE.Mesh(G('clkf',function(){return new THREE.CylinderGeometry(16,16,4,20);}),M(0xf2ead8));
-        fc.rotation.x=Math.PI/2; fc.position.set(0,149,33); fg.add(fc);
-        var rim=new THREE.Mesh(G('clkr',function(){return new THREE.TorusGeometry(16,2,6,20);}),M(0xe8c268));
-        rim.position.set(0,149,35); fg.add(rim);
-        box(3,11,1.4,0x2a2a2a,0,152,35.6,fg,false);
-        box(8.5,3,1.4,0x2a2a2a,2.5,149,35.6,fg,false);
+        var fc=new THREE.Mesh(G('clkf2',function(){return new THREE.CylinderGeometry(22,22,4,24);}),M(0xf6efdd,{emissive:0x4a4232}));
+        fc.rotation.x=Math.PI/2; fc.position.set(0,185,39); fg.add(fc);
+        var rim=new THREE.Mesh(G('clkr2',function(){return new THREE.TorusGeometry(22,3,8,24);}),M(0xe8c268));
+        rim.position.set(0,185,41); fg.add(rim);
+        for(var tki=0;tki<12;tki++){ /* hour ticks around the dial */
+          var ta=tki*Math.PI/6, tl=tki%3===0?7:4.5;
+          box(tki%3===0?3.4:2.2,tl,1.6,0x2a2a2a,Math.sin(ta)*17.6,185+Math.cos(ta)*17.6,41.4,fg,false);
+        }
+        box(3.6,15,1.6,0x1e1e24,0,189.5,42,fg,false);                 /* hour hand, pointing up-left of noon */
+        var mh=box(13,3.2,1.6,0x1e1e24,4.5,185,42,fg,false); mh.rotation.z=-0.5; /* minute hand */
+        sph(3,0xe8c268,0,185,42.6,fg);
+        box(9,13,3,0xffd98a,0,158,39.5,fg);                           /* lit window under the dial */
       }
-      box(48,22,48,STONE,0,181,0,cg);
-      cone(36,40,0x46586a,0,212,0,cg,4);                               /* spire: total ≈23.2m, the town's landmark over the west houses */
-      sph(4.5,0xe8c268,0,236,0,cg);
-      cyl(1.1,1.1,20,WOOD_D,0,242,0,cg,5); box(11,7,1.2,0xb03a30,6,248,0,cg,false); /* pennant over the spire */
+      box(56,24,56,STONE,0,223,0,cg);
+      cone(42,48,0x3a5a8a,0,259,0,cg,4);                               /* spire: total ≈28.5m, the town's landmark over the west houses */
+      sph(5,0xe8c268,0,286,0,cg);
+      cyl(1.1,1.1,22,WOOD_D,0,293,0,cg,5); box(12,8,1.2,0xb03a30,6.5,299,0,cg,false); /* pennant over the spire */
     }else if(f.kind==='chapel'){
+      /* the crystal cathedral: a much larger glowing church — pale stone
+         nave, twin front towers, a blue crystal roof ridge studded with
+         lit crystals, a great rose window and tall glowing lancets */
       var kg=new THREE.Group(); kg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(kg);
-      box(170,72,120,STONE_L,0,36,0,kg);                               /* nave walls ≈7.2m */
-      var kroof=prism(190,62,138,0x3f6fb5); kroof.position.y=72; kg.add(kroof); /* blue crystal roof: ridge ≈13.4m */
-      box(30,108,30,STONE_L,0,54,46,kg);                       /* front spire tower, facing the upper plaza */
-      cone(25,50,0x3f6fb5,0,133,46,kg,4);
-      var crys=sph(8,0xbfe6ff,0,164,46,kg,{emissive:0x4a9be0}); crys.castShadow=false; /* glowing crystal finial ≈16.4m */
-      var glow=sph(26,0x7ec3ff,0,164,46,kg,{transparent:true,opacity:0.26,emissive:0x3a7bd5}); glow.castShadow=false;
-      var rose=new THREE.Mesh(G('rose',function(){return new THREE.CylinderGeometry(20,20,4,20);}),M(0x86c9ff,{emissive:0x2a6bd5}));
-      rose.rotation.x=Math.PI/2; rose.position.set(0,50,61.5); kg.add(rose);
-      box(20,34,5,WOOD_D,0,17,61,kg);
-      box(26,7,6,STONE_D,0,38,61,kg);
-      [-38,38].forEach(function(sx){ [-30,12].forEach(function(sz){ box(4,26,13,0x86c9ff,sx>0?86:-86,42,sz,kg); }); });
-      box(12,24,4,0x86c9ff,-30,46,61,kg); box(12,24,4,0x86c9ff,30,46,61,kg);
-      [-52,52].forEach(function(bz){box(10,44,14,STONE_D,-89,22,bz,kg);box(10,44,14,STONE_D,89,22,bz,kg);}); /* buttresses along the nave */
-      box(176,8,126,0x5d564a,0,4,0,kg);                              /* dark footing course */
+      box(192,10,140,0x6e675c,0,5,0,kg);                               /* footing course */
+      box(190,88,132,0xcac2b0,0,44,0,kg);                              /* nave walls ≈8.8m, bright stone */
+      var kroof=prism(212,76,150,0x3f6fb5); kroof.position.y=88; kg.add(kroof); /* blue crystal roof: ridge ≈16.4m */
+      [-64,64].forEach(function(tx3){ /* twin front towers */
+        box(38,138,38,0xcac2b0,tx3,69,52,kg);
+        box(46,9,46,STONE_D,tx3,140,52,kg);
+        cone(31,58,0x2f5fb3,tx3,173,52,kg,4);
+        var tc=sph(7,0xbfe6ff,tx3,206,52,kg,{emissive:0x4a9be0}); tc.castShadow=false;
+        var tg3=sph(19,0x7ec3ff,tx3,206,52,kg,{transparent:true,opacity:0.22,emissive:0x3a7bd5}); tg3.castShadow=false;
+        box(11,30,4,0x86c9ff,tx3,96,71.5,kg);                          /* tower lancet, glowing */
+      });
+      box(34,118,34,STONE_L,0,59,52,kg);                               /* central front tower between them */
+      cone(28,56,0x3f6fb5,0,146,52,kg,4);
+      var crys=sph(10,0xbfe6ff,0,179,52,kg,{emissive:0x4a9be0}); crys.castShadow=false; /* glowing crystal finial ≈17.9m */
+      var glow=sph(32,0x7ec3ff,0,179,52,kg,{transparent:true,opacity:0.26,emissive:0x3a7bd5}); glow.castShadow=false;
+      /* crystals studding the roof ridge, glowing down its whole length */
+      [-52,-18,18,52].forEach(function(rz){
+        var rc2=sph(6.5,0xbfe6ff,0,168,rz,kg,{emissive:0x4a9be0}); rc2.castShadow=false; rc2.scale.y=1.5;
+      });
+      var rose=new THREE.Mesh(G('rose2',function(){return new THREE.CylinderGeometry(27,27,4,24);}),M(0x9fd4ff,{emissive:0x3a7bd5}));
+      rose.rotation.x=Math.PI/2; rose.position.set(0,62,67.5); kg.add(rose);
+      var roseRim=new THREE.Mesh(G('roserim',function(){return new THREE.TorusGeometry(27,3,8,24);}),M(0xe8c268));
+      roseRim.position.set(0,62,69.5); kg.add(roseRim);
+      box(24,40,5,WOOD_D,0,20,66,kg);                                  /* great doors */
+      box(30,8,7,STONE_D,0,44,66,kg);
+      [-38,38].forEach(function(sx){ [-36,0,36].forEach(function(sz){ box(4,34,15,0x86c9ff,sx>0?96:-96,50,sz,kg); }); }); /* tall side lancets */
+      box(13,28,4,0x86c9ff,-32,54,67,kg); box(13,28,4,0x86c9ff,32,54,67,kg);
+      [-56,56].forEach(function(bz){box(12,54,16,STONE_D,-101,27,bz,kg);box(12,54,16,STONE_D,101,27,bz,kg);}); /* buttresses along the nave */
+      [-56,56].forEach(function(bz){box(12,30,16,STONE_D,-112,15,bz,kg);box(12,30,16,STONE_D,112,15,bz,kg);}); /* outer flyer stubs */
     }else if(f.kind==='castle'){
       var sg=new THREE.Group(); sg.position.set(WX(f.x),gh-6,WZ(f.y)); staticGroup.add(sg);
       [[-70,40,44],[60,60,52],[0,-70,40],[-40,-50,30]].forEach(function(r){
         var rk=new THREE.Mesh(G('rk'+r[2],function(){return new THREE.DodecahedronGeometry(r[2],0);}),M(0x7d7466));
         rk.position.set(r[0],4,r[1]); rk.rotation.set(r[2],r[2]*2,0); rk.castShadow=true; rk.receiveShadow=true; sg.add(rk);
       });
-      box(150,100,150,0x8f887a,0,50,0,sg);                             /* keep walls ≈10m */
+      /* rock pedestal: a broad crag the whole castle stands on, mostly
+         buried at the crown of its rock so it emerges as cliff on the
+         downhill sides */
+      var ped=new THREE.Mesh(G('castped',function(){return new THREE.CylinderGeometry(118,148,44,14);}),M(0x7d7466));
+      ped.position.y=-16; ped.castShadow=true; ped.receiveShadow=true; sg.add(ped);
+      var ped2=new THREE.Mesh(G('castped2',function(){return new THREE.DodecahedronGeometry(96,0);}),M(0x8d8578));
+      ped2.position.set(-30,-24,20); ped2.scale.y=0.55; ped2.rotation.set(0.4,1.2,0.2); ped2.castShadow=true; ped2.receiveShadow=true; sg.add(ped2);
+      box(150,100,150,0xb0aa9e,0,50,0,sg);                             /* keep walls ≈10m, bright grey stone */
+      box(158,10,158,0x9c968a,0,102,0,sg);                             /* pale parapet slab */
+      for(var cmi=0;cmi<8;cmi++){var ca2=cmi*Math.PI/4;box(13,12,13,0xbcb6a8,Math.cos(ca2)*76,113,Math.sin(ca2)*76,sg);} /* keep merlons */
       [[-78,-78],[78,-78],[-78,78],[78,78]].forEach(function(c){
-        cyl(22,26,160,0x8f887a,c[0],80,c[1],sg,10);
-        cone(30,58,0x46586a,c[0],189,c[1],sg,10);                       /* corner spires ≈21.8m */
+        cyl(22,26,160,0xb0aa9e,c[0],80,c[1],sg,10);
+        cyl(27,27,9,0x9c968a,c[0],163,c[1],sg,10);
+        cone(30,58,0x2f5fb3,c[0],189,c[1],sg,10);                       /* corner spires in vivid blue ≈21.8m */
       });
-      cyl(31,37,205,0x978f7d,0,102,0,sg,12);
-      cone(42,78,0x46586a,0,244,0,sg,12);                              /* great central spire ≈28.3m over its rock */
+      cyl(31,37,205,0xbcb6a8,0,102,0,sg,12);
+      cone(42,78,0x2f5fb3,0,244,0,sg,12);                              /* great central spire ≈28.3m over its rock */
       sph(6,0xe8c268,0,288,0,sg);
       [[-78,-78],[78,-78],[-78,78],[78,78]].forEach(function(c){box(11,7,1.2,0x3a6bd5,c[0]+6,222,c[1],sg,false);}); /* pennants on the corner spires */
       box(13,8,1.2,0xb03a30,7,290,0,sg,false);                         /* banner over the great spire */
-      box(120,56,20,0x8f887a,0,28,86,sg);
+      box(120,56,20,0xb0aa9e,0,28,86,sg);
       box(14,36,2,0x3a6bd5,-30,30,97,sg,false);                        /* blue banners on the annex front */
       box(14,36,2,0x3a6bd5,30,30,97,sg,false);
       box(11,14,3,0xffca7a,-40,68,76,sg,false); box(11,14,3,0xffca7a,40,68,76,sg,false); box(11,14,3,0xffca7a,0,150,36,sg,false);
     }else if(f.kind==='fountain'){
       var pg=new THREE.Group(); pg.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(pg);
-      cyl(254,254,2.2,STONE_D,0,0.6,0,pg,44);        /* outer plaza pavement: the photo's great circular plaza (≈51m across) */
-      cyl(206,206,3,STONE_L,0,1,0,pg,40);            /* plaza stone pavement */
-      cyl(150,150,3.6,STONE,0,1.2,0,pg,36);          /* inner ring */
-      [178,120,86].forEach(function(rr){             /* dark paving-joint rings between the stone courses */
-        var ring=new THREE.Mesh(G('pring'+rr,function(){return new THREE.RingGeometry(rr-2.2,rr+2.2,48);}),M(0x5d564a));
+      cyl(254,254,2.2,0x9c968a,0,0.6,0,pg,44);        /* outer plaza pavement: the photo's great circular plaza (≈51m across) */
+      cyl(206,206,3,0xd6d0c0,0,1,0,pg,40);            /* bright plaza stone pavement */
+      cyl(150,150,3.6,0xcac2b0,0,1.2,0,pg,36);        /* inner ring, paler still */
+      [232,178,120,86].forEach(function(rr){         /* paving-joint rings between the stone courses */
+        var ring=new THREE.Mesh(G('pring'+rr,function(){return new THREE.RingGeometry(rr-2.2,rr+2.2,48);}),M(0x8a8172));
         ring.rotation.x=-Math.PI/2; ring.position.y=3.3; ring.receiveShadow=true; pg.add(ring);
       });
-      /* the basin's stonework — every tread of it is standable, and
-         fountainTopAt() returns exactly these heights */
-      cyl(80,84,4,STONE_D,0,2,0,pg,28);              /* step 1 (top at +4) */
-      cyl(70,74,8,STONE_D,0,4,0,pg,28);              /* step 2 (top at +8) */
-      cyl(54,60,7,STONE,0,11.5,0,pg,24);             /* basin wall (rim at +15) */
-      addWaterDisc(f.x,f.y,gh+13.5,47,false);        /* basin water (shader disc, in waterGroup) */
-      cyl(8,12,34,STONE,0,32,0,pg,12);               /* central column */
-      cyl(24,16,7,STONE,0,47,0,pg,16);               /* tier bowl */
-      cyl(5,7,12,STONE,0,56,0,pg,8);
-      sph(5.5,0xbfe6f7,0,66,0,pg);
+      for(var spi=0;spi<8;spi++){ /* radial joints: eight pale spokes dividing the plaza into stone sectors */
+        var sa3=spi*Math.PI/4;
+        var spoke=box(104,0.8,5,0xb8b2a4,Math.cos(sa3)*202,3.1,Math.sin(sa3)*202,pg,false);
+        spoke.rotation.y=-sa3;
+      }
+      /* the basin's stonework — bigger and prouder than before; every
+         tread of it is standable, and fountainTopAt() returns exactly
+         these heights */
+      cyl(98,102,4,STONE_D,0,2,0,pg,30);             /* step 1 (top at +4) */
+      cyl(84,88,8,STONE_D,0,4,0,pg,30);              /* step 2 (top at +8) */
+      cyl(66,72,7,STONE_L,0,11.5,0,pg,26);           /* basin wall (rim at +15) */
+      addWaterDisc(f.x,f.y,gh+13.5,59,false);        /* basin water (shader disc, in waterGroup) */
+      for(var fbi=0;fbi<8;fbi++){var fa=fbi*Math.PI/4;sph(4.5,0xf4fbff,Math.cos(fa)*52,15.5,Math.sin(fa)*52,pg);} /* foam ring where the jets land */
+      cyl(10,15,40,STONE_L,0,35,0,pg,12);            /* central column */
+      cyl(32,20,8,STONE_L,0,55,0,pg,18);             /* lower tier bowl */
+      cyl(6,9,14,STONE_L,0,66,0,pg,10);
+      cyl(20,13,6,STONE_L,0,76,0,pg,14);             /* upper tier bowl */
+      cyl(4,6,10,STONE_L,0,84,0,pg,8);
+      var fsp=sph(6.5,0xbfe6f7,0,92,0,pg,{emissive:0x3a7bd5}); fsp.castShadow=false; /* glowing water orb crowning the fountain */
     }else if(f.kind==='lamp'){
       var lg=new THREE.Group(); lg.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(lg);
       cyl(2.6,3.4,46,0x3a3f45,0,23,0,lg,6);
@@ -5256,10 +5479,50 @@ function buildTown3D(){
       var tg2=new THREE.Group(); tg2.position.set(WX(f.x),gh-1,WZ(f.y)); tg2.rotation.y=(f.seed-0.5)*0.6; staticGroup.add(tg2);
       box(56,18,40,WOOD,0,9,0,tg2);
       [[-25,-17],[25,-17],[-25,17],[25,17]].forEach(function(p){cyl(2.4,2.4,52,WOOD_D,p[0],26,p[1],tg2,5);});
-      var canopyCols=[0xb03a30,0x3a7a5a,0x3a6bd5,0xc9862b];
-      rbox(66,4,52,canopyCols[Math.floor(f.seed*4)%4],0,55,0,tg2,0,0,0.07);
+      var canopyCols=[0xb03a30,0x3a7a5a,0x3a6bd5,0xc9862b,0xc94f7c,0x2a9d8f];
+      var canC=canopyCols[Math.floor(f.seed*canopyCols.length)%canopyCols.length];
+      rbox(66,4,52,canC,0,55,0,tg2,0,0,0.07);
+      rbox(68,2.2,20,0xf2ead8,0,57.5,0,tg2,0,0,0.07);   /* cream stripe across the canopy */
+      rbox(68,2.2,14,canC,0,58.6,-14,tg2,0,0,0.07);
       sph(5,0xe5484d,-14,22,6,tg2); sph(5,0xffd34d,0,22,-6,tg2); sph(5,0x8fd0a8,14,22,4,tg2);
       box(12,9,12,0xc9a86a,-18,23,-8,tg2);
+      box(11,11,11,0xb08d54,16,23,10,tg2); box(13,7,13,0x8a6a44,-2,22,-13,tg2); /* more goods: crates and wares */
+      var slan=sph(3.6,0xffd98a,24,44,16,tg2,{emissive:0xcf9a3a}); slan.castShadow=false; /* hanging lantern */
+    }else if(f.kind==='street'){
+      /* paving strips: the street is laid in short chunks, each seated
+         on its own terrain height so the lane follows the town's slope
+         instead of floating over it — stone lanes in pale ashlar with a
+         darker centre joint, dirt lanes in packed earth */
+      var sdx=f.x2-f.x1, sdy=f.y2-f.y1, slen=Math.hypot(sdx,sdy), sn=Math.max(1,Math.round(slen/52));
+      var syaw=Math.atan2(-sdx,-sdy);
+      for(var sti=0;sti<sn;sti++){
+        var st=(sti+0.5)/sn, sx3=f.x1+sdx*st, sy3=f.y1+sdy*st;
+        var scol=f.t==='s'?((sti%2)?0xb8b2a4:0xc4beb0):((sti%2)?0x9a7f56:0xa8895f);
+        rbox(f.w,2.4,slen/sn+3,scol,WX(sx3),terrainH(sx3,sy3)+1.1+sti*0.06,WZ(sy3),staticGroup,syaw);
+        if(f.t==='s')rbox(2.2,2.7,slen/sn+3,0x8a8172,WX(sx3),terrainH(sx3,sy3)+1.25+sti*0.06,WZ(sy3),staticGroup,syaw); /* centre joint line */
+      }
+    }else if(f.kind==='well'){
+      var wg2=new THREE.Group(); wg2.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(wg2);
+      cyl(15,17,13,0xb8b2a4,0,6.5,0,wg2,12);              /* stone ring */
+      cyl(12.5,12.5,3,0x1a5f8a,0,12,0,wg2,12);            /* water glinting inside */
+      cyl(2.4,2.8,30,WOOD_D,-11,15,0,wg2,6); cyl(2.4,2.8,30,WOOD_D,11,15,0,wg2,6);
+      var wroof=prism(30,11,26,0x8a4a28); wroof.position.y=29; wg2.add(wroof); /* little gabled roof */
+      box(24,2.6,2.6,WOOD_D,0,29,0,wg2);
+      cyl(1,1,11,0x3a3128,0,21,0,wg2,5);                  /* rope */
+      box(7,6,7,0x74522f,0,16,0,wg2);                     /* bucket */
+    }else if(f.kind==='cart'){
+      var cg2=new THREE.Group(); cg2.position.set(WX(f.x),gh,WZ(f.y)); cg2.rotation.y=f.rot||0; staticGroup.add(cg2);
+      box(52,6,30,WOOD,0,15,0,cg2);                       /* bed */
+      box(52,10,3,WOOD_D,0,21,14,cg2); box(52,10,3,WOOD_D,0,21,-14,cg2);
+      [-17,17].forEach(function(wz2){
+        var wh=new THREE.Mesh(G('cartwh',function(){return new THREE.CylinderGeometry(13,13,3.4,14);}),M(WOOD_D));
+        wh.rotation.x=Math.PI/2; wh.position.set(0,13,wz2); wh.castShadow=true; cg2.add(wh);
+        var hub=sph(3,0x3a3128,0,13,wz2+(wz2>0?2.4:-2.4),cg2); hub.castShadow=false;
+      });
+      rbox(30,3,3,WOOD_D,-38,10,7,cg2,0.5); rbox(30,3,3,WOOD_D,-38,10,-7,cg2,0.5); /* shafts, resting forward */
+      box(20,9,20,0xc9a86a,-6,23,0,cg2);                  /* hay / goods load */
+      sph(6,0xe5484d,10,24,4,cg2); sph(6,0xffd34d,16,24,-5,cg2);
+      cyl(5,5.6,11,0x8a6a44,20,23,-8,cg2,8);              /* a barrel riding along */
     }else if(f.kind==='bridge'){
       /* the photo's stone arch bridge: a cambered deck (crowned in the
          middle) on a real arch opening, stone parapets following the
@@ -5475,7 +5738,7 @@ function buildWorld3D(){
       var bark=[0x6b4a2c,0x5d3f27,0x74522f][Math.floor(sr(2)*3)];
       var greens=d.kind==='snowtree'?[0x9fc4d8,0xbcd8ea,0x8fb8cc,0xd4e6f2,0xa8ccdf,0x9fc4d8,0xcfe2ee,0x8fb8cc]:[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43,0x548c46,0x24482a,0x3f7048];
       var gpick=function(n){return greens[Math.floor(sr(n)*greens.length)];};
-      if(sr(1)<0.42){
+      if(d.conifer||sr(1)<0.42){
         // pine: very tall straight trunk + five dense, drooping tiers and a spire tip
         var pth=S*3.1*hv;
         cyl(S*0.10,S*0.21,pth,bark,0,pth/2,0,tg,7);
