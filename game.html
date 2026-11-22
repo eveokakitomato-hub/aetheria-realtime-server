@@ -1624,7 +1624,7 @@ var TOWN_CX=1300, TOWN_CY=1740, TOWN_RX=790, TOWN_RY=695;
 var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
 var PLAZA={x:1300,y:1700};          /* the fountain plaza: at the town's centre, a touch north — the fountain is its centre */
 var POND_C={x:1280,y:1328,r:118};   /* central pond: round, its south shore touching the plaza's north edge */
-var POND_E={x:1775,y:1620,r:158};   /* the east pond: stretched E-W (terrain carve squashes x by 0.72), shifted SE, houses along its south shore — enlarged and given the brightest water in town so it reads from the air */
+var POND_E={x:1775,y:1620,r:170};   /* the east pond: stretched E-W (terrain carve squashes x by 0.72), shifted SE, houses along its south shore — enlarged again and ringed by a cleared shore (see the tree filter in genWorld) so it opens up and reads as one big sheet of bright water from the air */
 var POOL={x:1168,y:1290,r:72};      /* plunge pool under the falls */
 var RIVER=[[1168,1290],[1218,1312],[1280,1328],[1362,1370],[1470,1452],[1548,1532],[1632,1592],[1775,1620],[1902,1662],[1988,1762],[2038,1902],[2075,2085]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall) */
 var BRIDGES=[{x:1218,y:1312,rot:1.16},{x:1590,y:1562,rot:0.95},{x:1988,y:1762,rot:0.34}]; /* arched bridge over the inlet between the plunge pool and the central pond / bridge over the river east of the grand ramp's causeway / bridge over the east pond's outlet */
@@ -1889,7 +1889,7 @@ function buildTownData(){
      continuous ribbon (buildRiver3D). The east pond is two overlapping
      discs stretched E-W, matching its elongated terrain carve. */
   lake(POND_C.x,POND_C.y,POND_C.r);
-  lake(1678,1620,158,0,{vivid:true}); lake(1872,1620,158,0,{vivid:true}); /* the east pond, enlarged: two big overlapping discs matching its wider carve, flagged vivid so its surface renders in the brightest blue */
+  lake(1678,1620,170,0,{vivid:true}); lake(1872,1620,170,0,{vivid:true}); /* the east pond, enlarged: two big overlapping discs matching its wider carve, flagged vivid so its surface renders in the brightest blue */
   lake(POOL.x,POOL.y,POOL.r);
   lake(1150,1105,40,107); /* the falls' top pool, sitting in the crag top */
   for(var i=0;i<RIVER.length-1;i++){
@@ -1929,6 +1929,32 @@ function buildTownData(){
   [[1010,1015,54],[1130,975,62],[1265,995,52],[1395,1025,46],[1045,1085,42],[1340,1095,40],[1150,930,58],
    [2050,975,56],[2195,1005,50],[2315,1115,46],[2140,895,52],[1975,1115,42],[2260,1275,40],[1880,1010,44]
   ].forEach(function(rk3){townRock(rk3[0],rk3[1],rk3[2]);});
+  /* gorge crags: tall rocks standing on the two gorge shoulders (see
+     townTerrain), framing the falls channel on both sides from the
+     crag top down to the plunge pool — kept clear of the west houses,
+     the water itself and the central pond's shore */
+  [[1015,1100,52],[955,1360,42],
+   [1320,1095,52],[1345,1180,48],[1352,1228,34]
+  ].forEach(function(rk4){townRock(rk4[0],rk4[1],rk4[2]);});
+  /* --- the west lake's (月影湖) shore, dressed so the water sits in the
+     landscape instead of reading as a bright ellipse pasted on the
+     grass: a loose ring of conifers set back from the water and
+     boulders right on the shoreline, breaking the disc's outline.
+     Points that would land inside the town wall are skipped. --- */
+  (function(){
+    for(var wi2=0;wi2<16;wi2++){
+      var wa2=wi2/16*Math.PI*2+rnd()*0.25, wr2=266+rnd()*64;
+      var wx2=Math.round(420+Math.cos(wa2)*wr2), wy2=Math.round(2150+Math.sin(wa2)*wr2*0.86);
+      if(townNorm(wx2,wy2)<1.14)continue;
+      townTree(wx2,wy2,23+rnd()*10,true);
+    }
+    for(var wj2=0;wj2<9;wj2++){
+      var wa3=wj2/9*Math.PI*2+0.3+rnd()*0.3, wr3=238+rnd()*26;
+      var wx3=Math.round(420+Math.cos(wa3)*wr3), wy3=Math.round(2150+Math.sin(wa3)*wr3*0.86);
+      if(townNorm(wx3,wy3)<1.14)continue;
+      townRock(wx3,wy3,15+rnd()*16);
+    }
+  })();
   /* --- dense conifer forest outside the wall (west / east / north), as
      in the photo: jittered rows of pines filling the bands beyond the
      wall, kept clear of the gates' dirt roads, the SW outpost, the wild
@@ -1952,7 +1978,7 @@ function buildTownData(){
     }
   }
   coniferBand(52,150,440,980,2520);   /* west forest */
-  coniferBand(46,2180,2680,900,2450); /* east forest */
+  coniferBand(18,2260,2720,900,2450); /* east forest — thinned right down and pushed further out: the photo's east is houses, the pond and open grassland, not a wall of pines */
   coniferBand(54,240,2380,330,980);   /* north forest, over the mountain skirts */
   /* --- rocks & cliffs along the river banks and around the NE
      terraces: boulders set back from the channel (never in the water,
@@ -2015,6 +2041,22 @@ function genWorld(){
     var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+trnd()*14:10+trnd()*8,seed:trnd()*10};
     decorations.push(d);
     if(kind!=='flower'){var ob={type:'circle',x:x,y:y,r:d.s*0.45,ref:d};if(kind==='rock'){ob.topKind='rock';ob.topH=d.s*1.2;}obstacles.push(ob);}
+  }
+  /* east pond opening + east-town clearing: strip out any tree that
+     crowds the east pond's shore (a wide ellipse around it, so the
+     water opens up and reads at a glance from the air) and any tree
+     standing in the town's east half inside the wall — the photo's
+     east side is houses and the pond, not a conifer thicket. Their
+     trunk obstacles go with them. */
+  for(var fi2=decorations.length-1;fi2>=0;fi2--){
+    var fd=decorations[fi2];
+    if(fd.kind!=='tree'&&fd.kind!=='snowtree')continue;
+    var hide=false;
+    if(Math.hypot((fd.x-POND_E.x)*0.72,fd.y-POND_E.y)<POND_E.r+175)hide=true;
+    if(townNorm(fd.x,fd.y)<1.02&&fd.x>1520)hide=true;
+    if(!hide)continue;
+    decorations.splice(fi2,1);
+    for(var oi2=obstacles.length-1;oi2>=0;oi2--){if(obstacles[oi2].ref===fd)obstacles.splice(oi2,1);}
   }
   // lakes: 月影湖 (SW, original) / 翠玉湖 (deep south-west) / desert oasis
   decorations.push({x:420,y:2150,kind:'lake',s:230});
@@ -3729,6 +3771,14 @@ function townTerrain(x,y,h){
   h=_lerpTo(h,122,_band(Math.hypot(x-1130,y-1110),120,190));  /* falls crag (kept west, so the north wall stays clear of it) */
   h=_lerpTo(h,80,_band(Math.hypot((x-1157)*0.36,y-1176),30,56)); /* falls upper shelf (tier 1 lands here), stretched E-W under the widened sheet */
   h=_lerpTo(h,50,_band(Math.hypot((x-1162)*0.36,y-1240),30,56)); /* falls lower shelf (tier 2 lands here) */
+  /* the gorge: two rocky shoulders hugging the falls channel, west and
+     east, so the water drops through a real canyon instead of a grassy
+     dip. Laid down BEFORE the water carve (which cuts the channel back
+     through them) and before the building pads (which keep the west
+     houses level), and the high-terrace lerp east of the chapel still
+     wins further east. */
+  h=_lerpTo(h,108,_band(_rectD(x,y,965,1075,1055,1355),0,75));  /* gorge west wall */
+  h=_lerpTo(h,108,_band(_rectD(x,y,1285,1075,1375,1305),0,75)); /* gorge east wall */
   h=_lerpTo(h,80,_band(_rectD(x,y,1450,1420,2030,1620),0,110));  /* mid terrace (NE): broad shoulder the long ramp climbs past */
   h=_lerpTo(h,168,_band(_rectD(x,y,1380,1000,2070,1320),0,120)); /* high terrace: chapel (west) & castle (east) */
   h=_lerpTo(h,215,_band(Math.hypot(x-1905,y-1225),110,190));  /* castle rock, at the NE corner against the wall (kept clear of the chapel terrace) */
@@ -4907,15 +4957,15 @@ function rbox(w,h,d,color,x,y,z,parent,rotY,rotX,rotZ){
    radius the gradient and foam use. The waterfall sheets use a scrolling
    streak texture, and a small Points cloud adds spray at the plunge
    bases. Swimming / depth logic is untouched — this is looks only. */
-var waterGroup=null, waterTimeU={value:0}, WATER_MAT=null, WATER_MAT_PLUNGE=null, WATER_MAT_VIVID=null, WATER_GEO_UNIT=null;
+var waterGroup=null, waterTimeU={value:0}, WATER_MAT=null, WATER_MAT_PLUNGE=null, WATER_MAT_VIVID=null, WATER_MAT_DARK=null, WATER_GEO_UNIT=null;
 var fallsMat=null, fallsSpray=null, sprayParts=null;
 function waterMats(){
   if(WATER_MAT)return;
-  function make(plunge){
+  function make(plunge,deep,shallow){
     return new THREE.ShaderMaterial({
       transparent:true, depthWrite:false,
       uniforms:{ uTime:waterTimeU, uPlunge:{value:plunge?1:0},
-        uDeep:{value:new THREE.Color(0x1c8cd4)}, uShallow:{value:new THREE.Color(0x9feaf8)},
+        uDeep:{value:new THREE.Color(deep)}, uShallow:{value:new THREE.Color(shallow)},
         uSky:{value:new THREE.Color(0xcfe8ff)}, uSunDir:{value:new THREE.Vector3(0.5,0.82,0.29).normalize()} },
       vertexShader:'varying vec3 vW; varying vec2 vP;\nvoid main(){vP=position.xy; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}',
       fragmentShader:[
@@ -4936,36 +4986,40 @@ function waterMats(){
         ' vec3 V=normalize(cameraPosition-vW);',
         ' float fres=pow(1.0-max(dot(N,V),0.0),3.0);',
         ' vec3 col=mix(uDeep,uShallow,smoothstep(0.45,1.0,r));',
-        ' col=mix(col,uSky,0.22+0.52*fres);',
+        ' col=mix(col,uSky,0.10+0.34*fres);',
         ' vec3 R=reflect(-V,N);',
         ' float sd=max(dot(R,uSunDir),0.0);',
         ' col+=vec3(1.0,0.98,0.92)*(pow(sd,140.0)*1.5+pow(sd,36.0)*0.35*(0.6+0.4*n3));',
         ' col+=vec3(1.0)*smoothstep(0.93,1.0,n3)*0.12;',
         ' float foamN=noise(p*6.0+vec2(t*0.25,0.0));',
-        ' float foam=smoothstep(0.90,0.995,r+(foamN-0.5)*0.05)*(0.55+0.45*sin(t*1.7+r*40.0+foamN*6.0));',
-        ' float pfoam=uPlunge*smoothstep(0.55,0.0,r)*(0.5+0.5*noise(p*5.0-vec2(0.0,t*0.9)))*(0.7+0.3*sin(t*3.0+r*30.0));',
+        ' float foam=smoothstep(0.86,0.99,r+(foamN-0.5)*0.05)*(0.7+0.3*sin(t*1.7+r*40.0+foamN*6.0));',
+        ' float pfoam=uPlunge*smoothstep(0.78,0.0,r)*(0.55+0.45*noise(p*5.0-vec2(0.0,t*0.9)))*(0.75+0.25*sin(t*3.0+r*30.0));',
         ' foam=max(foam,clamp(pfoam,0.0,1.0));',
-        ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.85);',
-        ' float alpha=mix(0.86,0.97,fres);',
+        ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.94);',
+        ' float alpha=mix(0.92,0.98,fres);',
         ' alpha=mix(alpha,0.98,clamp(foam,0.0,1.0));',
-        ' float fogF=smoothstep(1100.0,3100.0,distance(cameraPosition,vW));',
-        ' col=mix(col,vec3(0.85,0.93,0.97),fogF);',
+        ' float fogF=smoothstep(1500.0,3400.0,distance(cameraPosition,vW));',
+        ' col=mix(col,vec3(0.85,0.93,0.97),fogF*0.6);',
         ' gl_FragColor=vec4(col,alpha);',
         '}'
       ].join('\n')
     });
   }
-  WATER_MAT=make(false); WATER_MAT_PLUNGE=make(true);
-  /* the east pond's vivid variant: the same shader with a brighter,
-     more saturated blue, so the pond stands out from the air */
-  WATER_MAT_VIVID=make(false);
-  WATER_MAT_VIVID.uniforms.uDeep.value.setHex(0x0f9fe8);
-  WATER_MAT_VIVID.uniforms.uShallow.value.setHex(0xaef2ff);
+  /* the town water runs a vivid, saturated cyan — the river and ponds
+     are the town's main artery and must read instantly from the air,
+     so the sky wash in the shader is kept low and the colour strong */
+  WATER_MAT=make(false,0x0096d8,0x86efff); WATER_MAT_PLUNGE=make(true,0x0096d8,0x86efff);
+  /* the east pond's vivid variant: brighter still, the most saturated
+     blue in town, so the pond stands out from the air */
+  WATER_MAT_VIVID=make(false,0x00a8f0,0x9df6ff);
+  /* the west lake's dark variant: a muted, deep green-blue that sits
+     quietly in its new forest shore instead of glowing like a sticker */
+  WATER_MAT_DARK=make(false,0x275f73,0x6f9aa8);
 }
-function waterSurfaceMesh(r,plunge,vivid){
+function waterSurfaceMesh(r,plunge,vivid,dark){
   waterMats();
   if(!WATER_GEO_UNIT)WATER_GEO_UNIT=new THREE.CircleGeometry(1,44);
-  var m=new THREE.Mesh(WATER_GEO_UNIT,vivid?WATER_MAT_VIVID:(plunge?WATER_MAT_PLUNGE:WATER_MAT));
+  var m=new THREE.Mesh(WATER_GEO_UNIT,dark?WATER_MAT_DARK:(vivid?WATER_MAT_VIVID:(plunge?WATER_MAT_PLUNGE:WATER_MAT)));
   m.rotation.x=-Math.PI/2; m.scale.set(r,r,1); m.renderOrder=2;
   return m;
 }
@@ -4975,9 +5029,9 @@ function ensureWaterGroup(){
   return waterGroup;
 }
 function clearWaterGroup(){ if(waterGroup)while(waterGroup.children.length)waterGroup.remove(waterGroup.children[0]); }
-function addWaterDisc(x,y2d,z,r,plunge,vivid){
+function addWaterDisc(x,y2d,z,r,plunge,vivid,dark){
   var g=ensureWaterGroup(); if(!g)return null;
-  var m=waterSurfaceMesh(r,plunge,vivid);
+  var m=waterSurfaceMesh(r,plunge,vivid,dark);
   m.position.set(WX(x),z,WZ(y2d));
   g.add(m); return m;
 }
@@ -4988,16 +5042,16 @@ function fallsSheetMaterial(){
   if(fallsMat)return fallsMat;
   var cv=document.createElement('canvas'); cv.width=128; cv.height=256;
   var c2=cv.getContext('2d');
-  c2.fillStyle='rgba(216,242,255,0.62)'; c2.fillRect(0,0,128,256);
+  c2.fillStyle='rgba(228,248,255,0.82)'; c2.fillRect(0,0,128,256);
   var sd=999; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
-  for(var i=0;i<70;i++){
-    var x=srnd()*128, w=1+srnd()*3, l=40+srnd()*160, y=srnd()*256, a=0.12+srnd()*0.4;
+  for(var i=0;i<115;i++){
+    var x=srnd()*128, w=1+srnd()*3, l=40+srnd()*160, y=srnd()*256, a=0.2+srnd()*0.45;
     c2.fillStyle='rgba(255,255,255,'+a.toFixed(2)+')'; c2.fillRect(x,y,w,l);
     c2.fillStyle='rgba(140,190,220,'+(a*0.7).toFixed(2)+')'; c2.fillRect(x+w+1,y,w*0.7,l*0.8);
   }
   var tex=new THREE.CanvasTexture(cv);
   tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(2,2);
-  fallsMat=new THREE.MeshLambertMaterial({color:0xdcf3ff,transparent:true,opacity:0.9,map:tex});
+  fallsMat=new THREE.MeshLambertMaterial({color:0xf4fcff,transparent:true,opacity:0.97,map:tex});
   return fallsMat;
 }
 /* spray: ~460 soft points bursting out of the three plunge bases,
@@ -5006,7 +5060,7 @@ function buildFallsSpray(){
   if(!scene)return;
   if(fallsSpray){scene.remove(fallsSpray);fallsSpray=null;sprayParts=null;}
   var bases=[[1157,1180,84],[1162,1244,54],[1168,1300,6]];
-  var N=460, pos=new Float32Array(N*3); sprayParts=[];
+  var N=640, pos=new Float32Array(N*3); sprayParts=[];
   var sd=4242; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
   for(var i=0;i<N;i++){
     var b=bases[i%3];
@@ -5018,7 +5072,7 @@ function buildFallsSpray(){
   var c2=cv.getContext('2d'); var gr=c2.createRadialGradient(16,16,2,16,16,15);
   gr.addColorStop(0,'rgba(255,255,255,0.9)'); gr.addColorStop(1,'rgba(255,255,255,0)');
   c2.fillStyle=gr; c2.fillRect(0,0,32,32);
-  fallsSpray=new THREE.Points(geo,new THREE.PointsMaterial({size:9,map:new THREE.CanvasTexture(cv),transparent:true,opacity:0.8,color:0xf4fbff,depthWrite:false,sizeAttenuation:true}));
+  fallsSpray=new THREE.Points(geo,new THREE.PointsMaterial({size:11,map:new THREE.CanvasTexture(cv),transparent:true,opacity:0.92,color:0xf4fbff,depthWrite:false,sizeAttenuation:true}));
   fallsSpray.renderOrder=3; fallsSpray.frustumCulled=false;
   scene.add(fallsSpray);
 }
@@ -5063,7 +5117,7 @@ function updateWaterFx(now){
     var ms=fallsMist[mi], mu=ms.userData, cyc=(ft*0.07+mu.ph)%1;
     ms.position.y=mu.bz+8+cyc*30;
     ms.position.x=WX(mu.bx)+Math.sin(ft*0.24+mu.ph*9.0)*7;
-    ms.material.opacity=0.20*Math.sin(cyc*Math.PI);
+    ms.material.opacity=0.30*Math.sin(cyc*Math.PI);
     var msc=mu.sc*(0.85+cyc*0.5); ms.scale.set(msc,msc*0.62,1);
   }
   for(var gi=0;gi<fallsRings.length;gi++){
@@ -5210,7 +5264,7 @@ function riverMats(){
   RIVER_MAT=new THREE.ShaderMaterial({
     transparent:true, depthWrite:false,
     uniforms:{ uTime:waterTimeU,
-      uDeep:{value:new THREE.Color(0x1c8cd4)}, uShallow:{value:new THREE.Color(0x9feaf8)},
+      uDeep:{value:new THREE.Color(0x0096d8)}, uShallow:{value:new THREE.Color(0x86efff)},
       uSky:{value:new THREE.Color(0xcfe8ff)}, uSunDir:{value:new THREE.Vector3(0.5,0.82,0.29).normalize()} },
     vertexShader:[
       'attribute float aPhase; attribute float aRapid;',
@@ -5236,7 +5290,7 @@ function riverMats(){
       ' vec3 V=normalize(cameraPosition-vW);',
       ' float fres=pow(1.0-max(dot(N,V),0.0),3.0);',
       ' vec3 col=mix(uShallow,uDeep,smoothstep(0.15,0.95,1.0-abs(across)));',
-      ' col=mix(col,uSky,0.22+0.52*fres);',
+      ' col=mix(col,uSky,0.10+0.34*fres);',
       ' vec3 R=reflect(-V,N);',
       ' float sd=max(dot(R,uSunDir),0.0);',
       ' col+=vec3(1.0,0.98,0.92)*(pow(sd,150.0)*1.6+pow(sd,36.0)*0.32*(0.6+0.4*n3));',
@@ -5245,11 +5299,11 @@ function riverMats(){
       ' float foam=smoothstep(0.90,0.995,abs(across)+(foamN-0.5)*0.07)*(0.5+0.5*sin(t*1.6+vPh*160.0+foamN*7.0));',
       ' float streak=noise(vec2(vUv.x*11.0,vPh*110.0-t*3.4));',
       ' float streak2=noise(vec2(vUv.x*23.0+7.0,vPh*190.0-t*4.6));',
-      ' foam=max(foam,vRp*smoothstep(0.40,0.70,streak*0.65+streak2*0.35)*(0.7+0.3*sin(t*5.0+vPh*300.0)));',
-      ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.88);',
-      ' float fogF=smoothstep(1100.0,3100.0,distance(cameraPosition,vW));',
-      ' col=mix(col,vec3(0.85,0.93,0.97),fogF);',
-      ' gl_FragColor=vec4(col,0.94);',
+      ' foam=max(foam,vRp*smoothstep(0.34,0.62,streak*0.65+streak2*0.35)*(0.75+0.25*sin(t*5.0+vPh*300.0)));',
+      ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.94);',
+      ' float fogF=smoothstep(1500.0,3400.0,distance(cameraPosition,vW));',
+      ' col=mix(col,vec3(0.85,0.93,0.97),fogF*0.6);',
+      ' gl_FragColor=vec4(col,0.96);',
       '}'
     ].join('\n')
   });
@@ -5280,7 +5334,7 @@ function buildRiver3D(){
     if(Math.hypot(gx-1902,gy-1662)<110)rapid=Math.max(rapid,0.55); /* the east pond's outflow */
     if(Math.hypot(gx-2038,gy-1902)<120)rapid=Math.max(rapid,0.5); /* the drop toward the water gate */
     if(inPond(gx,gy))rapid*=0.25;
-    var nx=-tan.z, nz=tan.x, hw=108;
+    var nx=-tan.z, nz=tan.x, hw=116;
     pos.push(p.x+nx*hw,2.8,p.z+nz*hw, p.x-nx*hw,2.8,p.z-nz*hw);
     uv.push(0,t*40, 1,t*40);
     ph.push(phase,phase); rp.push(rapid,rapid);
@@ -5358,12 +5412,13 @@ function buildTown3D(){
   sheet(1151,1142,105,1157,1174,82,214);  /* tier 1: top pool → upper shelf */
   sheet(1158,1188,79,1162,1238,52,204);   /* tier 2: upper shelf → lower shelf */
   sheet(1163,1250,49,1168,1298,3,194);    /* tier 3: lower shelf → plunge pool */
-  foam(1157,1178,81,50); foam(1162,1242,51,56); foam(1168,1302,4,62); foam(1150,1105,108,16);
-  foam(1120,1186,80,27); foam(1196,1186,80,27); foam(1126,1250,50,29); foam(1200,1250,50,29); /* side bursts where the widened sheets strike the shelves */
+  foam(1157,1178,81,60); foam(1162,1242,51,66); foam(1168,1302,4,74); foam(1150,1105,108,19);
+  foam(1120,1186,80,32); foam(1196,1186,80,32); foam(1126,1250,50,34); foam(1200,1250,50,34); /* side bursts where the widened sheets strike the shelves */
   buildFallsSpray(); /* animated spray mist at the three plunge bases */
   buildFallsMist();  /* drifting mist clouds + expanding ripple rings in the plunge pool */
   buildSmoke();      /* chimney smoke over every house (positions follow the house features, so it rebuilds with the town) */
   /* ---- features ---- */
+  var houseRoofSeq=0; /* round-robin roof colours: neighbouring houses never share a colour, and the palette's browns / greys / muted oranges land in near-equal shares across the town */
   townFeatures.forEach(function(f){
     var gh=terrainH(f.x,f.y);
     if(f.kind==='wall'){
@@ -5408,8 +5463,8 @@ function buildTown3D(){
       }
     }else if(f.kind==='house'){
       var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); hg.rotation.y=f.rot||0; if(f.hmul)hg.scale.y=f.hmul; staticGroup.add(hg);
-      var roofs=[0xb26a2e,0xc57c36,0xa25927,0xbb7433,0x9c5a2c,0xcd8a44,0x8a4a28,0xa8502c,0x6b7a80,0x8a3a30]; /* bright browns and oranges first (the photo's warm rooftops), one slate and one deep red for contrast — no two streets alike */
-      var rc=roofs[Math.floor(f.seed*roofs.length)%roofs.length];
+      var roofs=[0x8a5a34,0x6e625a,0xb26a2e,0x7d7a72,0x9c6b3f,0x5f6a72,0x74584a,0xa85f2c,0x65605a,0x8a4a28,0x93765a,0x4f5a60]; /* browns, stone greys and muted oranges in near-equal thirds — the photo's mixed rooftops, not one strong orange repeated down every row */
+      var rc=roofs[houseRoofSeq++%roofs.length];
       var roofH=f.roofH||Math.round(f.w*0.42);                         /* per-house pitch from buildTownData (matches the roof collision) */
       var plasterTints=[0xe6dcc4,0xdfd2b8,0xeee3cc,0xe8dcc6,0xdccfb4];
       var pTint=plasterTints[Math.floor(f.seed*plasterTints.length)%plasterTints.length]; /* every house its own plaster tone */
@@ -5849,7 +5904,7 @@ function buildWorld3D(){
   // decoration exists (a gamemaster can delete these water bodies in the
   // editor, and then both the swimming and the surface go away)
   function lakeAlive(x,y){for(var li=0;li<decorations.length;li++){var ld2=decorations[li];if(ld2.kind==='lake'&&Math.abs(ld2.x-x)<3&&Math.abs(ld2.y-y)<3)return true;}return false;}
-  if(lakeAlive(420,2150))addWaterDisc(420,2150,-0.8,232,false);
+  if(lakeAlive(420,2150)){addWaterDisc(420,2150,-0.8,232,false,false,true); addWaterDisc(330,2060,-0.72,120,false,false,true); addWaterDisc(505,2235,-0.72,118,false,false,true);} /* 月影湖 in the muted dark material, with two offset lobes so its outline is an irregular shore, not a perfect ellipse (its forest-and-boulder ring is planted in buildTownData) */
   if(lakeAlive(700,4300))addWaterDisc(700,4300,-0.8,262,false);
   if(lakeAlive(4200,2400))addWaterDisc(4200,2400,-0.8,132,false);
   if(lakeAlive(7800,7800))addWaterDisc(7800,7800,-0.8,262,false);
