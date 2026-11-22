@@ -59,8 +59,8 @@ canvas{display:block}
 .icon-btn{width:38px;height:38px;border:1px solid var(--line2);background:rgba(10,14,12,.85);color:var(--paper);border-radius:6px;display:grid;place-items:center;font-size:16px}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold)}
 
-/* ===== PLAYER HUD (top-left) ===== */
-#hud{position:absolute;left:12px;top:66px;width:340px;max-width:calc(100vw - 24px);z-index:20}
+/* ===== PLAYER HUD (bottom, above chat) — basic status only ===== */
+#hud{position:absolute;left:12px;bottom:188px;width:340px;max-width:calc(100vw - 24px);z-index:20}
 .char-card{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;backdrop-filter:blur(8px)}
 .char-top{display:flex;gap:10px;align-items:center}
 .avatar{width:46px;height:46px;border-radius:6px;border:2px solid var(--gold2);display:grid;place-items:center;font-size:24px;flex-shrink:0;background:#223128}
@@ -76,8 +76,7 @@ canvas{display:block}
 .bar.hp i{background:linear-gradient(180deg,#f0666a,#c1272d)}
 .bar.mp i{background:linear-gradient(180deg,#62b6f5,#256fb3)}
 .bar.xp{height:9px}.bar.xp i{background:var(--gold)}
-.gold-row{display:flex;gap:12px;margin-top:8px;font-size:12px;color:var(--muted)}
-.gold-row b{color:var(--gold)}
+
 
 /* ===== QUEST ===== */
 #quest{position:relative;width:262px;max-width:100%;z-index:19;background:rgba(10,15,13,.88);border:1px solid var(--line2);border-left:3px solid var(--gold);border-radius:6px;padding:11px 13px;backdrop-filter:blur(8px)}
@@ -91,7 +90,7 @@ canvas{display:block}
 #questReward{font-size:11px;color:#8fd0a8;margin-top:5px}
 
 /* ===== MINIMAP + PLAYERS ===== */
-#rightPanel{position:absolute;right:12px;top:66px;width:262px;max-width:calc(100vw - 24px);z-index:19;display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-height:calc(100% - 78px);overflow-y:auto;overflow-x:hidden;padding-bottom:2px}
+#rightPanel{position:absolute;right:12px;top:66px;width:262px;max-width:calc(100vw - 24px);z-index:19;display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-height:max(180px,calc(100% - 500px));overflow-y:auto;overflow-x:hidden;padding-bottom:2px}
 #rightPanel::-webkit-scrollbar{width:0;height:0}
 #minimapWrap{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:6px}
 #minimap{width:182px;height:182px;border-radius:4px;background:#16241a}
@@ -115,8 +114,8 @@ canvas{display:block}
 #chatInput{flex:1;background:transparent;border:0;color:#fff;padding:9px 10px;font-size:13px;outline:none;min-width:0}
 #chatForm button{background:var(--gold);border:0;font-weight:900;padding:0 16px;color:#1c1503}
 
-/* ===== ACTION BAR ===== */
-#actionbar{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;z-index:22;display:flex;gap:8px;align-items:flex-end}
+/* ===== ACTION BAR (right side, vertical stack, mid-to-lower — below minimap/quest) ===== */
+#actionbar{position:absolute;right:12px;bottom:12px;left:auto;transform:none;z-index:22;display:flex;flex-direction:column;gap:8px;align-items:center}
 .skill{width:58px;text-align:center}
 .skill button{width:58px;height:58px;border-radius:8px;border:1px solid var(--line2);background:rgba(12,18,15,.92);color:#fff;font-size:24px;position:relative;overflow:hidden;display:grid;place-items:center}
 .skill button:hover{border-color:var(--gold)}
@@ -128,7 +127,7 @@ canvas{display:block}
 #attackBtn{width:72px;height:72px;border-radius:50%!important;background:radial-gradient(circle at 35% 30%,#f3d27a,var(--gold2))!important;color:#231a02!important;font-size:28px!important;border:2px solid #ffe9a8!important;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 
 /* ===== JOYSTICK (mobile) ===== */
-#joystick{position:absolute;left:18px;bottom:196px;width:118px;height:118px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);z-index:23;display:none;touch-action:none}
+#joystick{position:absolute;left:18px;bottom:336px;width:118px;height:118px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);z-index:23;display:none;touch-action:none}
 #stick{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.5);transform:translate(-50%,-50%)}
 #targetInfo{position:absolute;left:50%;transform:translateX(-50%);top:70px;z-index:18;background:rgba(10,14,12,.85);border:1px solid var(--line2);border-radius:6px;padding:7px 14px;font-size:12px;display:none;text-align:center;min-width:210px}
 #targetInfo .tbar{height:8px;background:#0a0f0d;border-radius:99px;overflow:hidden;margin-top:5px}
@@ -179,9 +178,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 #continueBtn{width:100%;background:transparent;color:var(--gold);border:1px solid var(--gold2);border-radius:7px;padding:12px;font-weight:900;font-size:14px;margin-top:10px}
 #continueBtn:hover{background:#2a2413;border-color:var(--gold)}
 .save-note{font-size:11px;color:var(--muted);line-height:1.6;margin:8px 0 0;text-align:center}
-.save-status{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;align-items:center}
-.save-status b{color:var(--gold);font-weight:700}
-.save-status button{background:var(--gold);border:0;border-radius:5px;padding:5px 10px;font-weight:900;font-size:11px;color:#1c1503;min-height:28px}
+
 #saveModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .save-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
 .save-card h2{margin:0 0 6px;font-size:18px}
@@ -211,6 +208,14 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .set-ctl{display:flex;align-items:center;gap:9px;flex-shrink:0}
 .set-ctl input[type=range]{accent-color:var(--gold);width:130px;min-height:28px}
 .set-val{font-size:12px;font-weight:900;color:var(--gold);min-width:44px;text-align:right}
+.sound-toggle{min-width:96px;border-radius:6px;padding:8px 12px;font-weight:900;font-size:13px;border:1px solid var(--line2)}
+.sound-toggle.on{background:var(--gold);border-color:var(--gold);color:#1c1503}
+.sound-toggle.off{background:#0b100e;color:var(--muted)}
+.sound-toggle:hover{border-color:var(--gold)}
+.sound-test-btn{background:#0b100e;border:1px solid var(--line2);color:var(--gold);border-radius:6px;padding:8px 14px;font-weight:900;font-size:12px;min-width:96px}
+.sound-test-btn:hover{border-color:var(--gold)}
+.set-row.is-muted{opacity:.45}
+.set-row.is-muted input[type=range]{pointer-events:none}
 .key-btn{min-width:96px;background:#0b100e;border:1px solid var(--line2);color:var(--gold);border-radius:6px;padding:8px 12px;font-weight:900;font-size:13px}
 .key-btn:hover{border-color:var(--gold)}
 .key-btn.listening{border-color:var(--gold);background:#2a2413;color:#fff;box-shadow:0 0 0 3px rgba(232,194,104,.25)}
@@ -303,11 +308,10 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 @media(max-width:900px){.news-grid{grid-template-columns:1fr}.official-nav{display:none}.start-wrap{padding:12px 12px 4px}.news-grid,.official-foot{padding-left:12px;padding-right:12px}}
 
 @media(max-width:900px){
-  #hud{top:58px;left:10px;width:min(248px,56vw)}
+  #hud{top:auto;bottom:122px;left:10px;width:min(248px,56vw)}
   #hud .char-card{padding:8px 9px}
   #hud .avatar{width:38px;height:38px;font-size:20px}
-  #hud .save-status{display:none}
-  #rightPanel{top:58px;right:10px;width:150px;max-height:calc(100% - 300px)}
+  #rightPanel{top:58px;right:10px;width:150px;max-height:262px}
   #minimapWrap{padding:4px}
   #minimap{width:140px;height:140px}
   #minimapLabel{font-size:8px}
@@ -316,11 +320,12 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   #playerList{display:none}
   #chatLog{height:64px}
   #chat{left:10px;bottom:10px;width:calc(100vw - 20px)}
-  #actionbar{bottom:118px;left:auto;right:10px;transform:none}
+  #actionbar{top:330px;bottom:auto;left:auto;right:10px;transform:none;flex-direction:column;gap:6px}
   .skill{width:50px}.skill button{width:50px;height:50px;font-size:20px}
-  .skill.atk-skill{width:64px}
-  #attackBtn{width:64px;height:64px}
-  #joystick{display:block;bottom:118px;left:10px;width:104px;height:104px}
+  .skill small{display:none}
+  .skill.atk-skill{width:56px}
+  #attackBtn{width:56px;height:56px}
+  #joystick{display:block;bottom:236px;left:10px;width:104px;height:104px}
   .srv-sep,.srv-name{display:none}
   #targetInfo{top:58px;min-width:0;max-width:44vw}
   #camHint{display:none}
@@ -453,13 +458,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="brand"><div class="brand-badge">A</div><div><b>AETHERIA</b><span>ONLINE</span></div></div>
       <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end">
         <div class="online-pill"><span class="dot" id="netDot"></span><span id="onlineCount">接続中…</span><span class="srv-sep" style="color:var(--dim)">|</span><span class="srv-name" id="srvName" style="color:var(--muted)">公開サーバー: ルミナス</span></div>
-        <div class="top-actions">
-          <button class="icon-btn" id="menuBtn" title="メニュー（Esc）">☰</button>
-          <button class="icon-btn" id="saveBtn" title="セーブ">💾</button>
-          <button class="icon-btn" id="soundBtn" title="サウンド ON/OFF">♪</button>
-          <button class="icon-btn" id="settingsBtn" title="設定（キー・感度）">⚙</button>
-          <button class="icon-btn" id="helpBtn" title="遊び方">?</button>
-        </div>
       </div>
     </div>
 
@@ -479,8 +477,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <div class="bar-row"><label>HP</label><div class="bar hp"><i id="hpBar" style="width:100%"></i><em id="hpText">100 / 100</em></div></div>
         <div class="bar-row"><label>MP</label><div class="bar mp"><i id="mpBar" style="width:100%"></i><em id="mpText">50 / 50</em></div></div>
         <div class="bar-row"><label>EXP</label><div class="bar xp"><i id="xpBar" style="width:0%"></i></div><span id="xpText" style="color:var(--muted)">0%</span></div>
-        <div class="gold-row"><span>所持金 <b id="goldText">0 G</b></span><span>ポーション <b id="potionText">× 3</b></span><span>討伐 <b id="killText">0</b></span></div>
-        <div class="save-status"><span>💾 セーブ <b id="saveStatusText">未保存</b></span><button id="quickSaveBtn" type="button">今すぐセーブ</button></div>
       </div>
     </div>
 
@@ -523,14 +519,15 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <table>
         <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
         <tr><td>視点（一人称）</td><td>自分の目線で冒険できます。画面をクリックするとカーソルがロックされ、<b>マウスカーソルを動かすだけ</b>で上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグでも見回せて、<b>カーソルキー</b> <kbd>←</kbd><kbd>→</kbd> で左右、<kbd>↑</kbd><kbd>↓</kbd> で上下の視点移動もできます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
-        <tr><td>攻撃</td><td><kbd>Space</kbd> または右下の剣ボタン。近くの敵を自動で狙います</td></tr>
+        <tr><td>攻撃</td><td><kbd>Space</kbd> または画面右側に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
         <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
-        <tr><td>メニュー</td><td><kbd>Esc</kbd> キー（または右上の ☰ ボタン）でメニューを開きます。設定・バッグ・セーブ・遊び方・ログアウトを選べます</td></tr>
-        <tr><td>設定</td><td>右上の ⚙ ボタンで、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
+        <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
+        <tr><td>設定</td><td>Escメニューの「設定」から、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
+        <tr><td>サウンド設定</td><td>Escメニューの「サウンド設定」から、効果音の ON/OFF と音量（全体・効果音）を変更できます。テスト再生で今の音量を確認できます</td></tr>
         <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
         <tr><td>オンライン</td><td>同期サーバーに接続中は、実プレイヤーが <b style="color:#7ef0d4">◆マーク</b> で表示され、動きとチャットがリアルタイムに同期します。未接続の間はソロプレイになります</td></tr>
-        <tr><td>セーブ</td><td>アカウントでログイン中は<b>自動保存</b>されます（操作不要）。右上の 💾 は手動同期と、バックアップ用のファイル書き出しです</td></tr>
+        <tr><td>セーブ</td><td>アカウントでログイン中は<b>自動保存</b>されます（操作不要）。手動同期とバックアップ用のファイル書き出しは Escメニューの「セーブ」から行えます</td></tr>
         <tr><td>クエスト</td><td>右上のクエストを進めると報酬GET。最終目標は北東の森のボス討伐！</td></tr>
         <tr><td>エリア</td><td>町は安全地帯。北=草原（弱）／東=森（中）／北東=遺跡（強・ボス）</td></tr>
       </table>
@@ -539,7 +536,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="settingsModal"><div class="settings-card">
       <h2>⚙ 設定</h2>
-      <p class="set-note">技や攻撃のキー割り当てと、視点の感度を調整できます。変更はすぐに反映されます（移動の WASD とカーソルキーの視点移動は固定です）。</p>
+      <p class="set-note">技や攻撃のキー割り当て、視点の感度、サウンドを調整できます。変更はすぐに反映され、すべての項目が自動保存されます（ログイン中はアカウントに保存され、次回ログイン時に復元されます。ゲスト時はこの端末に保存されます）。移動の WASD とカーソルキーの視点移動は固定です。</p>
       <h3>キー割り当て</h3>
       <div class="set-row"><div><div class="set-label">攻撃</div><div class="set-desc">通常攻撃のキー</div></div><button type="button" class="key-btn" data-bind="attack">Space</button></div>
       <div class="set-row"><div><div class="set-label">スキル1</div><div class="set-desc" id="bindDesc1">強撃 など（クラスで変化）</div></div><button type="button" class="key-btn" data-bind="s1">1</button></div>
@@ -549,6 +546,11 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <h3>感度</h3>
       <div class="set-row"><div><div class="set-label">マウス感度</div><div class="set-desc">マウスロック中・ドラッグで見回す速さ</div></div><div class="set-ctl"><input type="range" id="sensRange" min="30" max="250" step="5" value="100"/><span class="set-val" id="sensVal">100%</span></div></div>
       <div class="set-row"><div><div class="set-label">カーソルキー感度</div><div class="set-desc">矢印キーで視点を回す速さ</div></div><div class="set-ctl"><input type="range" id="keySensRange" min="30" max="250" step="5" value="100"/><span class="set-val" id="keySensVal">100%</span></div></div>
+      <h3 id="soundSection">サウンド</h3>
+      <div class="set-row"><div><div class="set-label">サウンド</div><div class="set-desc">ゲーム内の効果音の ON / OFF</div></div><button type="button" class="sound-toggle on" id="soundToggleBtn" aria-pressed="true">ON ♪</button></div>
+      <div class="set-row" id="masterVolRow"><div><div class="set-label">全体の音量</div><div class="set-desc">すべての効果音にかかる音量</div></div><div class="set-ctl"><input type="range" id="masterVolRange" min="0" max="100" step="5" value="100" aria-label="全体の音量"/><span class="set-val" id="masterVolVal">100%</span></div></div>
+      <div class="set-row" id="seVolRow"><div><div class="set-label">効果音の音量</div><div class="set-desc">攻撃・スキル・レベルアップなどの音の大きさ</div></div><div class="set-ctl"><input type="range" id="seVolRange" min="0" max="100" step="5" value="100" aria-label="効果音の音量"/><span class="set-val" id="seVolVal">100%</span></div></div>
+      <div class="set-row"><div><div class="set-label">テスト再生</div><div class="set-desc">今の音量で確認用の音を鳴らします</div></div><button type="button" class="sound-test-btn" id="soundTestBtn">▶ 音を鳴らす</button></div>
       <div class="settings-actions">
         <button id="resetSettingsBtn" type="button">初期設定に戻す</button>
         <button id="closeSettingsBtn" type="button">閉じる</button>
@@ -562,6 +564,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
+        <button type="button" class="menu-item" id="menuSoundBtn"><span class="mi-ico">♪</span><span class="mi-body"><b>サウンド設定</b><small>効果音の ON / OFF と音量（全体・効果音）を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>自動保存の状態確認・手動同期とファイル書き出し</small></span></button>
         <button type="button" class="menu-item" id="menuHelpBtn"><span class="mi-ico">❓</span><span class="mi-body"><b>遊び方</b><small>操作方法と冒険のヒントを見る</small></span></button>
         <button type="button" class="menu-item danger" id="menuLogoutBtn"><span class="mi-ico">🚪</span><span class="mi-body"><b>ログアウト</b><small>タイトル画面に戻る</small></span></button>
@@ -777,11 +780,11 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           <table class="howto-table">
             <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
             <tr><td>視点（一人称）</td><td>画面をクリックするとカーソルがロックされ、マウスカーソルを動かすだけで上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグ、またはカーソルキー <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> でも視点移動できます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
-            <tr><td>攻撃</td><td><kbd>Space</kbd> または右下の剣ボタン。近くの敵を自動で狙います</td></tr>
+            <tr><td>攻撃</td><td><kbd>Space</kbd> または画面右側に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
             <tr><td>スキル</td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。MPとクールダウンに注意</td></tr>
             <tr><td>ポーション</td><td><kbd>Q</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
             <tr><td>チャット</td><td>左下の入力欄から送信。オンライン中は実プレイヤー全員に届きます</td></tr>
-            <tr><td>セーブ</td><td>アカウントでログイン中は自動保存（操作不要）。ログインはホーム画面から。ゲストプレイ時は右上の 💾 ボタン（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でファイルに保存できます</td></tr>
+            <tr><td>セーブ</td><td>アカウントでログイン中は自動保存（操作不要）。ログインはホーム画面から。ゲストプレイ時は <kbd>Esc</kbd> メニューの「セーブ」（または <kbd>Ctrl</kbd>+<kbd>S</kbd>）でファイルに保存できます</td></tr>
             <tr><td>オンライン</td><td>同期サーバー接続中は実プレイヤーが ◆ マークで表示。友だちと遊ぶときは、まず町の広場で落ち合うのがおすすめです</td></tr>
           </table>
         </section>
@@ -857,7 +860,7 @@ var obstacles=[], decorations=[];
 
 /* ================= SETTINGS (key bindings & sensitivity) ================= */
 var DEFAULT_BINDS={attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'};
-var settings={binds:{attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1};
+var settings={binds:{attack:'Space',s1:'Digit1',s2:'Digit2',s3:'Digit3',potion:'KeyQ'},sens:1,keySens:1,masterVol:1,seVol:1};
 var RESERVED_KEYS={KeyW:1,KeyA:1,KeyS:1,KeyD:1,ArrowLeft:1,ArrowRight:1,ArrowUp:1,ArrowDown:1,Enter:1};
 var captureBind=null; // action name currently waiting for a key press
 function keyLabel(code){
@@ -891,6 +894,75 @@ function refreshSensUI(){
   if(sr)sr.value=sp; if(sv)sv.textContent=sp+'%';
   if(kr)kr.value=kp; if(kv)kv.textContent=kp+'%';
 }
+function refreshSoundUI(){
+  var tb=$('soundToggleBtn');
+  if(tb){tb.textContent=soundOn?'ON ♪':'OFF ✕';tb.classList.toggle('on',!!soundOn);tb.classList.toggle('off',!soundOn);tb.setAttribute('aria-pressed',soundOn?'true':'false');}
+  var mv=Math.round(settings.masterVol*100),sv2=Math.round(settings.seVol*100);
+  var mr=$('masterVolRange'),mvv=$('masterVolVal'),er=$('seVolRange'),evv=$('seVolVal');
+  if(mr)mr.value=mv; if(mvv)mvv.textContent=mv+'%';
+  if(er)er.value=sv2; if(evv)evv.textContent=sv2+'%';
+  var mrRow=$('masterVolRow'),erRow=$('seVolRow');
+  if(mrRow)mrRow.classList.toggle('is-muted',!soundOn);
+  if(erRow)erRow.classList.toggle('is-muted',!soundOn);
+  var testBtn=$('soundTestBtn'); if(testBtn)testBtn.disabled=!soundOn;
+}
+function setSoundOn(on,announce){
+  soundOn=!!on; refreshSoundUI();
+  if(announce)toast(soundOn?'サウンド ON':'サウンド OFF');
+  if(soundOn)beep(700,0.06,'triangle',0.04);
+  markSettingsChanged();
+}
+/* ================= SETTINGS AUTOSAVE =================
+   Every settings change is autosaved:
+   - logged in: settings ride inside the character save JSON
+     (buildSaveData().settings) and the existing acctTick autosave
+     picks the change up because progressKey() includes settingsKey();
+     they are restored on login via acctOnAuth()/applySaveData().
+   - guest: settings are kept on this device (localStorage) and
+     restored on the next visit. */
+var SETTINGS_STORE_KEY='aetheria-settings-v1';
+var guestSettingsTimer=null;
+function snapshotSettings(){
+  return {binds:{attack:settings.binds.attack,s1:settings.binds.s1,s2:settings.binds.s2,s3:settings.binds.s3,potion:settings.binds.potion},
+    sens:settings.sens,keySens:settings.keySens,masterVol:settings.masterVol,seVol:settings.seVol,soundOn:!!soundOn};
+}
+function settingsKey(){try{return JSON.stringify(snapshotSettings());}catch(e){return '';}}
+function applySettingsData(s){
+  if(!s||typeof s!=='object')return;
+  function clampNum(v,fb,min,max){var n=Number(v);if(!isFinite(n))n=fb;return Math.max(min,Math.min(max,n));}
+  if(s.binds&&typeof s.binds==='object'){
+    ['attack','s1','s2','s3','potion'].forEach(function(k){
+      var code=s.binds[k];
+      if(typeof code==='string'&&code&&!RESERVED_KEYS[code])settings.binds[k]=code;
+    });
+  }
+  settings.sens=clampNum(s.sens,settings.sens,0.3,2.5);
+  settings.keySens=clampNum(s.keySens,settings.keySens,0.3,2.5);
+  settings.masterVol=clampNum(s.masterVol,settings.masterVol,0,1);
+  settings.seVol=clampNum(s.seVol,settings.seVol,0,1);
+  if(typeof s.soundOn==='boolean')soundOn=s.soundOn;
+  refreshKeyLabels();refreshSensUI();refreshSoundUI();
+}
+function saveGuestSettings(){
+  if(typeof acct!=='undefined'&&acct&&acct.token)return; /* logged in: server is the store */
+  try{localStorage.setItem(SETTINGS_STORE_KEY,JSON.stringify(snapshotSettings()));}catch(e){}
+}
+function loadGuestSettings(){
+  try{
+    var raw=localStorage.getItem(SETTINGS_STORE_KEY);
+    if(raw)applySettingsData(JSON.parse(raw));
+  }catch(e){}
+}
+function markSettingsChanged(){
+  /* guest: write to this device (debounced for slider drags) */
+  if(!(typeof acct!=='undefined'&&acct&&acct.token)){
+    if(guestSettingsTimer)clearTimeout(guestSettingsTimer);
+    guestSettingsTimer=setTimeout(saveGuestSettings,250);
+  }
+  /* logged in: progressKey() now differs from acct.savedKey, so the
+     regular autosave loop (acctTick) saves character+settings to the
+     server within a few seconds. Nothing else to do here. */
+}
 function refreshBindDescs(){
   if(!player)return;
   var c=CLASSES[player.cls];
@@ -912,6 +984,7 @@ function handleBindCapture(e){
       }
       settings.binds[act]=e.code;
       beep(700,0.06,'square',0.03);
+      markSettingsChanged();
     }
   }
   refreshKeyLabels();
@@ -933,12 +1006,18 @@ function openGameMenu(){
 function closeGameMenu(){
   menuOpen=false;$('gameMenu').style.display='none';
 }
-function openFromMenu(id){
+function openFromMenu(id,anchor){
   returnToMenu=true;closeGameMenu();
-  if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshBindDescs();}
+  if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshBindDescs();}
   if(id==='saveModal')refreshSaveUI();
   if(id==='bagModal')refreshBagUI();
   $(id).style.display='grid';
+  if(id==='settingsModal'&&anchor==='sound'){
+    setTimeout(function(){
+      var sec=$('soundSection'); if(sec&&sec.scrollIntoView)sec.scrollIntoView({behavior:'smooth',block:'start'});
+      var tb=$('soundToggleBtn'); if(tb&&tb.focus)tb.focus({preventScroll:true});
+    },60);
+  }
 }
 function closeSubModal(id){
   $(id).style.display='none';
@@ -1143,10 +1222,13 @@ function isSafe(x,y){return Math.hypot(x-1300,y-1300)<330;}
 /* ================= AUDIO ================= */
 function beep(f,d,type,v){
   if(!soundOn) return;
+  var volMul=(typeof settings!=='undefined')?((settings.masterVol!=null?settings.masterVol:1)*(settings.seVol!=null?settings.seVol:1)):1;
+  var vol=(v||0.04)*volMul;
+  if(vol<=0.0005) return;
   try{
     if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     var o=audioCtx.createOscillator(),g=audioCtx.createGain();
-    o.type=type||'square';o.frequency.value=f;g.gain.value=v||0.04;
+    o.type=type||'square';o.frequency.value=f;g.gain.value=vol;
     g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+(d||0.1));
     o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+(d||0.1));
   }catch(e){}
@@ -1427,6 +1509,8 @@ function acctSetMode(mode){
 function acctOnAuth(data){
   acct.token=data.token||null; acct.username=data.username||''; acct.character=data.character||null;
   acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0;
+  /* Restore this account's settings at login (they live in the character save JSON) */
+  if(acct.character&&acct.character.settings)applySettingsData(acct.character.settings);
   refreshAcctUI(); refreshSaveUI();
 }
 function acctStartFromCharacter(){
@@ -1502,6 +1586,7 @@ function acctTick(now){
 function acctLogout(){
   var token=acct.token;
   acct.token=null; acct.username=null; acct.character=null; acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0;
+  saveGuestSettings(); /* keep the current settings on this device after logout */
   refreshAcctUI(); refreshSaveUI();
   acctSetMode('login');
   acctMsg('ログアウトしました。');
@@ -1522,12 +1607,13 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,questIdx,questCount,Math.round(player.x),Math.round(player.y)].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,questIdx,questCount,Math.round(player.x),Math.round(player.y),settingsKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
     player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,kills:player.kills},
-    quest:{idx:questIdx,count:questCount}};
+    quest:{idx:questIdx,count:questCount},
+    settings:snapshotSettings()};
 }
 function refreshSaveUI(){
   var dirty=player&&lastSavedKey&&progressKey()!==lastSavedKey;
@@ -1537,8 +1623,7 @@ function refreshSaveUI(){
   }else{
     label=!player?'未保存':(lastSaveAt?(dirty?'変更あり（未保存）':'保存済み '+lastSaveAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})):'未保存');
   }
-  var qsBtn=$('quickSaveBtn'); if(qsBtn) qsBtn.textContent=acct.token?'今すぐ同期':'今すぐセーブ';
-  var st=$('saveStatusText');if(st)st.textContent=label;
+  /* 保存状態はステータス表示に出さない（自動保存は裏で継続し、状態はセーブ画面でのみ確認できる） */
   var sum=$('saveSummary');
   if(sum){
     if(!player){sum.textContent='ゲームを開始すると、ここに現在のステータスが表示されます。';}
@@ -1575,6 +1660,7 @@ function setupSkillUI(clsKey){
 }
 function applySaveData(data){
   if(!data||data.app!=='AETHERIA ONLINE'||!data.player||!CLASSES[data.player.cls])throw new Error('invalid save');
+  if(data.settings)applySettingsData(data.settings);
   var p=data.player;
   function num(v,fallback,min,max){var n=Number(v);if(!isFinite(n))n=fallback;return Math.max(min,Math.min(max,n));}
   var np=makePlayer(String(p.name||'冒険者').slice(0,12),p.cls);
@@ -1620,7 +1706,7 @@ function updateHUD(){
   $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
   var pct=Math.floor(player.exp/expNeed(player.lv)*100);
   $('xpBar').style.width=pct+'%';$('xpText').textContent=pct+'%';
-  $('goldText').textContent=player.gold+' G';$('potionText').textContent='× '+player.potions;$('killText').textContent=player.kills;
+  /* 所持金・ポーション数・討伐数はステータス表示に出さない（バッグ画面で確認できる） */
 }
 function updateTargetUI(){
   var box=$('targetInfo');
@@ -2404,8 +2490,6 @@ $('respawnBtn').addEventListener('click',function(){
   $('deathScreen').style.display='none';updateHUD();toast('ルミナスの町で復活した');
   netSendPos(true);
 });
-$('saveBtn').addEventListener('click',function(){if(!started){toast('ゲームを開始してからセーブできます');return;}returnToMenu=false;refreshSaveUI();$('saveModal').style.display='grid';});
-$('quickSaveBtn').addEventListener('click',function(){if(acct.token){serverSave(true);}else{downloadSave();}});
 $('downloadSaveBtn').addEventListener('click',function(){downloadSave();});
 $('loadSaveBtn2').addEventListener('click',function(){openSavePicker('ingame');});
 $('closeSaveBtn').addEventListener('click',function(){closeSubModal('saveModal');});
@@ -2439,7 +2523,6 @@ $('saveFileInput').addEventListener('change',function(){
   reader.onerror=function(){toast('ファイルの読み込みに失敗しました');};
   reader.readAsText(f);
 });
-$('settingsBtn').addEventListener('click',function(){returnToMenu=false;captureBind=null;refreshKeyLabels();refreshSensUI();refreshBindDescs();$('settingsModal').style.display='grid';});
 $('closeSettingsBtn').addEventListener('click',function(){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');});
 document.querySelectorAll('.key-btn[data-bind]').forEach(function(btn){
   btn.addEventListener('click',function(){
@@ -2447,22 +2530,32 @@ document.querySelectorAll('.key-btn[data-bind]').forEach(function(btn){
     refreshKeyLabels();
   });
 });
-$('sensRange').addEventListener('input',function(){settings.sens=this.value/100;refreshSensUI();});
-$('keySensRange').addEventListener('input',function(){settings.keySens=this.value/100;refreshSensUI();});
+$('sensRange').addEventListener('input',function(){settings.sens=this.value/100;refreshSensUI();markSettingsChanged();});
+$('keySensRange').addEventListener('input',function(){settings.keySens=this.value/100;refreshSensUI();markSettingsChanged();});
+$('soundToggleBtn').addEventListener('click',function(){setSoundOn(!soundOn,true);});
+$('masterVolRange').addEventListener('input',function(){settings.masterVol=this.value/100;refreshSoundUI();markSettingsChanged();});
+$('masterVolRange').addEventListener('change',function(){if(soundOn)beep(660,0.08,'triangle',0.05);});
+$('seVolRange').addEventListener('input',function(){settings.seVol=this.value/100;refreshSoundUI();markSettingsChanged();});
+$('seVolRange').addEventListener('change',function(){if(soundOn)beep(660,0.08,'triangle',0.05);});
+$('soundTestBtn').addEventListener('click',function(){
+  if(!soundOn){toast('サウンドが OFF です。ON にしてから試してください');return;}
+  beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(659,0.1,'triangle',0.05);},110);setTimeout(function(){beep(784,0.16,'triangle',0.05);},220);
+});
 $('resetSettingsBtn').addEventListener('click',function(){
   settings.binds={attack:DEFAULT_BINDS.attack,s1:DEFAULT_BINDS.s1,s2:DEFAULT_BINDS.s2,s3:DEFAULT_BINDS.s3,potion:DEFAULT_BINDS.potion};
-  settings.sens=1;settings.keySens=1;captureBind=null;
-  refreshKeyLabels();refreshSensUI();
+  settings.sens=1;settings.keySens=1;settings.masterVol=1;settings.seVol=1;soundOn=true;captureBind=null;
+  refreshKeyLabels();refreshSensUI();refreshSoundUI();
+  markSettingsChanged();
   toast('設定を初期状態に戻しました');beep(600,0.06,'square',0.03);
 });
-refreshKeyLabels();
-$('helpBtn').addEventListener('click',function(){returnToMenu=false;$('helpModal').style.display='grid';});
+loadGuestSettings();
+refreshKeyLabels();refreshSoundUI();
 $('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');});
-/* game menu (Esc) wiring */
-$('menuBtn').addEventListener('click',function(){if(started){openGameMenu();}else{toast('ゲームを開始するとメニューが開けます');}});
+/* game menu (Esc) wiring — the ONLY way to open settings / sound / save / help in game */
 $('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
 $('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
 $('menuSettingsBtn').addEventListener('click',function(){openFromMenu('settingsModal');});
+$('menuSoundBtn').addEventListener('click',function(){openFromMenu('settingsModal','sound');});
 $('menuSaveBtn').addEventListener('click',function(){openFromMenu('saveModal');});
 $('menuHelpBtn').addEventListener('click',function(){openFromMenu('helpModal');});
 $('menuLogoutBtn').addEventListener('click',function(){doLogout();});
@@ -2483,7 +2576,6 @@ document.addEventListener('pointerlockchange',function(){
     openGameMenu();
   }
 });
-$('soundBtn').addEventListener('click',function(){soundOn=!soundOn;this.textContent=soundOn?'♪':'✕';toast(soundOn?'サウンド ON':'サウンド OFF');});
 /* joystick */
 (function(){
   var joy=$('joystick'),stick=$('stick'),active=false;
@@ -2537,7 +2629,7 @@ $('startBtn').addEventListener('click',function(){
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
   netConnect();
   chat('— AETHERIA ONLINE にログインしました —','sys');
-  chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、攻撃は Space、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで右上の 💾 からセーブできます。'),'world');
+  chat('<b>案内人リア</b>: ようこそ、'+escHtml(name)+'さん！まずは北の草原でスライムを5体倒してみましょう。移動は WASD、攻撃は Space、視点は画面をクリックしてからマウスカーソルを動かす（またはカーソルキー）で回せます。'+(acct.token?'進捗はサーバーへ自動保存されるので、セーブは気にしなくて大丈夫ですよ。':'区切りのいいところで Escメニューの「セーブ」からセーブできます。'),'world');
   if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
 });
