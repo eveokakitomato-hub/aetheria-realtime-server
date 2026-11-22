@@ -1741,23 +1741,26 @@ function expNeed(lv){return 80+lv*55;}
    every zone at once meant ~90 live mobs — each with AI + a 3D model — even
    in zones nobody is visiting. Instead:
    - populate() only records spawn POINTS; nothing is created up front.
-   - A throttled spawner (see loop, ~every 1.4s) materialises a point only
+   - A throttled spawner (see loop, ~every 2.6s) materialises a point only
      when it is within SPAWN_RANGE of the player (~45 tiles).
    - Mobs farther than DESPAWN_RANGE (~52 tiles) are removed (despawn);
      their point can respawn them when the player comes back.
    - Hard caps: MAX_ALIVE total across the whole world, plus small per-type
-     caps — far below the old ~104 combined cap. */
+     caps — far below the old ~104 combined cap. Bosses bypass the global
+     cap so they always appear at their posts. */
 var SPAWN_RANGE=1830;   /* ≈45 tiles: spawn only near the player */
 var DESPAWN_RANGE=2110; /* ≈52 tiles: beyond this, mobs are removed */
-var MAX_ALIVE=26;       /* global cap on simultaneously existing mobs */
-var SPAWN_CAPS={slime:6,goblin:5,wolf:4,orc:4,boss:1,frostwolf:4,icegolem:3,scorpion:5,sandworm:3,treant:4,magma:5,lavagolem:3,ifrit:1};
+var MAX_ALIVE=16;       /* global cap on simultaneously existing mobs */
+var SPAWN_CAPS={slime:4,goblin:3,wolf:3,orc:3,boss:1,frostwolf:3,icegolem:2,scorpion:3,sandworm:2,treant:3,magma:3,lavagolem:2,ifrit:1};
 var spawnPoints=[]; /* {type,x,y,e:liveEnemy|null,coolUntil:timestamp} */
 function countAlive(type){var n=0;for(var i=0;i<enemies.length;i++)if(enemies[i].type===type&&!enemies[i].dead)n++;return n;}
 function aliveTotal(){var n=0;for(var i=0;i<enemies.length;i++)if(!enemies[i].dead)n++;return n;}
 function spawnEnemy(type,x,y,sp){
-  if(aliveTotal()>=MAX_ALIVE)return null;
-  if(countAlive(type)>=(SPAWN_CAPS[type]||4))return null;
   var t=ETYPES[type];
+  /* bosses always spawn: they ignore the global cap (their per-type cap
+     of 1 still applies), so lowering MAX_ALIVE never blocks them */
+  if(!t.boss&&aliveTotal()>=MAX_ALIVE)return null;
+  if(countAlive(type)>=(SPAWN_CAPS[type]||4))return null;
   var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6,seen:false,_sp:(sp||null)};
   enemies.push(e); return e;
 }
@@ -1797,25 +1800,39 @@ function populate(){
   addSpawnPoint('ifrit',4600,4600);
   trySpawnNear(true); /* fill the area around the start position right away */
 }
-/* Throttled spawner: at most 2 new mobs per call, and only for points near
-   the player. Called from the main loop roughly every 1.4 seconds. */
+/* Minimum spacing between a freshly spawned mob and any other live mob
+   (≈4 tiles), so spawns never pile up in one spot. Bosses are exempt:
+   they appear at their fixed posts regardless. */
+var SPAWN_MIN_SEP=170;
+function tooCrowded(x,y){
+  for(var i=0;i<enemies.length;i++){
+    var o=enemies[i];
+    if(o.dead)continue;
+    if(Math.hypot(o.x-x,o.y-y)<SPAWN_MIN_SEP)return true;
+  }
+  return false;
+}
+/* Throttled spawner: at most 1 new mob per call, and only for points near
+   the player. Called from the main loop roughly every 2.6 seconds. */
 function trySpawnNear(immediate){
   if(!player)return;
   var now=performance.now(), made=0;
   for(var i=0;i<spawnPoints.length;i++){
-    if(aliveTotal()>=MAX_ALIVE)break;
-    if(made>=(immediate?8:2))break;
     var sp=spawnPoints[i];
+    /* at the global cap only boss points may still materialise */
+    if(aliveTotal()>=MAX_ALIVE&&!(ETYPES[sp.type]&&ETYPES[sp.type].boss))continue;
+    if(made>=(immediate?5:1))break;
     if(sp.e&&!sp.e.dead)continue;               /* point already has a live mob */
     if(sp.e&&sp.e.dead){sp.e=null;}              /* corpse cleanup finished it */
     if(now<sp.coolUntil)continue;                /* respawn cooldown */
     if(inNoSpawn(sp.x,sp.y))continue;            /* Luminas safe zone: never materialises */
     if(Math.hypot(sp.x-player.x,sp.y-player.y)>SPAWN_RANGE)continue;
-    /* never spawn inside a building or the safe zone: jitter until clear */
-    var e=null, tt=ETYPES[sp.type], sr=(tt?tt.size:20)*0.7;
-    for(var tries=0;tries<6&&!e;tries++){
-      var sx=sp.x+(Math.random()*160-80), sy=sp.y+(Math.random()*160-80);
-      if(!collide(sx,sy,sr)&&!inNoSpawn(sx,sy))e=spawnEnemy(sp.type,sx,sy,sp);
+    /* never spawn inside a building or the safe zone, and keep fresh
+       spawns spaced away from other live mobs: jitter until clear */
+    var e=null, tt=ETYPES[sp.type], sr=(tt?tt.size:20)*0.7, isBoss=!!(tt&&tt.boss);
+    for(var tries=0;tries<8&&!e;tries++){
+      var sx=sp.x+(Math.random()*240-120), sy=sp.y+(Math.random()*240-120);
+      if(!collide(sx,sy,sr)&&!inNoSpawn(sx,sy)&&(isBoss||!tooCrowded(sx,sy)))e=spawnEnemy(sp.type,sx,sy,sp);
     }
     if(e){sp.e=e;made++;}
   }
@@ -1833,12 +1850,12 @@ function despawnFar(){
        in, or left over from before the zone existed) is removed unless
        the player is actively fighting it */
     if(inNoSpawn(e.x,e.y)&&target!==e&&aimTarget!==e){
-      if(e._sp){e._sp.e=null;e._sp.coolUntil=now+2500;}
+      if(e._sp){e._sp.e=null;e._sp.coolUntil=now+6000;}
       enemies.splice(i,1);
       continue;
     }
     if(Math.hypot(e.x-player.x,e.y-player.y)<=DESPAWN_RANGE)continue;
-    if(e._sp){e._sp.e=null;e._sp.coolUntil=now+2500;}
+    if(e._sp){e._sp.e=null;e._sp.coolUntil=now+6000;}
     if(target===e)target=null;
     if(aimTarget===e)aimTarget=null;
     enemies.splice(i,1);
@@ -1913,7 +1930,7 @@ function killEnemy(e){
   // goes on cooldown, and a fresh mob only appears if the player is still
   // (or again) near that point when the cooldown ends — no timers per kill,
   // and a crowded or distant area simply never respawns.
-  if(e._sp){e._sp.coolUntil=performance.now()+(e.boss?30000:9000+Math.random()*5000);}
+  if(e._sp){e._sp.coolUntil=performance.now()+(e.boss?30000:16000+Math.random()*8000);}
   updateHUD();
 }
 function gainExp(n){
@@ -3918,7 +3935,7 @@ function loop(now){
     update(dt,now);
     /* mob population maintenance is deliberately infrequent (~1.4s):
        spawn near mobs in small batches and despawn far ones */
-    if(now-spawnT>1400){spawnT=now;despawnFar();trySpawnNear(false);}
+    if(now-spawnT>2600){spawnT=now;despawnFar();trySpawnNear(false);}
     if(now-exploreT>350){exploreT=now;markExplored();
       // stuck arrows expire after a while
       for(var si=stuckArrows.length-1;si>=0;si--)if(now>stuckArrows[si].until)stuckArrows.splice(si,1);
