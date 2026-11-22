@@ -1488,6 +1488,12 @@ var PLAZA_R=235;                              // circular plaza ring radius
 var CATH={x:1120,y:545,w:360,h:225};          // cathedral footprint (north end)
 var POND={x:1150,y:1765,w:300,h:175};         // garden pond (inside the south gate)
 function inTown(x,y){return Math.abs(x-TOWN_C)<=TOWN_HALF&&Math.abs(y-TOWN_C)<=TOWN_HALF;}
+/* No-spawn safe zone: the walled town plus a buffer (~3 tiles) outside the
+   walls. No spawn point is placed inside it, the spawner never materialises
+   a mob there, live mobs found inside are removed, and isSafe() covers the
+   whole area — so Luminas, its gates and the roads just outside stay safe. */
+var NO_SPAWN_MARGIN=120;
+function inNoSpawn(x,y){return Math.abs(x-TOWN_C)<=TOWN_HALF+NO_SPAWN_MARGIN&&Math.abs(y-TOWN_C)<=TOWN_HALF+NO_SPAWN_MARGIN;}
 function genWorld(){
   obstacles=[];decorations=[];
   var tseed=987654;function trnd(){tseed=(tseed*16807)%2147483647;return tseed/2147483647;}
@@ -1588,6 +1594,65 @@ function unstickEnemy(e){
     }
   }
 }
+/* ============ LINE OF SIGHT (wall occlusion) ============
+   Plan-view sight test between two game-space points. Sight is blocked by
+   anything tall enough to hide a mob: houses, the city wall, gate towers,
+   the cathedral, ruin blocks, plaza pillars and tree canopies. Used so an
+   enemy behind a wall is never identified by the crosshair, never counts
+   as "seen" for the minimap, and its damage numbers never float through
+   the wall — the 3D body itself is already depth-occluded by the renderer,
+   these checks close the HUD / identification paths that ignored walls. */
+var _losSrc=null,_losBlockers=null;
+function losBlockers(){
+  if(_losSrc===obstacles&&_losBlockers)return _losBlockers;
+  _losSrc=obstacles;_losBlockers=[];
+  for(var i=0;i<obstacles.length;i++){
+    var o=obstacles[i];
+    if(o.type==='rect'){
+      if(o.house||o.wall||o.cathedral||o.ruin)
+        _losBlockers.push({rect:1,x:o.x,y:o.y,w:o.w,h:o.h,cx:o.x+o.w/2,cy:o.y+o.h/2,br:Math.hypot(o.w,o.h)/2});
+    }else{
+      var rad=0;
+      if(o.tower||o.pillar)rad=o.r;
+      else if(o.ref&&(o.ref.kind==='tree'||o.ref.kind==='snowtree'))rad=o.r*2.1; /* canopy, not just the trunk */
+      if(rad>0)_losBlockers.push({rect:0,x:o.x,y:o.y,rad:rad,cx:o.x,cy:o.y,br:rad});
+    }
+  }
+  return _losBlockers;
+}
+function losClear(x1,y1,x2,y2){
+  var dx=x2-x1, dy=y2-y1, d=Math.hypot(dx,dy);
+  if(d<30)return true;
+  /* pull the endpoints in a little so a mob hugging a wall on the player's
+     side still reads as visible, and one peeking at a corner isn't lost */
+  var ux=dx/d, uy=dy/d, pad=16;
+  var ax=x1+ux*pad, ay=y1+uy*pad, bx=x2-ux*pad, by=y2-uy*pad;
+  var sdx=bx-ax, sdy=by-ay, mx=(ax+bx)/2, my=(ay+by)/2, half=d/2;
+  var bl=losBlockers();
+  for(var i=0;i<bl.length;i++){
+    var b=bl[i];
+    if(Math.hypot(b.cx-mx,b.cy-my)>half+b.br+pad)continue;   /* nowhere near the sight line */
+    if(b.rect){
+      var tmin=0, tmax=1, blocked=true;
+      if(Math.abs(sdx)<1e-9){ if(ax<b.x||ax>b.x+b.w)blocked=false; }
+      else{ var ta=(b.x-ax)/sdx, tb=(b.x+b.w-ax)/sdx; if(ta>tb){var tt=ta;ta=tb;tb=tt;}
+        tmin=Math.max(tmin,ta); tmax=Math.min(tmax,tb); if(tmin>tmax)blocked=false; }
+      if(blocked){
+        if(Math.abs(sdy)<1e-9){ if(ay<b.y||ay>b.y+b.h)blocked=false; }
+        else{ var tc=(b.y-ay)/sdy, td=(b.y+b.h-ay)/sdy; if(tc>td){var te=tc;tc=td;td=te;}
+          tmin=Math.max(tmin,tc); tmax=Math.min(tmax,td); if(tmin>tmax)blocked=false; }
+      }
+      if(blocked)return false;
+    }else{
+      var seg2=sdx*sdx+sdy*sdy;
+      var t=seg2>0?((b.x-ax)*sdx+(b.y-ay)*sdy)/seg2:0;
+      t=Math.max(0,Math.min(1,t));
+      var px=ax+sdx*t-b.x, py=ay+sdy*t-b.y;
+      if(px*px+py*py<b.rad*b.rad)return false;
+    }
+  }
+  return true;
+}
 function zoneAt(x,y){
   if(inTown(x,y)) return "ルミナスの町（安全地帯）";
   if(x>3850&&y>3850) return "紅蓮火山（危険）";
@@ -1616,7 +1681,7 @@ function zoneColorAt(x,y){
   if(z.indexOf('遺跡')>=0) return '#5d5a68';
   return '#3a5c38';
 }
-function isSafe(x,y){return inTown(x,y);}
+function isSafe(x,y){return inNoSpawn(x,y);}
 
 /* ================= EXPLORATION (fog of war) =================
    The minimap shows a zoomed radius of ~18 tiles (MINI_VIEW_R world units).
@@ -1697,27 +1762,38 @@ function spawnEnemy(type,x,y,sp){
   enemies.push(e); return e;
 }
 function addSpawnPoint(type,x,y){spawnPoints.push({type:type,x:x,y:y,e:null,coolUntil:0});}
+/* Scatter n spawn points over a band, resampling any point that lands in
+   the Luminas no-spawn safe zone (town + buffer) so near-town bands keep
+   their population — just never inside the walls or at the gates. */
+function scatter(type,n,x0,x1,y0,y1){
+  for(var i=0;i<n;i++){
+    for(var t=0;t<12;t++){
+      var x=x0+Math.random()*(x1-x0), y=y0+Math.random()*(y1-y0);
+      if(!inNoSpawn(x,y)){addSpawnPoint(type,x,y);break;}
+    }
+  }
+}
 function populate(){
   enemies=[]; spawnPoints=[];
-  for(var i=0;i<14;i++) addSpawnPoint('slime',500+Math.random()*1600,250+Math.random()*600);
-  for(var i=0;i<10;i++) addSpawnPoint('goblin',1750+Math.random()*650,900+Math.random()*1000);
-  for(var i=0;i<7;i++) addSpawnPoint('wolf',1700+Math.random()*700,700+Math.random()*700);
-  for(var i=0;i<5;i++) addSpawnPoint('orc',1850+Math.random()*600,1100+Math.random()*800);
+  scatter('slime',14,500,2100,250,850);
+  scatter('goblin',10,1750,2400,900,1900);
+  scatter('wolf',7,1700,2400,700,1400);
+  scatter('orc',5,1850,2450,1100,1900);
   addSpawnPoint('boss',2220,420);
   // forgotten ruins guards (north, new lands)
-  for(var i=0;i<4;i++) addSpawnPoint('orc',2800+Math.random()*600,300+Math.random()*550);
+  scatter('orc',4,2800,3400,300,850);
   // snowfield (far north-east)
-  for(var i=0;i<7;i++) addSpawnPoint('frostwolf',3550+Math.random()*1400,220+Math.random()*950);
-  for(var i=0;i<5;i++) addSpawnPoint('icegolem',3650+Math.random()*1250,280+Math.random()*900);
+  scatter('frostwolf',7,3550,4950,220,1170);
+  scatter('icegolem',5,3650,4900,280,1180);
   // desert (east)
-  for(var i=0;i<9;i++) addSpawnPoint('scorpion',3450+Math.random()*1450,1600+Math.random()*1550);
-  for(var i=0;i<6;i++) addSpawnPoint('sandworm',3500+Math.random()*1350,1800+Math.random()*1350);
+  scatter('scorpion',9,3450,4900,1600,3150);
+  scatter('sandworm',6,3500,4850,1800,3150);
   // deep forest (far south-west)
-  for(var i=0;i<6;i++) addSpawnPoint('treant',220+Math.random()*1150,3450+Math.random()*1400);
-  for(var i=0;i<4;i++) addSpawnPoint('wolf',300+Math.random()*1000,3500+Math.random()*1200);
+  scatter('treant',6,220,1370,3450,4850);
+  scatter('wolf',4,300,1300,3500,4700);
   // volcano (far south-east)
-  for(var i=0;i<8;i++) addSpawnPoint('magma',3950+Math.random()*1050,3950+Math.random()*1050);
-  for(var i=0;i<5;i++) addSpawnPoint('lavagolem',4000+Math.random()*950,4000+Math.random()*950);
+  scatter('magma',8,3950,5000,3950,5000);
+  scatter('lavagolem',5,4000,4950,4000,4950);
   addSpawnPoint('ifrit',4600,4600);
   trySpawnNear(true); /* fill the area around the start position right away */
 }
@@ -1733,12 +1809,13 @@ function trySpawnNear(immediate){
     if(sp.e&&!sp.e.dead)continue;               /* point already has a live mob */
     if(sp.e&&sp.e.dead){sp.e=null;}              /* corpse cleanup finished it */
     if(now<sp.coolUntil)continue;                /* respawn cooldown */
+    if(inNoSpawn(sp.x,sp.y))continue;            /* Luminas safe zone: never materialises */
     if(Math.hypot(sp.x-player.x,sp.y-player.y)>SPAWN_RANGE)continue;
-    /* never spawn inside a building: jitter the point until it is clear */
+    /* never spawn inside a building or the safe zone: jitter until clear */
     var e=null, tt=ETYPES[sp.type], sr=(tt?tt.size:20)*0.7;
     for(var tries=0;tries<6&&!e;tries++){
       var sx=sp.x+(Math.random()*160-80), sy=sp.y+(Math.random()*160-80);
-      if(!collide(sx,sy,sr))e=spawnEnemy(sp.type,sx,sy,sp);
+      if(!collide(sx,sy,sr)&&!inNoSpawn(sx,sy))e=spawnEnemy(sp.type,sx,sy,sp);
     }
     if(e){sp.e=e;made++;}
   }
@@ -1752,6 +1829,14 @@ function despawnFar(){
   for(var i=enemies.length-1;i>=0;i--){
     var e=enemies[i];
     if(e.dead)continue;
+    /* the Luminas safe zone stays clear: a mob found inside it (wandered
+       in, or left over from before the zone existed) is removed unless
+       the player is actively fighting it */
+    if(inNoSpawn(e.x,e.y)&&target!==e&&aimTarget!==e){
+      if(e._sp){e._sp.e=null;e._sp.coolUntil=now+2500;}
+      enemies.splice(i,1);
+      continue;
+    }
     if(Math.hypot(e.x-player.x,e.y-player.y)<=DESPAWN_RANGE)continue;
     if(e._sp){e._sp.e=null;e._sp.coolUntil=now+2500;}
     if(target===e)target=null;
@@ -2434,6 +2519,8 @@ function update(dt,now){
   // crosshair identification + eyesight: the enemy captured by the center
   // crosshair is the only one whose name/level/HP are revealed; any enemy
   // that enters the player's field of view counts as "seen" for the minimap.
+  // Both require a clear line of sight — an enemy behind a wall or a house
+  // is never identified and never counts as seen.
   aimTarget=null;
   var fvx=-Math.sin(camYaw), fvy=-Math.cos(camYaw), bestAimScore=1e9;
   enemies.forEach(function(e){
@@ -2442,10 +2529,10 @@ function update(dt,now){
     if(d<1)return;
     var dot=(dx*fvx+dy*fvy)/d;
     var ang=Math.acos(Math.max(-1,Math.min(1,dot)));
-    if(!e.seen&&d<640&&(d<150||ang<1.0))e.seen=true;
+    if(!e.seen&&d<640&&(d<150||ang<1.0)&&losClear(player.x,player.y,e.x,e.y))e.seen=true;
     if(d<760){
       var thresh=0.13+Math.atan2(e.r+12,d);
-      if(ang<thresh&&d<bestAimScore){bestAimScore=d;aimTarget=e;}
+      if(ang<thresh&&d<bestAimScore&&losClear(player.x,player.y,e.x,e.y)){bestAimScore=d;aimTarget=e;}
     }
   });
   if(aimTarget)aimTarget.seen=true;
@@ -2712,9 +2799,10 @@ function drawMini(){
   if(mxp>=-4&&myp>=-4&&mxp<=S+4&&myp<=S+4){mctx.fillStyle='#ffd34d';mctx.fillRect(mxp-2.5,myp-2.5,5,5);}
   // real players in range
   remotes.forEach(function(r){var rx=MX(r.x),ry=MY(r.y);if(rx<0||ry<0||rx>S||ry>S)return;mctx.fillStyle='#2fbfa5';mctx.fillRect(rx-2,ry-2,4,4);});
-  // enemies — ONLY ones the player has actually seen
+  // enemies — ONLY ones the player has actually seen, and only while a
+  // clear line of sight exists (a wall or house hides the dot again)
   enemies.forEach(function(e){
-    if(e.dead||!e.seen)return;
+    if(e.dead||!e.seen||!losClear(player.x,player.y,e.x,e.y))return;
     var ex=MX(e.x),ey=MY(e.y);if(ex<0||ey<0||ex>S||ey>S)return;
     mctx.fillStyle=e.boss?'#ff3b30':'#e5484d';mctx.fillRect(ex-2,ey-2,e.boss?6:3,e.boss?6:3);
   });
@@ -3713,7 +3801,9 @@ function syncDmgTexts(now){
       el.textContent=d.text;el.style.color=d.color;layer.appendChild(el);dmgEls[d._mid]=el;
     }
     var sp=projectToScreen(WX(d.x),terrainH(d.x,d.y)+64,WZ(d.y),_pv);
-    if(sp){el.style.display='block';el.style.opacity=Math.max(0,1-d.t/46);el.style.transform='translate(-50%,-100%) translate('+sp.x.toFixed(1)+'px,'+sp.y.toFixed(1)+'px)';}
+    /* damage numbers are an overlay: hide them when a wall blocks the view
+       of the spot they belong to, so hits never show through buildings */
+    if(sp&&(!player||losClear(player.x,player.y,d.x,d.y))){el.style.display='block';el.style.opacity=Math.max(0,1-d.t/46);el.style.transform='translate(-50%,-100%) translate('+sp.x.toFixed(1)+'px,'+sp.y.toFixed(1)+'px)';}
     else el.style.display='none';
   });
   for(var k in dmgEls){if(!alive[k]){if(dmgEls[k].parentNode)dmgEls[k].parentNode.removeChild(dmgEls[k]);delete dmgEls[k];}}
