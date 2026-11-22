@@ -1018,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>写真と見比べて、ルミナスの配置を全体的に直しました。</b>噴水広場は南寄りの位置のまま東へ寄せ直し（前回の西寄せは取り消し）、南門は広場の真下に連動。大通り・市場区画・スポーン・大階段の起点も広場に合わせました。滝はさらに西へ移して落差を大きくし、高い岩山の上から滝壺まで一気に落ちる形に。中央の池は幅広い丸い池に広げました。城は北東の隅へ離して岩山も高くし、礼拝堂からしっかり距離を。テラスは礼拝堂前・城前の小さな前広場を別々にして、間は緑地・岩・木で埋めました。大階段は1段ずつ段差と踊り場が分かる形に作り替えました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>川・滝・テラスを作り替え、広場と南門の軸もそろえました。</b>川は全区間くねくねと蛇行し、幅も流れの中で広がったり狭まったりするように。地形に彫り込んだ水路にしたので両岸が水面へなだらかに下がり、岸際は土色が水色へなじみ、水底の色の濃淡と白い早瀬で深さが読めるようになりました。滝は西へ移して幅・落差とも大きくし、水しぶきと水煙も増量。周りは岩と針葉樹で囲み、北の雪原は見えなくなりました。礼拝堂と城の高台は、礼拝堂前の広場に生垣・庭・木・街灯を配した庭園にし、礼拝堂自体も大きくしました。噴水広場は写真に合わせて南西へ移し、南門をその真下に置いて大通りを一直線に。広場から西への通りと大通りはどちらも太くしました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>ルミナスの配置を区画ごとに見直し、城壁の敷地もさらに広げました。</b>噴水広場は写真の比率どおり南へ（滝〜南門の軸の約67%）かつ町の中心線より東へ移し、周りを囲んでいた露店の輪は外して、広場の西の市場区画に集めました。広場からは石畳の通りが西の住宅街を抜けて西の壁際まで伸び、そこで北へ曲がって城壁の内側を北西の区画まで続きます。川の両岸と中央の池の周りは開け、中央の池は大きく。東の池は広場の東〜南東で、岸は自然な曲線になり、水の色にも濃淡を付けました。家はもう一段小さくして西半分（西・南西・北西）にぎっしり詰め、広場周り・川沿い・テラスには置きません。南の住宅区画は広場と南門の間に収めました。城壁の外周には針葉樹を密に植えて森に囲まれた町にし、町の中の木は家の庭と通りの脇だけに置きました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>ルミナスの町並みを写真に寄せて整えました。</b>川は滝壺・中央の池・東の池の区間で川の水面そのものが池の幅いっぱいに広がり、池ごとの円盤の水面は無くして、滝から南東の水門まで一枚の水面でつながる一本の流れになりました。東の池はもっと東へ移して横長に。家は曲がった通りに沿って向き・大きさ・間隔にばらつきを持たせて並べ直し、北西〜西の城壁の内側も家で埋めました。高台の円形広場は礼拝堂と城のちょうど中間へ移し（両方の建物・前広場と重ならない位置で、半径は小さめに）、町の中には家の周りの庭・街路の木・草地と花を点在させました（石畳の通りと広場は石畳のまま）。</span></li>
@@ -1795,9 +1796,11 @@ function regionAt(x,y){
      photo; the south grassland and the NE bare rock remain between
      the woods.
    - a waterfall in three broad tiers off a crag at north-centre —
-     since moved WEST and enlarged (wider sheets, a taller drop off a
-     raised crag, more spray and mist), ringed by gorge crags and a
-     dense conifer screen so the snowy heights never show behind it —
+     since moved WEST twice and given a much taller drop (the crag
+     top pool sits at z ≈152, ≈15m above the plunge pool, so the
+     tiers plunge one after another down the gorge), ringed by gorge
+     crags and a dense conifer screen so the snowy heights never
+     show behind it —
      feeding a river: ONE continuous flowing channel whose single
      ribbon surface swells to each pond's full width as it passes
      through. The centreline MEANDERS the whole way (no straight
@@ -1806,8 +1809,9 @@ function regionAt(x,y){
      surface that sits below the bank tops, bed tinted with a depth
      gradation, white rapids at the rocky narrows — so it reads as a
      natural river, never a flat blue tape. It runs south to the
-     CENTRAL POND (due north of the plaza, enlarged so it cannot be
-     missed from the air), turns south-east to the EAST POND (east to
+     CENTRAL POND (due north of the plaza, widened into a broad
+     round pond that cannot be missed from the air), turns
+     south-east to the EAST POND (east to
      south-east of the plaza, its shore a naturally wobbling curve —
      see pondEMetric — and its bed tinted with a depth gradation so
      it never reads as a flat plate), then leaves through a water
@@ -1816,9 +1820,9 @@ function regionAt(x,y){
      stalls, so the flow can be followed from above end to end.
      Cambered stone arch bridges cross it below the falls, at the
      east pond's inlet, and over the east pond's outlet.
-   - the FOUNTAIN PLAZA sits SOUTH-WEST: on the falls→south-gate
+   - the FOUNTAIN PLAZA sits SOUTH-EAST: on the falls→south-gate
      axis ≈67% of the way toward the gate (the photo's ratio), and
-     west of the town's centre line, with the SOUTH GATE directly
+     east of the town's centre line, with the SOUTH GATE directly
      below it on the same axis so the (widened) boulevard runs dead
      straight from fountain to gate. A great circular stone-paved
      plaza with the fountain ALONE at its centre — the ring of market
@@ -1836,12 +1840,13 @@ function regionAt(x,y){
    - the CLOCK TOWER stands among the dense WEST houses at the
      measured (37.2%, 56.0%), just north of the market square.
    - the blue-glowing CHAPEL stands on the broad high NE terrace, the
-     CASTLE east of it in the NE corner on its own rock, against the
-     wall. A grand stone staircase climbs diagonally NE from the plaza
-     to the mid terrace, forks at a landing there, and climbs on to the
+     CASTLE well east of it in the NE corner on its own raised rock,
+     against the wall. A grand stone staircase climbs diagonally NE
+     from the plaza to the terrace fork, and climbs on to the
      chapel (west branch) and the castle (east branch) — every flight
-     built tread by tread with parapet walls, landings and lamps, and
-     the terrain carved to the same profile so it walks smoothly.
+     built tread by tread with parapet walls, landings and lamps,
+     its steps a true ≈17cm riser each (not a ramp), and the terrain
+     carved to the same profile so it walks smoothly.
    - houses are one size SMALLER than before and pack the WEST HALF
      at the photo's density — the north-west, west and south-west
      blocks around the clock tower, filled right up toward the wall —
@@ -1856,16 +1861,18 @@ function regionAt(x,y){
      ground floor under a timber-framed white upper floor, with a
      brown-to-orange roof, chimney, dormers and — on the shopfronts —
      coloured awnings like the market stalls.
-   - on the high terrace the chapel and the castle stand apart, with
-     a small round paved plaza (and two lamps) of their own between
-     them at the stair fork.
+   - on the high terrace the chapel and the castle stand WELL apart:
+     each keeps its own small paved forecourt, the stair fork keeps a
+     small landing circle between them, and everything else up there
+     is green — lawns, hedges, shade trees and crags on the slope —
+     never one wide empty stone slab.
    The whole walled interior is the safe zone: no mob spawns inside, mobs
    found inside are removed by the despawn sweep, and players inside
    slowly heal (isSafe). */
-var TOWN_CX=1560, TOWN_CY=1880, TOWN_RX=1040, TOWN_RY=930; /* EXPANDED SITE AGAIN: the wall ring grew once more (radii 920×810 → 1040×930, centre shifted east/south) and the whole town was re-laid on the photo's proportions with the extra room — the plaza sits SOUTH-WEST with the south gate on its axis, the housing packs the west half, the river corridor and the ponds stand open, and the west lake still stays just outside the west wall */
+var TOWN_CX=1560, TOWN_CY=1880, TOWN_RX=1040, TOWN_RY=930; /* EXPANDED SITE AGAIN: the wall ring grew once more (radii 920×810 → 1040×930, centre shifted east/south) and the whole town was re-laid on the photo's proportions with the extra room — the plaza sits SOUTH-EAST with the south gate on its axis, the housing packs the west half, the river corridor and the ponds stand open, and the west lake still stays just outside the west wall */
 var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
-var PLAZA={x:1470,y:2400};          /* the fountain plaza: re-measured against the photo once more, it sits SOUTH-WEST — on the falls→south-gate axis ≈67% of the way south, and WEST of the town's centre line. The SOUTH GATE now stands directly below it on the same north-south axis (see gateA in buildTownData), so the great boulevard runs dead straight from the fountain to the gate. The fountain is its centre. Everything plaza-linked (spawn, corner lamps, the grand staircase's foot, the plaza streets, townsfolk waypoints) is placed relative to this point. The market stalls are NOT here: they gather in the market district west of the plaza (see buildTownData) */
-var POND_C={x:1490,y:1760,r:175};   /* central pond: enlarged so it reads unmistakably from the air, due north of the plaza on the falls line, its shores kept clear of houses and stalls — the whole water corridor (falls → this pond → east pond) stands open so the flow can be followed from above */
+var PLAZA={x:1650,y:2400};          /* the fountain plaza: it sits SOUTH-EAST — on the falls→south-gate axis ≈67% of the way south (the southward position is unchanged), and EAST of the town's centre line (1560), as the user confirmed against the photo: the brief westward shift was a mistake and is undone here, and the plaza now stands east of centre by the same margin it briefly sat west. The SOUTH GATE stands directly below it on the same north-south axis (see gateA in buildTownData), so the great boulevard runs dead straight from the fountain to the gate. The fountain is its centre. Everything plaza-linked (spawn, corner lamps, the grand staircase's foot, the plaza streets, the market district, townsfolk waypoints) moved east with it. The market stalls are NOT here: they gather in the market district west of the plaza (see buildTownData) */
+var POND_C={x:1520,y:1730,r:210};   /* central pond: WIDENED into the photo's broad round pond (r 175 → 210, a ≈42m sheet of water) — it used to read as a thin band of river passing under the falls bridge; now the ribbon swells to a full round pond whose shores stand clear of houses and stalls, north of the plaza on the falls line — the whole water corridor (falls → this pond → east pond) stands open so the flow can be followed from above */
 var POND_E={x:2210,y:2200,r:150};   /* the east pond: EAST to SOUTH-EAST of the plaza, clear of the plaza's rim, stretched wide E-W (terrain carve squashes x by POND_E_Q) — its shore is NOT a clean ellipse: pondEMetric() wobbles the radius with the shore angle, so the bank curves naturally in and out, and the ground tint deepens toward its middle so the water reads with gradation instead of as one flat plate */
 var POND_E_Q=0.55;                  /* the east pond's E-W squash: its water spans x ±r/Q (≈±273) against y ±r — a long horizontal lake, not a round one */
 /* the east pond's shore distance: the squashed radial distance minus a
@@ -1878,10 +1885,10 @@ function pondEMetric(x,y){
   var a=Math.atan2(dy,dx);
   return d-(Math.sin(a*3+1.7)*10+Math.sin(a*5+0.6)*7+Math.cos(a*2+2.9)*8);
 }
-var POOL={x:1449,y:1322,r:110};     /* plunge pool under the falls — the falls themselves moved WEST and grew (see the crag / sheets in buildTown3D), so the pool, the gorge and the river's head all shifted west with them and the pool widened */
-var TERRACE_PLAZA={x:2075,y:1200,r:100}; /* the round plaza BETWEEN the chapel and the castle: the EXACT midpoint of the two landmarks (chapel 1820,1150 / castle 2330,1250 → 2075,1200), kept small (r 100) on the high terrace. It clears both footprints (chapel east wall 1916 / castle west wall 2240) and both forecourt aprons — the chapel's apron (1820,1273,r 92): centres 265 apart > 100+92; the castle's forecourt (2330,1435,r 138): 347 apart > 100+138. townTerrain() flattens its disc to the terrace level so it truly sits there (see there) */
-var RIVER=[[1449,1322],[1395,1450],[1470,1560],[1405,1660],[1490,1760],[1615,1835],[1555,1935],[1640,1985],[1790,2050],[1960,2065],[2080,2130],[2210,2200],[2330,2185],[2420,2300],[2505,2405],[2620,2560]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall). The centreline MEANDERS the whole way — every leg bends against the last, no straight reach anywhere, as the photo's river winds: it S-curves down from the falls into the central pond, swings east then west then east again across the mid-town, threads the east pond and twists out through the water gate. Both banks are kept clear of houses and stalls along the whole run */
-var BRIDGES=[{x:1470,y:1560,rot:1.0},{x:2020,y:2095,rot:0.95},{x:2420,y:2300,rot:0.5}]; /* arched bridge below the falls, between the plunge pool and the central pond / bridge over the river east of the plaza, at the east pond's inlet / bridge over the east pond's outlet */
+var POOL={x:1389,y:1322,r:110};     /* plunge pool under the falls — the falls moved WEST AGAIN (another ≈60 units) and the drop above the pool grew much taller (see the crag / sheets in buildTown3D), so the pool, the gorge and the river's head all shifted west with them */
+var TERRACE_PLAZA={x:2095,y:1215,r:58}; /* the stair-top LANDING circle between the chapel and the castle, near the two landmarks' midpoint (chapel 1820,1150 / castle 2375,1285 → 2098,1218) — shrunk to a small landing disc (r 100 → 58): the terrace is NO longer one wide paved expanse. The chapel keeps its own small forecourt apron (1820,1273,r 72) and the castle its own forecourt (2375,1470,r 95), and everything between the three small courts is green — lawns, hedges, trees and crags (see TOWN_GREENERY / the terrace trees & rocks in buildTownData), as in the photo. townTerrain() flattens its disc to the terrace level so it truly sits there (see there) */
+var RIVER=[[1389,1322],[1360,1480],[1435,1570],[1395,1660],[1520,1730],[1615,1835],[1555,1935],[1640,1985],[1820,2010],[1990,2030],[2080,2130],[2210,2200],[2330,2185],[2420,2300],[2505,2405],[2620,2560]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall). The head shifted WEST with the falls and the mid-town reach swung a little north, clear of the east-moved plaza's rim. The centreline MEANDERS the whole way — every leg bends against the last, no straight reach anywhere, as the photo's river winds: it S-curves down from the falls into the central pond, swings east then west then east again across the mid-town, threads the east pond and twists out through the water gate. Both banks are kept clear of houses and stalls along the whole run */
+var BRIDGES=[{x:1415,y:1545,rot:1.0},{x:2020,y:2095,rot:0.95},{x:2420,y:2300,rot:0.5}]; /* arched bridge below the falls, at the widened central pond's north-west inlet / bridge over the river east of the plaza, at the east pond's inlet / bridge over the east pond's outlet */
 /* --- the town's streets: stone-paved lanes (t:'s') through the housing
    blocks and dirt lanes (t:'d') elsewhere. They thread the GAPS between
    the house rows (never a house footprint, the plaza disc or the water),
@@ -1889,16 +1896,16 @@ var BRIDGES=[{x:1470,y:1560,rot:1.0},{x:2020,y:2095,rot:0.95},{x:2420,y:2300,rot
    (chunked paving strips in buildTown3D) and init3D() tints the ground
    vertices along them, so the town floor reads as streets, not lawn. --- */
 var STREETS=[
-  {x1:1470,y1:2480,x2:1470,y2:2810,w:64,t:'s'},  /* THE GREAT BOULEVARD: plaza → south gate, one dead-straight run down the shared north-south axis (the gate now stands directly below the plaza), and WIDE — a proper stone-paved avenue at the photo's breadth, not a lane */
-  {x1:1170,y1:2400,x2:600,y2:2400,w:56,t:'s'},   /* THE WEST STREET: from the plaza's west rim straight through the housing blocks to the west wall by the clock tower, as in the photo — widened to a full stone street like the boulevard, and kept clear of houses and stalls along its whole run so it reads (and walks) as a street */
+  {x1:1650,y1:2480,x2:1650,y2:2809,w:64,t:'s'},  /* THE GREAT BOULEVARD: plaza → south gate, one dead-straight run down the shared north-south axis (the gate stands directly below the east-moved plaza), and WIDE — a proper stone-paved avenue at the photo's breadth, not a lane */
+  {x1:1350,y1:2400,x2:600,y2:2400,w:56,t:'s'},   /* THE WEST STREET: from the plaza's west rim straight through the housing blocks to the west wall by the clock tower, as in the photo — widened to a full stone street like the boulevard, and kept clear of houses and stalls along its whole run so it reads (and walks) as a street */
   {x1:600,y1:2400,x2:600,y2:1240,w:40,t:'s'},    /* at the west wall the street TURNS NORTH and runs up along the inside of the wall to the north-west district, exactly as the photo's road does — widened with the west street */
   {x1:600,y1:1240,x2:1150,y2:1240,w:24,t:'d'},   /* …and bends east into the NW block at the top */
-  {x1:600,y1:2080,x2:1330,y2:2130,w:26,t:'s'},   /* the clock tower's south street, running east toward the plaza's NW rim */
+  {x1:600,y1:2080,x2:1480,y2:2130,w:26,t:'s'},   /* the clock tower's south street, running east toward the (east-moved) plaza's NW rim */
   {x1:600,y1:1900,x2:1250,y2:1900,w:24,t:'d'},   /* lane north of the clock-tower block */
   {x1:600,y1:1625,x2:900,y2:1612,w:28,t:'s'},    /* west housing blocks: stone lanes threading the rows — gently bent, as the photo's lanes are, not ruled straight */
   {x1:900,y1:1612,x2:1250,y2:1625,w:28,t:'s'},
   {x1:600,y1:1450,x2:1250,y2:1450,w:22,t:'d'},
-  {x1:1030,y1:2190,x2:1030,y2:2365,w:300,t:'s'}, /* the MARKET SQUARE: a broad paved band west of the plaza (moved south-west with it), between the clock tower's street and the west street — the stalls stand on its edges (see buildTownData) */
+  {x1:1210,y1:2190,x2:1210,y2:2365,w:300,t:'s'}, /* the MARKET SQUARE: a broad paved band west of the plaza (moved east with it), between the clock tower's street and the west street — the stalls stand on its edges (see buildTownData) */
   {x1:660,y1:2560,x2:1010,y2:2520,w:24,t:'d'},   /* the curved SW lanes, bending through the south-west blocks toward the boulevard (shifted south with the rows they thread) */
   {x1:1010,y1:2520,x2:1300,y2:2500,w:24,t:'d'},
   {x1:1150,y1:2680,x2:1600,y2:2680,w:22,t:'d'}   /* a lane along the inside of the south wall, serving the south housing row between the plaza and the south gate (stops short of the row's east house) */
@@ -1912,16 +1919,20 @@ var STREETS=[
    inside them, so the stone town stays stone where it should. --- */
 var TOWN_GREENERY=[
   [800,1460,52],[1085,1460,50],[795,1905,52],[1085,1900,48],
-  [860,2470,54],[1140,2470,50],[1620,2700,44],[1900,1620,70],
+  [860,2470,54],[1140,2470,50],[1760,2700,44],[1900,1620,70],
   [700,1200,44],[1260,1200,44],
   /* the high terrace is gardened now, not bare stone: lawn-and-flower
      patches around the chapel's forecourt, between the landmarks and
      around the castle's forecourt (the scatter sows tufts and flowers
      in them, the tint paints them lawn-green) */
-  [1690,1310,58],[1960,1300,52],[2075,1065,48],[2260,1420,50],
-  [1690,1010,46],[2330,1620,55]
+  [1690,1310,58],[1960,1300,52],[2095,1080,48],[2260,1420,50],
+  [1690,1010,46],[2375,1655,55],
+  /* the ground BETWEEN the terrace's three small courts is green,
+     not stone: broad lawn patches filling the slope between the
+     chapel apron, the landing circle and the castle forecourt */
+  [2050,1330,62],[2200,1300,58],[2130,1090,50],[1960,1420,44]
 ];
-var SPAWN_X=1470, SPAWN_Y=2670;     /* south side of the fountain plaza, on the boulevard (moved south-west with the plaza; on the plaza→gate axis, clear of the south housing row) */
+var SPAWN_X=1650, SPAWN_Y=2670;     /* south side of the fountain plaza, on the boulevard (moved east with the plaza; on the plaza→gate axis, clear of the south housing row) */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
 /* ============ THE GRAND STAIRCASE (plaza → one long diagonal ramp → terrace-top fork → chapel / castle) ============
    Parametric stone flights, sized for the 1.7m body: riser ≈0.17m
@@ -1936,13 +1947,13 @@ var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData
    west to the CHAPEL and run C climbs east to the CASTLE rock. */
 var STAIR_TREAD_A=5.6, STAIR_TREAD_B=4.6;
 var STAIRS=[
-  {x:1635,y:2150,dx:427,dy:-800,w:80,z0:30,z1:168, tread:5.4,n:162,n1:81,land:30},
+  {x:1815,y:2150,dx:247,dy:-800,w:80,z0:30,z1:168, tread:10.0,n:81,n1:40,land:30},
   {x:2005,y:1345,dx:-185,dy:-72,w:54, z0:168,z1:168,tread:4.6,n:38,n1:19,land:20},
-  {x:2120,y:1355,dx:170,dy:60, w:56, z0:168,z1:215,tread:4.6,n:35,n1:17, land:18}
-]; /* flights narrowed to proper stair widths (main 8m, branches ~5.5m) — a paved stair, not a broad stone slope. Run A starts at the (moved, south-west) plaza's NE rim and climbs the longer diagonal to the same terrace fork; B crosses west to the chapel, C climbs east to the castle forecourt */
+  {x:2120,y:1355,dx:200,dy:85, w:56, z0:168,z1:228,tread:5.6,n:35,n1:17, land:18}
+]; /* flights narrowed to proper stair widths (main 8m, branches ~5.5m) — a paved stair, not a broad stone slope. Run A starts at the (east-moved) plaza's NE rim and climbs the diagonal to the same terrace fork; B crosses west to the chapel, C climbs east to the castle forecourt on its raised rock. THE STEPS THEMSELVES were rebuilt: the old flights spread their climb over 162 hair-thin risers (≈8.5cm each), which read as a smooth ramp no matter how the treads were drawn — runs A and C now climb in true stair steps of ≈17cm (1.7 units, matched to the 1.7m body) with deep treads and a flat mid landing, so every tread and the landing read as steps from any distance */
 STAIRS.forEach(function(r){var l=Math.hypot(r.dx,r.dy);r.dx/=l;r.dy/=l;r.riser=(r.z1-r.z0)/r.n;r.len=r.n*r.tread+r.land;});
 var STAIR_FORK={x:2062,y:1350}; /* the fork landing at the top of the long ramp, where B and C diverge across the terrace */
-function stairRiserSmooth(u){u=Math.max(0,Math.min(1,u/0.45));return u*u*(3-2*u);}
+function stairRiserSmooth(u){u=Math.max(0,Math.min(1,u/0.32));return u*u*(3-2*u);} /* the rise happens over the first third of each tread and the rest of the tread is flat, so the carved ground itself steps (with the taller 17cm risers this is what makes the flight walk — and read — as stairs, not as a slope) */
 function stairHAt(r,s){
   if(s<=0)return r.z0; if(s>=r.len)return r.z1;
   var sL=r.n1*r.tread;
@@ -1991,7 +2002,7 @@ function buildTownData(){
   function circ(x,y,r,flags){var o={type:'circle',x:x,y:y,r:r,town:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
   /* --- city wall: stone segments following the rounded-square outline,
      with gaps at the two gates and at the river's water gate --- */
-  var gateA=[95.5*Math.PI/180,128*Math.PI/180]; /* south gate — moved so it stands DIRECTLY BELOW the (south-west-moved) fountain plaza: at 95.5° the wall point lands at (1470, 2810), exactly on the plaza's north-south axis, so the boulevard runs dead straight from the fountain to the gate — then the south-west corner gate (its dirt road runs out diagonally) */
+  var gateA=[84.5*Math.PI/180,128*Math.PI/180]; /* south gate — moved so it stands DIRECTLY BELOW the (east-moved) fountain plaza: at 84.5° the wall point lands at (1650, 2809), exactly on the plaza's north-south axis, so the boulevard runs dead straight from the fountain to the gate — then the south-west corner gate (its dirt road runs out diagonally) */
   var riverA=Math.atan2(RIVER[RIVER.length-2][1]-TOWN_CY,RIVER[RIVER.length-2][0]-TOWN_CX); /* direction of the river's wall crossing (its water-gate point) */
   function wallTan(a){var p1=townWallPoint(a-0.02), p2=townWallPoint(a+0.02); var dx=p2.x-p1.x, dy=p2.y-p1.y, l=Math.hypot(dx,dy)||1; return {x:dx/l,y:dy/l};}
   var wallStep=0;
@@ -2062,19 +2073,19 @@ function buildTownData(){
      wall lane at x 600 and the clock tower's street all stay clear),
      each house at its own slight angle on its own flattened pad --- */
   var HOUSES=[
-    [760,1135,64,55,0],[885,1128,66,56,5],[1015,1138,64,55,-5],[1140,1130,66,56,4],[1265,1138,64,55,-4],
+    [760,1135,64,55,0],[885,1128,66,56,5],[1015,1138,64,55,-5],[1115,1150,66,56,4],[1265,1138,64,55,-4],
     [745,1330,64,55,180],[880,1338,66,56,175],[1010,1326,64,55,185],[1145,1334,66,56,178],[1265,1330,64,55,182],
-    [750,1560,64,55,0],[885,1554,66,56,5],[1015,1566,64,55,-5],[1145,1558,66,56,4],[1265,1562,64,55,-4],
-    [745,1700,64,55,180],[880,1708,66,56,175],[1010,1696,64,55,185],[1140,1704,66,56,178],[1265,1700,64,55,182],
+    [750,1560,64,55,0],[885,1554,66,56,5],[1015,1566,64,55,-5],[1145,1558,66,56,4],[1235,1562,64,55,-4],
+    [745,1700,64,55,180],[880,1708,66,56,175],[1010,1696,64,55,185],[1120,1704,66,56,178],[1235,1700,64,55,182],
     [750,1980,64,55,0],[885,1974,66,56,5],[1015,1986,64,55,-5],[1118,1980,66,56,4],[1055,2060,62,54,-6],
     [740,2145,64,55,180],[875,2140,66,56,175],[1000,2148,64,55,185],
     [745,2545,64,55,0],[870,2539,66,56,5],[995,2551,64,55,-5],[1120,2543,66,56,4],
     /* (the old second SW row is gone: the widened west street and the
-       south-west-moved plaza took its ground — the row above slid
+       moved plaza took its ground — the row above slid
        south into the freed space instead) */
     /* the south row: squeezed between the plaza and the south gate,
        flanking the boulevard and fronting the south wall lane */
-    [1200,2710,66,56,160],[1560,2760,64,55,175],[1740,2660,66,56,185],[1830,2540,64,55,190]
+    [1200,2710,66,56,160],[1560,2760,64,55,175],[1885,2715,66,56,185],[2010,2450,64,55,190]
   ];
   var ROOF_MULT=[0.42,0.36,0.50,0.44,0.38,0.54,0.40,0.48]; /* per-house roof pitch: ridges land anywhere from ≈7.4m to ≈9.5m, so no two rooftops read alike */
   HOUSES.forEach(function(hs,hi){
@@ -2102,8 +2113,8 @@ function buildTownData(){
   });
   /* --- landmarks --- */
   circ(1195,2000,42,{tower:true});  townFeatures.push({kind:'clocktower',x:1195,y:2000}); /* in the middle of the west housing block, at the measured (37.2%, 56.0%) — just north of the market square */
-  rect(1820,1150,192,134,{chapel:true}); townFeatures.push({kind:'chapel',x:1820,y:1150}); townFeatures.push({kind:'terraceplaza',x:1820,y:1150+123,r:92}); /* high terrace, west end, close above the river — measured at (65.7%, 17.2%), the crystal cathedral, footprint matched to its enlarged nave. Its forecourt is a small apron (r 92) hugging the nave's south front: the big r 150 disc that used to sit due south of the chapel read as a stray plaza between the landmarks, so the between-landmarks round plaza now lives at their exact midpoint instead (TERRACE_PLAZA, just below) */
-  rect(2330,1250,180,180,{castle:true}); townFeatures.push({kind:'castle',x:2330,y:1250}); townFeatures.push({kind:'terraceplaza',x:2330,y:1250+185,r:138}); /* the NE corner, hard against the wall and its rock — measured at (86.9%, 21.4%) */
+  rect(1820,1150,192,134,{chapel:true}); townFeatures.push({kind:'chapel',x:1820,y:1150}); townFeatures.push({kind:'terraceplaza',x:1820,y:1150+123,r:72}); /* high terrace, west end, close above the river — measured at (65.7%, 17.2%), the crystal cathedral, footprint matched to its enlarged nave. Its forecourt is a SMALL apron (r 92 → 72) hugging the nave's south front — its own separate court, not part of one big terrace slab: green fills the ground between it, the landing circle and the castle's court (see TERRACE_PLAZA) */
+  rect(2375,1285,180,180,{castle:true}); townFeatures.push({kind:'castle',x:2375,y:1285}); townFeatures.push({kind:'terraceplaza',x:2375,y:1285+185,r:95}); /* the castle moved EAST into the NE corner and onto a higher rock (see townTerrain): it used to crowd the chapel across one shared paved terrace; now it stands apart in the corner, hard against the wall, with its own SMALLER forecourt (r 138 → 95) on its south front and green slope between it and the chapel */
   /* between the two landmarks, the small round plaza on the terrace
      at their EXACT midpoint (TERRACE_PLAZA) — the chapel and the
      castle stand APART with this paved circle (and its two lamps)
@@ -2112,7 +2123,7 @@ function buildTownData(){
      TERRACE_PLAZA note), and townTerrain() levels its whole disc to
      the terrace height so the castle rock cannot bury its east half */
   townFeatures.push({kind:'terraceplaza',x:TERRACE_PLAZA.x,y:TERRACE_PLAZA.y,r:TERRACE_PLAZA.r});
-  [[2038,1133],[2112,1133]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
+  [[2058,1148],[2132,1148]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
   /* --- the high terrace, dressed (it used to read as one empty stone
      plateau): lamps on the chapel's forecourt apron and the castle's
      forecourt, clipped HEDGES framing the chapel apron, the terrace
@@ -2120,14 +2131,14 @@ function buildTownData(){
      (see TOWN_GREENERY) with shade trees (see the tree list below) —
      so the chapel stands in a kept garden court, framed and lit,
      instead of on bare paving --- */
-  [[1760,1330],[1880,1330],[2270,1540],[2390,1540]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});}); /* forecourt lamps: a pair before the chapel doors, a pair on the castle forecourt */
+  [[1760,1330],[1880,1330],[2315,1575],[2435,1575]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});}); /* forecourt lamps: a pair before the chapel doors, a pair on the castle forecourt (moved east with the castle) */
   function hedge(x,y,w,d,rot){rect(x,y,w,d,{});townFeatures.push({kind:'hedge',x:x,y:y,w:w,d:d,rot:rot||0,seed:rnd()});}
   hedge(1712,1273,15,120,0); hedge(1928,1273,15,120,0);            /* the chapel apron's west and east edges: two green walls funnelling the eye to the cathedral doors */
-  hedge(1990,1115,54,14,0.6); hedge(2160,1115,54,14,-0.6);         /* the terrace plaza's north corners */
-  hedge(1962,1200,14,54,0); hedge(2188,1200,14,54,0);              /* …and green walls on its west and east rims (clear of the fork lamps) */
-  hedge(2210,1500,90,14,0); hedge(2450,1500,90,14,0);              /* the castle forecourt's rim, west and east of its centre */
+  hedge(2010,1125,54,14,0.6); hedge(2180,1125,54,14,-0.6);         /* the landing circle's north corners */
+  hedge(1982,1215,14,54,0); hedge(2208,1215,14,54,0);              /* …and green walls on its west and east rims (clear of the fork lamps) */
+  hedge(2255,1535,90,14,0); hedge(2495,1535,90,14,0);              /* the castle forecourt's rim, west and east of its centre (moved east with the castle) */
   circ(PLAZA.x,PLAZA.y,17,{pillar:true}); townFeatures.push({kind:'fountain',x:PLAZA.x,y:PLAZA.y});
-  [[1255,2185],[1685,2185],[1255,2615],[1540,2670]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});}); /* the plaza's four lamps, moved south-west with the plaza: NW / NE / SW rim points plus one at the boulevard's head — the SE rim gets none, because the south housing row crowds it now */
+  [[1435,2185],[1820,2210],[1435,2615],[1720,2670]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});}); /* the plaza's four lamps, moved east with the plaza: NW / NE / SW rim points plus one at the boulevard's head — the NE lamp stands a little in from the rim, on the bank above the river's bend; the SE rim gets none, because the south housing row crowds it now */
   /* --- market stalls: NOT a ring around the plaza any more. The
      plaza stands open with the fountain as its only star; the stalls
      gather in the MARKET DISTRICT west of the plaza — on the edges
@@ -2135,14 +2146,14 @@ function buildTownData(){
      tower's street and the west street, plus a pair fronting the
      west street's south side. Every stall stands clear of the
      streets themselves, the plaza rim and the water --- */
-  [[950,2230],[950,2310],[1080,2235],[1080,2315],[1170,2240],[1170,2320],[880,2270],[1015,2275],[1145,2270],[1015,2345],[1145,2345],[880,2330]].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});}); /* the market moved south-west with the plaza: the stalls now edge the market square between the clock tower's street and the widened west street, clear of both streets, the plaza rim and the west housing rows */
+  [[1130,2230],[1130,2310],[1260,2235],[1260,2315],[1350,2240],[1350,2320],[1060,2270],[1195,2275],[1325,2270],[1195,2345],[1325,2345],[1060,2330]].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});}); /* the market moved east with the plaza: the stalls now edge the market square between the clock tower's street and the widened west street, clear of both streets, the plaza rim and the west housing rows */
   /* --- the streets (see STREETS): render features only — the ground
      tint along them is painted in init3D() --- */
   STREETS.forEach(function(s){townFeatures.push({kind:'street',x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,w:s.w,t:s.t,x:(s.x1+s.x2)/2,y:(s.y1+s.y2)/2});});
   /* --- wells & carts: the town's working furniture --- */
   [[1280,2730],[2520,2060]].forEach(function(wp2){circ(wp2[0],wp2[1],16,{well:true});townFeatures.push({kind:'well',x:wp2[0],y:wp2[1]});}); /* the south well stands by the south wall lane, clear of the south housing row; the east well moved further east with the river's new meander, clear of the east pond and the channel's bank slope */
-  townFeatures.push({kind:'cart',x:1230,y:2620,rot:0.5,seed:rnd()});
-  townFeatures.push({kind:'cart',x:930,y:2310,rot:-0.35,seed:rnd()});
+  townFeatures.push({kind:'cart',x:1410,y:2620,rot:0.5,seed:rnd()});
+  townFeatures.push({kind:'cart',x:1110,y:2310,rot:-0.35,seed:rnd()});
   /* --- building pads: sample every house's ground height NOW, while
      TOWN_PADS is still empty (so no pad feeds back into another pad in
      the dense blocks), plus the clock tower's; townTerrain() then
@@ -2191,7 +2202,7 @@ function buildTownData(){
   lake(POND_C.x,POND_C.y,POND_C.r,0,{ribbon:true});
   lake(2045,2200,125,0,{ribbon:true}); lake(2165,2200,125,0,{ribbon:true}); lake(2285,2200,125,0,{ribbon:true}); lake(2405,2200,125,0,{ribbon:true});
   lake(POOL.x,POOL.y,POOL.r,0,{ribbon:true}); /* the plunge pool too is depth-only: NO separate disc surface anywhere on the river — the ribbon alone draws the whole chain from the falls to the water gate (the falls' top pool above the crag keeps its own small disc; it is not part of the river's sheet) */
-  lake(1426,1090,55,125); /* the falls' top pool, sitting in the (raised, west-moved) crag top */
+  lake(1366,1090,55,153); /* the falls' top pool, sitting in the (raised higher, moved west again) crag top — its surface is the head of the falls' much taller drop */
   for(var i=0;i<RIVER.length-1;i++){
     var ax=RIVER[i][0],ay=RIVER[i][1],bx=RIVER[i+1][0],by=RIVER[i+1][1];
     var segLen=Math.hypot(bx-ax,by-ay), stp=Math.max(1,Math.round(segLen/52));
@@ -2214,12 +2225,12 @@ function buildTownData(){
      the market square, the river corridor and the pond shores stay
      treeless and open (the old pine row along the west lane is gone —
      the wall lane there is a street now, and streets stay clear) */
-  [[800,1505],[1085,1505],[795,1855],[1085,1855],[800,2510],[1140,2470],[1460,2560],[655,2040],[655,1565],[700,2310],[1960,1120],[2190,1120],[1660,1300],[1935,1245],[2200,1085],[1730,1010]].forEach(function(p){townTree(p[0],p[1],21+rnd()*7);}); /* the last four shade the high terrace's new gardens: west of the chapel apron, south-east of the terrace plaza, north-west of the castle, and north of the chapel — the terrace reads as a planted court, not a stone slab */
+  [[800,1505],[1085,1505],[795,1855],[1085,1855],[800,2510],[1140,2470],[1640,2560],[655,2040],[655,1565],[700,2310],[1960,1120],[2190,1120],[1660,1300],[1935,1245],[2200,1085],[1730,1010],[2200,1240],[1995,1095],[1930,1420]].forEach(function(p){townTree(p[0],p[1],21+rnd()*7);}); /* the terrace trees shade its gardens: west of the chapel apron, around the landing circle, north-west of the castle, north of the chapel — and the last three fill the green between the chapel's court and the castle's, so the terrace reads as a planted slope with three small courts, not one stone slab. The plaza tree moved east with the plaza */
   [[320,1332],[255,1545],[351,1770],[248,1995],[108,2020],[170,1720],[226,1145]].forEach(function(p){townTree(p[0],p[1],24+rnd()*8);}); /* conifer forest outside the west wall (the photo's wooded west) — the southernmost tree stands on the west lake's shore, clear of its water */
   [[1100,3080],[1560,3150],[2050,3060]].forEach(function(p){townTree(p[0],p[1],20+rnd()*8);}); /* lone pines on the south grassland, south of the enlarged wall */
   for(var mi=0;mi<46;mi++){ /* conifers on the north mountain slopes — ALL pines now: the mixed broadleaf stand read pale from the town and let the snowy heights behind show through; a solid dark conifer slope closes the view north */
     var mx2=570+rnd()*1560, my2=620+rnd()*430;
-    if(Math.hypot(mx2-1426,my2-1109)<250)continue;
+    if(Math.hypot(mx2-1366,my2-1109)<250)continue;
     if(waterDepthAt(mx2,my2)>0)continue;
     townTree(mx2,my2,20+rnd()*12,true);
   }
@@ -2230,26 +2241,26 @@ function buildTownData(){
   (function(){
     for(var fi=0;fi<30;fi++){
       var fa3=Math.PI*(0.06+0.88*fi/29), fr3=295+rnd()*135;
-      var fx3=Math.round(1426+Math.cos(fa3)*fr3), fy3=Math.round(1090-Math.sin(fa3)*fr3*0.78);
+      var fx3=Math.round(1366+Math.cos(fa3)*fr3), fy3=Math.round(1090-Math.sin(fa3)*fr3*0.78);
       if(waterDepthAt(fx3,fy3)>0)continue;
       townTree(fx3,fy3,24+rnd()*10,true);
     }
-    [[1215,1180],[1185,1330],[1150,1500],[1645,1190],[1675,1330],[1635,1460]].forEach(function(p){townTree(p[0],p[1],23+rnd()*9,true);}); /* gorge-shoulder pines flanking the channel below the falls (each ≥200 from the centreline, clear of the swimming-depth discs) */
+    [[1210,1185],[1200,1335],[1130,1505],[1585,1190],[1615,1330],[1575,1460]].forEach(function(p){townTree(p[0],p[1],23+rnd()*9,true);}); /* gorge-shoulder pines flanking the channel below the falls (shifted west with the gorge, clear of the swimming-depth discs and the west houses) */
   })();
   function townRock(x,y,s){var d={x:x,y:y,kind:'rock',s:s,seed:rnd()*10};decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:s*0.45,ref:d,topKind:'rock',topH:s*1.2});}
   for(var ri=0;ri<26;ri++){townRock(540+rnd()*1790,580+rnd()*430,16+rnd()*30);}
-  townRock(1144,1168,26); townRock(1294,1142,22); townRock(1156,1255,20); townRock(1306,1242,18); /* the falls' flanking boulders, moved west with the falls */
-  townRock(2048,1068,40); townRock(2420,1470,36); townRock(1772,1055,26);
+  townRock(1084,1168,26); townRock(1234,1142,22); townRock(1096,1255,20); townRock(1246,1242,18); /* the falls' flanking boulders, moved west with the falls */
+  townRock(2048,1068,40); townRock(2500,1420,36); townRock(1772,1055,26); /* the middle crag moved east/north with the castle, clear of its smaller forecourt */
   townRock(2660,1055,34); townRock(2798,1268,26); townRock(2510,880,30); /* bare rock outside the NE wall, as in the photo */
   /* the north crags, made unmistakable: a jagged cluster looming behind
      the falls (the photo's rocky backdrop) and a second cliff band
      across the north-east heights behind the castle terrace */
-  [[1231,974,54],[1381,924,62],[1550,949,52],[1712,986,46],[1275,1061,42],[1644,1074,40],[1406,868,58],[2498,924,56],[2679,961,50],[2829,1099,46],[2610,824,52],[2404,1099,42],[2760,1299,40],[2285,968,44]].forEach(function(rk3){townRock(rk3[0],rk3[1],rk3[2]);}); /* the falls cluster shifted west with the falls; the NE band stays */
+  [[1171,974,54],[1321,924,62],[1550,949,52],[1712,986,46],[1215,1061,42],[1644,1074,40],[1346,868,58],[2498,924,56],[2679,961,50],[2829,1099,46],[2610,824,52],[2404,1099,42],[2760,1299,40],[2285,968,44]].forEach(function(rk3){townRock(rk3[0],rk3[1],rk3[2]);}); /* the falls cluster shifted west with the falls; the NE band stays */
   /* gorge crags: tall rocks standing on the two gorge shoulders (see
      townTerrain), framing the falls channel on both sides from the
      crag top down to the plunge pool — kept clear of the west houses,
      the water itself and the central pond's shore */
-  [[1330,1060,52],[1162,1405,42],[1594,1061,52],[1612,1368,34]].forEach(function(rk4){townRock(rk4[0],rk4[1],rk4[2]);}); /* moved west with the falls and gorge (the west crag sits on the gorge wall's shoulder, clear of the east house column) */
+  [[1270,1060,52],[1102,1405,42],[1534,1061,52],[1552,1368,34]].forEach(function(rk4){townRock(rk4[0],rk4[1],rk4[2]);}); /* moved west with the falls and gorge (the west crag sits on the gorge wall's shoulder, clear of the east house column) */
   /* --- the west lake's (月影湖) shore, dressed so the water sits in the
      landscape instead of reading as a bright ellipse pasted on the
      grass: a loose ring of conifers set back from the water and
@@ -2283,7 +2294,7 @@ function buildTownData(){
       if(waterDepthAt(fx,fy)>0)continue;
       if(Math.hypot(fx-420,fy-2150)<310)continue;              /* 月影湖 stays open */
       if(fx>1900&&fy<800)continue;                            /* ruins floor stays bare */
-      if(Math.hypot(fx-1426,fy-1090)<265)continue;            /* the falls crag */
+      if(Math.hypot(fx-1366,fy-1090)<265)continue;            /* the falls crag */
       var clash=false;
       for(var ci2=0;ci2<decorations.length;ci2++){var od=decorations[ci2];if(od.kind==='tree'&&Math.hypot(od.x-fx,od.y-fy)<52){clash=true;break;}}
       if(clash)continue;
@@ -2317,7 +2328,7 @@ function buildTownData(){
         townRock(Math.round(px),Math.round(py),17+rnd()*22);
       }
     }
-    [[1710,1395,34],[1885,1408,42],[2085,1399,30],[2285,1405,44],[2472,1392,32],[1691,936,38],[1910,924,30],[2135,942,42],[2410,936,34],[2516,1105,30],[2222,1061,26],[1772,1330,24],[2560,1330,28]].forEach(function(rk2){townRock(rk2[0],rk2[1],rk2[2]);}); /* terrace-edge crags */
+    [[1710,1395,34],[1885,1408,42],[2085,1399,30],[2285,1405,44],[2472,1392,32],[1691,936,38],[1910,924,30],[2135,942,42],[2410,936,34],[2516,1105,30],[2222,1061,26],[1772,1330,24],[2560,1330,28],[2150,1180,26],[2050,1290,22]].forEach(function(rk2){townRock(rk2[0],rk2[1],rk2[2]);}); /* terrace-edge crags — the last two stud the green slope between the landing circle and the two forecourts */
   })();
 }
 function genWorld(){
@@ -4549,28 +4560,29 @@ function townTerrain(x,y,h){
       h+=348*kk*peaks+178*_sm01((770-y)/220)*kx;
     }
   }
-  h=_lerpTo(h,140,_band(Math.hypot(x-1401,y-1096),165,250));  /* falls crag — moved WEST with the falls and raised: the drop is taller now, so the falls read as the town's face from anywhere inside the wall */
-  h=_lerpTo(h,80,_band(Math.hypot((x-1435)*0.30,y-1179),36,68)); /* falls upper shelf (tier 1 lands here), stretched wider E-W under the widened sheet */
-  h=_lerpTo(h,50,_band(Math.hypot((x-1441)*0.30,y-1259),36,68)); /* falls lower shelf (tier 2 lands here) */
+  h=_lerpTo(h,168,_band(Math.hypot(x-1341,y-1096),155,245));  /* falls crag — moved WEST AGAIN with the falls and raised much higher (140 → 168): the drop from the top pool (152) to the plunge pool (≈0) is now ≈15m in three plunging tiers, so the falls read as the town's face from anywhere inside the wall */
+  h=_lerpTo(h,100,_band(Math.hypot((x-1375)*0.30,y-1179),36,68)); /* falls upper shelf (tier 1 lands here), stretched wider E-W under the widened sheet */
+  h=_lerpTo(h,62,_band(Math.hypot((x-1381)*0.30,y-1259),36,68)); /* falls lower shelf (tier 2 lands here) */
   /* the gorge: two rocky shoulders hugging the falls channel, west and
      east, so the water drops through a real canyon instead of a grassy
      dip. Laid down BEFORE the water carve (which cuts the channel back
      through them) and before the building pads (which keep the west
      houses level), and the high-terrace lerp east of the chapel still
      wins further east. */
-  h=_lerpTo(h,108,_band(_rectD(x,y,1255,1053,1358,1403),0,75));  /* gorge west wall (moved west with the falls; its east face still clears the east house column — the house pads, applied later, keep the two nearest houses level) */
-  h=_lerpTo(h,108,_band(_rectD(x,y,1595,1053,1708,1340),0,75)); /* gorge east wall */
+  h=_lerpTo(h,108,_band(_rectD(x,y,1195,1053,1298,1403),0,75));  /* gorge west wall (moved west with the falls; its east face still clears the east house column — the house pads, applied later, keep the two nearest houses level) */
+  h=_lerpTo(h,108,_band(_rectD(x,y,1535,1053,1648,1340),0,75)); /* gorge east wall */
   h=_lerpTo(h,80,_band(_rectD(x,y,1740,1470,2470,1740),0,110));  /* mid terrace (NE): broad shoulder the long ramp climbs past */
   h=_lerpTo(h,168,_band(_rectD(x,y,1760,960,2520,1360),0,120)); /* high terrace: chapel (west) & castle (east) */
   h=_lerpTo(h,168,_band(Math.hypot(x-1820,y-1150),185,280));  /* the chapel's own terrace disc: the cathedral stands level even where the terrace's west edge blends toward the gorge */
-  h=_lerpTo(h,215,_band(Math.hypot(x-2330,y-1250),140,235));  /* castle rock, at the NE corner against the wall (kept clear of the chapel terrace) */
-  h=_lerpTo(h,168,_band(Math.hypot(x-TERRACE_PLAZA.x,y-TERRACE_PLAZA.y),TERRACE_PLAZA.r,TERRACE_PLAZA.r+55)); /* the between-landmarks plaza's own terrace disc, levelled AFTER the castle rock: the rock's feather reaches to ~140 from the castle, which buried the plaza's east half (up to z 215 against the disc's 168) and shoved its visible centre toward the chapel — now the full r 100 disc sits flat at the terrace level, at the landmarks' exact midpoint */
+  h=_lerpTo(h,228,_band(Math.hypot(x-2375,y-1285),140,235));  /* castle rock, raised (215 → 228) and moved east with the castle into the NE corner against the wall (kept clear of the chapel terrace) */
+  h=_lerpTo(h,168,_band(Math.hypot(x-TERRACE_PLAZA.x,y-TERRACE_PLAZA.y),TERRACE_PLAZA.r,TERRACE_PLAZA.r+55)); /* the landing circle's own terrace disc, levelled AFTER the castle rock: the rock's feather reaches to ~140 from the castle, which would bury the circle's east half and shove its visible centre toward the chapel — now the full r 58 disc sits flat at the terrace level */
+  h=_lerpTo(h,196,_band(Math.hypot(x-2375,y-1470),95,150)); /* the castle forecourt's own court, levelled after the rock for the same reason: a flat court at 196 — a step below the castle rock's crown (228), a step above the terrace (168) — so the smaller forecourt reads as its own space in front of the castle, not as a slope of the rock */
   /* water carve */
   h=_lerpTo(h,-6,_band(Math.hypot(x-POND_C.x,y-POND_C.y),POND_C.r+20,POND_C.r+64)); /* central pond: round */
   h=_lerpTo(h,-6,_band(pondEMetric(x,y),POND_E.r-20,POND_E.r+25)); /* east pond: stretched wide E-W with a naturally wobbling shore (see pondEMetric) */
   h=_lerpTo(h,-5,_band(Math.hypot(x-POOL.x,y-POOL.y),POOL.r-18,POOL.r+22));
-  h=_lerpTo(h,124,_band(Math.hypot(x-1426,y-1090),36,72));    /* falls top pool set into the raised crag */
-  h=_lerpTo(h,-5,_band(Math.hypot(x-1464,y-1399),50,100));     /* falls outflow below the plunge pool */
+  h=_lerpTo(h,152,_band(Math.hypot(x-1366,y-1090),36,72));    /* falls top pool set into the raised crag — the head of the taller drop */
+  h=_lerpTo(h,-5,_band(Math.hypot(x-1404,y-1399),50,100));     /* falls outflow below the plunge pool */
   /* river carve starts after the falls outflow segment (segment 0), so the
      channel never eats the falls shelf above it */
   var rd=1e9; for(var i=1;i<RIVER.length-1;i++){var sd=_segD(x,y,RIVER[i][0],RIVER[i][1],RIVER[i+1][0],RIVER[i+1][1]); if(sd<rd)rd=sd;}
@@ -4591,8 +4603,8 @@ function townTerrain(x,y,h){
   var bk=0,bh=0;
   for(var hp=0;hp<TOWN_PADS.length;hp++){var pd=TOWN_PADS[hp];var pdd=_rectD(x,y,pd.x0,pd.y0,pd.x1,pd.y1);if(pdd<46){var pk=_band(pdd,0,46);if(pk>bk){bk=pk;bh=pd.h;}}}
   if(bk>0)h=_lerpTo(h,bh,bk);
-  h=_lerpTo(h,80,_band(Math.hypot((x-1435)*0.30,y-1179),32,62)); /* falls shelves re-asserted last: the pool carve must not eat them */
-  h=_lerpTo(h,50,_band(Math.hypot((x-1441)*0.30,y-1259),32,62));
+  h=_lerpTo(h,100,_band(Math.hypot((x-1375)*0.30,y-1179),32,62)); /* falls shelves re-asserted last: the pool carve must not eat them */
+  h=_lerpTo(h,62,_band(Math.hypot((x-1381)*0.30,y-1259),32,62));
   return h;
 }
 /* Rolling terrain height (world units) at game coords x,y: gentle hills and dips,
@@ -5951,7 +5963,7 @@ function fallsSheetMaterial(){
 function buildFallsSpray(){
   if(!scene)return;
   if(fallsSpray){scene.remove(fallsSpray);fallsSpray=null;sprayParts=null;}
-  var bases=[[1435,1189,84],[1441,1269,54],[1449,1339,6]]; /* the three plunge bases, moved west with the falls */
+  var bases=[[1375,1189,102],[1381,1269,65],[1389,1339,6]]; /* the three plunge bases, moved west and raised with the taller falls */
   var N=880, pos=new Float32Array(N*3); sprayParts=[]; /* more spray, thrown wider and higher off the bigger falls */
   var sd=4242; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
   for(var i=0;i<N;i++){
@@ -5981,7 +5993,7 @@ function buildFallsMist(){
   gr.addColorStop(0,'rgba(255,255,255,0.85)'); gr.addColorStop(0.55,'rgba(240,250,255,0.38)'); gr.addColorStop(1,'rgba(240,250,255,0)');
   c2.fillStyle=gr; c2.fillRect(0,0,64,64);
   var tex=new THREE.CanvasTexture(cv);
-  var spots=[[1435,1194,86],[1441,1274,56],[1449,1339,8],[1429,1347,7],[1469,1332,7]]; /* the mist spots, moved west with the falls */
+  var spots=[[1375,1194,104],[1381,1274,67],[1389,1339,8],[1369,1347,7],[1409,1332,7]]; /* the mist spots, moved west and raised with the taller falls */
   for(var i=0;i<spots.length;i++){
     var sm=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:0.16,depthWrite:false,color:0xf6fcff});
     var sp=new THREE.Sprite(sm);
@@ -5995,7 +6007,7 @@ function buildFallsMist(){
   for(var ri=0;ri<3;ri++){
     var rm=new THREE.Mesh(new THREE.RingGeometry(0.84,1.0,44),new THREE.MeshBasicMaterial({color:0xf4fbff,transparent:true,opacity:0.4,depthWrite:false,side:THREE.DoubleSide}));
     rm.rotation.x=-Math.PI/2;
-    rm.position.set(WX(1449),3.4,WZ(1334));
+    rm.position.set(WX(1389),3.4,WZ(1334));
     rm.renderOrder=3;
     rm.userData={ph:ri/3};
     scene.add(rm); fallsRings.push(rm);
@@ -6079,7 +6091,7 @@ function updateSmoke(now){
    a while, then ambles on. They are pure townsfolk — no combat, no
    labels — just the sense that Luminas is inhabited. Models are built
    once and moved in render3D, like the remote players. */
-var FOLK_SPOTS=[[800,1460],[1000,1650],[800,1900],[610,1700],[1100,1460],[1060,2280],[900,2400],[1470,2400],[1470,2670],[1420,2680],[1250,2080],[900,2470],[1660,2700],[1015,2275],[1330,2700],[760,1330]]; /* plaza / spawn / market / west-street spots moved south-west with the plaza */
+var FOLK_SPOTS=[[800,1460],[1000,1650],[800,1900],[610,1700],[1100,1460],[1200,2280],[1000,2400],[1650,2400],[1650,2670],[1600,2680],[1250,2080],[900,2470],[1700,2700],[1195,2275],[1400,2700],[760,1330]]; /* plaza / spawn / market / west-street spots moved east with the plaza */
 var townsfolk=[], folkLastT=0;
 function villagerModel(seed){
   var g=new THREE.Group();
@@ -6249,8 +6261,8 @@ function buildRiver3D(){
     var rapid=0;
     var dFalls=Math.hypot(gx-POOL.x,gy-POOL.y);
     if(dFalls<280)rapid=Math.max(rapid,1.0-dFalls/280);
-    if(Math.hypot(gx-1555,gy-1935)<110)rapid=Math.max(rapid,0.6); /* rocky narrows where the river leaves the central pond */
-    if(Math.hypot(gx-1960,gy-2065)<100)rapid=Math.max(rapid,0.5); /* the stony run into the east pond's inlet */
+    if(Math.hypot(gx-1620,gy-1960)<110)rapid=Math.max(rapid,0.6); /* rocky narrows where the river leaves the widened central pond */
+    if(Math.hypot(gx-1990,gy-2030)<100)rapid=Math.max(rapid,0.5); /* the stony run into the east pond's inlet */
     if(Math.hypot(gx-2420,gy-2300)<110)rapid=Math.max(rapid,0.55); /* the east pond's outflow */
     if(Math.hypot(gx-2505,gy-2405)<120)rapid=Math.max(rapid,0.5); /* the drop toward the water gate */
     if(inPond(gx,gy))rapid*=0.25;
@@ -6341,11 +6353,11 @@ function buildTown3D(){
     var m=new THREE.Mesh(G('s'+r,function(){return new THREE.SphereGeometry(r,10,8);}),M(0xf4fbff));
     m.scale.y=0.35; m.position.set(WX(x),z,WZ(y2d)); staticGroup.add(m);
   }
-  sheet(1428,1142,123,1435,1182,82,340);  /* tier 1: top pool → upper shelf — the falls moved WEST and grew: wider sheets (340/330/320) and a taller first drop off the raised crag, so the falls are the town's face, not a ribbon on the hill */
-  sheet(1436,1199,79,1441,1262,52,330);   /* tier 2: upper shelf → lower shelf */
-  sheet(1443,1277,49,1449,1337,3,320);    /* tier 3: lower shelf → plunge pool */
-  foam(1435,1187,81,78); foam(1441,1267,51,84); foam(1449,1342,4,92); foam(1426,1090,126,24);
-  foam(1389,1197,80,40); foam(1484,1197,80,40); foam(1396,1277,50,42); foam(1489,1277,50,42); /* side bursts where the widened sheets strike the shelves */
+  sheet(1368,1142,151,1375,1182,102,340);  /* tier 1: top pool → upper shelf — the falls moved WEST AGAIN and the drop grew: the crag top pool now sits at z ≈152 and the three tiers plunge ≈15m in total (was ≈12m) to the plunge pool, so the falls crash down the gorge as the town's face, not a ribbon on the hill */
+  sheet(1376,1199,99,1381,1262,65,330);   /* tier 2: upper shelf → lower shelf */
+  sheet(1383,1277,62,1389,1337,3,320);    /* tier 3: lower shelf → plunge pool */
+  foam(1375,1187,101,78); foam(1381,1267,64,84); foam(1389,1342,4,92); foam(1366,1090,154,24);
+  foam(1329,1197,99,40); foam(1424,1197,99,40); foam(1336,1277,63,42); foam(1429,1277,63,42); /* side bursts where the widened sheets strike the shelves */
   buildFallsSpray(); /* animated spray mist at the three plunge bases */
   buildFallsMist();  /* drifting mist clouds + expanding ripple rings in the plunge pool */
   buildSmoke();      /* chimney smoke over every house (positions follow the house features, so it rebuilds with the town) */
