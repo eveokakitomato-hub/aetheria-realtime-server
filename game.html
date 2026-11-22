@@ -1598,10 +1598,13 @@ function regionAt(x,y){
      gate in the south-east wall. Cambered stone arch bridges cross it
      west of the central pond, at the pond's outflow, and over the east
      pond's outlet.
-   - the FOUNTAIN PLAZA sits at the town's centre, a touch south: a
-     great circular stone-paved plaza with the fountain at its centre
+   - the FOUNTAIN PLAZA sits WEST of the town's centre (its centre
+     about 40% of the way across from the west wall, as in the photo),
+     a touch south: a great circular stone-paved plaza with the
+     fountain at its centre
      (its basin steps and rim are standable, at their drawn heights);
-     spawn is on its south edge.
+     spawn is on its south edge. The central pond, which used to sit
+     due north of it, now lies to its north-east.
    - the CLOCK TOWER stands against the WEST wall among the houses.
    - the blue-glowing CHAPEL stands on the broad high NE terrace, the
      CASTLE east of it in the NE corner on its own rock, against the
@@ -1622,8 +1625,8 @@ function regionAt(x,y){
    slowly heal (isSafe). */
 var TOWN_CX=1300, TOWN_CY=1740, TOWN_RX=790, TOWN_RY=695;
 var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
-var PLAZA={x:1300,y:1700};          /* the fountain plaza: at the town's centre, a touch north — the fountain is its centre */
-var POND_C={x:1280,y:1328,r:118};   /* central pond: round, its south shore touching the plaza's north edge */
+var PLAZA={x:1140,y:1700};          /* the fountain plaza: shifted 16m west of the town's centre, so its centre sits ≈40% across from the west wall (photo layout) — the fountain is its centre. Everything plaza-linked (spawn, stalls, corner lamps, the grand staircase's foot, the plaza streets, townsfolk waypoints) is placed relative to this point */
+var POND_C={x:1280,y:1328,r:118};   /* central pond: round, UNCHANGED — from the shifted plaza it now lies to the north-east, across the river's west bank */
 var POND_E={x:1775,y:1620,r:170};   /* the east pond: stretched E-W (terrain carve squashes x by 0.72), shifted SE, houses along its south shore — enlarged again and ringed by a cleared shore (see the tree filter in genWorld) so it opens up and reads as one big sheet of bright water from the air */
 var POOL={x:1168,y:1290,r:72};      /* plunge pool under the falls */
 var RIVER=[[1168,1290],[1218,1312],[1280,1328],[1362,1370],[1470,1452],[1548,1532],[1632,1592],[1775,1620],[1902,1662],[1988,1762],[2038,1902],[2075,2085]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall) */
@@ -1644,14 +1647,14 @@ var STREETS=[
   {x1:1218,y1:1620,x2:1218,y2:1470,w:24,t:'s'},
   {x1:880,y1:2150,x2:1480,y2:2150,w:27,t:'s'},
   {x1:900,y1:1995,x2:1480,y2:1995,w:28,t:'d'},
-  {x1:1300,y1:1950,x2:1158,y2:1995,w:29,t:'d'},
+  {x1:1140,y1:1950,x2:1158,y2:1995,w:29,t:'d'},
   {x1:1158,y1:1995,x2:1158,y2:2140,w:27,t:'d'},
   {x1:1098,y1:2150,x2:1098,y2:2310,w:27,t:'d'},
   {x1:1098,y1:2310,x2:1270,y2:2425,w:31,t:'d'},
-  {x1:1554,y1:1700,x2:1640,y2:1700,w:30,t:'s'},
+  {x1:1525,y1:1700,x2:1640,y2:1700,w:30,t:'s'},
   {x1:1700,y1:1895,x2:1980,y2:1895,w:27,t:'s'}
 ];
-var SPAWN_X=1300, SPAWN_Y=1925;     /* south edge of the fountain plaza */
+var SPAWN_X=1140, SPAWN_Y=1925;     /* south edge of the fountain plaza (moved west with the plaza) */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
 /* ============ THE GRAND STAIRCASE (plaza → one long diagonal ramp → terrace-top fork → chapel / castle) ============
    Parametric stone flights, sized for the 1.7m body: riser ≈0.17m
@@ -1666,7 +1669,7 @@ var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData
    west to the CHAPEL and run C climbs east to the CASTLE rock. */
 var STAIR_TREAD_A=5.6, STAIR_TREAD_B=4.6;
 var STAIRS=[
-  {x:1452,y:1552,dx:308,dy:-308,w:124,z0:30,z1:168, tread:5.4,n:66,n1:33,land:30},
+  {x:1292,y:1552,dx:433,dy:-273,w:124,z0:30,z1:168, tread:5.4,n:89,n1:44,land:30},
   {x:1692,y:1264,dx:-130,dy:-10,w:70, z0:168,z1:168,tread:4.6,n:24,n1:12,land:20},
   {x:1752,y:1260,dx:88,dy:-17, w:78, z0:168,z1:215,tread:4.4,n:16,n1:8, land:18}
 ];
@@ -1791,10 +1794,10 @@ function buildTownData(){
     [720,1300,105,92,0],[832,1292,100,90,5],[945,1318,105,92,-5],
     [725,1412,100,90,180],[832,1406,105,92,175],[955,1415,100,90,185],
     [700,1522,100,90,0],[988,1520,100,90,5],
-    [705,1692,105,92,180],[840,1702,100,90,175],[975,1690,105,92,185],
+    [630,1692,105,92,180],[765,1702,100,90,175],[905,1690,105,92,185],
     [730,1802,100,90,0],[855,1812,105,92,-5],[970,1800,100,90,5],
     [760,1908,105,92,180],[905,1918,100,90,175],
-    [1064,1420,95,85,95],[1092,1560,95,85,85],[1080,1730,95,85,90],
+    [1064,1420,95,85,95],[1480,1730,95,85,-85],[1125,2055,95,85,-90],
     [955,1195,95,85,60],[2010,1470,95,85,-60],[845,1198,95,85,35],
     [865,2088,105,92,180],[995,2086,110,95,185],[1235,2088,115,95,180],[1365,2086,110,95,170],[1470,2088,90,88,178],
     [950,2215,105,92,180],[1210,2212,110,95,175],[1340,2215,105,92,185],[1470,2212,100,92,172],[1600,2210,100,92,180],
@@ -1830,18 +1833,18 @@ function buildTownData(){
   rect(1500,1185,192,134,{chapel:true}); townFeatures.push({kind:'chapel',x:1500,y:1185}); /* high terrace, west end, close above the river — the crystal cathedral, footprint matched to its enlarged nave */
   rect(1905,1225,180,180,{castle:true}); townFeatures.push({kind:'castle',x:1905,y:1225}); /* the NE corner, hard against the wall and its rock */
   circ(PLAZA.x,PLAZA.y,17,{pillar:true}); townFeatures.push({kind:'fountain',x:PLAZA.x,y:PLAZA.y});
-  [[1095,1525],[1505,1525],[1095,1875],[1505,1875]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
+  [[925,1525],[1345,1525],[935,1865],[1345,1875]].forEach(function(p){circ(p[0],p[1],6,{pillar:true});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});}); /* the plaza's four corner lamps, moved west with the plaza (the W pair nudged a few units to clear the west house row's edges) */
   /* --- market stalls around the plaza: a full ring of them on the
      plaza's rim (kept clear of the spawn point, the streets, the grand
      staircase corridor and the pond) --- */
-  [[1150,1895],[1455,1895],[1062,1648],[1525,1710],[1170,1525],
-   [1005,1705],[1560,1835],[1085,1940],[1515,1940],[1025,1490],[1130,1470],[1210,1965],[1395,1965]
-  ].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});});
+  [[990,1895],[1295,1895],[1400,1600],[1365,1710],[1075,1525],
+   [1080,1940],[1385,1835],[990,1945],[1355,1940],[865,1490],[1155,1480],[1185,1955],[1255,1965]
+  ].forEach(function(s){rect(s[0],s[1],56,42,{stall:true});townFeatures.push({kind:'stall',x:s[0],y:s[1],seed:rnd()});}); /* the ring moved west with the plaza; the stalls that would have landed inside the west house row / the relocated houses were re-seated on the plaza's open N / NE / S rims instead */
   /* --- the streets (see STREETS): render features only — the ground
      tint along them is painted in init3D() --- */
   STREETS.forEach(function(s){townFeatures.push({kind:'street',x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,w:s.w,t:s.t,x:(s.x1+s.x2)/2,y:(s.y1+s.y2)/2});});
   /* --- wells & carts: the town's working furniture --- */
-  [[1120,1990],[1960,1935]].forEach(function(wp2){circ(wp2[0],wp2[1],16,{well:true});townFeatures.push({kind:'well',x:wp2[0],y:wp2[1]});});
+  [[1010,2010],[1960,1935]].forEach(function(wp2){circ(wp2[0],wp2[1],16,{well:true});townFeatures.push({kind:'well',x:wp2[0],y:wp2[1]});}); /* the south well stepped west with the plaza, clear of the house that moved onto the south row */
   townFeatures.push({kind:'cart',x:1145,y:2330,rot:0.5,seed:rnd()});
   townFeatures.push({kind:'cart',x:1850,y:1932,rot:-0.35,seed:rnd()});
   /* --- building pads: sample every house's ground height NOW, while
@@ -3832,7 +3835,7 @@ function terrainHBase(x,y){
   function flatC(cx,cy,r0,r1){var d=Math.hypot(x-cx,y-cy);if(d<=r0)return 0;if(d>=r1)return 1;var t=(d-r0)/(r1-r0);return t*t*(3-2*t);}
   function flatR(x0,y0,x1,y1,m0,m1){var dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1);var d=Math.hypot(dx,dy);if(d<=m0)return 0;if(d>=m1)return 1;var t=(d-m0)/(m1-m0);return t*t*(3-2*t);}
   var f=1;
-  f*=flatC(1300,1680,260,520);        // spawn clearing stays level
+  f*=flatC(1140,1680,260,520);        // spawn clearing stays level (centred on the west-shifted plaza / spawn)
   f*=flatC(420,2150,300,560);         // lake 1 surface stays level
   f*=flatC(700,4300,330,600);         // lake 2 （翠玉湖）
   f*=flatC(4200,2400,180,420);        // desert oasis
@@ -5187,7 +5190,7 @@ function updateSmoke(now){
    a while, then ambles on. They are pure townsfolk — no combat, no
    labels — just the sense that Luminas is inhabited. Models are built
    once and moved in render3D, like the remote players. */
-var FOLK_SPOTS=[[760,1467],[900,1620],[760,1747],[640,1620],[1030,1620],[1218,1620],[1150,1700],[1450,1700],[1300,1560],[1300,1860],[1300,1995],[1000,1995],[1098,2150],[1300,2150],[1700,1895],[1850,1895]];
+var FOLK_SPOTS=[[760,1467],[900,1620],[760,1747],[640,1620],[1030,1620],[1218,1620],[990,1700],[1290,1700],[1140,1560],[1140,1860],[1140,1995],[1000,1995],[1098,2150],[1140,2150],[1700,1895],[1850,1895]];
 var townsfolk=[], folkLastT=0;
 function villagerModel(seed){
   var g=new THREE.Group();
