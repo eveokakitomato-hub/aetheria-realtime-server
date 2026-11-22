@@ -19,6 +19,7 @@
  * Render では render.yaml / Dockerfile からそのままデプロイできる。
  */
 const http = require('http');
+const crypto = require('crypto');
 const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 2567;
@@ -53,6 +54,174 @@ function broadcast(obj, exceptId = null) {
   }
 }
 
+// ---- アカウント & 自動保存 (Supabase を保存先に使う) ----
+// 環境変数 SUPABASE_URL と SUPABASE_SERVICE_KEY が設定されている時だけ有効。
+// 未設定なら /api/* は 503 を返し、ゲーム側は従来のファイルセーブで動く。
+// パスワードは scrypt ハッシュ (salt つき) でだけ保存し、平文は保持しない。
+// ログイン状態は DB に保存したセッショントークンで管理するので、
+// サーバーが再起動・スリープ復帰してもログインは維持される。
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+const ACCOUNTS_ENABLED = !!(SUPABASE_URL && SUPABASE_SERVICE_KEY);
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30日
+const CHAR_MAX_BYTES = 256 * 1024;
+const loginFails = new Map(); // username -> {count, lockedUntil}
+
+async function sb(pathname, { method = 'GET', body = null, prefer = '' } = {}) {
+  const headers = {
+    apikey: SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+    'Content-Type': 'application/json',
+  };
+  if (prefer) headers.Prefer = prefer;
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${pathname}`, {
+    method, headers, body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await r.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { /* ignore */ }
+  if (!r.ok) throw new Error(`supabase ${r.status}: ${text.slice(0, 200)}`);
+  return data;
+}
+
+function scryptHash(password, salt) {
+  return new Promise((resolve, reject) => {
+    crypto.scrypt(password, salt, 64, (err, key) => err ? reject(err) : resolve(key));
+  });
+}
+async function makePassHash(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const key = await scryptHash(password, salt);
+  return `${salt}:${key.toString('hex')}`;
+}
+async function checkPassHash(password, stored) {
+  const [salt, hex] = String(stored || '').split(':');
+  if (!salt || !hex) return false;
+  const key = await scryptHash(password, salt);
+  const expected = Buffer.from(hex, 'hex');
+  return key.length === expected.length && crypto.timingSafeEqual(key, expected);
+}
+
+function sendJson(res, code, obj) {
+  res.writeHead(code, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(obj));
+}
+function readJsonBody(req) {
+  return new Promise((resolve) => {
+    const chunks = [];
+    let size = 0;
+    req.on('data', (c) => {
+      size += c.length;
+      if (size > 512 * 1024) { req.destroy(); resolve(null); return; }
+      chunks.push(c);
+    });
+    req.on('end', () => {
+      try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}')); }
+      catch { resolve(null); }
+    });
+    req.on('error', () => resolve(null));
+  });
+}
+
+const USERNAME_RE = /^[a-z0-9_]{3,16}$/;
+async function findAccountByName(username) {
+  const rows = await sb(`accounts?username=eq.${encodeURIComponent(username)}&select=*`);
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+async function findAccountByToken(token) {
+  if (!token) return null;
+  const rows = await sb(`accounts?session_token=eq.${encodeURIComponent(token)}&select=*`);
+  const acc = Array.isArray(rows) && rows.length ? rows[0] : null;
+  if (!acc) return null;
+  if (acc.session_expires && new Date(acc.session_expires).getTime() < Date.now()) return null;
+  return acc;
+}
+async function issueSession(acc) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + SESSION_TTL_MS).toISOString();
+  await sb(`accounts?id=eq.${acc.id}`, {
+    method: 'PATCH',
+    body: { session_token: token, session_expires: expires, updated_at: new Date().toISOString() },
+  });
+  return token;
+}
+function bearerToken(req) {
+  const h = String(req.headers.authorization || '');
+  return h.startsWith('Bearer ') ? h.slice(7) : '';
+}
+
+async function handleApi(req, res, url) {
+  if (!ACCOUNTS_ENABLED) {
+    return sendJson(res, 503, { ok: false, error: 'accounts_not_configured' });
+  }
+  try {
+    if (url === '/api/register' && req.method === 'POST') {
+      const body = await readJsonBody(req);
+      const username = String((body && body.username) || '').trim().toLowerCase();
+      const password = String((body && body.password) || '');
+      if (!USERNAME_RE.test(username)) return sendJson(res, 400, { ok: false, error: 'bad_username' });
+      if (password.length < 6 || password.length > 64) return sendJson(res, 400, { ok: false, error: 'bad_password' });
+      if (await findAccountByName(username)) return sendJson(res, 409, { ok: false, error: 'username_taken' });
+      const pass_hash = await makePassHash(password);
+      const rows = await sb('accounts', {
+        method: 'POST', prefer: 'return=representation',
+        body: { username, pass_hash },
+      });
+      const acc = Array.isArray(rows) ? rows[0] : null;
+      if (!acc) return sendJson(res, 500, { ok: false, error: 'register_failed' });
+      const token = await issueSession(acc);
+      return sendJson(res, 200, { ok: true, token, username, character: null });
+    }
+    if (url === '/api/login' && req.method === 'POST') {
+      const body = await readJsonBody(req);
+      const username = String((body && body.username) || '').trim().toLowerCase();
+      const password = String((body && body.password) || '');
+      const fail = loginFails.get(username);
+      if (fail && fail.lockedUntil > Date.now()) return sendJson(res, 429, { ok: false, error: 'too_many_attempts' });
+      const acc = await findAccountByName(username);
+      const ok = acc && await checkPassHash(password, acc.pass_hash);
+      if (!ok) {
+        const f = fail || { count: 0, lockedUntil: 0 };
+        f.count += 1;
+        if (f.count >= 10) { f.lockedUntil = Date.now() + 5 * 60 * 1000; f.count = 0; }
+        loginFails.set(username, f);
+        return sendJson(res, 401, { ok: false, error: 'wrong_credentials' });
+      }
+      loginFails.delete(username);
+      const token = await issueSession(acc);
+      return sendJson(res, 200, { ok: true, token, username, character: acc.char_data || null });
+    }
+    // ここから先はログイン必須
+    const acc = await findAccountByToken(bearerToken(req));
+    if (!acc) return sendJson(res, 401, { ok: false, error: 'not_logged_in' });
+    if (url === '/api/character' && req.method === 'GET') {
+      return sendJson(res, 200, { ok: true, username: acc.username, character: acc.char_data || null });
+    }
+    if (url === '/api/save' && req.method === 'POST') {
+      const body = await readJsonBody(req);
+      const character = body && body.character;
+      if (!character || typeof character !== 'object') return sendJson(res, 400, { ok: false, error: 'bad_character' });
+      if (JSON.stringify(character).length > CHAR_MAX_BYTES) return sendJson(res, 413, { ok: false, error: 'character_too_large' });
+      await sb(`accounts?id=eq.${acc.id}`, {
+        method: 'PATCH',
+        body: { char_data: character, updated_at: new Date().toISOString() },
+      });
+      return sendJson(res, 200, { ok: true });
+    }
+    if (url === '/api/logout' && req.method === 'POST') {
+      await sb(`accounts?id=eq.${acc.id}`, {
+        method: 'PATCH',
+        body: { session_token: null, session_expires: null, updated_at: new Date().toISOString() },
+      });
+      return sendJson(res, 200, { ok: true });
+    }
+    return sendJson(res, 404, { ok: false, error: 'not_found' });
+  } catch (err) {
+    console.error('[api]', err.message);
+    return sendJson(res, 500, { ok: false, error: 'server_error' });
+  }
+}
+
 // ---- HTTP ----
 // /health: ヘルスチェック (ゲーム画面からの疎通確認のため CORS を許可)
 // / と /game: ゲーム本体 (game.html) を配信する。Cache-Control: no-store で
@@ -75,10 +244,17 @@ function loadGame() {
 }
 const httpServer = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   const url = (req.url || '/').split('?')[0];
-  if (url === '/health') {
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+  } else if (url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, players: players.size, protocol: 2 }));
+    res.end(JSON.stringify({ ok: true, players: players.size, protocol: 2, accounts: ACCOUNTS_ENABLED ? 'on' : 'off' }));
+  } else if (url.startsWith('/api/')) {
+    handleApi(req, res, url);
   } else if (url === '/' || url === '/game') {
     const html = loadGame();
     if (html) {
