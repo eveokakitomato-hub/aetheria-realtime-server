@@ -1000,6 +1000,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程になります</td></tr>
             <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
             <tr><td>浮遊（飛行）</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）のみ。空中でもう一度 <kbd>Space</kbd> で浮遊し、浮遊中は <kbd>Space</kbd> 長押しで上昇、短く2回押すと解除されて降ります</td></tr>
+            <tr><td>高速移動</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）のみ。歩行・ダッシュ・浮遊中の移動・泳ぎの速度がすべて4倍になります（歩行モーションも速さに合わせて速くなります）</td></tr>
             <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動でダッシュ。MPを毎秒1消費し、尽きるとダッシュできません</td></tr>
             <tr><td>全体マップ</td><td><kbd>M</kbd> キー。歩いて探索したエリアだけが表示される全体マップ（探索記録はセーブに残ります）</td></tr>
             <tr><td>矢</td><td>アーチャーの射撃は矢を消費し、矢は放物線を描いて飛びます。地形に刺さった矢は近づいて <kbd>E</kbd> で回収できます</td></tr>
@@ -3201,13 +3202,14 @@ function update(dt,now){
     }
     var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
     if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
+    sp*=gmSpeedMul(); /* gamemaster account only: walk / dash / float-move / swim all 4x (1x for everyone else) */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     /* feetZ: walls / rocks / houses only block up to their visible top */
     var feetZ=playerGroundZ()+jumpY;
     if(!collide(nx,player.y,player.r,feetZ)) player.x=nx;
     if(!collide(player.x,ny,player.r,feetZ)) player.y=ny;
     if(mx)player.dir=mx>0?1:-1;
-    player.walk+=dt*0.02;
+    player.walk+=dt*0.02*gmSpeedMul(); /* walk-cycle phase follows the actual ground speed (4x for gamemaster) */
   }
   // jump physics (Space): gravity pulls the player back down onto the terrain height;
   // horizontal movement above keeps working while airborne.
@@ -3221,7 +3223,7 @@ function update(dt,now){
     if(player.swimming){hovering=false;hoverTapT=0;clearHoverPress();}
     else if(keys['Space']&&hoverPressT&&now-hoverPressT>=HOVER_HOLD_MS&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
       hoverTapT=0;hoverPressWasSecond=false; /* this press is a hold now, not a tap */
-      jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_RISE_PER_MS*dt);
+      jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_RISE_PER_MS*gmSpeedMul()*dt); /* float rise is gamemaster-only, so it takes the same 4x */
     }
   }else if(jumpVY!==0||jumpY>0){
     var gZf=standH(player.x,player.y);
@@ -3871,6 +3873,14 @@ function terrainHBase(x,y){
    else. Placed buildings are a sparse list too, with real collision. */
 function isGameMaster(){
   return !!(typeof acct!=='undefined'&&acct&&acct.token&&acct.username==='gamemaster');
+}
+/* GAMEMASTER SPEED: while logged in as the gamemaster account, ALL
+   movement — walking, dashing, moving while floating, and swimming —
+   runs at 4x. Guests and every other account get exactly 1x. The walk
+   animation phase and the first-person weapon bob advance with the
+   same multiplier so the motion matches the ground speed. */
+function gmSpeedMul(){
+  return isGameMaster()?4:1;
 }
 var EDIT_SEG=220, EDIT_STEP=W/EDIT_SEG, EDIT_N=EDIT_SEG+1; /* 220 segments over 10400 units = the same 47.27-unit step the old 110-segment grid had over 5200, so brush feel and terrain resolution are unchanged after the expansion */
 var terrainDelta=new Float32Array(EDIT_N*EDIT_N);
@@ -6340,7 +6350,8 @@ function render3D(now){
     if(player.cls!==vmCls)buildViewModel();
     viewModel.visible=!player.dead;
     var moving=(keys['KeyW']||keys['KeyA']||keys['KeyS']||keys['KeyD']||joyVec.x||joyVec.y);
-    var bobY=moving?Math.sin(now/95)*0.018:0, bobX=moving?Math.cos(now/190)*0.012:0;
+    var bobT=now*gmSpeedMul(); /* weapon bob tempo follows ground speed (4x for gamemaster) */
+    var bobY=moving?Math.sin(bobT/95)*0.018:0, bobX=moving?Math.cos(bobT/190)*0.012:0;
     var sw=(now-atkAnimT)/220;
     var swing=0,swingZ=0;
     if(sw>=0&&sw<1){var s2=Math.sin(sw*Math.PI);swing=-s2*0.9;swingZ=-s2*0.55;}
