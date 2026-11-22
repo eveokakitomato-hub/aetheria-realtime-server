@@ -1784,7 +1784,7 @@ function draw(){
   decorations.forEach(function(d){
     if(d.kind==='lake')return;
     var sx=d.x-cam.x,sy=d.y-cam.y;if(sx<-60||sy<-60||sx>vw+60||sy>vh+60)return;
-    ctx.font=(d.s*1.7)+'px serif';ctx.textAlign='center';
+    ctx.font=((d.kind==='tree'?d.s*2.4:d.s*1.7))+'px serif';ctx.textAlign='center';
     if(d.kind==='tree')ctx.fillText('🌲',sx,sy+6);
     else if(d.kind==='rock')ctx.fillText('🪨',sx,sy+4);
     else ctx.fillText(Math.floor(d.seed)%2?'🌼':'🌷',sx,sy+3);
@@ -2015,9 +2015,39 @@ function buildWorld3D(){
     var x=WX(d.x),z=WZ(d.y);
     if(d.kind==='tree'){
       var tg=new THREE.Group();tg.position.set(x,0,z);staticGroup.add(tg);
-      cyl(d.s*0.16,d.s*0.22,d.s*1.1,0x6b4a2c,0,d.s*0.55,0,tg,7);
-      cone(d.s*0.95,d.s*1.7,0x2e5d33,0,d.s*1.35,0,tg,8);
-      cone(d.s*0.7,d.s*1.3,0x37703c,0,d.s*2.0,0,tg,8);
+      var sd=d.seed, S=d.s;
+      var sr=function(n){var v=Math.sin(sd*127.1+n*311.7)*43758.5453;return v-Math.floor(v);};
+      tg.rotation.y=sd*2.39;
+      var bark=sr(2)<0.5?0x6b4a2c:0x5d3f27;
+      var greens=[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43];
+      if(sr(1)<0.42){
+        // pine: tall straight trunk + layered drooping tiers
+        var pth=S*2.7;
+        cyl(S*0.10,S*0.20,pth,bark,0,pth/2,0,tg,7);
+        cyl(S*0.20,S*0.34,S*0.3,bark,0,S*0.15,0,tg,7);
+        for(var li=0;li<4;li++){
+          var lt=li/3, lr=S*(1.05-0.62*lt), lh=S*(1.15-0.35*lt);
+          cone(lr,lh,greens[(Math.floor(sd*7)+li)%greens.length],(sr(li+3)-0.5)*S*0.12,pth*0.52+li*S*0.52+lh/2,(sr(li+5)-0.5)*S*0.12,tg,9);
+        }
+      }else{
+        // broadleaf: tall tapered trunk, branches, leafy blob canopy
+        var th=S*2.35;
+        var trunk=cyl(S*0.13,S*0.26,th,bark,0,th/2,0,tg,8);trunk.rotation.z=(sr(3)-0.5)*0.07;
+        cyl(S*0.26,S*0.42,S*0.34,bark,0,S*0.17,0,tg,8);
+        for(var bi=0;bi<3;bi++){
+          var ba=sr(bi+4)*Math.PI*2, bl=S*(0.75+sr(bi+6)*0.3);
+          var br=cyl(S*0.045,S*0.085,bl,bark,Math.cos(ba)*S*0.30,th*0.86,Math.sin(ba)*S*0.30,tg,5);
+          br.rotation.set(Math.sin(ba)*0.85,0,-Math.cos(ba)*0.85);
+        }
+        for(var ci=0;ci<5;ci++){
+          var cr=ci===0?S*0.92:S*(0.52+sr(ci+8)*0.22);
+          var blob=sph(Math.round(cr),greens[(Math.floor(sd*5)+ci)%greens.length],
+            ci===0?0:(sr(ci+10)-0.5)*S*1.05,
+            th+S*0.42+(ci===0?S*0.28:(sr(ci+14)-0.5)*S*0.55),
+            ci===0?0:(sr(ci+12)-0.5)*S*1.05,tg,{flatShading:true});
+          blob.scale.y=0.82;
+        }
+      }
     }else if(d.kind==='rock'){
       var r=new THREE.Mesh(G('rock'+Math.round(d.s),function(){return new THREE.DodecahedronGeometry(d.s*0.8,0);}),M(0x8d9299));
       r.position.set(x,d.s*0.4,z);r.rotation.set(d.seed,d.seed*2,0);r.castShadow=true;r.receiveShadow=true;staticGroup.add(r);
