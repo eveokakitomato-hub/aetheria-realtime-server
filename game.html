@@ -379,6 +379,12 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .bag-slot:hover{border-color:var(--gold)}
 .bag-slot .bs-ico{font-size:24px;line-height:1.1}
 .bag-slot .bs-name{font-size:10px;line-height:1.25;text-align:center;color:var(--muted)}
+.bag-slot .bs-price{font-size:9px;color:var(--gold);font-weight:700;line-height:1.2}
+#bagDetail{margin:6px 0 2px;padding:9px 11px;background:rgba(255,255,255,.045);border:1px solid var(--line2);border-radius:8px;font-size:11.5px;line-height:1.65;color:#dfe9e1;display:none;text-align:left}
+#bagDetail .bd-cat{color:var(--muted);font-size:10.5px}
+#bagDetail .bd-price{color:var(--gold);font-weight:900}
+#bagDetail .bd-cnt{color:var(--muted)}
+#bagDetail .bd-use{color:#8fe3ae}
 .bag-slot .bs-count{position:absolute;top:3px;right:6px;font-size:11px;font-weight:900;color:var(--gold)}
 .bag-slot .bs-tag{font-size:9px;font-weight:900;color:#8fe3ae;border:1px solid #2f5d3f;border-radius:99px;padding:1px 6px}
 .bag-slot.dim{opacity:.45}
@@ -819,6 +825,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         </div>
       </div>
       <div id="bagGrid" class="bag-grid" aria-label="アイテム欄（最大26種類・スクロール）"></div>
+      <div id="bagDetail" aria-label="アイテムの説明と売値"></div>
       <p class="sub" id="bagStats"></p>
       <div class="bag-actions"><button id="closeBagBtn" type="button">閉じる</button></div>
     </div></div>
@@ -1210,6 +1217,7 @@ var cdPrev={}, cdPanelCls=null; /* top-left cooldown panel state */
 var itemBar=['potion','weapon','arrows',null];
 var leftSlotItem='potion';
 var bagAssignMode=false, bagSelAct=null; /* bag → hotbar assignment */
+var bagDetailAct=null; /* drop item currently shown in the bag's detail panel (description / sell price) */
 var selectedClass='warrior';
 var lastSaveAt=null, lastSavedKey='', saveLoadContext='title';
 var obstacles=[], decorations=[];
@@ -1546,15 +1554,34 @@ function refreshBagUI(){
     {ico:weapon[0],name:weapon[1],act:'weapon',tag:bowEquipped()?'装備中':'外し中',dim:!bowEquipped()},
     {ico:'💰',name:'ゴールド',cnt:player.gold+' G',act:'gold'}
   ];
+  DROP_IDS.forEach(function(id){
+    var n=invCount(id); if(n<=0)return;
+    var d=DROP_ITEMS[id];
+    items.push({ico:d.ico,name:d.name,cnt:'×'+n,act:id,drop:d});
+  });
   if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
   var html='';
   items.forEach(function(it){
-    html+='<button type="button" draggable="true" class="bag-slot'+(it.dim?' dim':'')+(bagAssignMode&&bagSelAct===it.act?' sel':'')+'" data-act="'+it.act+'"><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.tag?'<span class="bs-tag">'+it.tag+'</span>':'<span class="bs-count">'+it.cnt+'</span>')+'</button>';
+    var title=it.drop?(' title="'+escHtml(it.drop.cat+'｜売値 '+it.drop.price+' G｜'+it.drop.desc)+'"'):'';
+    html+='<button type="button" draggable="true" class="bag-slot'+(it.dim?' dim':'')+(bagAssignMode&&bagSelAct===it.act?' sel':'')+'" data-act="'+it.act+'"'+title+'><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.tag?'<span class="bs-tag">'+it.tag+'</span>':'<span class="bs-count">'+it.cnt+'</span>')+(it.drop?'<span class="bs-price">売値 '+it.drop.price+' G</span>':'')+'</button>';
   });
   for(var i=items.length;i<BAG_CAPACITY;i++)html+='<div class="bag-slot empty"></div>';
   grid.innerHTML=html;
   syncBagHotbar();
+  renderBagDetail();
   if(stats)stats.textContent='🏅 討伐記録：これまでに倒したモンスター '+player.kills+' 体';
+}
+/* the bag's detail panel: name, category, sell price, count and the
+   full description of the drop item under the cursor / last clicked */
+function renderBagDetail(){
+  var det=$('bagDetail'); if(!det)return;
+  var d=bagDetailAct?DROP_ITEMS[bagDetailAct]:null;
+  if(d&&player&&invCount(bagDetailAct)>0){
+    det.innerHTML='<b>'+d.ico+' '+escHtml(d.name)+'</b> <span class="bd-cat">'+escHtml(d.cat)+'</span> <span class="bd-price">売値 '+d.price+' G</span> <span class="bd-cnt">所持 ×'+invCount(bagDetailAct)+'</span><br>'+escHtml(d.desc)+(d.use?'<br><span class="bd-use">クリック（またはホットバー）で使用できます</span>':'');
+  }else{
+    det.textContent='アイテムにカーソルを合わせるかクリックすると、説明と売値がここに表示されます。';
+  }
+  det.style.display='block';
 }
 function refreshPlayersUI(){
   var sub=$('playersSub'),list=$('playersList');if(!list)return;
@@ -2493,7 +2520,7 @@ function beep(f,d,type,v){
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
   return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
-    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,dir:1,walk:0,dead:false}; /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0) */
+    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,dir:1,walk:0,dead:false,inv:{},jellySlowUntil:0,oilUntil:0}; /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0). inv = {dropItemId:count} for monster drops; jellySlowUntil / oilUntil are the slime-jelly / slime-oil buff timers (session only) */
 }
 function expNeed(lv){return 80+lv*55;}
 /* ============ MOB POPULATION CONTROL (lag fix) ============
@@ -2730,6 +2757,13 @@ function nearestEnemy(maxDist){
 function damageEnemy(e,dmg,crit){
   if(!e||e.dead)return;
   e.hp-=dmg;e.hitFlash=6;e.aggro=player;e.state='chase';
+  /* SLIME OIL: while the player's oil buff lasts, every hit also slows
+     the enemy (鈍足, refreshed to 3s) and poisons it (微量の毒, 4s of
+     small ticks resolved in update's enemy loop) */
+  if(player&&player.oilUntil&&e.hp>0){
+    var oNow=performance.now();
+    if(oNow<player.oilUntil){e.slowUntil=oNow+3000;e.poisonUntil=oNow+4000;if(!e.poisonTickAt||e.poisonTickAt<oNow)e.poisonTickAt=oNow+1000;}
+  }
   /* GOBLIN LINK: hurting one goblin alerts the whole pack — every
      goblin-family mob nearby turns on the attacker at once and stays
      on them past the usual leash while the alert is fresh */
@@ -2753,6 +2787,7 @@ function killEnemy(e){
   addDmg(player.x,player.y-14,'+'+e.gold+' G','#e8c268');
   chat('⚔ <b>'+e.name+'</b> を倒した！ +'+e.exp+' EXP / +'+e.gold+' G','sys');
   if(Math.random()<0.28){player.potions++;toast('ポーションをドロップ！（所持 '+player.potions+'）');}
+  if(e.type==='slime')rollSlimeDrop(); /* slimes always drop one item from the slime drop table */
   // quest
   var q=QUESTS[questIdx];
   if(q&&!q.done){
@@ -2940,9 +2975,73 @@ function classWeapon(){
    hotbars and the item picker wherever the 矢 item appears, instead
    of the bow-and-arrow emoji. */
 var ARROW_ICON='<svg viewBox="0 0 24 24" width="1.25em" height="1.25em" style="vertical-align:-0.25em" aria-hidden="true"><line x1="5.5" y1="18.5" x2="16.8" y2="7.2" stroke="#a5713d" stroke-width="2.3" stroke-linecap="round"/><polygon points="21,3 19.1,8.9 15.1,4.9" fill="#cfd6de" stroke="#79828d" stroke-width="0.8" stroke-linejoin="round"/><polygon points="7.2,16.8 3.2,12.6 10.2,14.4" fill="#d84a3a"/><polygon points="7.2,16.8 11.4,21 9.6,14" fill="#efe8d8"/></svg>';
+/* ================= SLIME DROP ITEMS =================
+   Killing a slime rolls ONCE on this table — the rates add up to
+   exactly 100%, so every slime drops exactly one of these items.
+   Drops land in player.inv, a plain {itemId:count} store shared by
+   the bag, the item hotbar and saves. スライムゼリー and スライム
+   オイル are usable (bag click / hotbar key); the rest are materials
+   you simply own, with category, description and sell price readable
+   in the bag's detail panel. */
+var DROP_ITEMS={
+  mucus:{name:'濁った粘液',ico:'🫧',rate:50,price:0,cat:'素材',desc:'スライムの体表から削ぎ落とした、不純物まみれの粘液。'},
+  jelly:{name:'スライムゼリー',ico:'🍮',rate:25,price:1,cat:'食用、素材',desc:'プルプルとした半透明のゼリー。そのまま食べるとHPとMPがわずかに回復するが、あまりの不味さに10秒間移動速度が5%低下する。',use:'jelly'},
+  core:{name:'スライムの核',ico:'🔮',rate:10,price:1,cat:'素材',desc:'スライムの体内でクッションの役割を果たしていた高弾力の結晶。'},
+  oil:{name:'スライムオイル',ico:'🧴',rate:7,price:1,cat:'素材',desc:'粘り気と微弱な毒素を含んだ特殊な油。武器に塗り込むことで、15分間、攻撃した相手に「鈍足（移動速度低下）」と「微量の毒ダメージ」を与える。',use:'oil'},
+  rustDagger:{name:'錆びた短剣',ico:'🗡️',rate:2.5,price:0,cat:'武器、素材',desc:'かつてスライムに挑み、敗れ去った冒険者の遺品。酸でボロボロに錆びついている。'},
+  brokenArrow:{name:'折れた矢',ico:ARROW_ICON,rate:2.5,price:0,cat:'武器、素材',desc:'スライムの体内で消化されずに残っていた矢の残骸。矢じりが欠けており飛距離が落ちる。'},
+  glassBottle:{name:'溶け残ったガラス瓶',ico:'🫙',rate:2,price:1,cat:'素材',desc:'スライムの消化液にも耐え抜いた頑丈な空き瓶。'},
+  ring:{name:'誰かの指輪',ico:'💍',rate:0.35,price:30,cat:'装備、素材',desc:'スライムの体内で鈍く光っていた銀の指輪。内側には古びたイニシャルが刻まれている。'},
+  silverCoin:{name:'欠けた銀貨',ico:'🪙',rate:0.35,price:30,cat:'素材',desc:'酸で縁が溶け、少し軽くなってしまった銀貨。'},
+  oldText:{name:'未鑑定の古文書',ico:'📜',rate:0.3,price:1,cat:'素材',desc:'特殊な魔法コーティングにより、スライムの胃酸を免れた古い羊皮紙。古代文字で書かれており、そのままでは読むことができない。'}
+};
+var DROP_IDS=Object.keys(DROP_ITEMS);
+function invCount(id){return (player&&player.inv&&player.inv[id])||0;}
+function invAdd(id,n){if(!player)return;if(!player.inv)player.inv={};player.inv[id]=Math.max(0,(player.inv[id]||0)+n);if(player.inv[id]<=0)delete player.inv[id];}
+function invKey(){if(!player||!player.inv)return'';return DROP_IDS.map(function(id){return player.inv[id]||0;}).join(',');}
+function rollSlimeDrop(){
+  var r=Math.random()*100,acc=0,pick=DROP_IDS[DROP_IDS.length-1];
+  for(var i=0;i<DROP_IDS.length;i++){acc+=DROP_ITEMS[DROP_IDS[i]].rate;if(r<acc){pick=DROP_IDS[i];break;}}
+  invAdd(pick,1);
+  var d=DROP_ITEMS[pick];
+  chat('🎁 <b>'+d.name+'</b> をドロップした！（'+d.cat+'／所持 ×'+invCount(pick)+'）','sys');
+  toast('🎁 ドロップ：'+d.name,2600);
+  beep(880,0.08,'triangle',0.04);
+  _ibSig='';refreshItemBars();
+}
+/* using a drop item: jelly heals a little but tastes awful (-5% move
+   speed for 10s); oil coats the weapon for 15 minutes so every hit
+   slows and poisons (applied in damageEnemy, ticked in update);
+   plain materials just show their description */
+function useDropItem(act){
+  var d=DROP_ITEMS[act]; if(!d)return;
+  var now=performance.now();
+  if(d.use==='jelly'){
+    if(invCount(act)<=0){toast('「'+d.name+'」を持っていません');return;}
+    invAdd(act,-1);
+    player.hp=Math.min(player.maxHp,player.hp+10);
+    player.mp=Math.min(player.maxMp,player.mp+5);
+    player.jellySlowUntil=now+10000;
+    addDmg(player.x,player.y,'+10 HP / +5 MP','#7de08d',true);
+    burst(player.x,player.y,'#a8e6a1',12);
+    toast('🍮 スライムゼリーを食べた…まずい！ HP+10 / MP+5回復、10秒間 移動速度-5%',3600);
+    beep(420,0.12,'sine',0.05);
+  }else if(d.use==='oil'){
+    if(invCount(act)<=0){toast('「'+d.name+'」を持っていません');return;}
+    invAdd(act,-1);
+    player.oilUntil=now+15*60*1000;
+    toast('🧴 武器にスライムオイルを塗り込んだ！ 15分間、攻撃ヒットで鈍足＋微量の毒ダメージ',3800);
+    beep(560,0.1,'triangle',0.05);
+  }else{
+    toast(d.name+'（'+d.cat+'）— '+d.desc,4600);
+  }
+  _ibSig='';refreshItemBars();updateHUD();
+  if($('bagModal').style.display==='grid')refreshBagUI();
+}
 function itemDef(act){
   if(act==='potion')return{ico:'🧪',name:'回復ポーション'};
   if(act==='arrows')return{ico:ARROW_ICON,name:'矢'};
+  if(DROP_ITEMS[act])return{ico:DROP_ITEMS[act].ico,name:DROP_ITEMS[act].name};
   if(act==='gold')return{ico:'💰',name:'ゴールド'};
   if(act==='weapon'){var w=classWeapon();return{ico:w[0],name:w[1]};}
   return{ico:'＋',name:'空'};
@@ -2951,6 +3050,7 @@ function itemCountTxt(act){
   if(!player)return'';
   if(act==='potion')return'×'+player.potions;
   if(act==='arrows')return'×'+player.arrows;
+  if(DROP_ITEMS[act])return'×'+invCount(act);
   if(act==='gold')return player.gold+' G';
   if(act==='weapon')return bowEquipped()?'装備中':'外し中';
   return'';
@@ -2973,11 +3073,12 @@ function useItem(act){
   else if(act==='weapon')toggleWeaponEquip();
   else if(act==='arrows')toast(player.cls==='archer'?'矢は射撃のたびに自動で1本消費されます。地形に刺さった矢は E キーで回収できます':'矢はアーチャーが射撃で使う弾薬です');
   else if(act==='gold')toast('所持金 '+player.gold+' G');
+  else if(DROP_ITEMS[act])useDropItem(act);
 }
 var _ibSig='';
 function refreshItemBars(){
   if(!player)return;
-  var sig=itemBar.join(',')+'|'+leftSlotItem+'|'+player.potions+'/'+player.arrows+'/'+player.gold+'/'+(player.weaponEquipped===false?0:1)+'/'+player.cls;
+  var sig=itemBar.join(',')+'|'+leftSlotItem+'|'+player.potions+'/'+player.arrows+'/'+player.gold+'/'+(player.weaponEquipped===false?0:1)+'/'+player.cls+'|'+invKey();
   if(sig===_ibSig)return; _ibSig=sig;
   for(var i=0;i<4;i++){
     var btn=$('ih'+(i+1)); if(!btn)continue;
@@ -3017,6 +3118,7 @@ function openItemPicker(target,anchorEl){
   var pk=$('itemPicker'); if(!pk)return;
   pickerTarget=target;
   var acts=['potion','weapon','arrows','gold'];
+  DROP_IDS.forEach(function(id){if(invCount(id)>0)acts.push(id);}); /* owned drop items can be registered too */
   var html='<div class="ip-title">登録するアイテムを選択</div>';
   acts.forEach(function(act){var d=itemDef(act);html+='<button type="button" class="ip-btn" data-act="'+act+'">'+d.ico+' '+d.name+'<small>'+itemCountTxt(act)+'</small></button>';});
   if(target.kind==='bar')html+='<button type="button" class="ip-btn" data-act="__clear">✕ 空にする</button>';
@@ -3242,11 +3344,11 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey(),worldEditKey()].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey(),worldEditKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
-    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills},
+    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
     quest:{idx:questIdx,count:questCount},
     explored:exploredToString(),
     worldEdit:serializeWorldEdit(),
@@ -3308,6 +3410,8 @@ function applySaveData(data){
   np.lv=Math.floor(num(p.lv,1,1,99));np.exp=num(p.exp,0,0,99999);
   np.gold=Math.floor(num(p.gold,0,0,999999));np.potions=Math.floor(num(p.potions,0,0,999));np.kills=Math.floor(num(p.kills,0,0,999999));
   np.arrows=Math.floor(num(p.arrows,(p.cls==='archer'?30:0),0,9999));
+  np.inv={};
+  if(p.inv&&typeof p.inv==='object'){DROP_IDS.forEach(function(id){var n=Math.floor(Number(p.inv[id]));if(isFinite(n)&&n>0)np.inv[id]=Math.min(9999,n);});} /* drop items: only known ids, sane counts */
   if(isGameMaster())np.arrows=1000; /* gamemaster account: every game start (incl. loading a saved/server character) begins with 1000 arrows */
   exploredFromString(data.explored);
   np.x=num(p.x,SPAWN_X,40,W-40);np.y=num(p.y,SPAWN_Y,40,H-40);
@@ -3531,7 +3635,7 @@ function goblinRangedAI(e,dp,now,edt){
   var mv=0;
   if(dp>range*0.92)mv=1; else if(dp<keep*0.72)mv=-1;
   if(mv!==0){
-    var gx=e.x+Math.cos(a)*e.speed*mv, gy=e.y+Math.sin(a)*e.speed*mv;
+    var gx=e.x+Math.cos(a)*e.speed*((e.slowUntil&&now<e.slowUntil)?0.55:1)*mv, gy=e.y+Math.sin(a)*e.speed*((e.slowUntil&&now<e.slowUntil)?0.55:1)*mv;
     if(!collide(gx,e.y,e.r*0.7))e.x=gx;
     if(!collide(e.x,gy,e.r*0.7))e.y=gy;
     e.walk+=edt*0.015;
@@ -3630,6 +3734,7 @@ function update(dt,now){
     var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
     if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
     sp*=gmSpeedMul(); /* gamemaster account only: walk / dash / float-move / swim all 4x (1x for everyone else) */
+    if(player.jellySlowUntil&&now<player.jellySlowUntil)sp*=0.95; /* slime jelly: the awful taste slows movement 5% for 10 seconds */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     /* feetZ: every object only blocks up to its visible top (finite-top obstacles) */
     var feetZ=playerGroundZ()+jumpY;
@@ -3734,6 +3839,16 @@ function update(dt,now){
   enemies.forEach(function(e){
     if(e.dead)return;
     if(e.hitFlash>0)e.hitFlash--;
+    /* slime-oil poison: a small tick (2 dmg) once a second while poisoned */
+    if(e.poisonUntil&&now<e.poisonUntil){
+      if(!e.poisonTickAt)e.poisonTickAt=now+1000;
+      if(now>=e.poisonTickAt){
+        e.poisonTickAt=now+1000; e.hp-=2;
+        addDmg(e.x+(Math.random()*14-7),e.y-8,'毒 2','#9fe870');
+        burst(e.x,e.y,'#9fe870',3);
+        if(e.hp<=0){killEnemy(e);return;}
+      }
+    }
     /* a mob that is somehow inside a building gets nudged out first */
     if(collide(e.x,e.y,e.r*0.7))unstickEnemy(e);
     var dp=Math.hypot(player.x-e.x,player.y-e.y);
@@ -3781,7 +3896,8 @@ function update(dt,now){
          and cover that gap with the body-slam lunge instead of walking
          all the way into contact; other mobs keep the old contact range */
       var a=Math.atan2(player.y-e.y,player.x-e.x);
-      var ex=e.x+Math.cos(a)*e.speed,ey=e.y+Math.sin(a)*e.speed;
+      var espd=e.speed*((e.slowUntil&&now<e.slowUntil)?0.55:1); /* slime-oil 鈍足: 45% slower while slowed */
+      var ex=e.x+Math.cos(a)*espd,ey=e.y+Math.sin(a)*espd;
       if(!collide(ex,e.y,e.r*0.7))e.x=ex; if(!collide(e.x,ey,e.r*0.7))e.y=ey;
       e.walk+=edt*0.015;
     }else if(e.state==='chase'&&dp<=(isSlime?e.r+player.r+40:e.r+player.r+6)){
@@ -3801,7 +3917,7 @@ function update(dt,now){
       if(e.wt<=0){e.wt=1600+Math.random()*2200;e.tx=e.homeX+(Math.random()*130-65);e.ty=e.homeY+(Math.random()*130-65);
         /* a wander target inside a building is useless: skip it */
         if(e.tx&&collide(e.tx,e.ty,e.r*0.7)){e.tx=0;e.ty=0;e.wt=500;}}
-      if(e.tx){var d2=Math.hypot(e.tx-e.x,e.ty-e.y);if(d2>4){var wsp=e.speed*0.45*(slowTick?(edt/16.7):1);
+      if(e.tx){var d2=Math.hypot(e.tx-e.x,e.ty-e.y);if(d2>4){var wsp=e.speed*((e.slowUntil&&now<e.slowUntil)?0.55:1)*0.45*(slowTick?(edt/16.7):1);
         /* axis-separated move, same as the player's: slide along walls
            instead of walking into / through buildings */
         var wx2=e.x+(e.tx-e.x)/d2*wsp, wy2=e.y+(e.ty-e.y)/d2*wsp, movedW=false;
@@ -7530,10 +7646,18 @@ $('bagGrid').addEventListener('click',function(e){
   if(!slot||!player)return;
   var act=slot.getAttribute('data-act');
   if(bagAssignMode){bagSelAct=act;refreshBagUI();toast('「'+itemDef(act).name+'」を選択 — ホットバーのマスをクリックして登録');return;}
+  bagDetailAct=DROP_ITEMS[act]?act:null;
   if(act==='potion'){usePotion();refreshBagUI();}
   else if(act==='weapon'){toggleWeaponEquip();}
   else if(act==='arrows'){toast(player.cls==='archer'?'矢は射撃のたびに自動で1本消費されます。地形に刺さった矢は E キーで回収できます':'矢はアーチャーが射撃で使う弾薬です');}
   else if(act==='gold'){toast('所持金 '+player.gold+' G');}
+  else if(DROP_ITEMS[act]){useItem(act);refreshBagUI();}
+});
+$('bagGrid').addEventListener('mouseover',function(e){
+  var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
+  if(!slot)return;
+  var act=slot.getAttribute('data-act');
+  if(DROP_ITEMS[act]&&bagDetailAct!==act){bagDetailAct=act;renderBagDetail();}
 });
 $('bagGrid').addEventListener('dragstart',function(e){
   var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
