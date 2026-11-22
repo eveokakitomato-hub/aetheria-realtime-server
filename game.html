@@ -199,6 +199,31 @@ body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 /* ===== HOTBAR (bottom-left, floating just above the chat box so the
    two never overlap: skill 1 / skill 2 / skill 3 / potion, keys 1-4) ===== */
 #hotbar{position:absolute;left:12px;bottom:196px;z-index:22;display:flex;gap:8px;align-items:flex-start}
+/* skill cooldown panel — top-left vertical stack under the attack button */
+#cdPanel{position:absolute;left:12px;top:158px;z-index:21;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.cd-row{display:flex;align-items:center;gap:8px;background:rgba(10,14,12,.78);border:1px solid var(--line2);border-radius:8px;padding:5px 9px 5px 6px;min-width:176px}
+.cd-row .cd-ico{font-size:17px;width:23px;text-align:center;flex-shrink:0}
+.cd-row .cd-main{flex:1;min-width:0}
+.cd-row .cd-name{display:block;font-size:11px;font-weight:700;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cd-row .cd-track{height:5px;background:rgba(255,255,255,.14);border-radius:99px;overflow:hidden;margin-top:3px}
+.cd-row .cd-track i{display:block;height:100%;width:0%;background:var(--gold);border-radius:99px}
+.cd-row .cd-sec{font-size:12px;font-weight:900;color:#fff;min-width:32px;text-align:right;font-variant-numeric:tabular-nums}
+.cd-row.cooling{opacity:.72}
+.cd-row.cooling .cd-ico{filter:grayscale(.65)}
+.cd-row.ready{animation:cdReady .8s ease-out}
+@keyframes cdReady{0%{border-color:var(--line2);box-shadow:none}25%{border-color:#ffe9a8;box-shadow:0 0 16px 3px rgba(232,194,104,.8)}100%{border-color:var(--line2);box-shadow:none}}
+/* item hotbar — bottom-right, 4 registrable item slots (keys 5-8) */
+#itemHotbar{position:absolute;right:12px;bottom:12px;z-index:22;display:flex;gap:8px;align-items:flex-start}
+#itemHotbar .skill button.empty{opacity:.55;border-style:dashed}
+body.bag-open #hotbar,body.bag-open #itemHotbar{z-index:65} /* while the bag is open the hotbars stay clickable for drag & drop / click assignment */
+#itemPicker{position:absolute;z-index:70;background:var(--panel);border:1px solid var(--gold2);border-radius:10px;padding:8px;display:none;flex-direction:column;gap:4px;min-width:176px;box-shadow:0 14px 40px rgba(0,0,0,.55)}
+#itemPicker .ip-title{font-size:11px;font-weight:900;color:var(--gold);letter-spacing:.06em;padding:2px 4px 4px}
+#itemPicker .ip-btn{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:7px;color:#fff;font:inherit;font-size:12px;font-weight:700;padding:7px 10px;cursor:pointer;text-align:left}
+#itemPicker .ip-btn:hover{border-color:var(--gold)}
+#itemPicker .ip-btn small{margin-left:auto;color:var(--gold);font-weight:900}
+.bag-slot.sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(232,194,104,.55)}
+#bagAssignBtn{background:rgba(255,255,255,.06);border:1px solid var(--line2);border-radius:6px;color:var(--paper);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer;width:100%}
+#bagAssignBtn.on{border-color:var(--gold);color:var(--gold)}
 .skill .cnt{position:absolute;top:3px;right:4px;font-size:10px;font-weight:900;color:#ffd98a;background:rgba(0,0,0,.55);border-radius:99px;padding:1px 5px;line-height:1.35}
 
 /* ===== JOYSTICK (mobile) ===== */
@@ -426,6 +451,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   .srv-sep,.srv-name{display:none}
   #targetInfo{top:58px;min-width:0;max-width:44vw}
   #camHint{display:none}
+  #cdPanel{left:10px;top:148px}
+  .cd-row{min-width:148px;padding:4px 7px 4px 5px}
+  #itemHotbar{right:10px;bottom:10px;gap:6px}
   .start-card{grid-template-columns:1fr}
   .start-visual{min-height:210px}
   .brand span{display:none}
@@ -640,6 +668,16 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="skill atk-skill"><button id="attackBtn">⚔</button><small id="atkLabel">攻撃 / F</small></div>
     </div>
 
+    <!-- SKILL COOLDOWN PANEL (top-left, vertical): per skill, the
+         remaining seconds and a draining gauge while on cooldown;
+         the row flashes bright the moment the skill is ready again -->
+    <div id="cdPanel" aria-label="スキルクールダウン">
+      <div class="cd-row" id="cdr1"><span class="cd-ico" id="cdi1">💥</span><div class="cd-main"><span class="cd-name" id="cdn1">スキル1</span><div class="cd-track"><i id="cdb1"></i></div></div><span class="cd-sec" id="cds1"></span></div>
+      <div class="cd-row" id="cdr2"><span class="cd-ico" id="cdi2">🌀</span><div class="cd-main"><span class="cd-name" id="cdn2">スキル2</span><div class="cd-track"><i id="cdb2"></i></div></div><span class="cd-sec" id="cds2"></span></div>
+      <div class="cd-row" id="cdr3"><span class="cd-ico" id="cdi3">✦</span><div class="cd-main"><span class="cd-name" id="cdn3">スキル3</span><div class="cd-track"><i id="cdb3"></i></div></div><span class="cd-sec" id="cds3"></span></div>
+      <div class="cd-row" id="cdr4"><span class="cd-ico">🧪</span><div class="cd-main"><span class="cd-name">ポーション</span><div class="cd-track"><i id="cdb4"></i></div></div><span class="cd-sec" id="cds4"></span></div>
+    </div>
+
     <!-- HOTBAR: skill 1-3 + potion in 4 slots at the bottom-left, above
          the chat box so they never overlap. Keys 1-4 and click both work;
          each slot shows its cooldown, the potion slot its count. -->
@@ -647,8 +685,19 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="skill"><button id="skill1"><span class="key">1</span><span id="s1ico">💥</span><span class="cd"></span></button><small id="s1name">強撃</small></div>
       <div class="skill"><button id="skill2"><span class="key">2</span><span id="s2ico">🌀</span><span class="cd"></span></button><small id="s2name">旋風斬</small></div>
       <div class="skill"><button id="skill3"><span class="key">3</span><span id="s3ico">✦</span><span class="cd"></span></button><small id="s3name">奥義</small></div>
-      <div class="skill potion"><button id="potionBtn"><span class="key">4</span>🧪<span class="cnt" id="potionCnt">×0</span><span class="cd"></span></button><small>ポーション</small></div>
+      <div class="skill potion"><button id="potionBtn"><span class="key">4</span><span id="potionIco">🧪</span><span class="cnt" id="potionCnt">×0</span><span class="cd"></span></button><small id="potionName">ポーション</small></div>
     </div>
+
+    <!-- ITEM HOTBAR (bottom-right): 4 slots holding bag items for
+         instant use — click or keys 5-8. Register items from the bag
+         (drag & drop / assign mode) or by right-clicking a slot. -->
+    <div id="itemHotbar">
+      <div class="skill"><button id="ih1"><span class="key">5</span><span class="ih-ico">🧪</span><span class="cnt"></span></button><small class="ih-name">回復ポーション</small></div>
+      <div class="skill"><button id="ih2"><span class="key">6</span><span class="ih-ico">🏹</span><span class="cnt"></span></button><small class="ih-name">武器</small></div>
+      <div class="skill"><button id="ih3"><span class="key">7</span><span class="ih-ico">🏹</span><span class="cnt"></span></button><small class="ih-name">矢</small></div>
+      <div class="skill"><button id="ih4"><span class="key">8</span><span class="ih-ico">＋</span><span class="cnt"></span></button><small class="ih-name">空き</small></div>
+    </div>
+    <div id="itemPicker" role="menu" aria-label="ホットバー登録アイテムの選択"></div>
 
     <div id="joystick"><div id="stick"></div></div>
     <button type="button" id="interactPrompt"><b>E</b>：刺さった矢を回収する</button>
@@ -678,7 +727,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>移動</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 左スティック（スマホ）。向いている方向に合わせて進みます</td></tr>
         <tr><td>視点（一人称）</td><td>自分の目線で冒険できます。画面をクリックするとカーソルがロックされ、<b>マウスカーソルを動かすだけ</b>で上下左右に見回せます（<kbd>Esc</kbd>で解放）。ドラッグでも見回せて、<b>カーソルキー</b> <kbd>←</kbd><kbd>→</kbd> で左右、<kbd>↑</kbd><kbd>↓</kbd> で上下の視点移動もできます。マウスホイールでズーム（照準）。画面中央の照準を敵に合わせてクリックしても攻撃できます</td></tr>
         <tr><td>攻撃</td><td><kbd>F</kbd>（初期設定）または画面左上に縦に並んだ剣ボタン。近くの敵を自動で狙います</td></tr>
-        <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります</td></tr>
+        <tr><td>弓の引き絞り</td><td>アーチャーは攻撃を<b>長押し</b>すると弓を引き絞り（弦と矢が引かれ、照準の周りにゲージが溜まります）、<b>離すと発射</b>します。長く引くほど矢は速く・遠くまで飛び、フルに引くと最大射程＋会心の構えになります。<b>弓を装備していない（バッグで外した）状態では、弓の通常攻撃も弓スキルも使えません</b>。バッグで「狩人の弓」をクリックすると装備／外すを切り替えます</td></tr>
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
         <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を<b>長押しすると上昇</b>します（押すたびにも少し上がります）。浮遊の解除は、<kbd>Space</kbd> を<b>短く2回すばやく押す</b>（ダブルタップ）ときだけです。長押しでは解除されず、上昇し続けます。着地すると通常状態に戻ります</td></tr>
         <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木・橋・石段・水（池）などの配置（大きさの変更つき）ができ、削除モードでは町の家・城壁・木・岩に加えて川・池の水、橋、石段など既存の物も消せます。編集も削除の記録もセーブデータに保存され、「全リセット」で元に戻ります</td></tr>
@@ -686,7 +735,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
         <tr><td>矢（アーチャー）</td><td>アーチャーの射撃は矢を1本ずつ消費し、矢が0本だと攻撃できません。矢は放った方向へ放物線を描いて飛び、地形に刺さった矢は近づいて <kbd>E</kbd> キーで回収できます</td></tr>
-        <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。画面左下のホットバーのクリックでも使えます。MPとクールダウンに注意</td></tr>
+        <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。画面左下のホットバーのクリックでも使えます。MPとクールダウンに注意。クールダウンの残り時間は画面左上のパネル（残り秒数＋ゲージ、使えるようになると光ります）でも確認できます</td></tr>
+        <tr><td>アイテムホットバー</td><td>画面右下の4マス。バッグのアイテムを登録しておけば、<kbd>5</kbd>〜<kbd>8</kbd> キーかクリックで即座に使えます。登録は、バッグを開いてアイテムをマスへドラッグ＆ドロップするか、バッグの「ホットバー登録モード」でアイテムを選んでからマスをクリック。マスの右クリックでも変更できます。左下ホットバーの4マス目（ポーション枠）も同じ方法で別のアイテムに入れ替えられます（初期設定のキーは <kbd>4</kbd>）</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>4</kbd> キー（ホットバーの4マス目）。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
         <tr><td>バッグ</td><td><kbd>R</kbd> キーでバッグ（所持品）を直接開閉できます。アイテム欄は最大26種類まで入るスクロール式で、ポーションや矢などが種類ごとに個数付きで並び、クリックで使用・装備できます</td></tr>
@@ -751,6 +801,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <p class="sub" id="bagSub">持ち物</p>
       <div id="bagGrid" class="bag-grid" aria-label="アイテム欄（最大26種類・スクロール）"></div>
       <p class="sub" id="bagStats"></p>
+      <button id="bagAssignBtn" type="button">🎯 ホットバー登録モード：OFF</button>
+      <p class="sub" id="bagAssignHint" style="display:none">アイテムをクリックで選んでから、ホットバーのマス（右下の4マス／左下の4マス目）をクリックすると登録できます。アイテムをマスへドラッグ＆ドロップしても登録できます。</p>
       <div class="bag-actions"><button id="closeBagBtn" type="button">閉じる</button></div>
     </div></div>
 
@@ -1078,7 +1130,10 @@ var CLASSES={
 };
 var ETYPES={
   slime:{name:"スライム",emoji:"🟢",hp:38,atk:6,exp:22,gold:9,lv:1,speed:1.1,size:17,color:"#6fce62"},
-  goblin:{name:"ゴブリン",emoji:"👺",hp:75,atk:11,exp:42,gold:18,lv:3,speed:1.55,size:19,color:"#8a9a3a"},
+  goblin:{name:"ゴブリン",emoji:"👺",hp:62,atk:9,exp:42,gold:18,lv:3,speed:1.55,size:19,color:"#8a9a3a",fam:"gob"},
+  goblinArcher:{name:"ゴブリンアーチャー",emoji:"🏹",hp:55,atk:9,exp:50,gold:22,lv:3,speed:1.6,size:18,color:"#7a8a34",fam:"gob",ranged:330,keep:190},
+  goblinShaman:{name:"ゴブリンシャーマン",emoji:"🔮",hp:58,atk:12,exp:62,gold:26,lv:4,speed:1.35,size:18,color:"#4a8a72",fam:"gob",ranged:300,keep:210,healer:true},
+  goblinChief:{name:"ゴブリンチーフ",emoji:"👑",hp:340,atk:20,exp:170,gold:95,lv:6,speed:1.45,size:30,color:"#8a5a2e",fam:"gob"},
   wolf:{name:"フォレストウルフ",emoji:"🐺",hp:110,atk:16,exp:68,gold:26,lv:5,speed:2.3,size:20,color:"#8d99a6"},
   orc:{name:"オークウォリアー",emoji:"👹",hp:185,atk:22,exp:110,gold:44,lv:7,speed:1.5,size:24,color:"#b0623a"},
   boss:{name:"遺跡の守護者ゴーレム",emoji:"🗿",hp:720,atk:30,exp:600,gold:500,lv:10,speed:1.25,size:38,color:"#9a8fb0",boss:true},
@@ -1093,7 +1148,7 @@ var ETYPES={
 };
 var QUESTS=[
   {title:"スライム討伐",desc:"始まりの草原のスライムを倒そう。",target:"slime",need:5,exp:80,gold:50},
-  {title:"ゴブリン退治",desc:"東の森に巣くうゴブリンを退治しよう。少し強いのでレベルを上げてから。",target:"goblin",need:5,exp:180,gold:120},
+  {title:"ゴブリン退治",desc:"東の森に巣くうゴブリンを退治しよう。3〜5体の群れで現れ、1体を攻撃すると仲間が一斉に襲ってくる。アーチャーやシャーマン、まれにチーフが混ざっていることも。",target:"goblin",need:5,exp:180,gold:120},
   {title:"森の脅威",desc:"フォレストウルフとオークを倒して森に平和を。",target:"any_mid",need:6,exp:320,gold:220},
   {title:"遺跡の守護者",desc:"北東の遺跡に眠るボス「守護者ゴーレム」を討伐せよ！",target:"boss",need:1,exp:800,gold:600},
   {title:"火山の炎魔",desc:"南東の果て・紅蓮火山に君臨する炎魔イフリートを討伐せよ！",target:"ifrit",need:1,exp:1500,gold:1200},
@@ -1131,6 +1186,13 @@ var camYaw=0, camPitch=0.02, camDist=560, camFov=70, atkAnimT=-9999;
 var player=null, enemies=[], projectiles=[], particles=[], dmgTexts=[], drops=[];
 var questIdx=0, questCount=0, target=null, lastAttack=0, potionCd=0;
 var skillCd={s1:0,s2:0,s3:0};
+var cdPrev={}, cdPanelCls=null; /* top-left cooldown panel state */
+/* item hotbar state: the bottom-right bar's 4 slots and the bottom-left
+   hotbar's item slot (the old potion slot) each hold one item id
+   ('potion' / 'weapon' / 'arrows' / 'gold', or null for an empty slot) */
+var itemBar=['potion','weapon','arrows',null];
+var leftSlotItem='potion';
+var bagAssignMode=false, bagSelAct=null; /* bag → hotbar assignment */
 var selectedClass='warrior';
 var lastSaveAt=null, lastSavedKey='', saveLoadContext='title';
 var obstacles=[], decorations=[];
@@ -1397,7 +1459,7 @@ function openFromMenu(id,anchor){
   returnToMenu=true;closeGameMenu(true);
   if(id==='settingsModal'){captureBind=null;refreshKeyLabels();refreshSensUI();refreshSoundUI();refreshResUI();refreshBindDescs();}
   if(id==='saveModal')refreshSaveUI();
-  if(id==='bagModal')refreshBagUI();
+  if(id==='bagModal'){refreshBagUI();document.body.classList.add('bag-open');}
   if(id==='playersModal')refreshPlayersUI();
   if(id==='worldMapModal')drawWorldMap();
   $(id).style.display='grid';
@@ -1411,8 +1473,17 @@ function openFromMenu(id,anchor){
 }
 function closeSubModal(id){
   $(id).style.display='none';
+  if(id==='bagModal'){document.body.classList.remove('bag-open');setBagAssignMode(false);}
   if(returnToMenu){returnToMenu=false;openGameMenu();}
   else{relockPointer();}
+}
+/* bag → hotbar assign mode: while ON, clicking a bag item SELECTS it
+   (instead of using it); clicking any hotbar slot then registers it */
+function setBagAssignMode(on){
+  bagAssignMode=!!on; if(!on)bagSelAct=null;
+  var b=$('bagAssignBtn'); if(b){b.textContent='🎯 ホットバー登録モード：'+(bagAssignMode?'ON':'OFF');b.classList.toggle('on',bagAssignMode);}
+  var h=$('bagAssignHint'); if(h)h.style.display=bagAssignMode?'block':'none';
+  if($('bagModal').style.display==='grid')refreshBagUI();
 }
 /* R key: open / close the bag directly, without going through the Esc
    menu. Opened this way the bag is NOT tied to the menu (returnToMenu
@@ -1424,6 +1495,7 @@ function toggleBag(){
   returnToMenu=false;
   refreshBagUI();
   $('bagModal').style.display='grid';
+  document.body.classList.add('bag-open');
   if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
   syncCursorHide();
 }
@@ -1450,17 +1522,17 @@ function refreshBagUI(){
   var sub=$('bagSub'),grid=$('bagGrid'),stats=$('bagStats');if(!grid)return;
   if(!player){if(sub)sub.textContent='ゲームを開始すると持ち物が表示されます';grid.innerHTML='';if(stats)stats.textContent='';return;}
   var c=CLASSES[player.cls];
-  var weapon=player.cls==='warrior'?['🗡️','鉄の剣','近接攻撃の基本武器']:player.cls==='mage'?['🪄','魔法の杖','魔法攻撃の基本武器']:['🏹','狩人の弓','遠距離攻撃の基本武器'];
+  var weapon=classWeapon();
   var items=[
     {ico:'🧪',name:'回復ポーション',cnt:'×'+player.potions,act:'potion',dim:player.potions<=0},
     {ico:'🏹',name:'矢',cnt:'×'+player.arrows,act:'arrows',dim:player.arrows<=0},
-    {ico:weapon[0],name:weapon[1],act:'weapon',equipped:true},
+    {ico:weapon[0],name:weapon[1],act:'weapon',tag:bowEquipped()?'装備中':'外し中',dim:!bowEquipped()},
     {ico:'💰',name:'ゴールド',cnt:player.gold+' G',act:'gold'}
   ];
-  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備）';
+  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備／ホットバーへはドラッグ＆ドロップ）';
   var html='';
   items.forEach(function(it){
-    html+='<button type="button" class="bag-slot'+(it.dim?' dim':'')+'" data-act="'+it.act+'"><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.equipped?'<span class="bs-tag">装備中</span>':'<span class="bs-count">'+it.cnt+'</span>')+'</button>';
+    html+='<button type="button" draggable="true" class="bag-slot'+(it.dim?' dim':'')+(bagAssignMode&&bagSelAct===it.act?' sel':'')+'" data-act="'+it.act+'"><span class="bs-ico">'+it.ico+'</span><span class="bs-name">'+it.name+'</span>'+(it.tag?'<span class="bs-tag">'+it.tag+'</span>':'<span class="bs-count">'+it.cnt+'</span>')+'</button>';
   });
   for(var i=items.length;i<BAG_CAPACITY;i++)html+='<div class="bag-slot empty"></div>';
   grid.innerHTML=html;
@@ -1486,6 +1558,7 @@ function doLogout(){
   if(acct.token)serverSave(false); /* save FIRST (buildSaveData runs synchronously), then clear */
   clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); /* world edits never leak into the next session */
   returnToMenu=false;closeGameMenu(true);
+  document.body.classList.remove('bag-open');bagAssignMode=false;bagSelAct=null;closeItemPicker();
   ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal'].forEach(function(id){$(id).style.display='none';});
   $('deathScreen').style.display='none';
   netClosed=true;clearTimeout(netRetryTimer);
@@ -2224,7 +2297,7 @@ function collide(nx,ny,r,feetZ){
          (small step tolerance so the player can walk up a roof slope
          and along a wall top) passes over instead of hitting air */
       var tz=obstacleTopZAt(o,nx,ny,r+4);
-      if(tz>-Infinity&&feetZ>=tz-3) continue; /* step-up tolerance 3 units (0.3m): what a 1.7m leg can step onto without jumping */
+      if(tz>-Infinity&&feetZ>=tz-6) continue; /* step-up tolerance 6 units (0.6m): low ledges can be stepped / scrambled onto; update() lifts the feet onto them (see the step-up block) */
     }
     if(o.type==='circle'){if(Math.hypot(nx-o.x,ny-o.y)<r+o.r) return true;}
     else if(nx+r>o.x&&nx-r<o.x+o.w&&ny+r>o.y&&ny-r<o.y+o.h) return true;
@@ -2420,7 +2493,7 @@ function expNeed(lv){return 80+lv*55;}
 var SPAWN_RANGE=1830;   /* ≈45 tiles: spawn only near the player */
 var DESPAWN_RANGE=2110; /* ≈52 tiles: beyond this, mobs are removed */
 var MAX_ALIVE=16;       /* global cap on simultaneously existing mobs */
-var SPAWN_CAPS={slime:4,goblin:3,wolf:3,orc:3,boss:1,frostwolf:3,icegolem:2,scorpion:3,sandworm:2,treant:3,magma:3,lavagolem:2,ifrit:1};
+var SPAWN_CAPS={slime:4,goblin:8,goblinArcher:2,goblinShaman:2,goblinChief:1,wolf:3,orc:3,boss:1,frostwolf:3,icegolem:2,scorpion:3,sandworm:2,treant:3,magma:3,lavagolem:2,ifrit:1};
 var spawnPoints=[]; /* {type,x,y,e:liveEnemy|null,coolUntil:timestamp} */
 function countAlive(type){var n=0;for(var i=0;i<enemies.length;i++)if(enemies[i].type===type&&!enemies[i].dead)n++;return n;}
 function aliveTotal(){var n=0;for(var i=0;i<enemies.length;i++)if(!enemies[i].dead)n++;return n;}
@@ -2430,7 +2503,7 @@ function spawnEnemy(type,x,y,sp){
      of 1 still applies), so lowering MAX_ALIVE never blocks them */
   if(!t.boss&&aliveTotal()>=MAX_ALIVE)return null;
   if(countAlive(type)>=(SPAWN_CAPS[type]||4))return null;
-  var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,walk:Math.random()*6,seen:false,_sp:(sp||null)};
+  var e={type:type,name:t.name,emoji:t.emoji,x:x,y:y,homeX:x,homeY:y,r:t.size,hp:t.hp,maxHp:t.hp,atk:t.atk,exp:t.exp,gold:t.gold,lv:t.lv,speed:t.speed*(0.85+Math.random()*0.3),state:'idle',wt:Math.random()*2000,aggro:null,hitFlash:0,boss:!!t.boss,fam:t.fam||null,walk:Math.random()*6,seen:false,_sp:(sp||null)};
   enemies.push(e); return e;
 }
 function addSpawnPoint(type,x,y){spawnPoints.push({type:type,x:x,y:y,e:null,coolUntil:0});}
@@ -2448,7 +2521,7 @@ function scatter(type,n,x0,x1,y0,y1){
 function populate(){
   enemies=[]; spawnPoints=[];
   scatter('slime',14,500,2100,250,850);
-  scatter('goblin',10,1750,2400,900,1900);
+  scatter('gobpack',6,1750,2400,900,1900); /* goblins live in packs of 3–5, not alone */
   scatter('wolf',7,1700,2400,700,1400);
   scatter('orc',5,1850,2450,1100,1900);
   addSpawnPoint('boss',2220,420);
@@ -2469,19 +2542,19 @@ function populate(){
   addSpawnPoint('ifrit',4600,4600);
   // new lands — east grassland / east forest
   scatter('slime',10,5400,10000,300,2300);
-  scatter('goblin',8,5400,10000,2800,5000);
+  scatter('gobpack',5,5400,10000,2800,5000);
   scatter('wolf',6,5600,10000,2800,5000);
   scatter('orc',5,6000,10000,3000,5000);
   // new lands — south grassland / south hills
   scatter('slime',8,300,2300,5400,10000);
   scatter('wolf',6,300,2400,5600,10000);
-  scatter('goblin',7,2800,5000,5400,10000);
+  scatter('gobpack',4,2800,5000,5400,10000);
   scatter('orc',6,2800,5000,5600,10000);
   // new lands — frontier forest / frontier hills (far south-east)
   scatter('treant',7,5400,7800,5400,10000);
   scatter('wolf',5,5400,7800,5600,10000);
   scatter('orc',6,8200,10100,5400,10100);
-  scatter('goblin',6,8200,10100,5400,10100);
+  scatter('gobpack',4,8200,10100,5400,10100);
   trySpawnNear(true); /* fill the area around the start position right away */
 }
 /* Minimum spacing between a freshly spawned mob and any other live mob
@@ -2496,6 +2569,52 @@ function tooCrowded(x,y){
   }
   return false;
 }
+/* ============ GOBLIN PACKS ============
+   Goblins never appear alone: a 'gobpack' spawn point materialises a
+   whole pack of 3–5 at once — mostly ordinary goblins, sometimes with
+   an archer or a shaman mixed in, and rarely a chief at the centre.
+   Members stand 45–95 units apart (inside the usual SPAWN_MIN_SEP,
+   which only applies to the generic one-by-one spawner). Every member
+   still goes through spawnEnemy(), so the per-type caps and the global
+   MAX_ALIVE (16) bound the pack: at the cap the pack just comes out
+   smaller or not at all. The pack fights as a unit via the LINK
+   reaction in damageEnemy(). */
+function spawnGoblinPack(sp){
+  var n=3+Math.floor(Math.random()*3); /* 3–5 */
+  var specials=[];
+  if(Math.random()<0.30)specials.push('goblinArcher');
+  if(Math.random()<0.24)specials.push('goblinShaman');
+  var hasChief=Math.random()<0.12;
+  if(hasChief)specials.unshift('goblinChief'); /* the chief stands at the centre */
+  while(specials.length>n-2)specials.pop();     /* a pack is mostly ordinary goblins: at least 2, always */
+  var order=specials.slice();
+  while(order.length<n)order.push('goblin');
+  /* find a clear centre near the point */
+  var cx=0, cy=0, ok=false;
+  for(var t=0;t<8&&!ok;t++){
+    cx=sp.x+(Math.random()*200-100); cy=sp.y+(Math.random()*200-100);
+    if(!collide(cx,cy,20)&&!inNoSpawn(cx,cy))ok=true;
+  }
+  if(!ok)return 0;
+  var members=[];
+  for(var i=0;i<order.length;i++){
+    var type=order[i], tt=ETYPES[type], mx=cx, my=cy;
+    if(i>0||!hasChief){ /* chief (order[0] when present) takes the centre; everyone else rings around */
+      var placed=false;
+      for(var t2=0;t2<8&&!placed;t2++){
+        var aa=Math.random()*Math.PI*2, rr=45+Math.random()*55;
+        mx=cx+Math.cos(aa)*rr; my=cy+Math.sin(aa)*rr;
+        if(!collide(mx,my,tt.size*0.7)&&!inNoSpawn(mx,my))placed=true;
+      }
+      if(!placed)continue;
+    }
+    var e=spawnEnemy(type,mx,my,sp);
+    if(e)members.push(e);
+  }
+  if(!members.length)return 0;
+  sp.pack=members; sp.e=members[0];
+  return members.length;
+}
 /* Throttled spawner: at most 1 new mob per call, and only for points near
    the player. Called from the main loop roughly every 2.6 seconds. */
 function trySpawnNear(immediate){
@@ -2507,6 +2626,16 @@ function trySpawnNear(immediate){
     /* at the global cap only boss points may still materialise */
     if(aliveTotal()>=MAX_ALIVE&&!(ETYPES[sp.type]&&ETYPES[sp.type].boss))continue;
     if(made>=(immediate?5:1))break;
+    if(sp.type==='gobpack'){
+      /* a pack point is alive while ANY member still stands */
+      if(sp.pack&&sp.pack.some(function(m){return m&&!m.dead&&enemies.indexOf(m)>=0;}))continue;
+      sp.pack=null; sp.e=null;
+      if(now<sp.coolUntil)continue;
+      if(inNoSpawn(sp.x,sp.y))continue;
+      if(Math.hypot(sp.x-player.x,sp.y-player.y)>SPAWN_RANGE)continue;
+      if(spawnGoblinPack(sp))made++;
+      continue;
+    }
     if(sp.e&&!sp.e.dead)continue;               /* point already has a live mob */
     if(sp.e&&sp.e.dead){sp.e=null;}              /* corpse cleanup finished it */
     if(now<sp.coolUntil)continue;                /* respawn cooldown */
@@ -2583,6 +2712,14 @@ function nearestEnemy(maxDist){
 function damageEnemy(e,dmg,crit){
   if(!e||e.dead)return;
   e.hp-=dmg;e.hitFlash=6;e.aggro=player;e.state='chase';
+  /* GOBLIN LINK: hurting one goblin alerts the whole pack — every
+     goblin-family mob nearby turns on the attacker at once and stays
+     on them past the usual leash while the alert is fresh */
+  if(e.fam==='gob'&&player){
+    var lkT=performance.now();
+    for(var li=0;li<enemies.length;li++){var lo=enemies[li];
+      if(lo!==e&&!lo.dead&&lo.fam==='gob'&&Math.hypot(lo.x-e.x,lo.y-e.y)<330){lo.state='chase';lo.aggro=player;lo.linkUntil=lkT+6000;}}
+  }
   flashCrosshair(e.hp<=0?'kill':(crit?'crit':''));
   addDmg(e.x+(Math.random()*20-10),e.y,dmg+(crit?'!':''),crit?'#ffd34d':'#fff',crit);
   burst(e.x,e.y,'#ffe9a8',crit?10:5);
@@ -2601,7 +2738,7 @@ function killEnemy(e){
   // quest
   var q=QUESTS[questIdx];
   if(q&&!q.done){
-    var hit=(q.target===e.type)||(q.target==='any_mid'&&(e.type==='wolf'||e.type==='orc'))||(q.target==='boss'&&e.boss);
+    var hit=(q.target===e.type)||(q.target==='goblin'&&e.fam==='gob')||(q.target==='any_mid'&&(e.type==='wolf'||e.type==='orc'))||(q.target==='boss'&&e.boss);
     if(hit){questCount++;updateQuest();
       if(questCount>=q.need){completeQuest();}}
   }
@@ -2663,6 +2800,7 @@ function bowPower(){ if(!bowDraw.active)return 0; return Math.min(1,(performance
 function startBowDraw(){
   if(typeof editorState!=='undefined'&&editorState&&editorState.active)return false;
   if(!started||!player||player.dead||player.cls!=='archer')return false;
+  if(!bowEquipped()){noBowNotice();return false;} /* no bow in hand: no draw, no shot */
   if(bowDraw.active)return true;
   if(menuOpen||isAnyOverlayOpen())return false;
   if(player.arrows<=0){noArrows();return false;}
@@ -2687,6 +2825,7 @@ function releaseBow(){
   fireArrow(p,1,full);
 }
 function fireArrow(power,mult,full){
+  if(!bowEquipped()){noBowNotice();return;}
   if(player.arrows<=0){noArrows();return;}
   player.arrows--; atkAnimT=performance.now();
   var spd=8.5+power*11.5, cp2=Math.cos(camPitch);   // 8.5 (tap) → 20 (full draw): range grows with draw
@@ -2705,6 +2844,7 @@ function playerAttack(mult,skillKey){
   /* ARCHER skills fire instantly at a solid draw; the BASIC attack goes
      through the draw-and-release system above (see startBowDraw). */
   if(player.cls==='archer'){
+    if(!bowEquipped()){noBowNotice();return;}
     fireArrow(0.65,mult,false);
     return;
   }
@@ -2737,6 +2877,7 @@ function useSkill(n){
   if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
   var c=CLASSES[player.cls],key='s'+n,sk=c[key],now=performance.now();
   if(now<skillCd[key])return;
+  if(player.cls==='archer'&&!bowEquipped()){noBowNotice();return;} /* every archer skill is a bow skill: no bow in hand, no skill (and no MP / cooldown spent) */
   if(player.mp<sk.mp){toast('MPが足りません');beep(140,0.1,'square',0.04);return;}
   if(player.cls==='archer'&&!sk.aoe&&player.arrows<=0){noArrows();return;}
   if(player.cls==='archer'&&sk.aoe){ /* アローレインは矢を3本消費する */
@@ -2766,9 +2907,93 @@ function usePotion(){
   addDmg(player.x,player.y,'+45','#7de08d',true);burst(player.x,player.y,'#7de08d',14);
   beep(520,0.1,'sine',0.05);updateHUD();
 }
+/* ================= ITEMS & ITEM HOTBAR =================
+   One item catalogue shared by the bag, the bottom-right item hotbar
+   (keys 5–8 / click) and the bottom-left hotbar's item slot. Items are
+   registered onto slots from the bag — drag & drop, the bag's assign
+   mode (click an item, then click a slot), or a slot's right-click
+   picker — and using a slot runs the very same action as the bag. */
+function classWeapon(){
+  var c=player?player.cls:'warrior';
+  return c==='warrior'?['🗡️','鉄の剣','近接攻撃の基本武器']:c==='mage'?['🪄','魔法の杖','魔法攻撃の基本武器']:['🏹','狩人の弓','遠距離攻撃の基本武器'];
+}
+function itemDef(act){
+  if(act==='potion')return{ico:'🧪',name:'回復ポーション'};
+  if(act==='arrows')return{ico:'🏹',name:'矢'};
+  if(act==='gold')return{ico:'💰',name:'ゴールド'};
+  if(act==='weapon'){var w=classWeapon();return{ico:w[0],name:w[1]};}
+  return{ico:'＋',name:'空'};
+}
+function itemCountTxt(act){
+  if(!player)return'';
+  if(act==='potion')return'×'+player.potions;
+  if(act==='arrows')return'×'+player.arrows;
+  if(act==='gold')return player.gold+' G';
+  if(act==='weapon')return bowEquipped()?'装備中':'外し中';
+  return'';
+}
+/* the archer's bow must be IN HAND: with it put away, bow attacks and
+   bow skills are refused (see startBowDraw / useSkill / playerAttack) */
+function bowEquipped(){return !player||player.cls!=='archer'||player.weaponEquipped!==false;}
+function noBowNotice(){toast('🏹 弓を持っていない！バッグで「狩人の弓」を装備しよう',3200);beep(160,0.12,'square',0.05);}
+function toggleWeaponEquip(){
+  if(!player)return;
+  if(player.cls!=='archer'){toast('その武器はすでに装備中です');return;}
+  player.weaponEquipped=(player.weaponEquipped===false)?true:false;
+  if(player.weaponEquipped){toast('🏹 狩人の弓を装備した');beep(660,0.07,'triangle',0.04);}
+  else{cancelBowDraw();toast('🏹 狩人の弓を外した — 弓攻撃と弓スキルは使えなくなります');beep(330,0.08,'triangle',0.04);}
+  refreshBagUI();
+}
+function useItem(act){
+  if(!act||!started||!player||player.dead)return;
+  if(act==='potion')usePotion();
+  else if(act==='weapon')toggleWeaponEquip();
+  else if(act==='arrows')toast(player.cls==='archer'?'矢は射撃のたびに自動で1本消費されます。地形に刺さった矢は E キーで回収できます':'矢はアーチャーが射撃で使う弾薬です');
+  else if(act==='gold')toast('所持金 '+player.gold+' G');
+}
+var _ibSig='';
+function refreshItemBars(){
+  if(!player)return;
+  var sig=itemBar.join(',')+'|'+leftSlotItem+'|'+player.potions+'/'+player.arrows+'/'+player.gold+'/'+(player.weaponEquipped===false?0:1)+'/'+player.cls;
+  if(sig===_ibSig)return; _ibSig=sig;
+  for(var i=0;i<4;i++){
+    var btn=$('ih'+(i+1)); if(!btn)continue;
+    var act=itemBar[i], ico=btn.querySelector('.ih-ico'), cnt=btn.querySelector('.cnt'), nm=btn.parentNode.querySelector('.ih-name');
+    if(act){var d=itemDef(act); ico.textContent=d.ico; cnt.style.display=''; cnt.textContent=itemCountTxt(act); nm.textContent=d.name; btn.classList.remove('empty');}
+    else{ico.textContent='＋'; cnt.style.display='none'; nm.textContent='空き'; btn.classList.add('empty');}
+  }
+  var pi=$('potionIco'), pn=$('potionName'), pc=$('potionCnt'), ld=itemDef(leftSlotItem);
+  if(pi)pi.textContent=ld.ico;
+  if(pn)pn.textContent=ld.name;
+  if(pc)pc.textContent=itemCountTxt(leftSlotItem);
+}
+/* register an item onto a hotbar slot: {kind:'bar',i:0..3} or {kind:'left'} */
+function assignToSlot(target,act){
+  if(!act)return;
+  if(target.kind==='left')leftSlotItem=act; else itemBar[target.i]=act;
+  _ibSig=''; refreshItemBars();
+  toast('「'+itemDef(act).name+'」をホットバーに登録した');
+  beep(720,0.06,'triangle',0.04);
+}
+/* right-click picker for hotbar slots */
+var pickerTarget=null;
+function openItemPicker(target,anchorEl){
+  var pk=$('itemPicker'); if(!pk)return;
+  pickerTarget=target;
+  var acts=['potion','weapon','arrows','gold'];
+  var html='<div class="ip-title">登録するアイテムを選択</div>';
+  acts.forEach(function(act){var d=itemDef(act);html+='<button type="button" class="ip-btn" data-act="'+act+'">'+d.ico+' '+d.name+'<small>'+itemCountTxt(act)+'</small></button>';});
+  if(target.kind==='bar')html+='<button type="button" class="ip-btn" data-act="__clear">✕ 空にする</button>';
+  pk.innerHTML=html;
+  var r=anchorEl.getBoundingClientRect();
+  pk.style.display='flex';
+  pk.style.left=Math.max(6,Math.min(window.innerWidth-190,r.left))+'px';
+  pk.style.top=Math.max(6,r.top-pk.offsetHeight-8)+'px';
+}
+function closeItemPicker(){var pk=$('itemPicker');if(pk)pk.style.display='none';pickerTarget=null;}
 function hurtPlayer(dmg,src){
   if(player.dead||isSafe(player.x,player.y))return;
-  if(src&&(jumpY>0||jumpVY!==0||hovering))return; /* airborne (jump / fall / hover): enemy attacks cannot reach — see the AIRBORNE SAFETY note in update() */
+  if(src&&hovering)return; /* HOVER ONLY: while floating, enemy attacks cannot reach — jumping / falling players are seen and hit normally — see the HOVER SAFETY note in update() */
   if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: invulnerable */
   var real=Math.max(1,dmg-player.def);
   player.hp-=real;addDmg(player.x,player.y,'-'+real,'#ff8a8a');
@@ -3131,8 +3356,38 @@ function updateSkillUI(now){
     else cd.style.display='none';
   });
   var pb=$('potionBtn').querySelector('.cd'),pr=potionCd-now;
-  if(pr>0){pb.style.display='block';pb.style.height=Math.min(100,pr/900*100)+'%';pb.textContent=(pr/1000).toFixed(1);}else pb.style.display='none';
-  var pcnt=$('potionCnt'); if(pcnt&&player)pcnt.textContent='×'+player.potions; /* the hotbar potion slot always shows the count on the slot */
+  /* the left slot's cooldown shade is the potion's own — it only shows
+     while the potion is what the slot currently holds */
+  if(leftSlotItem==='potion'&&pr>0){pb.style.display='block';pb.style.height=Math.min(100,pr/900*100)+'%';pb.textContent=(pr/1000).toFixed(1);}else pb.style.display='none';
+  /* top-left cooldown panel: per skill, remaining seconds + a draining
+     gauge while cooling down, and a bright flash the moment it readies */
+  if(player){
+    var cls=CLASSES[player.cls];
+    if(cdPanelCls!==player.cls){
+      cdPanelCls=player.cls;
+      for(var ci2=1;ci2<=3;ci2++){var sk0=cls['s'+ci2],ic0=$('cdi'+ci2),nm0=$('cdn'+ci2);if(ic0)ic0.textContent=sk0.ico;if(nm0)nm0.textContent=sk0.name;}
+    }
+    var cdRows=[['s1',cls.s1.cd],['s2',cls.s2.cd],['s3',cls.s3.cd],['potion',900]];
+    for(var ri=0;ri<4;ri++){
+      var ckey=cdRows[ri][0], ctotal=cdRows[ri][1], cidx=ri+1;
+      var crem=(ckey==='potion'?potionCd:skillCd[ckey])-now;
+      var crow=$('cdr'+cidx), cbar=$('cdb'+cidx), csec=$('cds'+cidx);
+      if(!crow)continue;
+      var cwas=cdPrev[ckey]||0;
+      if(crem>0){
+        crow.classList.add('cooling'); crow.classList.remove('ready');
+        if(cbar)cbar.style.width=Math.min(100,crem/ctotal*100)+'%';
+        if(csec)csec.textContent=(crem/1000).toFixed(1);
+      }else{
+        if(cwas>0){crow.classList.remove('ready');void crow.offsetWidth;crow.classList.add('ready');}
+        crow.classList.remove('cooling');
+        if(cbar)cbar.style.width='0%';
+        if(csec)csec.textContent='';
+      }
+      cdPrev[ckey]=crem;
+    }
+  }
+  refreshItemBars();
 }
 
 /* ================= WATER & SWIMMING =================
@@ -3202,7 +3457,7 @@ function handleJumpKey(){
     jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_TAP_NUDGE);
     return;
   }
-  if(jumpY<=0&&jumpVY===0){jumpVY=0.070;return;} /* grounded: normal jump for everyone — impulse tuned so the apex is ~5.4 units (0.54m), a 1.7m person's jump */
+  if(jumpY<=0&&jumpVY===0){jumpVY=0.118;return;} /* grounded: normal jump for everyone — impulse raised so the apex is ~15.5 units (≈1.55m): ledges, rocks and low roofs are now reachable by jumping */
   if(!isGameMaster())return; /* mid-air press: only gamemaster can float */
   hovering=true;jumpVY=0;hoverTapT=0;clearHoverPress();
   toast('🕊 浮遊モード — Space長押しで上昇／短く2回押すと解除',3600);
@@ -3222,6 +3477,47 @@ function handleJumpRelease(){
     beep(420,0.07,'sine',0.03);updateHoverBanner();
   }else{
     hoverTapT=now; /* first short tap: remember it in case a second short tap follows quickly */
+  }
+}
+
+/* ============ GOBLIN RANGED AI (archer / shaman) ============
+   Ranged goblins keep their distance: they close to just inside their
+   range, back off when the player gets near, and hold position in
+   between. Archers loose stones / arrows; shamans hurl magic bolts —
+   but a shaman mends a wounded packmate first whenever one is hurt
+   nearby. Shots are ordinary projectiles with from:'enemy'; the hit
+   test lives in update()'s projectile pass and goes through
+   hurtPlayer(), so the hover rule and the safe zone apply as usual. */
+function goblinRangedAI(e,dp,now,edt){
+  var t=ETYPES[e.type], range=t.ranged||300, keep=t.keep||200;
+  var a=Math.atan2(player.y-e.y,player.x-e.x);
+  var mv=0;
+  if(dp>range*0.92)mv=1; else if(dp<keep*0.72)mv=-1;
+  if(mv!==0){
+    var gx=e.x+Math.cos(a)*e.speed*mv, gy=e.y+Math.sin(a)*e.speed*mv;
+    if(!collide(gx,e.y,e.r*0.7))e.x=gx;
+    if(!collide(e.x,gy,e.r*0.7))e.y=gy;
+    e.walk+=edt*0.015;
+  }
+  e._face=Math.atan2(player.x-e.x,player.y-e.y);
+  if(t.healer&&(!e.healT||now-e.healT>2400)){
+    var ally=null, worst=0.78;
+    for(var i=0;i<enemies.length;i++){var o=enemies[i];
+      if(o!==e&&!o.dead&&o.fam==='gob'&&o.hp<o.maxHp*worst&&Math.hypot(o.x-e.x,o.y-e.y)<290){ally=o;worst=o.hp/o.maxHp;}}
+    if(ally){
+      e.healT=now;
+      var amt=Math.min(30,ally.maxHp-ally.hp); ally.hp+=amt;
+      addDmg(ally.x+(Math.random()*16-8),ally.y-12,'+'+amt,'#7de08d');
+      burst(ally.x,ally.y,'#7de08d',8);
+      beep(740,0.09,'sine',0.025);
+      return; /* mending takes the turn — no bolt this cycle */
+    }
+  }
+  if(dp<=range&&(!e.atkT||now-e.atkT>(e.type==='goblinShaman'?2100:1700))){
+    e.atkT=now;
+    var spd=7.2, isSh=(e.type==='goblinShaman');
+    projectiles.push({x:e.x,y:e.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,dmg:Math.round(e.atk*(0.85+Math.random()*0.3)),from:'enemy',src:e,life:Math.ceil(dp/spd)+16,color3:isSh?0x63e6a8:0xd8c9a3,emoji:isSh?'✦':'➤'});
+    beep(isSh?520:300,0.06,'sawtooth',0.018);
   }
 }
 
@@ -3245,7 +3541,14 @@ function update(dt,now){
   }
   var wasSwimming=!!player.swimming;
   player.swimming=player.swimDepth>=SWIM_DEPTH;
-  if(player.swimming)topLift=0; /* swimming means feet on the water bottom, never on a wall / rock / roof top */
+  if(player.swimming){
+    /* swimming pins the body to the water: any jump / float state that
+       leaked in (a jump that landed in deep water, a cancelled hover)
+       is cleared here, so the player can never hang in the air while
+       the swim state is on — the eyes ride at swimSurfaceZ() instead */
+    topLift=0; jumpY=0; jumpVY=0;
+    if(hovering){hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();}
+  }
   if(player.swimming&&!wasSwimming)chat('🏊 深い水に入った ― 泳いでいる間はMPを消費します','sys');
   if(player.swimming){
     if(player.mp>0){
@@ -3324,6 +3627,15 @@ function update(dt,now){
       topLift=tZf-gZf; jumpY=0; jumpVY=0; hovering=false; hoverTapT=0; clearHoverPress();
     }else if(jumpY<=0){jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;clearHoverPress();topLift=0;}
   }
+  /* step-up: a low top (≤6 units ≈ 0.6m above the feet) directly
+     underfoot is simply stepped onto while grounded — collide()'s
+     step tolerance already lets the player walk into its footprint,
+     this lifts the feet onto it. Bigger ledges are reached with the
+     (now higher) jump and the fall-onto-top landing below. */
+  if(topLift===0&&jumpY===0&&jumpVY===0&&!hovering&&!player.swimming){
+    var gZs=standH(player.x,player.y), tZs=topSurfaceAt(player.x,player.y);
+    if(tZs>gZs&&tZs-gZs<=6)topLift=tZs-gZs;
+  }
   /* standing on a wall / rock / roof top: follow its surface while
      walking (roof slopes included); walking off the edge converts the
      lift into a fall from that height; leaving the footprint mid-air
@@ -3354,20 +3666,34 @@ function update(dt,now){
     if(!e.seen&&d<640&&(d<150||ang<1.0)&&losClear(player.x,player.y,e.x,e.y))e.seen=true;
     if(d<760){
       var thresh=0.13+Math.atan2(e.r+12,d);
-      if(ang<thresh&&d<bestAimScore&&losClear(player.x,player.y,e.x,e.y)){bestAimScore=d;aimTarget=e;}
+      var cap=(ang<thresh);
+      if(!cap&&(jumpY>0||jumpVY!==0||hovering)){
+        /* airborne identification: judge by the real 3D line from the
+           eyes (riding at jumpY) to the enemy, pitch included — so
+           aiming down at a mob mid-jump / mid-fall / while floating
+           identifies it (name / HP / crosshair) exactly as on ground */
+        var eyeZ=playerGroundZ()+EYE_H+jumpY;
+        var vz3=(terrainH(e.x,e.y)+e.r+8)-eyeZ;
+        var d3=Math.sqrt(dx*dx+dy*dy+vz3*vz3)||1;
+        var cp3=Math.cos(camPitch);
+        var cos3=(dx*(-Math.sin(camYaw)*cp3)+dy*(-Math.cos(camYaw)*cp3)+vz3*Math.sin(camPitch))/d3;
+        var ang3=Math.acos(Math.max(-1,Math.min(1,cos3)));
+        if(ang3<0.15+Math.atan2(e.r+14,d3))cap=true;
+      }
+      if(cap&&d<bestAimScore&&losClear(player.x,player.y,e.x,e.y)){bestAimScore=d;aimTarget=e;}
     }
   });
   if(aimTarget)aimTarget.seen=true;
   if(isSafe(player.x,player.y)&&player.hp<player.maxHp){player.hp=Math.min(player.maxHp,player.hp+dt*0.03);}
   // enemies AI — distant mobs (>~1100 units, far off-screen) tick at a
   // reduced rate (~3 times/sec) so phones don't burn frames on them
-  /* AIRBORNE SAFETY: while the player's feet are off the ground —
-     jumping, falling or hovering — mobs cannot target or hit them at
-     all: a chasing mob loses interest and goes back to wandering.
-     Standing on a wall / rock / roof top (topLift) and swimming both
-     count as grounded — jumpY and jumpVY are 0 and hovering is off in
-     those states, so this stays false there. */
-  var pAirborne=(jumpY>0||jumpVY!==0||hovering);
+  /* HOVER SAFETY: only while FLOATING (hover mode) is the player
+     untouchable — mobs cannot target or hit them at all, and a chasing
+     mob loses interest and goes back to wandering. Jumping and falling
+     are NOT protected: mobs see and hit the player normally mid-jump.
+     Standing on a wall / rock / roof top (topLift) and swimming count
+     as grounded, and hovering is off in those states anyway. */
+  var pHover=hovering;
   enemies.forEach(function(e){
     if(e.dead)return;
     if(e.hitFlash>0)e.hitFlash--;
@@ -3380,15 +3706,55 @@ function update(dt,now){
       edt=e._slowT?Math.min(400,now-e._slowT):dt;
       e._slowT=now; slowTick=true;
     }
-    if(pAirborne){if(e.state==='chase')e.state='idle';} /* untargetable mid-air: the mob drops the chase and wanders */
-    else if(dp<210&&!isSafe(player.x,player.y)) e.state='chase'; else if(dp>340) e.state='return';
-    if(e.state==='chase'&&dp>e.r+player.r-4){
+    if(pHover){if(e.state==='chase')e.state='idle';} /* untargetable while floating: the mob drops the chase and wanders */
+    else if(dp<210&&!isSafe(player.x,player.y)) e.state='chase';
+    else if(e.linkUntil&&now<e.linkUntil&&!isSafe(player.x,player.y)) e.state='chase'; /* goblin pack link: stays on the attacker past the usual leash while the alert is fresh */
+    else if(dp>340) e.state='return';
+    var isSlime=(e.type==='slime'||e.type==='magma');
+    if(isSlime&&e.atkAnim){
+      /* SLIME BODY-SLAM in progress (committed — no chasing / wandering
+         until it lands): windup 0-320ms crouched low, lunge 320-580ms
+         flying at the player, recovery 580-880ms squashed on landing.
+         Damage lands ONLY at the impact moment (470ms), and only if the
+         lunge head actually reaches the player — stepping away dodges it.
+         The visuals live in syncEntity (driven by atkAnim.t0). */
+      var aa=e.atkAnim, ael=now-aa.t0;
+      if(!aa.hitDone&&ael>=470){
+        aa.hitDone=true;
+        var hx=e.x+aa.dx*aa.len*0.93, hy=e.y+aa.dy*aa.len*0.93;
+        /* the SAME hover check as every other enemy attack (HOVER
+           SAFETY above): a floating player cannot be hit — the slam
+           whiffs underneath them. A merely jumping / falling player
+           IS hit, exactly as with any other mob's attack. */
+        if(!hovering&&Math.hypot(player.x-hx,player.y-hy)<e.r+player.r+16){hurtPlayer(aa.dmg,e);beep(120,0.06,'square',0.03);}
+        else beep(90,0.08,'sine',0.015); /* whoosh — dodged (or floated above it) */
+      }
+      if(!aa.landed&&ael>=580){
+        aa.landed=true; /* the slam carries the slime to its landing spot */
+        var lx=e.x+aa.dx*aa.len, ly=e.y+aa.dy*aa.len;
+        if(!collide(lx,e.y,e.r*0.7))e.x=lx;
+        if(!collide(e.x,ly,e.r*0.7))e.y=ly;
+      }
+      if(ael>=880)e.atkAnim=null;
+    }else if(e.state==='chase'&&(e.type==='goblinArcher'||e.type==='goblinShaman')){
+      goblinRangedAI(e,dp,now,edt); /* archers / shamans fight at range: keep their distance, shoot (or mend packmates) */
+    }else if(e.state==='chase'&&dp>e.r+player.r-4){
       var a=Math.atan2(player.y-e.y,player.x-e.x);
       var ex=e.x+Math.cos(a)*e.speed,ey=e.y+Math.sin(a)*e.speed;
       if(!collide(ex,e.y,e.r*0.7))e.x=ex; if(!collide(e.x,ey,e.r*0.7))e.y=ey;
       e.walk+=edt*0.015;
     }else if(e.state==='chase'&&dp<=e.r+player.r+6){
-      if(!e.atkT||now-e.atkT>(e.boss?900:1100)){e.atkT=now;hurtPlayer(e.atk*(0.85+Math.random()*0.3),e);beep(120,0.06,'square',0.03);}
+      if(isSlime){
+        /* start the body-slam instead of instant damage: face the player,
+           remember the direction / distance / rolled damage; syncEntity
+           plays the crouch → stretch → lunge, impact is resolved above */
+        if(!e.atkT||now-e.atkT>1100){
+          e.atkT=now;
+          var sa=Math.atan2(player.y-e.y,player.x-e.x);
+          e.atkAnim={t0:now,dx:Math.cos(sa),dy:Math.sin(sa),len:Math.max(10,dp-4),dmg:e.atk*(0.85+Math.random()*0.3),hitDone:false,landed:false};
+          e._face=Math.atan2(player.x-e.x,player.y-e.y);
+        }
+      }else if(!e.atkT||now-e.atkT>(e.boss?900:1100)){e.atkT=now;hurtPlayer(e.atk*(0.85+Math.random()*0.3),e);beep(120,0.06,'square',0.03);}
     }else{
       e.wt-=edt;
       if(e.wt<=0){e.wt=1600+Math.random()*2200;e.tx=e.homeX+(Math.random()*130-65);e.ty=e.homeY+(Math.random()*130-65);
@@ -3429,6 +3795,14 @@ function update(dt,now){
     if(p.from==='player'){
       for(var i=0;i<enemies.length;i++){var e=enemies[i];
         if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<e.r+9){var crit=Math.random()<0.15;damageEnemy(e,Math.round(p.dmg*(crit?1.7:1)),crit);beep(300,0.06,'square',0.04);return false;}}
+    }else if(p.from==='enemy'){
+      /* enemy shots (goblin archer / shaman): they connect only with a
+         grounded player — a floating (hovering) player is untouchable,
+         the same HOVER SAFETY rule as every melee attack; hurtPlayer
+         itself handles the safe zone and death */
+      if(Math.hypot(player.x-p.x,player.y-p.y)<player.r+10){
+        if(!hovering){hurtPlayer(p.dmg,p.src||null);beep(120,0.06,'square',0.03);return false;}
+      }
     }
     return true;
   });
@@ -4119,7 +4493,7 @@ function refreshGroundAll(){
 function computeEditorAim(){
   if(!player)return null;
   var eyeY=playerGroundZ()+EYE_H+jumpY;
-  if(player.swimming)eyeY=terrainH(player.x,player.y)+Math.max(1,(player.swimDepth||SWIM_DEPTH)-1);
+  if(player.swimming){var swZ2=swimSurfaceZ(player.x,player.y);eyeY=(swZ2>-Infinity?swZ2:terrainH(player.x,player.y))+1;}
   var cp=Math.cos(camPitch);
   var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
   var px=player.x, py=player.y, pz=eyeY;
@@ -4239,16 +4613,43 @@ function buildPlacedModel(o){
     box(13,13,4,0xffd98a,-30,36,49,g); box(13,13,4,0xffd98a,30,36,49,g);
     box(13,26,13,STONE_D,30,72,-18,g);
   }else if(o.t==='tree_b'){
-    cyl(5,8,52,0x6b4a2c,0,26,0,g,7);
-    sph(34,0x3e7a3e,0,74,0,g,{flatShading:true});
-    sph(24,0x2c5a30,-22,58,6,g,{flatShading:true});
-    sph(24,0x477d43,22,60,-6,g,{flatShading:true});
-    sph(20,0x548c46,0,96,0,g,{flatShading:true});
+    /* placed broadleaf: same per-tree shape variety as the wild ones —
+       a seeded silhouette (round / tall / wide), trunk girth, lean and
+       3–5 canopy blobs, all derived from the placement id + position
+       so a given placed tree always grows the same shape. The canopy
+       top stays under 116 (placedObstaclesFor's topH). */
+    var psd=(o.id||1)*31.7+o.x*0.37+o.y*0.73;
+    var psr=function(n){var v=Math.sin(psd*12.9+n*78.2)*43758.5;return v-Math.floor(v);};
+    var pth2=46+psr(1)*14, ptw2=0.85+psr(2)*0.4;
+    var ptr=cyl(5*ptw2,8*ptw2,pth2,0x6b4a2c,0,pth2/2,0,g,7); ptr.rotation.z=(psr(3)-0.5)*0.18;
+    var par=psr(4);
+    var pcols=[0x3e7a3e,0x2c5a30,0x477d43,0x548c46,0x356b38];
+    var pnb=3+Math.floor(psr(5)*3);
+    for(var pbi=0;pbi<pnb;pbi++){
+      var pcr,pX,pY,pZ;
+      if(pbi===0){pcr=29+psr(6)*9;pX=0;pY=pth2+15+psr(7)*9;pZ=0;}
+      else{
+        var paa=psr(pbi+8)*Math.PI*2, prr=(par<0.4?17:(par<0.7?10:27))+psr(pbi+10)*10;
+        pcr=16+psr(pbi+12)*10;pX=Math.cos(paa)*prr;pY=pth2+(par<0.7?2+psr(pbi+14)*24:-3+psr(pbi+14)*10);pZ=Math.sin(paa)*prr;
+      }
+      if(pY+pcr>114)pY=114-pcr;
+      sph(pcr,pcols[Math.floor(psr(pbi+16)*pcols.length)],pX,pY,pZ,g,{flatShading:true});
+    }
   }else if(o.t==='tree_p'){
-    cyl(4.5,7,64,0x5d3f27,0,32,0,g,7);
-    cone(30,52,0x2c5a30,0,72,0,g,9);
-    cone(23,44,0x356b38,0,102,0,g,9);
-    cone(15,36,0x3e7a3e,0,128,0,g,9);
+    /* placed pine: seeded tier widths / heights / counts and a slight
+       lean, again from id + position. Tier tops stay under 146. */
+    var qsd=(o.id||1)*47.3+o.x*0.53+o.y*0.19;
+    var qsr=function(n){var v=Math.sin(qsd*12.9+n*78.2)*43758.5;return v-Math.floor(v);};
+    var qtw=0.85+qsr(2)*0.4;
+    var qtr=cyl(4.5*qtw,7*qtw,64,0x5d3f27,0,32,0,g,7); qtr.rotation.z=(qsr(3)-0.5)*0.1;
+    var qcols=[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230];
+    var qlev=[[30,52,72],[23,44,102],[15,36,128]];
+    if(qsr(4)<0.4)qlev.push([9,22,134]); /* an occasional fourth, spire tier */
+    for(var qti=0;qti<qlev.length;qti++){
+      var qcr=qlev[qti][0]*(0.85+qsr(qti+6)*0.35), qch=qlev[qti][1]*(0.92+qsr(qti+8)*0.14), qcy=qlev[qti][2]+(qsr(qti+10)-0.5)*5;
+      if(qcy+qch/2>145)qcy=145-qch/2;
+      cone(qcr,qch,qcols[Math.floor(qsr(qti+12)*qcols.length)],(qsr(qti+14)-0.5)*4,qcy,(qsr(qti+15)-0.5)*4,g,9);
+    }
   }else if(o.t==='wall'){
     box(96,72,24,STONE,0,36,0,g);
     box(102,10,30,STONE_D,0,76,0,g);
@@ -4438,6 +4839,25 @@ function waterLevelAt(x,y){
     if(o.kind!=='lake')continue;
     if(Math.hypot(x-o.x,y-o.y)<o.s){
       var z=(o.wz!=null)?o.wz:(o.townWater?2.4:1.2);
+      if(z>lv)lv=z;
+    }
+  }
+  return lv;
+}
+/* the ACTUAL height of the water surface over a point: wild lakes sit
+   at z -0.8 (see buildWorld3D's discs), town ponds at their recorded
+   wz, placed ponds at the level captured when they were dug. Swimming
+   heights (camera / body) must come from THIS — never from terrain +
+   swimDepth, because swimDepth is an abstract 0..120 scale while the
+   wild-lake beds are only carved ~5 units below the surface: adding
+   the two used to park the "swimming" camera ~110 units in the air. */
+function swimSurfaceZ(x,y){
+  var lv=-Infinity;
+  for(var i=0;i<decorations.length;i++){
+    var o=decorations[i];
+    if(o.kind!=='lake')continue;
+    if(Math.hypot(x-o.x,y-o.y)<o.s){
+      var z=o.placedWater?(o.wz!=null?o.wz:-0.8):(o.townWater?(o.wz!=null?o.wz:2.4):-0.8);
       if(z>lv)lv=z;
     }
   }
@@ -6038,35 +6458,61 @@ function buildWorld3D(){
       var greens=d.kind==='snowtree'?[0x9fc4d8,0xbcd8ea,0x8fb8cc,0xd4e6f2,0xa8ccdf,0x9fc4d8,0xcfe2ee,0x8fb8cc]:[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230,0x477d43,0x548c46,0x24482a,0x3f7048];
       var gpick=function(n){return greens[Math.floor(sr(n)*greens.length)];};
       if(d.conifer||sr(1)<0.42){
-        // pine: very tall straight trunk + five dense, drooping tiers and a spire tip
+        // pine: tall straight trunk + drooping tiers and a spire tip.
+        // The SHAPE varies per tree: tier count (5–7), how the tiers
+        // stack (a smooth cone taper vs chunkier, more even steps),
+        // trunk girth, and each tier's sideways wander. Trunk height
+        // and the spire are untouched, so treeTopH() stays exact.
         var pth=S*3.1*hv;
-        cyl(S*0.10,S*0.21,pth,bark,0,pth/2,0,tg,7);
-        cyl(S*0.21,S*0.38,S*0.34,bark,0,S*0.17,0,tg,7);
-        for(var li=0;li<6;li++){
-          var lt=li/5, lr=S*(1.22-0.82*lt)*(0.9+sr(li+30)*0.25), lh=S*(1.2-0.42*lt);
-          cone(lr,lh,gpick(li+31),(sr(li+3)-0.5)*S*0.16,pth*(0.36+0.105*li)+lh/2,(sr(li+5)-0.5)*S*0.16,tg,9);
+        var ptw=0.85+sr(23)*0.4;
+        cyl(S*0.10*ptw,S*0.21*ptw,pth,bark,0,pth/2,0,tg,7);
+        cyl(S*0.21*ptw,S*0.38*ptw,S*0.34,bark,0,S*0.17,0,tg,7);
+        var tiers=5+Math.floor(sr(24)*3);
+        var evenT=sr(25)<0.45;
+        for(var li=0;li<tiers;li++){
+          var lt=li/(tiers-1), lr=S*(1.22-(evenT?0.55:0.82)*lt)*(0.88+sr(li+30)*0.3), lh=S*(1.2-0.42*lt);
+          cone(lr,lh,gpick(li+31),(sr(li+3)-0.5)*S*0.24,pth*(0.34+0.52*lt)+lh/2,(sr(li+5)-0.5)*S*0.24,tg,9);
         }
         cone(S*0.16,S*0.7,gpick(40),0,pth+S*0.3,0,tg,7);
       }else{
-        // broadleaf: long tapered trunk, four uneven branches, big dense 7-blob canopy
+        // broadleaf: the SILHOUETTE is per-tree — round / tall / wide /
+        // tiered crowns, a trunk that bends or forks, 3–6 branches at
+        // seeded angles, and 7–11 canopy blobs laid out by archetype.
+        // Blobs are clamped under th + 1.93S, so treeTopH() (which
+        // allows th + 1.95S) stays a safe top for every shape.
         var th=S*3.0*hv;
-        var trunk=cyl(S*0.13,S*0.27,th,bark,0,th/2,0,tg,8);trunk.rotation.z=(sr(3)-0.5)*0.09;
-        cyl(S*0.27,S*0.46,S*0.36,bark,0,S*0.18,0,tg,8);
-        for(var bi=0;bi<4;bi++){
-          var ba=sr(bi+4)*Math.PI*2, bl=S*(0.85+sr(bi+6)*0.45);
-          var br=cyl(S*0.045,S*0.09,bl,bark,Math.cos(ba)*S*0.32,th*(0.76+sr(bi+24)*0.16),Math.sin(ba)*S*0.32,tg,5);
-          br.rotation.set(Math.sin(ba)*(0.75+sr(bi+26)*0.3),0,-Math.cos(ba)*(0.75+sr(bi+26)*0.3));
+        var arch=sr(7);
+        var ttw=0.82+sr(23)*0.45;
+        var bend=(sr(27)-0.5)*0.26;
+        var trunk=cyl(S*0.13*ttw,S*0.27*ttw,th,bark,0,th/2,0,tg,8);trunk.rotation.z=bend+(sr(3)-0.5)*0.09;
+        cyl(S*0.27*ttw,S*0.46*ttw,S*0.36,bark,0,S*0.18,0,tg,8);
+        if(sr(28)<0.45){ /* forked leader: a second, thinner trunk splitting off near the top */
+          var fk=cyl(S*0.07*ttw,S*0.11*ttw,th*0.42,bark,S*0.14,th*0.78,0,tg,6);fk.rotation.z=bend-0.34-sr(29)*0.2;
         }
-        for(var ci=0;ci<9;ci++){
-          var cr, cx2, cy2, cz2;
-          if(ci===0){cr=S*(0.98+sr(41)*0.22);cx2=0;cy2=th+S*0.62;cz2=0;}
-          else if(ci<5){var aa=sr(ci+42)*Math.PI*2, rr=S*(0.62+sr(ci+44)*0.3);
-            cr=S*(0.55+sr(ci+46)*0.25);cx2=Math.cos(aa)*rr;cy2=th+S*(0.34+sr(ci+48)*0.3);cz2=Math.sin(aa)*rr;}
-          else if(ci<7){cr=S*(0.5+sr(ci+50)*0.22);cx2=(sr(ci+52)-0.5)*S*0.8;cy2=th+S*(0.95+sr(ci+54)*0.35);cz2=(sr(ci+56)-0.5)*S*0.8;}
-          else{var aa2=sr(ci+70)*Math.PI*2, rr2=S*(0.85+sr(ci+72)*0.3); /* low outer blobs: the canopy reads layered, not a single ball */
-            cr=S*(0.42+sr(ci+74)*0.2);cx2=Math.cos(aa2)*rr2;cy2=th+S*0.16;cz2=Math.sin(aa2)*rr2;}
+        var topX=Math.sin(-bend)*th*0.45; /* the crown roughly follows the bend */
+        var nbr=3+Math.floor(sr(30)*4);
+        for(var bi=0;bi<nbr;bi++){
+          var ba=sr(bi+4)*Math.PI*2, bl=S*(0.8+sr(bi+6)*0.55);
+          var br=cyl(S*0.045,S*0.09,bl,bark,Math.cos(ba)*S*0.32,th*(0.72+sr(bi+24)*0.2),Math.sin(ba)*S*0.32,tg,5);
+          br.rotation.set(Math.sin(ba)*(0.7+sr(bi+26)*0.35),0,-Math.cos(ba)*(0.7+sr(bi+26)*0.35));
+        }
+        var spread=arch<0.34?1.0:(arch<0.62?0.6:(arch<0.84?1.38:0.95)); /* round / tall / wide / tiered */
+        var lift=arch<0.34?0.6:(arch<0.62?0.8:(arch<0.84?0.38:0.5));
+        var syB=(arch>=0.34&&arch<0.62)?1.06:0.85;                     /* tall crowns stretch up a touch */
+        var nbl=7+Math.floor(sr(31)*5);
+        for(var ci=0;ci<nbl;ci++){
+          var cr,cx2,cy2,cz2;
+          if(ci===0){cr=S*(0.9+sr(41)*0.26);cx2=topX;cy2=th+S*lift;cz2=0;}
+          else if(arch>=0.84&&ci<7){ /* tiered: two distinct flat layers with air between */
+            var la=ci<4?0:1, aaT=sr(ci+42)*Math.PI*2, rrT=S*(0.5+sr(ci+44)*0.35)*spread;
+            cr=S*(0.48+sr(ci+46)*0.24);cx2=topX+Math.cos(aaT)*rrT;cy2=th+S*(la?1.08:0.4);cz2=Math.sin(aaT)*rrT;
+          }else{
+            var aa=sr(ci+42)*Math.PI*2, rr=S*(0.45+sr(ci+44)*0.5)*spread;
+            cr=S*(0.4+sr(ci+46)*0.32);cx2=topX+Math.cos(aa)*rr;cy2=th+S*(0.12+sr(ci+48)*0.95);cz2=Math.sin(aa)*rr;
+          }
+          var topLim=th+S*1.93-cr*syB; if(cy2>topLim)cy2=topLim;
           var blob=sph(Math.round(cr),gpick(ci+60),cx2,cy2,cz2,tg,{flatShading:true});
-          blob.scale.y=0.85;
+          blob.scale.y=syB;
         }
       }
     }else if(d.kind==='rock'){
@@ -6216,11 +6662,48 @@ function enemyModel(type){
     var hl=sph(S*0.30,0xffffff,-S*0.40,S*0.98,S*0.42,jg,{transparent:true,opacity:0.5}); hl.scale.set(0.55,1.2,0.3); hl.castShadow=false;
     var hl2=sph(S*0.12,0xffffff,S*0.34,S*1.04,S*0.46,jg,{transparent:true,opacity:0.45}); hl2.castShadow=false;
     g.userData.slime={jg:jg,skirt:skirt,core:core,size:S,ph:Math.random()*6.28};
-  }else if(type==='goblin'){
-    cyl(9,11,24,col,0,26,0,g,9);sph(11,0xa8b86a,0,48,0,g);
-    cone(5,14,0x8a9a3a,-11,54,0,g,6);cone(5,14,0x8a9a3a,11,54,0,g,6);
-    cyl(4,4,18,0x5d4a2c,16,32,0,g,6);
-    g.userData.groundOff=-14;
+  }else if(type==='goblin'||type==='goblinArcher'||type==='goblinShaman'||type==='goblinChief'){
+    /* The goblin family, after the reference sheet: child-sized and
+       hunched, green or earth-brown skin, long pointed ears swept
+       back, a hooked hawk nose, bulging yellow eyes, and ragged cloth
+       / patchwork leather instead of proper armour. The chief is the
+       same build at half again the size, with a horned helmet and a
+       heavy club; the archer carries a bow and quiver, the shaman a
+       staff with a glowing orb and a hood. Feet sit at local y=0. */
+    var chief=(type==='goblinChief'), sc=chief?1.5:1;
+    var skin=chief?0x6d9435:(type==='goblinShaman'?0x5f9a7a:(type==='goblinArcher'?0x7fae4a:(Math.random()<0.5?0x74a03e:0x8a6f3f)));
+    var cloth=(type==='goblinShaman')?0x46655e:0x6e5136;
+    cyl(3.2*sc,3.7*sc,10*sc,0x54432a,-4.5*sc,5*sc,0,g,6);cyl(3.2*sc,3.7*sc,10*sc,0x54432a,4.5*sc,5*sc,0,g,6); /* short legs */
+    var torso=new THREE.Group(); torso.position.set(0,9*sc,0); torso.rotation.x=0.38; g.add(torso); /* the hunch */
+    cyl(8.5*sc,10.5*sc,17*sc,cloth,0,8.5*sc,0,torso,8); /* ragged torso */
+    box(9*sc,6*sc,2.5*sc,0x8a6a44,-4*sc,11*sc,9.3*sc,torso);box(7*sc,5*sc,2.5*sc,0x5d4a2c,5*sc,5*sc,9.6*sc,torso);box(6*sc,4*sc,2.5*sc,0x77603c,0,2.5*sc,10*sc,torso); /* patchwork leather plates */
+    var armL=cyl(2.8*sc,3.2*sc,19*sc,skin,-12.5*sc,6*sc,1*sc,torso,6);armL.rotation.z=0.16;
+    var armR=cyl(2.8*sc,3.2*sc,19*sc,skin,12.5*sc,6*sc,1*sc,torso,6);armR.rotation.z=-0.16; /* long arms, knuckles low */
+    var head=new THREE.Group(); head.position.set(0,19.5*sc,2.5*sc); head.rotation.x=0.12; torso.add(head);
+    sph(8.6*sc,skin,0,0,0,head);
+    var nose=cone(2.2*sc,7.5*sc,skin,0,-0.6*sc,9.8*sc,head,6); nose.rotation.x=Math.PI/2+0.5; /* hawk nose, hooked down */
+    var earL=cone(2.6*sc,13.5*sc,skin,-9.8*sc,3.5*sc,-1*sc,head,6); earL.rotation.z=1.05; earL.rotation.x=-0.35;
+    var earR=cone(2.6*sc,13.5*sc,skin,9.8*sc,3.5*sc,-1*sc,head,6); earR.rotation.z=-1.05; earR.rotation.x=-0.35; /* long pointed ears */
+    sph(2.5*sc,0xffd34d,-3.4*sc,1.4*sc,7.4*sc,head,{emissive:0x8a5a00});sph(2.5*sc,0xffd34d,3.4*sc,1.4*sc,7.4*sc,head,{emissive:0x8a5a00}); /* bulging eyes */
+    if(type==='goblin'){
+      var dg=box(1.8*sc,10*sc,3.2*sc,0x9aa2ab,13.5*sc,-2*sc,5*sc,torso); dg.rotation.x=0.5; /* rusty short sword */
+    }else if(type==='goblinArcher'){
+      var bowM=new THREE.Mesh(new THREE.TorusGeometry(11*sc,1.5*sc,6,14,Math.PI*0.95),M(0x7a4a26));
+      bowM.position.set(-14.5*sc,5*sc,6*sc); bowM.rotation.z=Math.PI*0.52; bowM.castShadow=true; torso.add(bowM);
+      var quiv=box(5*sc,12*sc,5*sc,0x5d4a2c,-3*sc,10*sc,-10.5*sc,torso); quiv.rotation.x=-0.25; /* quiver on the back */
+    }else if(type==='goblinShaman'){
+      var hood=cone(9.5*sc,11*sc,0x38545e,0,5.5*sc,-1*sc,head,8); hood.rotation.x=0.25; /* pointed hood */
+      cyl(1.6*sc,1.6*sc,30*sc,0x5d3f27,13.5*sc,7*sc,4*sc,torso,6);
+      sph(4*sc,0x63e6a8,13.5*sc,23.5*sc,4*sc,torso,{emissive:0x1f8a52}); /* glowing staff orb */
+    }else if(chief){
+      cyl(9.2*sc,9.6*sc,4.5*sc,0x6e6a72,0,6.8*sc,0,head,10); /* helmet band */
+      var hornL=cone(2.4*sc,10*sc,0xd8cfb8,-9*sc,10*sc,0,head,6); hornL.rotation.z=0.95;
+      var hornR=cone(2.4*sc,10*sc,0xd8cfb8,9*sc,10*sc,0,head,6); hornR.rotation.z=-0.95;
+      var club=cyl(3*sc,4.6*sc,21*sc,0x6b4a2c,14*sc,-1*sc,5*sc,torso,7); club.rotation.x=0.45; /* heavy club */
+      box(10*sc,13*sc,2*sc,0x8a2f2a,-11*sc,10*sc,-9*sc,torso);box(10*sc,13*sc,2*sc,0x8a2f2a,11*sc,10*sc,-9*sc,torso); /* shoulder guards */
+      box(15*sc,16*sc,1.6*sc,0x7a2620,0,9*sc,-11.5*sc,torso); /* ragged red cape */
+    }
+    g.userData.groundOff=-1;
   }else if(type==='wolf'){
     var bd=box(20,16,38,0x8d99a6,0,24,0,g);
     box(13,13,16,0x7c8794,0,32,20,g);
@@ -6339,7 +6822,7 @@ function syncEntity(ent,kind,now){
   var dx=ent.x-(ent._px||ent.x),dy=ent.y-(ent._py||ent.y);
   if(Math.abs(dx)+Math.abs(dy)>0.05){ent._face=Math.atan2(dx,dy);ent._px=ent.x;ent._py=ent.y;}
   else if(kind!=='e'&&ent.dir){/* keep last facing */}
-  var bob=(kind==='e'&&(ent.type==='slime'||ent.type==='magma'))?Math.abs(Math.sin(now/280+ent.walk))*4:Math.abs(Math.sin(ent.walk||0))*(kind==='e'?2.2:0.7); /* player bob scaled to the 1.7m body */
+  var bob=(kind==='e'&&(ent.type==='slime'||ent.type==='magma'))?Math.abs(Math.sin(now/700+(ent.walk||0)*0.4))*4:Math.abs(Math.sin(ent.walk||0))*(kind==='e'?2.2:0.7); /* slime bob: same height, ~2.5x slower cycle (ブヨブヨをゆっくりに) — player bob scaled to the 1.7m body */
   var groundY=terrainH(ent.x,ent.y);
   mesh.position.set(WX(ent.x),groundY+bob+(mesh.userData.groundOff||0),WZ(ent.y));
   if(ent._face!==undefined)mesh.rotation.y=ent._face;
@@ -6349,19 +6832,44 @@ function syncEntity(ent,kind,now){
        on its walk cycle and the puddle rim undulates (ブヨブヨ) —
        strongly while moving, gently (breathing) while standing still */
     var moving=(Math.abs(dx)+Math.abs(dy))>0.05;
-    var amp=moving?1:0.3, sph2=now/140+ent.walk*1.7+sl.ph;
+    var amp=moving?1:0.3, sph2=now/350+(ent.walk||0)*0.68+sl.ph; /* squash cycle ~2.5x slower, amplitude (0.13 below) unchanged */
     var sq=Math.sin(sph2)*0.13*amp;
     sl.jg.scale.set(1-sq*0.65,1+sq,1-sq*0.65);
+    if(ent.atkAnim){
+      /* body-slam visuals (state machine in update): crouch low while
+         winding up, stretch tall and fly at the player, splat on landing.
+         Overrides the walk squash above; the mesh leaves the ground on an
+         arc and the render offset becomes real position when it lands. */
+      var aa3=ent.atkAnim, el3=now-aa3.t0;
+      if(el3<320){ /* windup: squash down low, widening — telegraphs the slam */
+        var wp=el3/320, we=wp*wp*(3-2*wp);
+        sl.jg.scale.set(1+0.34*we,1-0.52*we,1+0.34*we);
+        mesh.position.y=groundY+(mesh.userData.groundOff||0);
+      }else if(el3<580){ /* lunge: stretch up and hurtle toward the player */
+        var lq=(el3-320)/260, eo=1-Math.pow(1-lq,3);
+        var sy3,sx3;
+        if(lq<0.45){var fp=lq/0.45;sy3=0.48+(1.40-0.48)*fp;sx3=1.34+(0.76-1.34)*fp;}
+        else{var rp=(lq-0.45)/0.55;sy3=1.40+(1.05-1.40)*rp;sx3=0.76+(0.95-0.76)*rp;}
+        sl.jg.scale.set(sx3,sy3,sx3);
+        mesh.position.x+=aa3.dx*aa3.len*eo;
+        mesh.position.z+=aa3.dy*aa3.len*eo;
+        mesh.position.y=groundY+Math.sin(lq*Math.PI)*sl.size*0.55+(mesh.userData.groundOff||0);
+      }else if(el3<880){ /* landed: splat flat, then slowly recover its shape */
+        var gp=(el3-580)/300, ge=1-Math.pow(1-gp,2);
+        sl.jg.scale.set(1.30-0.30*ge,0.60+0.40*ge,1.30-0.30*ge);
+        mesh.position.y=groundY+(mesh.userData.groundOff||0);
+      }
+    }
     var posA=sl.skirt.geometry.attributes.position, ud=sl.skirt.geometry.userData, ts=now*0.001;
     var wAmp=sl.size*(moving?0.085:0.028), rAmp=moving?0.05:0.018;
     for(var vi=0;vi<posA.count;vi++){
       var a2=ud.ang[vi], f2=ud.rf[vi];
-      var wv=Math.sin(a2*3+ts*(moving?7.5:2.6)+ud.phase)*0.55+Math.sin(a2*5-ts*(moving?9.5:3.4)+f2*4.2)*0.45;
+      var wv=Math.sin(a2*3+ts*(moving?3.0:1.04)+ud.phase)*0.55+Math.sin(a2*5-ts*(moving?3.8:1.36)+f2*4.2)*0.45; /* skirt wave ~2.5x slower, wave size (wAmp/rAmp) unchanged */
       var rr2=1+wv*rAmp*f2;
       posA.setXYZ(vi,ud.base[vi*3]*rr2,ud.base[vi*3+1]+wv*wAmp*f2*f2,ud.base[vi*3+2]*rr2);
     }
     posA.needsUpdate=true;
-    sl.core.position.y=sl.size*0.55+Math.sin(now/320+ent.walk+sl.ph)*sl.size*0.05; /* the core bobs gently inside the jelly */
+    sl.core.position.y=sl.size*0.55+Math.sin(now/800+(ent.walk||0)*0.4+sl.ph)*sl.size*0.05; /* the core bobs gently inside the jelly — same range, ~2.5x slower */
   }
   if(ent.hitFlash>0){mesh.traverse(function(c){if(c.userData._m)c.material=M(0xff5a5a);});rec._flash=true;}
   else if(rec._flash){
@@ -6422,7 +6930,7 @@ function render3D(now){
         var fl=new THREE.Mesh(G('arrowFl',function(){return new THREE.BoxGeometry(0.6,7,7);}),M(0xe5484d));
         fl.position.z=11;m.add(fl);
       }else{
-        m=new THREE.Mesh(G('proj',function(){return new THREE.SphereGeometry(6,10,8);}),M(p.from==='player'?0xffa53c:0xffffff,{emissive:0xcc5a00}));
+        m=new THREE.Mesh(G('proj',function(){return new THREE.SphereGeometry(6,10,8);}),M(p.from==='player'?0xffa53c:(p.color3||0xffffff),{emissive:p.from==='player'?0xcc5a00:(p.color3||0x888888)}));
       }
       dynGroup.add(m);projMeshes[p._mid]=m;
     }
@@ -6484,15 +6992,17 @@ function render3D(now){
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
   var eyeY=playerGroundZ()+EYE_H+jumpY;
-  /* swimming: the eyes ride low at the water surface with a gentle bob */
-  if(player.swimming)eyeY=terrainH(player.x,player.y)+Math.max(1,player.swimDepth-1)+Math.sin(now/300)*0.6;
+  /* swimming: the eyes ride low at the ACTUAL water surface (never at
+     terrain + the abstract depth scale — that floated the camera high
+     above wild lakes), with a gentle bob */
+  if(player.swimming){var swZ=swimSurfaceZ(player.x,player.y);eyeY=(swZ>-Infinity?swZ:terrainH(player.x,player.y))+1+Math.sin(now/300)*0.6;}
   var cp=Math.cos(camPitch);
   camera3d.position.set(tx,eyeY,tz);
   camera3d.lookAt(tx-Math.sin(camYaw)*cp,eyeY+Math.sin(camPitch),tz-Math.cos(camYaw)*cp);
   // weapon viewmodel: rebuild per class, bob while walking, swing on attack
   if(viewModel){
     if(player.cls!==vmCls)buildViewModel();
-    viewModel.visible=!player.dead;
+    viewModel.visible=!player.dead&&bowEquipped(); /* an archer who put the bow away holds nothing */
     var moving=(keys['KeyW']||keys['KeyA']||keys['KeyS']||keys['KeyD']||joyVec.x||joyVec.y);
     var bobT=now*gmSpeedMul(); /* weapon bob tempo follows ground speed (4x for gamemaster) */
     var bobY=moving?Math.sin(bobT/95)*0.018:0, bobX=moving?Math.cos(bobT/190)*0.012:0;
@@ -6744,7 +7254,11 @@ document.addEventListener('keydown',function(e){
   var b=settings.binds;
   if(e.code===b.attack){e.preventDefault();if(player&&player.cls==='archer'){if(!e.repeat)startBowDraw();}else playerAttack(1);}
   if(e.code===b.s1)useSkill(1); if(e.code===b.s2)useSkill(2); if(e.code===b.s3)useSkill(3);
-  if(e.code===b.potion)usePotion();
+  if(e.code===b.potion)useItem(leftSlotItem);
+  if(e.code==='Digit5'||e.code==='Numpad5')useItem(itemBar[0]);
+  if(e.code==='Digit6'||e.code==='Numpad6')useItem(itemBar[1]);
+  if(e.code==='Digit7'||e.code==='Numpad7')useItem(itemBar[2]);
+  if(e.code==='Digit8'||e.code==='Numpad8')useItem(itemBar[3]);
   if(e.code==='Enter'){e.preventDefault();$('chatInput').focus();}
 });
 document.addEventListener('keyup',function(e){keys[e.code]=false;
@@ -6767,7 +7281,45 @@ $('attackBtn').addEventListener('click',function(){if(player&&player.cls==='arch
 $('skill1').addEventListener('click',function(){useSkill(1);});
 $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
-$('potionBtn').addEventListener('click',usePotion);
+/* item hotbar (bottom-right): click / keys 5-8 use the registered item;
+   right-click opens the registration picker; bag items can be dropped
+   onto any slot, and in the bag's assign mode a click registers the
+   selected item instead of using the slot */
+(function(){
+  function slotTarget(el){return el.id==='potionBtn'?{kind:'left'}:{kind:'bar',i:parseInt(el.id.slice(2),10)-1};}
+  function wireSlot(el){
+    if(!el)return;
+    el.addEventListener('click',function(){
+      if(bagSelAct){assignToSlot(slotTarget(el),bagSelAct);bagSelAct=null;if(bagAssignMode)refreshBagUI();return;}
+      var t=slotTarget(el);
+      if(t.kind==='bar'&&!itemBar[t.i]){openItemPicker(t,el);return;}
+      useItem(t.kind==='left'?leftSlotItem:itemBar[t.i]);
+    });
+    el.addEventListener('contextmenu',function(e){e.preventDefault();openItemPicker(slotTarget(el),el);});
+    el.addEventListener('dragover',function(e){e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';});
+    el.addEventListener('drop',function(e){
+      e.preventDefault();
+      var act=(e.dataTransfer&&e.dataTransfer.getData('text/plain'))||bagSelAct;
+      if(act){assignToSlot(slotTarget(el),act);bagSelAct=null;if(bagAssignMode)refreshBagUI();}
+    });
+  }
+  for(var ii=1;ii<=4;ii++)wireSlot($('ih'+ii));
+  wireSlot($('potionBtn'));
+  var pk=$('itemPicker');
+  if(pk)pk.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
+    if(!b||!pickerTarget)return;
+    var act=b.getAttribute('data-act');
+    if(act==='__clear'){itemBar[pickerTarget.i]=null;_ibSig='';refreshItemBars();toast('ホットバーのマスを空にしました');}
+    else assignToSlot(pickerTarget,act);
+    closeItemPicker();
+  });
+  document.addEventListener('click',function(e){
+    if(!pickerTarget)return;
+    if(e.target&&e.target.closest&&e.target.closest('#itemPicker'))return;
+    closeItemPicker();
+  });
+})();
 $('respawnBtn').addEventListener('click',function(){
   player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=SPAWN_X;player.y=SPAWN_Y;jumpY=0;jumpVY=0;topLift=0;hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();
   $('deathScreen').style.display='none';updateHUD();toast('スポーン地点で復活した');
@@ -6879,11 +7431,19 @@ $('bagGrid').addEventListener('click',function(e){
   var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
   if(!slot||!player)return;
   var act=slot.getAttribute('data-act');
+  if(bagAssignMode){bagSelAct=act;refreshBagUI();toast('「'+itemDef(act).name+'」を選択 — ホットバーのマスをクリックして登録');return;}
   if(act==='potion'){usePotion();refreshBagUI();}
-  else if(act==='weapon'){toast('その武器はすでに装備中です');}
+  else if(act==='weapon'){toggleWeaponEquip();}
   else if(act==='arrows'){toast(player.cls==='archer'?'矢は射撃のたびに自動で1本消費されます。地形に刺さった矢は E キーで回収できます':'矢はアーチャーが射撃で使う弾薬です');}
   else if(act==='gold'){toast('所持金 '+player.gold+' G');}
 });
+$('bagGrid').addEventListener('dragstart',function(e){
+  var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
+  if(!slot)return;
+  bagSelAct=slot.getAttribute('data-act');
+  if(e.dataTransfer){e.dataTransfer.setData('text/plain',bagSelAct);e.dataTransfer.effectAllowed='copy';}
+});
+$('bagAssignBtn').addEventListener('click',function(){setBagAssignMode(!bagAssignMode);});
 var plWasLocked=false;
 document.addEventListener('pointerlockchange',function(){
   var locked=!!document.pointerLockElement;
