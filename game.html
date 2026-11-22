@@ -1075,6 +1075,7 @@ var mini=document.getElementById('minimap'),mctx=mini.getContext('2d');
 var started=false, soundOn=true, audioCtx=null;
 var keys={}, joyVec={x:0,y:0};
 var jumpY=0, jumpVY=0; // jump height above terrain / vertical velocity (Space)
+var topLift=0; // extra ground height while standing ON TOP of a wall / rock / house roof (0 = on the terrain)
 var hovering=false, hoverTapT=0; // float mode (gamemaster only): gravity stopped mid-air
 var hoverPressT=0, hoverPressWasSecond=false; // current Space press while floating: its start time + whether it began soon after a short tap
 var HOVER_HOLD_MS=160;      // holding Space at least this long counts as a hold (rise), never as a tap
@@ -1598,7 +1599,7 @@ function buildTownData(){
     da=Math.min(da,Math.PI*2-da);
     if(da<0.10)continue;
     var wx=TOWN_CX+Math.cos(t)*TOWN_RX, wy=TOWN_CY+Math.sin(t)*TOWN_RY;
-    rect(wx,wy,58,58,{wall:true});
+    rect(wx,wy,58,58,{wall:true,topKind:'wall',topH:100}); /* topH = the wall walkway's visible top (cap slab) above the terrain: collision ends there */
     townFeatures.push({kind:'wall',x:wx,y:wy,seed:rnd()});
   }
   /* --- gates (SW & SE): twin towers flanking the opening --- */
@@ -1620,7 +1621,7 @@ function buildTownData(){
   var HOUSES=[[880,1420,110,95],[860,1700,120,100],[900,1880,105,90],[1040,1960,115,95],[800,1540,100,90],[760,1800,110,100],[975,1250,95,85],
     [1055,1350,95,85],[1070,1510,90,80],[1120,1620,90,80],[900,2070,105,90],[1080,2070,110,95],[1260,2070,115,95],[1440,2070,110,95],[1680,2060,105,90],
     [1850,1720,110,95],[1620,1830,115,100],[1540,1420,100,85],[1480,1700,105,90],[1660,1930,110,95],[1600,1700,90,80],[1400,1325,95,85],[1330,1180,90,80]];
-  HOUSES.forEach(function(hs){rect(hs[0],hs[1],hs[2],hs[3],{house:true});townFeatures.push({kind:'house',x:hs[0],y:hs[1],w:hs[2],d:hs[3],seed:rnd()});});
+  HOUSES.forEach(function(hs){rect(hs[0],hs[1],hs[2],hs[3],{house:true,topKind:'house'});townFeatures.push({kind:'house',x:hs[0],y:hs[1],w:hs[2],d:hs[3],seed:rnd()});});
   /* --- landmarks --- */
   circ(950,1560,42,{tower:true});  townFeatures.push({kind:'clocktower',x:950,y:1560});
   rect(1520,1240,170,120,{chapel:true}); townFeatures.push({kind:'chapel',x:1520,y:1240});
@@ -1665,7 +1666,7 @@ function buildTownData(){
     if(waterDepthAt(mx2,my2)>0)continue;
     townTree(mx2,my2,20+rnd()*12);
   }
-  function townRock(x,y,s){var d={x:x,y:y,kind:'rock',s:s,seed:rnd()*10};decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:s*0.45,ref:d});}
+  function townRock(x,y,s){var d={x:x,y:y,kind:'rock',s:s,seed:rnd()*10};decorations.push(d);obstacles.push({type:'circle',x:x,y:y,r:s*0.45,ref:d,topKind:'rock',topH:s*1.2});}
   for(var ri=0;ri<26;ri++){townRock(400+rnd()*1650,520+rnd()*430,16+rnd()*30);}
   townRock(1095,1170,26); townRock(1215,1150,22); townRock(1105,1240,20); townRock(1225,1230,18);
   townRock(1690,1090,40); townRock(1860,1330,36); townRock(1560,1095,30);
@@ -1702,7 +1703,7 @@ function genWorld(){
     else kind=roll<0.72?'tree':(roll<0.86?'rock':'flower');
     var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+trnd()*14:10+trnd()*8,seed:trnd()*10};
     decorations.push(d);
-    if(kind!=='flower') obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d});
+    if(kind!=='flower'){var ob={type:'circle',x:x,y:y,r:d.s*0.45,ref:d};if(kind==='rock'){ob.topKind='rock';ob.topH=d.s*1.2;}obstacles.push(ob);}
   }
   // lakes: 月影湖 (SW, original) / 翠玉湖 (deep south-west) / desert oasis
   decorations.push({x:420,y:2150,kind:'lake',s:230});
@@ -1710,9 +1711,68 @@ function genWorld(){
   decorations.push({x:4200,y:2400,kind:'lake',s:130});
   decorations.push({x:4750,y:4100,kind:'lava',s:150});
 }
-function collide(nx,ny,r){
+/* ============ FINITE-TOP OBSTACLES (walls / rocks / houses) ============
+   Stone walls (the town wall + placed walls), rocks (natural + placed)
+   and houses (town + placed) used to collide as infinitely tall columns:
+   an invisible wall kept blocking the player high above the visible top.
+   These obstacles now carry topKind (+ topH / roof data), and
+   obstacleTopZAt() returns the absolute height of their VISIBLE top
+   surface at a point — for houses the gable roof's slope, so the shape
+   matches what is drawn. collide() takes an optional feetZ (the mover's
+   absolute foot height): at or above the top the obstacle no longer
+   blocks, so the player can fly / jump over it and land on it (landing
+   and standing on tops is handled in update() via topSurfaceAt()).
+   Callers that pass no feetZ (enemies, spawns, placement checks) keep
+   the old always-blocked behaviour. */
+function obstacleTopZAt(o,x,y,margin){
+  if(!o||!o.topKind)return -Infinity;
+  var mg=(margin==null?2:margin);
+  if(o.topKind==='wall'||o.topKind==='rock'){
+    var cx,cy;
+    if(o.type==='circle'){ if(Math.hypot(x-o.x,y-o.y)>o.r+mg)return -Infinity; cx=o.x; cy=o.y; }
+    else{ if(x<o.x-mg||x>o.x+o.w+mg||y<o.y-mg||y>o.y+o.h+mg)return -Infinity; cx=o.x+o.w/2; cy=o.y+o.h/2; }
+    return terrainH(cx,cy)+o.topH;
+  }
+  if(o.topKind==='house'){
+    if(o.placed){
+      /* placed house: ridge runs along the model's local Z; the roof
+         height falls linearly from the ridge toward local ±X (u) */
+      var sc=o._sc||1, dx=x-o._cx, dy=y-o._cy;
+      var rad=(o._rot||0)*Math.PI/180, ca=Math.cos(rad), sa=Math.sin(rad);
+      var u=dx*ca+dy*sa, v=-dx*sa+dy*ca;
+      if(Math.abs(u)>55*sc+mg||Math.abs(v)>47.5*sc+mg)return -Infinity;
+      var t=Math.max(0,1-Math.abs(u)/(66*sc));
+      return terrainH(o._cx,o._cy)-1+sc*(58+55*t);
+    }
+    /* town house: axis-aligned, ridge along game Y, slope across X */
+    var hx=o.x+o.w/2, hy=o.y+o.h/2;
+    if(x<o.x-mg||x>o.x+o.w+mg||y<o.y-mg||y>o.y+o.h+mg)return -Infinity;
+    var t2=Math.max(0,1-Math.abs(x-hx)/((o.w+22)/2));
+    return terrainH(hx,hy)-2+58+(o.w*0.5)*t2;
+  }
+  return -Infinity;
+}
+/* highest visible top surface (wall / rock / roof) under a point, or
+   -Infinity when the point is not over any such obstacle */
+function topSurfaceAt(x,y){
+  var best=-Infinity;
+  for(var i=0;i<obstacles.length;i++){
+    var o=obstacles[i]; if(!o.topKind)continue;
+    var tz=obstacleTopZAt(o,x,y,2);
+    if(tz>best)best=tz;
+  }
+  return best;
+}
+function collide(nx,ny,r,feetZ){
   if(nx<r||ny<r||nx>W-r||ny>H-r) return true;
   for(var i=0;i<obstacles.length;i++){var o=obstacles[i];
+    if(feetZ!==undefined&&o.topKind){
+      /* finite top: a mover whose feet are at/above the visible top
+         (small step tolerance so the player can walk up a roof slope
+         and along a wall top) passes over instead of hitting air */
+      var tz=obstacleTopZAt(o,nx,ny,r+4);
+      if(tz>-Infinity&&feetZ>=tz-8) continue;
+    }
     if(o.type==='circle'){if(Math.hypot(nx-o.x,ny-o.y)<r+o.r) return true;}
     else if(nx+r>o.x&&nx-r<o.x+o.w&&ny+r>o.y&&ny-r<o.y+o.h) return true;
   }
@@ -2143,7 +2203,7 @@ function fireArrow(power,mult,full){
   player.arrows--; atkAnimT=performance.now();
   var spd=8.5+power*11.5, cp2=Math.cos(camPitch);   // 8.5 (tap) → 20 (full draw): range grows with draw
   projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
-    z:standH(player.x,player.y)+54+jumpY,vz:Math.sin(camPitch)*spd,
+    z:playerGroundZ()+54+jumpY,vz:Math.sin(camPitch)*spd,
     dmg:Math.round(player.atk*(mult||1)*(full?1.15:1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:Math.round(50+power*95)});
   beep(full?980:640+power*260,0.07,'sawtooth',0.03);
   if(full)flashCrosshair(null);
@@ -2679,8 +2739,14 @@ function handleJumpRelease(){
 function update(dt,now){
   if(!player||player.dead){return;}
   var dashingNow=false;
-  /* water state for this frame: depth at the player's feet */
-  player.swimDepth=waterDepthAt(player.x,player.y);
+  /* water state for this frame: depth at the player's feet.
+     SWIMMING only starts once the feet actually rest on the ground
+     under the water: while airborne — jumping, falling, hovering, or
+     otherwise above the surface — there is no swim state at all (no
+     banner, no MP drain, no drowning, no speed change), however deep
+     the water below is. */
+  var groundedNow=(jumpY<=0&&jumpVY===0&&!hovering);
+  player.swimDepth=groundedNow?waterDepthAt(player.x,player.y):0;
   /* standing on a placed bridge / stair platform whose top is at or above
      the water surface means dry feet, however deep the water below is */
   if(player.swimDepth>0&&typeof platformTopAt==='function'){
@@ -2689,6 +2755,7 @@ function update(dt,now){
   }
   var wasSwimming=!!player.swimming;
   player.swimming=player.swimDepth>=SWIM_DEPTH;
+  if(player.swimming)topLift=0; /* swimming means feet on the water bottom, never on a wall / rock / roof top */
   if(player.swimming&&!wasSwimming)chat('🏊 深い水に入った ― 泳いでいる間はMPを消費します','sys');
   if(player.swimming){
     if(player.mp>0){
@@ -2733,8 +2800,10 @@ function update(dt,now){
     var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
     if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
-    if(!collide(nx,player.y,player.r)) player.x=nx;
-    if(!collide(player.x,ny,player.r)) player.y=ny;
+    /* feetZ: walls / rocks / houses only block up to their visible top */
+    var feetZ=playerGroundZ()+jumpY;
+    if(!collide(nx,player.y,player.r,feetZ)) player.x=nx;
+    if(!collide(player.x,ny,player.r,feetZ)) player.y=ny;
     if(mx)player.dir=mx>0?1:-1;
     player.walk+=dt*0.02;
   }
@@ -2753,9 +2822,27 @@ function update(dt,now){
       jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_RISE_PER_MS*dt);
     }
   }else if(jumpVY!==0||jumpY>0){
+    var gZf=standH(player.x,player.y);
+    var feetB=gZf+jumpY+topLift;
     jumpY+=jumpVY*dt;
     jumpVY-=0.00045*dt;
-    if(jumpY<=0){jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;clearHoverPress();}
+    var feetA=gZf+jumpY+topLift;
+    var tZf=topSurfaceAt(player.x,player.y);
+    if(tZf>gZf&&feetA<=feetB&&feetB>=tZf-0.5&&feetA<=tZf){
+      /* falling onto a wall / rock / roof top: land ON it, not in it */
+      topLift=tZf-gZf; jumpY=0; jumpVY=0; hovering=false; hoverTapT=0; clearHoverPress();
+    }else if(jumpY<=0){jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;clearHoverPress();topLift=0;}
+  }
+  /* standing on a wall / rock / roof top: follow its surface while
+     walking (roof slopes included); walking off the edge converts the
+     lift into a fall from that height; leaving the footprint mid-air
+     keeps the absolute height instead of snapping down */
+  if(topLift>0){
+    var gZt=standH(player.x,player.y), tZt=topSurfaceAt(player.x,player.y);
+    if(jumpY===0&&!hovering){
+      if(tZt>gZt)topLift=tZt-gZt;
+      else{jumpY=topLift;topLift=0;jumpVY=0;}
+    }else if(tZt===-Infinity){jumpY+=topLift;topLift=0;}
   }
   updateHoverBanner();
   // mp regen (paused while dashing or swimming); safe-zone heal below
@@ -3359,7 +3446,7 @@ function refreshGroundAll(){
 /* ---- aim: ray-march the centre crosshair onto the terrain ---- */
 function computeEditorAim(){
   if(!player)return null;
-  var eyeY=standH(player.x,player.y)+54+jumpY;
+  var eyeY=playerGroundZ()+54+jumpY;
   if(player.swimming)eyeY=terrainH(player.x,player.y)+30;
   var cp=Math.cos(camPitch);
   var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
@@ -3543,18 +3630,20 @@ function placedObstaclesFor(o){
     if(snap<2||snap>88){
       var swap=(((o.rot%180)+180)%180)>45;
       var w=(swap?95:110)*sc, h=(swap?110:95)*sc;
-      out.push({type:'rect',x:o.x-w/2,y:o.y-h/2,w:w,h:h,c:'#8a8172',house:true,placed:true,_pid:o.id});
-    }else circ(o.x,o.y,58*sc,{house:true});
+      out.push({type:'rect',x:o.x-w/2,y:o.y-h/2,w:w,h:h,c:'#8a8172',house:true,placed:true,_pid:o.id,topKind:'house',_rot:o.rot,_sc:sc,_cx:o.x,_cy:o.y});
+    }else circ(o.x,o.y,58*sc,{house:true,topKind:'house',_rot:o.rot,_sc:sc,_cx:o.x,_cy:o.y});
   }else if(o.t==='tree_b'||o.t==='tree_p'){
     circ(o.x,o.y,11*sc,{ref:{kind:'tree'}});
   }else if(o.t==='wall'){
-    [-32,0,32].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,17*sc,{});});
+    /* topH: the model's cap slab top (81) above its ground seat (terrainH-1), scaled */
+    [-32,0,32].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,17*sc,{topKind:'wall',topH:81*sc-1});});
   }else if(o.t==='lamp'){
     circ(o.x,o.y,6*sc,{pillar:true});
   }else if(o.t==='fence'){
     [-36,0,36].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,10*sc,{});});
   }else if(o.t==='rock'){
-    circ(o.x,o.y,22*sc,{});
+    /* topH: the main boulder's visible top (38) above its ground seat (terrainH-1), scaled */
+    circ(o.x,o.y,22*sc,{topKind:'rock',topH:38*sc-1});
   }else if(o.t==='bridge'){
     [-52,0,52].forEach(function(off){
       circ(o.x+dirx*off*sc-diry*30*sc,o.y+diry*off*sc+dirx*30*sc,8*sc,{});
@@ -3611,6 +3700,12 @@ function platformTopAt(x,y){
 function standH(x,y){
   var t=terrainH(x,y), p=platformTopAt(x,y);
   return p>t?p:t;
+}
+/* the ground height under the PLAYER's feet, including topLift while
+   standing on a wall / rock / roof top (see update()'s top handling) */
+function playerGroundZ(){
+  if(!player)return 0;
+  return standH(player.x,player.y)+topLift;
 }
 /* water surface height at a point (for "standing on a bridge over water
    is not swimming"): the highest surface among lakes covering the point */
@@ -4908,7 +5003,7 @@ function render3D(now){
   }else if(render3D._ring)render3D._ring.visible=false;
   // first-person camera: positioned at the player's eyes, looking along yaw/pitch
   var tx=WX(player.x),tz=WZ(player.y);
-  var eyeY=standH(player.x,player.y)+54+jumpY;
+  var eyeY=playerGroundZ()+54+jumpY;
   /* swimming: the eyes ride low at the water surface with a gentle bob */
   if(player.swimming)eyeY=terrainH(player.x,player.y)+30+Math.sin(now/300)*1.8;
   var cp=Math.cos(camPitch);
@@ -5187,7 +5282,7 @@ $('skill2').addEventListener('click',function(){useSkill(2);});
 $('skill3').addEventListener('click',function(){useSkill(3);});
 $('potionBtn').addEventListener('click',usePotion);
 $('respawnBtn').addEventListener('click',function(){
-  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();
+  player.dead=false;player.hp=player.maxHp;player.mp=player.maxMp;player.x=1300;player.y=1680;jumpY=0;jumpVY=0;topLift=0;hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();
   $('deathScreen').style.display='none';updateHUD();toast('スポーン地点で復活した');
   relockPointer();
   netSendPos(true);
@@ -5356,7 +5451,7 @@ $('startBtn').addEventListener('click',function(){
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
   resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
-  clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; /* a fresh character starts on a fresh world */
+  clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; topLift=0; /* a fresh character starts on a fresh world */
   setupSkillUI(selectedClass);
   genWorld();populate();
   started=true;
