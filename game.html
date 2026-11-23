@@ -1019,6 +1019,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>土の道の見た目を、草のない土の地面らしくしました。</b>アルトの南門から風車広場への道など、土の道が板を敷いたように見えていたのを、継ぎ目のない一色の土が地面に沿う素朴な見た目に変えました。ルミナスの土の小道も同じ見た目に揃えています。道の通り道と幅は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの風車広場と道のめり込みを直しました。</b>風車のある円形の石畳広場に、南門からの土の道が食い込んで見えていたのを修正。重なる部分では広場の石畳が上に来るよう、広場の石畳を少し高くしました。道の通り道は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>露店の陳列台を低くしました。</b>ルミナスの市場と風見村アルトの露店で、商品を置く台が高すぎたのを、腰から胸くらいの自然な高さ（約1m）に下げました。台の上に並ぶ商品や木箱も、新しい台の高さに合わせて置き直しています。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">戦闘</span><span><b>弓矢の射程が伸びました。</b>矢の初速を上げ、矢にかかる重力を弱めたことで、フルに引いて水平に撃つと約30mまで届くようになりました（これまでは約18m）。軽く引いただけのタップ撃ちも少しだけ伸びていますが、引き具合で飛距離が変わる感覚は今まで通りです。敵の矢の飛び方は変わっていません。</span></li>
@@ -1038,7 +1039,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>「ルミナスの町」の範囲を、石壁に囲まれた内側だけにしました。</b>これまで壁の東側の帯状の範囲まで町の扱いになっていましたが、マップ表示でもゾーン判定でも、町になるのは城壁の内側だけに統一。南と東に広げた新しい城壁の形にそのまま追随します。壁の外はルミナス平原など周囲の野原として表示されます（地形や木はそのまま）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>ルミナスの敷地を東へ少し広げ、通りと大階段を太くしました。</b>東の城壁だけを約8m東へ出し（南側の拡張はそのまま、北・西の壁とランドマークは不動）、川の水門と川の出口も新しい壁に合わせました。あわせて町の大通り・西への通り・壁際の北上路・住宅街や市場の通りを全体的に太くし、大階段も分岐の階段まで幅を広げました。さらに、家・城壁・門・塔・礼拝堂・城・木・岩・露店など全ての物の当たり判定を見た目の頂点の高さで終わらせ、上に乗って歩けるように統一（今後追加される物も自動で同じ仕様になります）。古代遺跡と忘れ去られた遺跡、町の西の月影湖は撤去して通常の野原に戻し、「ささやきの森」のゾーン名は廃止してルミナスの町として扱うようにしました（守護者ゴーレムは北東の丘に残ります）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>噴水広場をもう少し北へ寄せました。</b>東西の位置はそのままに、広場を約5m北へ移動。南門は広場の真下のまま、大通り・市場区画・スポーン・大階段の起点も広場に合わせて連動させました。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>噴水広場を少し北へ、さらに東へ寄せました。</b>広場の移動に合わせて南門は広場の真下へ連動し、大通り・市場区画・スポーン・大階段の起点も広場にそろえました。東の池と川の入り口も東へずらして、広場のふちと水辺の間隔は今まで通り保っています。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -7688,9 +7688,22 @@ function buildTown3D(){
       var syaw=Math.atan2(-sdx,-sdy);
       for(var sti=0;sti<sn;sti++){
         var st=(sti+0.5)/sn, sx3=f.x1+sdx*st, sy3=f.y1+sdy*st;
-        var scol=f.t==='s'?((sti%2)?0xb8b2a4:0xc4beb0):((sti%2)?0x9a7f56:0xa8895f);
-        rbox(f.w,2.4,slen/sn+3,scol,WX(sx3),terrainH(sx3,sy3)+1.1+sti*0.06,WZ(sy3),staticGroup,syaw);
-        if(f.t==='s')rbox(2.2,2.7,slen/sn+3,0x8a8172,WX(sx3),terrainH(sx3,sy3)+1.25+sti*0.06,WZ(sy3),staticGroup,syaw); /* centre joint line */
+        var scol=f.t==='s'?((sti%2)?0xb8b2a4:0xc4beb0):0x8a6f4d;
+        if(f.t==='s'){
+          rbox(f.w,2.4,slen/sn+3,scol,WX(sx3),terrainH(sx3,sy3)+1.1+sti*0.06,WZ(sy3),staticGroup,syaw);
+          rbox(2.2,2.7,slen/sn+3,0x8a8172,WX(sx3),terrainH(sx3,sy3)+1.25+sti*0.06,WZ(sy3),staticGroup,syaw); /* centre joint line */
+        }else{
+          /* dirt lanes: NO raised deck and NO alternating shades.
+             The old build laid each chunk as a 2.4-thick slab in one
+             of two alternating tan tones, chunk by chunk — it read
+             as wooden boards laid over the road. Now every chunk is
+             one flat soil tone (0x8a6f4d, the same packed-earth tone
+             the ground tint under the roads uses) and the strip is a
+             thin skin hugging the ground (top ≈ terrain +1.15), so a
+             dirt road reads as what it is: bare earth where the
+             grass has been worn away. Route and width unchanged. */
+          rbox(f.w,1.2,slen/sn+3,scol,WX(sx3),terrainH(sx3,sy3)+0.55+sti*0.06,WZ(sy3),staticGroup,syaw);
+        }
       }
     }else if(f.kind==='well'){
       var wg2=new THREE.Group(); wg2.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(wg2);
