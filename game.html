@@ -1018,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>消えていた大階段を復旧し、写真の規模に合わせて大きく作り直しました。</b>前回の作り替えで階段の高さ計算が壊れ、階段が地形に埋もれて見えなくなっていた問題を修正。あわせて全体を大型化しました：下段の橋階段は幅を広げ、川の上に太い橋脚3本と深い橋桁が立つ段々の橋に。中段テラスは大きく張り出した円形の台地に広げ、中央の噴水池と周りの岩も大きくしました。上段はテラスの北西から東へ長く折り返して上がるので、広場から見て「上がる→踊り場→逆向きに上がる」折り返しの形がはっきり分かります。両側の石壁は高く厚くし、テラスを囲む擁壁の石ドラムも深くして、階段全体が下の町より一段高い石の構造物としてそびえる形にしました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>大階段を、写真の折り返し式（スイッチバック）に作り替えました。</b>まっすぐ一本だった階段を、下段は広場の北のふちの真ん中から川を渡る橋階段として上がり、真ん中に岩で囲んだ小さな丸い噴水池のある中段テラスで折り返し、上段が礼拝堂前の高台へ上がる形に変更。階段の両側は城壁のような厚い石の側壁になり、高台の擁壁と一体になっています。段は幅広い石板のまま、上段の先では今まで通り二股に分かれて礼拝堂前と城前へつながります。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>大階段の登り口を、噴水広場の北のふちの真ん中へ付け替えました。</b>これまで広場の北東のふちから斜めに上がっていた大階段を、広場の北側の中央（噴水の真北）からまっすぐ始まるように位置と向きを調整。階段の幅・段数・段差と、上った先の分岐・礼拝堂と城への階段は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>「ルミナスの町」の範囲を、石壁に囲まれた内側だけにしました。</b>これまで壁の東側の帯状の範囲まで町の扱いになっていましたが、マップ表示でもゾーン判定でも、町になるのは城壁の内側だけに統一。南と東に広げた新しい城壁の形にそのまま追随します。壁の外はルミナス平原など周囲の野原として表示されます（地形や木はそのまま）。</span></li>
@@ -1845,8 +1846,9 @@ function regionAt(x,y){
      CASTLE well east of it in the NE corner on its own raised rock,
      against the wall. A grand stone staircase SWITCHBACKS up from
      the middle of the plaza's north rim — its foot on the fountain's
-     own axis: a bridge-flight climbs over the river to a round MID
-     TERRACE with a small rock-ringed fountain pond at its centre,
+     own axis: a bridge-flight climbs over the river to a big round
+     MID TERRACE jutting out of the slope, with a large rock-ringed
+     fountain pond at its centre,
      an upper flight folds back from the terrace to the terrace fork,
      and there the stair splits in two, on to the chapel (west
      branch) and the castle (east branch) — every flight built tread
@@ -1895,7 +1897,7 @@ function pondEMetric(x,y){
   return d-(Math.sin(a*3+1.7)*10+Math.sin(a*5+0.6)*7+Math.cos(a*2+2.9)*8);
 }
 var POOL={x:1269,y:1370,r:110};     /* plunge pool under the falls — the falls moved WEST AGAIN, and this time by a LOT (x 1389 → 1269, −120 units ≈ 12m, twice the last step), at the user's word ("思いっきり西"): the crag, top pool, shelves, gorge, spray and the river's head all shifted west with it, and the pool also stepped a little south (+48) so its swimming water clears the north housing row's lane — the two east-column houses now stand on its shore, kept level by their pads, exactly as the old shore house did */
-var MID_TERRACE={x:1960,y:1550,r:135,z:99}; /* the SWITCHBACK's mid landing terrace: a broad round stone platform halfway up the grand staircase (see STAIRS), levelled to z 99 in townTerrain(). The lower bridge-flight climbs from the plaza's north rim to its south rim, the upper flight folds back north-east from its north-west rim to the terrace fork, and a small rock-ringed fountain pond sits at its centre (the 'midfountain' feature in buildTownData / buildTown3D). It sits NORTH of the river's eastern reach with its south rim (y 1685) just clear of the channel carve's feather (215 from the centreline at y≈1885), so the platform never dips into the bank slope */
+var MID_TERRACE={x:1830,y:1560,r:165,z:99}; /* the SWITCHBACK's mid landing terrace: a BIG round stone platform jutting out of the slope halfway up the grand staircase (see STAIRS), levelled to z 99 in townTerrain() — enlarged (r 135 → 165) and shifted west so the two flights get a long run each and the fold-back reads across a broad platform, as in the photo. The lower bridge-flight climbs from the plaza's north rim to its south-east rim (1884,1716), the upper flight folds back east-north-east from its north-west rim (1720,1440) to the terrace fork, and a large rock-ringed fountain pond sits at its centre (the 'midfountain' feature in buildTownData / buildTown3D). It sits NORTH of the river's eastern reach; townTerrain() re-asserts its level AFTER the river carve, so the platform never dips into the bank slope */
 var TERRACE_PLAZA={x:2095,y:1215,r:58}; /* the stair-top LANDING circle between the chapel and the castle, near the two landmarks' midpoint (chapel 1820,1150 / castle 2375,1285 → 2098,1218) — shrunk to a small landing disc (r 100 → 58): the terrace is NO longer one wide paved expanse. The chapel keeps its own small forecourt apron (1820,1273,r 72) and the castle its own forecourt (2375,1470,r 95), and everything between the three small courts is green — lawns, hedges, trees and crags (see TOWN_GREENERY / the terrace trees & rocks in buildTownData), as in the photo. townTerrain() flattens its disc to the terrace level so it truly sits there (see there) */
 var RIVER=[[1269,1370],[1300,1490],[1400,1560],[1395,1660],[1520,1730],[1615,1835],[1555,1935],[1660,1955],[1780,1920],[1900,1880],[2020,1890],[2140,1910],[2320,1940],[2400,2060],[2420,2300],[2505,2405],[2700,2590]]; /* plunge pool → central pond → east pond → SE water gate (last point sits just outside the wall — it stepped EAST with the expanded east wall, (2620,2560) → (2700,2590), so the outflow still leaves through the water gate on the new wall line). The head shifted WEST with the falls (the first reach now swings east under the falls bridge to rejoin the central pond), and the eastern reach swung NORTH around the far-east-moved plaza: it leaves the central pond north-east, threads the relocated east pond (2320,1940) and drops south along the east wall — clear of the plaza's rim — to the same water gate. The centreline MEANDERS the whole way — every leg bends against the last, no straight reach anywhere, as the photo's river winds. Both banks are kept clear of houses and stalls along the whole run */
 var BRIDGES=[{x:1350,y:1525,rot:0.85},{x:2215,y:1928,rot:1.45},{x:2420,y:2300,rot:0.5}]; /* arched bridge below the falls, where the west-shifted head reach swings east toward the central pond / bridge over the river at the relocated east pond's inlet (north-east of the far-east plaza) / bridge over the east pond's outlet */
@@ -1929,7 +1931,7 @@ var STREETS=[
    inside them, so the stone town stays stone where it should. --- */
 var TOWN_GREENERY=[
   [800,1460,52],[1085,1460,50],[795,1905,52],[1085,1900,48],
-  [860,2470,54],[1140,2470,50],[1855,2670,44],[1900,1620,70],
+  [860,2470,54],[1140,2470,50],[1855,2670,44],[2130,1660,70],
   [700,1200,44],[1260,1200,44],
   /* the high terrace is gardened now, not bare stone: lawn-and-flower
      patches around the chapel's forecourt, between the landmarks and
@@ -1960,24 +1962,35 @@ var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData
      the centre of the plaza disc's north edge, exactly as before —
      and climbs north-north-west, crossing the river's eastern reach
      on stone piers as a bridge-stair (its long flat mid landing is
-     the bridge span over the channel), up to the south rim of the
-     MID TERRACE (z 99, see MID_TERRACE);
-   - the MID TERRACE is a broad round stone platform (r 135) whose
-     centre holds a small round fountain pond ringed with rocks;
+     the bridge span over the channel), up to the south-east rim of
+     the MID TERRACE (z 99, see MID_TERRACE);
+   - the MID TERRACE is a big round stone platform (r 165) jutting
+     out of the slope, whose centre holds a large round fountain
+     pond ringed with big rocks;
    - run B (the UPPER flight) starts at the terrace's north-west rim
-     and FOLDS BACK north-east — the switchback turn — climbing to
+     and FOLDS BACK east-north-east — the switchback turn — climbing to
      the same terrace fork (2062, 1350) the old straight ramp reached;
    - at the top the stair FORKS IN TWO: run C crosses the terrace
      west to the CHAPEL forecourt and run D climbs east to the
      CASTLE forecourt on its raised rock. */
 var STAIR_TREAD_A=5.6, STAIR_TREAD_B=4.6;
 var STAIRS=[
-  {x:1990,y:2020,dx:-50,dy:-330,w:118,z0:30,z1:99,  tread:7.16,n:41,n1:19,land:40},
-  {x:1822,y:1502,dx:240,dy:-152,w:118,z0:99,z1:168, tread:6.29,n:41,n1:20,land:26},
+  {x:1990,y:2020,dx:-106,dy:-304,w:140,z0:30,z1:99,  tread:6.88,n:41,n1:19,land:40},
+  {x:1720,y:1440,dx:342,dy:-90, w:140,z0:99,z1:168, tread:7.55,n:41,n1:20,land:44},
   {x:2005,y:1345,dx:-185,dy:-72,w:76, z0:168,z1:168,tread:4.6,n:38,n1:19,land:20},
   {x:2120,y:1355,dx:200,dy:85, w:78, z0:168,z1:228,tread:5.6,n:35,n1:17, land:18}
 ];
-/* A: plaza north rim centre (1990,2020) → mid terrace south rim (1940,1690), z 30→99 — the bridge flight: its 40-long mid landing (after 19 treads) lies over the river crossing (centreline at s≈137, landing s 136–176), and buildTown3D sets stone piers and a beam under that span. B: mid terrace NW rim (1822,1502) → fork (2062,1350), z 99→168 — the fold-back. C: fork → chapel forecourt (flat). D: fork → castle forecourt, z 168→228. The main flights are 11.8m wide (w 118), the fork branches ≈7.7m; every climbing flight rises in true ≈17cm risers (1.68 units, matched to the 1.7m body) with deep slab treads and a flat mid landing, so every tread reads as a step from any distance. The river's swimming-depth discs skip every stair corridor (see buildTownData), so the bridge flight's causeway stays dry to walk, exactly as the old diagonal's did. */
+/* derive every run's unit direction, true length (n treads + the mid
+   landing) and riser from the raw deltas above — stairProfileAt(),
+   stairHAt(), the terrain carve and buildTown3D() ALL rely on these
+   three fields; without them the heights come out NaN, the carved
+   terrain collapses and the staircase vanishes from the game */
+STAIRS.forEach(function(r){
+  var L=Math.hypot(r.dx,r.dy); r.dx/=L; r.dy/=L;
+  r.len=r.n*r.tread+r.land;
+  r.riser=(r.z1-r.z0)/r.n;
+});
+/* A: plaza north rim centre (1990,2020) → mid terrace SE rim (1884,1716), z 30→99 — the bridge flight: its 40-long mid landing (after 19 treads) lies over the river crossing (centreline at s≈143, landing s 131–171), and buildTown3D sets a deep stone beam and three piers under that span. B: mid terrace NW rim (1720,1440) → fork (2062,1350), z 99→168 — the fold-back: a long east-north-east run, so the switchback turn across the big terrace reads clearly from the plaza. C: fork → chapel forecourt (flat). D: fork → castle forecourt, z 168→228. The main flights are 14m wide (w 140), the fork branches ≈7.7m; every climbing flight rises in true ≈17cm risers (1.68 units, matched to the 1.7m body) with deep slab treads and a flat mid landing, so every tread reads as a step from any distance. The river's swimming-depth discs skip every stair corridor (see buildTownData), so the bridge flight's causeway stays dry to walk, exactly as the old diagonal's did. */
 var STAIR_FORK={x:2062,y:1350}; /* the fork landing at the top of the upper (folded-back) flight, where the stair splits in two: run C west to the chapel forecourt, run D east to the castle forecourt */
 function stairRiserSmooth(u){u=Math.max(0,Math.min(1,u/0.32));return u*u*(3-2*u);} /* the rise happens over the first third of each tread and the rest of the tread is flat, so the carved ground itself steps (with the taller 17cm risers this is what makes the flight walk — and read — as stairs, not as a slope) */
 function stairHAt(r,s){
@@ -2202,8 +2215,8 @@ function buildTownData(){
        the player can jump onto the parapet but not walk through it */
     for(var s=14;s<r.len;s+=26){
       [-1,1].forEach(function(sd){
-        var px=r.x+r.dx*s-r.dy*sd*(r.w/2+4), py=r.y+r.dy*s+r.dx*sd*(r.w/2+4);
-        var topZ=stairHAt(r,s)+16; /* the thickened side wall's cap slab top, as drawn (wall top +13, cap centre +1, half-cap 1.5, rounded) */
+        var px=r.x+r.dx*s-r.dy*sd*(r.w/2+10), py=r.y+r.dy*s+r.dx*sd*(r.w/2+10);
+        var topZ=stairHAt(r,s)+20; /* the thickened side wall's cap slab top, as drawn (wall top +18, cap centre +1, half-cap 1.75, rounded) */
         obstacles.push({type:'circle',x:px,y:py,r:9,town:true,topKind:'wall',topH:topZ-terrainH(px,py),stair:true,_smx:Math.round(mx),_smy:Math.round(my)});
       });
     }
@@ -2216,15 +2229,15 @@ function buildTownData(){
      nobody swims in a fountain --- */
   townFeatures.push({kind:'midterrace',x:MID_TERRACE.x,y:MID_TERRACE.y,r:MID_TERRACE.r});
   townFeatures.push({kind:'midfountain',x:MID_TERRACE.x,y:MID_TERRACE.y});
-  circ(MID_TERRACE.x,MID_TERRACE.y,40,{topKind:'prop',topH:16}); /* the pond's stone rim: collision ends at its visible top, like every other prop */
+  circ(MID_TERRACE.x,MID_TERRACE.y,58,{topKind:'prop',topH:16}); /* the pond's stone rim: collision ends at its visible top, like every other prop */
   /* lamps flanking the fork landing at the top of the upper flight */
   [[1992,1282],[2132,1288]].forEach(function(p){circ(p[0],p[1],6,{pillar:true,topKind:'prop',topH:56});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
   /* lamps on the mid terrace: a pair flanking the bridge flight's
      arrival on its south rim, a pair on its west and east rims — all
      clear of both flight corridors and of the pond's rock ring */
-  [[1885,1645],[2035,1645],[1838,1592],[2075,1550]].forEach(function(p){circ(p[0],p[1],6,{pillar:true,topKind:'prop',topH:56});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
+  [[1950,1662],[1799,1714],[1680,1560],[1980,1560]].forEach(function(p){circ(p[0],p[1],6,{pillar:true,topKind:'prop',topH:56});townFeatures.push({kind:'lamp',x:p[0],y:p[1]});});
   townFeatures.push({kind:'skirt',x0:1685,y0:1360,x1:2510,y1:1360});
-  townFeatures.push({kind:'skirt',x0:1760,y0:1740,x1:2460,y1:1740});
+  townFeatures.push({kind:'skirt',x0:1650,y0:1740,x1:2460,y1:1740});
   townFeatures.push({kind:'falls'});
   /* --- water: ponds & pools are 'lake' decorations (they drive
      waterDepthAt / swimming); the river is a chain of them --- */
@@ -2347,8 +2360,8 @@ function buildTownData(){
         townRock(Math.round(px),Math.round(py),17+rnd()*22);
       }
     }
-    [[1710,1395,34],[1755,1330,42],[2085,1480,30],[2285,1405,44],[2472,1392,32],[1691,936,38],[1910,924,30],[2135,942,42],[2410,936,34],[2516,1105,30],[2222,1061,26],[1772,1330,24],[2560,1330,28],[2150,1180,26],[2050,1290,22]].forEach(function(rk2){townRock(rk2[0],rk2[1],rk2[2]);}); /* terrace-edge crags — the last two stud the green slope between the landing circle and the two forecourts; the 2nd and 3rd stepped west / south off the folded-back upper flight's corridor when the staircase became a switchback, so no crag stands on its treads */
-    [[1978,1496,16],[1962,1608,17],[1898,1568,19],[2018,1520,18],[2006,1502,20],[1916,1594,18]].forEach(function(rk5){townRock(rk5[0],rk5[1],rk5[2]);}); /* the mid terrace fountain pond's rock ring: six boulders hugging the pond's rim (r ≈57–66 about MID_TERRACE), as in the photo — clear of both flight corridors where they meet the terrace */
+    [[1620,1330,34],[1740,1290,42],[2085,1480,30],[2285,1405,44],[2472,1392,32],[1691,936,38],[1910,924,30],[2135,942,42],[2410,936,34],[2516,1105,30],[2222,1061,26],[1772,1330,24],[2560,1330,28],[2150,1180,26],[2050,1290,22]].forEach(function(rk2){townRock(rk2[0],rk2[1],rk2[2]);}); /* terrace-edge crags — the last two stud the green slope between the landing circle and the two forecourts; the 1st and 2nd stepped west / north off the folded-back upper flight's corridor when the staircase grew (its foot now starts at the mid terrace's NW rim, (1720,1440)), so no crag stands on its treads */
+    [[1904,1518,27],[1904,1602,25],[1830,1640,29],[1756,1602,26],[1746,1545,24],[1872,1486,22]].forEach(function(rk5){townRock(rk5[0],rk5[1],rk5[2]);}); /* the mid terrace fountain pond's rock ring: six BIG boulders hugging the enlarged pond's rim (r ≈85 about MID_TERRACE), as in the photo — clear of both flight corridors where they meet the terrace */
   })();
 }
 function genWorld(){
@@ -4661,6 +4674,12 @@ function townTerrain(x,y,h){
   var rd=1e9; for(var i=1;i<RIVER.length-1;i++){var sd=_segD(x,y,RIVER[i][0],RIVER[i][1],RIVER[i+1][0],RIVER[i+1][1]); if(sd<rd)rd=sd;}
   h=_lerpTo(h,-6,_band(rd,118,215)); /* the channel is CARVED, not painted: full depth holds only under the water itself (rd<118), then the banks slope gently up over a long feather (to 215) — so both shores fall toward the water, the surface (z 1.2) sits well below the bank tops, and the ribbon's edges tuck into the slope instead of ending on a hard line */
   for(var bi=0;bi<BRIDGES.length;bi++){h=_lerpTo(h,16,_band(Math.hypot(x-BRIDGES[bi].x,y-BRIDGES[bi].y),26,50));} /* bridge fords: just the banks under each arch, so the channel stays wet right up to the bridges — and the ponds stay deep (a wider ford leaked into the central pond and the plunge pool) */
+  /* the MID TERRACE level, re-asserted AFTER the water carve: the
+     enlarged terrace's south rim now stands within the channel's bank
+     feather, and the carve above would dip the rim toward the water —
+     the platform itself stays dead level at z 99, and only the ground
+     beyond its rim (past r+40) falls away to the bank */
+  h=_lerpTo(h,MID_TERRACE.z,_band(Math.hypot(x-MID_TERRACE.x,y-MID_TERRACE.y),MID_TERRACE.r,MID_TERRACE.r+40));
   /* the grand staircase: carve every flight's corridor to the stepped-
      smooth profile, so the ground itself climbs exactly like the drawn
      steps (parapets and landings included in the blend) */
@@ -6798,7 +6817,7 @@ function buildTown3D(){
          courses, so the terrace reads as one piece of masonry with the
          flights' side walls, exactly as the photo's walled terrace does */
       var mg9=new THREE.Group(); mg9.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(mg9);
-      cyl(f.r+8,f.r+16,20,STONE,0,-8,0,mg9,40);          /* retaining drum (its top meets the paving, its foot sinks into the slope) */
+      cyl(f.r+10,f.r+20,36,STONE,0,-16,0,mg9,44);        /* retaining drum — TALL and thick now (its top meets the paving, its foot sinks deep into the slope), so the enlarged terrace stands out of the hillside as one high walled platform, as in the photo */
       cyl(f.r,f.r,2.4,0xa8a294,0,0.6,0,mg9,40);          /* lower paved course */
       cyl(Math.round(f.r*0.8),Math.round(f.r*0.8),3.2,0xdcd4c2,0,1.2,0,mg9,36); /* upper paved course */
     }else if(f.kind==='midfountain'){
@@ -6807,12 +6826,12 @@ function buildTown3D(){
          it in buildTownData), shader water inside, a centre stone and
          a foam ring where the little jet lands */
       var mf9=new THREE.Group(); mf9.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(mf9);
-      cyl(46,50,7,STONE_D,0,3.5,0,mf9,20);               /* pond rim */
-      cyl(40,44,5,STONE_L,0,5,0,mf9,20);                 /* rim cap course */
-      addWaterDisc(f.x,f.y,gh+6.5,36,false);             /* pond water (shader disc, in waterGroup) */
-      cyl(9,13,13,STONE_L,0,11,0,mf9,10);                /* centre stone */
-      var mfo9=sph(4.5,0xbfe6f7,0,20,0,mf9,{emissive:0x3a7bd5}); mfo9.castShadow=false; /* glowing droplet over the jet */
-      for(var mfi=0;mfi<6;mfi++){var mfa=mfi*Math.PI/3;sph(3.5,0xf4fbff,Math.cos(mfa)*27,7.5,Math.sin(mfa)*27,mf9).castShadow=false;} /* foam ring */
+      cyl(64,70,9,STONE_D,0,4.5,0,mf9,24);               /* pond rim — enlarged with the terrace, so the fountain pond reads from the plaza below */
+      cyl(56,62,6,STONE_L,0,6,0,mf9,24);                 /* rim cap course */
+      addWaterDisc(f.x,f.y,gh+8.5,52,false);             /* pond water (shader disc, in waterGroup) */
+      cyl(12,17,17,STONE_L,0,13,0,mf9,12);               /* centre stone */
+      var mfo9=sph(6,0xbfe6f7,0,25,0,mf9,{emissive:0x3a7bd5}); mfo9.castShadow=false; /* glowing droplet over the jet */
+      for(var mfi=0;mfi<8;mfi++){var mfa=mfi*Math.PI/4;sph(4.5,0xf4fbff,Math.cos(mfa)*40,9.5,Math.sin(mfa)*40,mf9).castShadow=false;} /* foam ring */
     }else if(f.kind==='stairs'){
       /* one stone box per tread, on the same stepped profile the
          terrain is carved to; THICK stepped side walls with cap slabs
@@ -6843,31 +6862,33 @@ function buildTown3D(){
           segs.push([cur,nxt]); cur=nxt;
         }
         segs.forEach(function(sg){
-          var sm=(sg[0]+sg[1])/2, topP=stairHAt(r,sg[1])+13, botP=stairHAt(r,sg[0])-58;
+          var sm=(sg[0]+sg[1])/2, topP=stairHAt(r,sg[1])+18, botP=stairHAt(r,sg[0])-88;
           [-1,1].forEach(function(sd){
-            var pp=sPoint(sm,sd*(r.w/2+7));
-            rbox(13,topP-botP,sg[1]-sg[0]+3,STONE,WX(pp[0]),(topP+botP)/2,WZ(pp[1]),staticGroup,yaw);
-            rbox(17,3,sg[1]-sg[0]+4,STONE_D,WX(pp[0]),topP+1,WZ(pp[1]),staticGroup,yaw);
+            var pp=sPoint(sm,sd*(r.w/2+10));
+            rbox(20,topP-botP,sg[1]-sg[0]+3,STONE,WX(pp[0]),(topP+botP)/2,WZ(pp[1]),staticGroup,yaw);
+            rbox(26,3.5,sg[1]-sg[0]+4,STONE_D,WX(pp[0]),topP+1,WZ(pp[1]),staticGroup,yaw);
           });
         });
         /* newel stones at the foot and head of the flight */
         [6,r.len-6].forEach(function(s){
           [-1,1].forEach(function(sd){
-            var np=sPoint(s,sd*(r.w/2+7));
-            box(15,20,15,STONE_D,WX(np[0]),stairHAt(r,s)+10,WZ(np[1]),staticGroup);
+            var np=sPoint(s,sd*(r.w/2+10));
+            box(20,28,20,STONE_D,WX(np[0]),stairHAt(r,s)+13,WZ(np[1]),staticGroup);
           });
         });
         if(f.run===0){
           /* the BRIDGE span: where the lower flight crosses the river
-             (its long flat mid landing, s≈111–151), a deep stone beam
-             runs under the treads and two piers stand in the channel
-             down to the riverbed, so the flight reads as a bridge over
-             the water, not a causeway through it */
+             (its long flat mid landing, s≈131–171), a deep stone beam
+             runs under the treads and THREE broad piers stand in the
+             channel down to the riverbed, so the flight reads as a
+             stepped stone bridge over the water, not a causeway
+             through it — the piers and the beam's deep fascia are
+             sized to be unmistakable from the plaza */
           var bsm=r.n1*r.tread+r.land/2, bcp=sPoint(bsm,0), bTop=stairHAt(r,bsm);
-          rbox(r.w+24,11,r.land+62,STONE_D,WX(bcp[0]),bTop-9,WZ(bcp[1]),staticGroup,yaw); /* bridge beam under the landing span */
-          [-1,1].forEach(function(psd){
-            var ps2=bsm+psd*(r.land/2+13), pcp=sPoint(ps2,0), pTop=stairHAt(r,ps2);
-            rbox(Math.round(r.w*0.7),pTop+6,18,STONE,WX(pcp[0]),(pTop-16)/2,WZ(pcp[1]),staticGroup,yaw); /* pier: from the riverbed (z −10) up under the beam */
+          rbox(r.w+30,18,r.land+76,STONE_D,WX(bcp[0]),bTop-12,WZ(bcp[1]),staticGroup,yaw); /* bridge beam under the landing span */
+          [-1,0,1].forEach(function(psd){
+            var ps2=bsm+psd*(r.land/2+16), pcp=sPoint(ps2,0), pTop=stairHAt(r,ps2);
+            rbox(Math.round(r.w*0.8),pTop+12,30,STONE,WX(pcp[0]),(pTop-14)/2,WZ(pcp[1]),staticGroup,yaw); /* pier: from the riverbed (z −13) up under the beam */
           });
         }
       }
