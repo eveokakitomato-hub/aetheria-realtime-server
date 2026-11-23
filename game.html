@@ -2002,6 +2002,24 @@ STAIRS.forEach(function(r){
   r.len=r.n*r.tread+r.land;
   r.riser=(r.z1-r.z0)/r.n;
 });
+/* ============ KAZAMI VILLAGE "ALTO" — the new village in the south-east frontier (centre 13700,15300), built to the user's illustration: a round log palisade with a SOUTH gate, a windmill on a round stone plaza at its heart, six houses facing the plaza, fields, a well and cart to the west, and a river that winds down from the north-east hills along the village's east side and crosses the south road on a wooden bridge. Luminas and every existing area are untouched: Alto lives entirely in its own constants, its own data builder and its own renderers, hooked into the shared systems at the same points Luminas uses. ============ */
+var ALTO={x:13700,y:15300}; var ALTO_R=500; var ALTO_Z=26;
+var ALTO_BRIDGE={x:13710,y:16760};
+var ALTO_RIVER=[[15300,13600],[15000,14150],[14620,14700],[14490,15250],[14510,15800],[14340,16200],[14050,16420],[13830,16600],[13690,16830],[13640,17100],[13850,17450],[14250,17800],[14800,18150],[15350,18600],[15800,19200]];
+var ALTO_RIVER_Z=[29,25,20,18,22,27,29,27,25,26,21,19,19,22,22];
+var ALTO_FIELDS=[{x:13845,y:15555,w:92,d:64},{x:13955,y:15555,w:92,d:64},{x:13845,y:15635,w:92,d:64},{x:13955,y:15635,w:92,d:64},{x:13550,y:15640,w:84,d:58}];
+var ALTO_FOLK_SPOTS=[[13700,15160],[13490,15120],[13470,15240],[13860,15520],[13680,15520],[13960,15290],[13700,15690],[13560,15380]];
+function altoRiverFrame(x,y){
+  var bd=1e9, bb=ALTO_RIVER_Z[0];
+  for(var i=0;i<ALTO_RIVER.length-1;i++){
+    var ax=ALTO_RIVER[i][0], ay=ALTO_RIVER[i][1], bx=ALTO_RIVER[i+1][0], by=ALTO_RIVER[i+1][1];
+    var dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy, t=l2>0?((x-ax)*dx+(y-ay)*dy)/l2:0;
+    t=Math.max(0,Math.min(1,t));
+    var d=Math.hypot(x-(ax+dx*t), y-(ay+dy*t));
+    if(d<bd){bd=d; bb=ALTO_RIVER_Z[i]+(ALTO_RIVER_Z[i+1]-ALTO_RIVER_Z[i])*t;}
+  }
+  return {d:bd, bank:bb};
+}
 /* A: plaza north rim centre (1990,2020) → mid terrace south rim centre (1990,1698), z 30→99 — the bridge flight: its 40-long mid landing (after 19 treads) lies over the river crossing (centreline at s≈133, landing s 131–171), and buildTown3D sets a deep stone beam and three piers under that span. W1–W4 / E1–E4: the twin curves — each run's start is the previous run's end, chained along the terrace rim's arc (radius ≈150 about MID_TERRACE), z 99→145 in four even climbs; W5 / E5 run straight north from the arc's end to the high terrace (z 145→168); W6 / E6 are FLAT (z 168) and land inside the terrace plaza disc, so both routes walk out level onto the upper terrace. The bridge flight is 14m wide (w 140), the curves 11m, the straight climbs 12m, the flat runs 9m; every climbing run rises in true ≈17cm risers (1.64–1.68 units, matched to the 1.7m body) with deep slab treads and a flat mid landing, so every tread reads as a step from any distance. The river's swimming-depth discs skip every stair corridor (see buildTownData), so the bridge flight's causeway stays dry to walk. (There is NO STAIR_FORK any more: the switchback and its fork were removed with the castle.) */
 function stairRiserSmooth(u){u=Math.max(0,Math.min(1,u/0.32));return u*u*(3-2*u);} /* the rise happens over the first third of each tread and the rest of the tread is flat, so the carved ground itself steps (with the taller 17cm risers this is what makes the flight walk — and read — as stairs, not as a slope) */
 function stairHAt(r,s){
@@ -2039,7 +2057,7 @@ function townWallPoint(t){
   return {x:TOWN_CX+c*r, y:TOWN_CY+s*r};
 }
 function inTown(x,y){return townNorm(x,y)<=1.0;}
-function inNoSpawn(x,y){return townNorm(x,y)<=1.15||Math.hypot(x-SPAWN_X,y-SPAWN_Y)<=SAFE_R;} /* the town's safe zone is back: the whole walled interior plus a margin of about three tiles outside the wall (and the spawn clearing) — no spawns, no damage, slow healing inside it */
+function inNoSpawn(x,y){return townNorm(x,y)<=1.15||Math.hypot(x-SPAWN_X,y-SPAWN_Y)<=SAFE_R||Math.hypot(x-ALTO.x,y-ALTO.y)<=ALTO_R+60;} /* the town's safe zone is back: the whole walled interior plus a margin of about three tiles outside the wall (and the spawn clearing) — no spawns, no damage, slow healing inside it */
 var townFeatures=[]; /* render instructions for buildTown3D(), filled by buildTownData() */
 /* Build the town's collision + render data. Called from genWorld() before
    the wild decoration scatter, so the scatter can keep out of the town and
@@ -2392,6 +2410,102 @@ function buildTownData(){
     }
   }
 }
+/* Build Alto's collision + render data. Called from genWorld() right
+   after buildTownData(), in the same style: obstacles / townFeatures /
+   decorations. Everything here carries alto:true and lives inside the
+   village's own ground — Luminas's data is never touched. */
+function buildAltoData(){
+  var seed=424242;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
+  function rect(cx,cy,w,h,flags){var o={type:'rect',x:cx-w/2,y:cy-h/2,w:w,h:h,c:"#8a8172",alto:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
+  function circ(x,y,r,flags){var o={type:'circle',x:x,y:y,r:r,alto:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
+  function street(x1,y1,x2,y2,w){townFeatures.push({kind:'street',x1:x1,y1:y1,x2:x2,y2:y2,w:w,t:'d',x:(x1+x2)/2,y:(y1+y2)/2});}
+  function altoTree(x,y){
+    var d={x:x,y:y,kind:'tree',s:22+rnd()*6,seed:rnd()*10,alto:true};
+    decorations.push(d);
+    obstacles.push({type:'circle',x:x,y:y,r:d.s*0.45,ref:d,topKind:'tree',topH:treeTopH(d),alto:true});
+  }
+  /* --- the round log palisade (radius 500) with the SOUTH gate opening --- */
+  for(var fa=0;fa<Math.PI*2;fa+=0.092){
+    var fda=Math.atan2(Math.sin(fa-Math.PI/2),Math.cos(fa-Math.PI/2));
+    if(Math.abs(fda)<0.19)continue; /* the south gate opening */
+    circ(ALTO.x+Math.cos(fa)*ALTO_R, ALTO.y+Math.sin(fa)*ALTO_R, 24, {topKind:'prop',topH:34});
+  }
+  circ(13700-46,15800,9,{topKind:'prop',topH:46});
+  circ(13700+46,15800,9,{topKind:'prop',topH:46});
+  townFeatures.push({kind:'altofence'});
+  townFeatures.push({kind:'altogate',x:13700,y:15800});
+  /* --- the windmill and its round stone plaza at the village's heart --- */
+  townFeatures.push({kind:'windmill',x:ALTO.x,y:ALTO.y});
+  circ(ALTO.x,ALTO.y,38,{topKind:'prop',topH:128});
+  townFeatures.push({kind:'altoplaza',x:ALTO.x,y:ALTO.y,r:150});
+  townFeatures.push({kind:'stall',x:13850,y:15190,seed:0.42});
+  rect(13850,15190,56,42,{stall:true,topKind:'prop',topH:58});
+  townFeatures.push({kind:'altobench',x:13865,y:15330,rot:Math.atan2(-165,30)});
+  townFeatures.push({kind:'altobench',x:13540,y:15260,rot:Math.atan2(160,40)});
+  townFeatures.push({kind:'altobench',x:13700,y:15135,rot:Math.PI});
+  townFeatures.push({kind:'altobarrels',x:13840,y:15420});
+  /* --- the six houses, placed exactly as the illustration lays them
+     out around the plaza; every front faces the plaza centre (front
+     vector (sin rot, cos rot)), collision is the rotated footprint's
+     bounding box in the same shape as Luminas's houses --- */
+  var ALTO_HOUSES=[
+    {x:13430,y:15050,w:100,d:78,rot:0.82,roof:0x8a5a34,roofH:46,style:'board',sign:true,props:true,seed:0.63},
+    {x:13960,y:15060,w:62,d:50,rot:-0.83,roof:0xc9a86a,roofH:30,style:'thatch',seed:0.3},
+    {x:14040,y:15230,w:70,d:56,rot:-1.37,roof:0xb26a2e,roofH:30,style:'tile',seed:0.47},
+    {x:14010,y:15410,w:68,d:54,rot:-1.91,roof:0x7a7d82,roofH:29,style:'tile',seed:0.81},
+    {x:13660,y:15620,w:76,d:60,rot:3.02,roof:0x9c6b3f,roofH:30,style:'tile',forge:true,seed:0.55},
+    {x:13360,y:15370,w:60,d:48,rot:1.77,roof:0xa85f2c,roofH:26,style:'tile',seed:0.38}
+  ];
+  ALTO_HOUSES.forEach(function(hs){
+    var ca=Math.abs(Math.cos(hs.rot)), sa=Math.abs(Math.sin(hs.rot));
+    var o=rect(hs.x,hs.y,hs.w*ca+hs.d*sa,hs.w*sa+hs.d*ca,{house:true,topKind:'house'});
+    o._cx=hs.x; o._cy=hs.y; o._rotY=hs.rot; o._hw=hs.w/2; o._hd=hs.d/2; o._eave=38; o._roofH=hs.roofH;
+    var f={kind:'altohouse',x:hs.x,y:hs.y,w:hs.w,d:hs.d,rot:hs.rot,roof:hs.roof,roofH:hs.roofH,style:hs.style,sign:!!hs.sign,forge:!!hs.forge,props:!!hs.props,seed:hs.seed};
+    var lx,lz,sz;
+    if(hs.forge){lx=hs.w*0.22; lz=-hs.d*0.10; sz=38+62;}
+    else{lx=hs.w*0.26; lz=-hs.d*0.18; sz=38+hs.roofH*0.45+24;}
+    f.smoke={dx:lx*Math.cos(hs.rot)+lz*Math.sin(hs.rot), dy:-lx*Math.sin(hs.rot)+lz*Math.cos(hs.rot), z:sz};
+    townFeatures.push(f);
+  });
+  /* --- well, cart, fields, village trees, lanes --- */
+  townFeatures.push({kind:'well',x:13430,y:15240});
+  circ(13430,15240,16,{well:true,topKind:'prop',topH:40});
+  townFeatures.push({kind:'cart',x:13390,y:15490,rot:0.5,seed:0.4});
+  ALTO_FIELDS.forEach(function(fd,fi){townFeatures.push({kind:'altofield',x:fd.x,y:fd.y,w:fd.w,d:fd.d,seed:fi*0.23+0.11});});
+  [[13560,15030],[13870,15100],[13510,15470],[13930,15490]].forEach(function(p){altoTree(p[0],p[1]);});
+  street(13700,15440,13700,15810,46);
+  street(13700,15810,13700,16655,46);
+  street(13700,16865,13700,16960,46);
+  street(13610,15230,13485,15100,30);
+  street(13840,15270,13960,15260,30);
+  street(13695,15445,13675,15550,30);
+  street(13565,15285,13470,15255,30);
+  townFeatures.push({kind:'altobridge',x:ALTO_BRIDGE.x,y:ALTO_BRIDGE.y});
+  /* --- the river's swimming-depth discs (depth only: the ribbon drawn
+     by buildAltoRiver3D is the surface, exactly like Luminas's river);
+     the stretch under the bridge is skipped so the ford stays shallow --- */
+  for(var ri2=0;ri2<ALTO_RIVER.length-1;ri2++){
+    var ax=ALTO_RIVER[ri2][0], ay=ALTO_RIVER[ri2][1], bx=ALTO_RIVER[ri2+1][0], by=ALTO_RIVER[ri2+1][1];
+    var segL=Math.hypot(bx-ax,by-ay), stp2=Math.max(1,Math.round(segL/55));
+    for(var j2=0;j2<=stp2;j2++){
+      var px=ax+(bx-ax)*j2/stp2, py=ay+(by-ay)*j2/stp2;
+      if(Math.hypot(px-ALTO_BRIDGE.x,py-ALTO_BRIDGE.y)<115)continue;
+      var fr2=altoRiverFrame(px,py);
+      decorations.push({kind:'lake',x:px,y:py,s:85,wz:fr2.bank-5.5,townWater:true,ribbon:true,altoRiver:true});
+    }
+  }
+  /* --- the wood outside the palisade, north-west (the illustration's
+     forest shoulder); the north-east stays open hill grass --- */
+  var placedF=0, guardF=0;
+  while(placedF<26&&guardF<600){
+    guardF++;
+    var ang=-2.75+rnd()*0.8, dist=600+rnd()*380;
+    var tx=Math.round(ALTO.x+Math.cos(ang)*dist), ty=Math.round(ALTO.y+Math.sin(ang)*dist);
+    if(altoRiverFrame(tx,ty).d<170)continue;
+    if(_segD(tx,ty,ALTO.x,15760,ALTO.x,16920)<90)continue;
+    altoTree(tx,ty); placedF++;
+  }
+}
 function genWorld(){
   obstacles=[];decorations=[];
   var tseed=987654;function trnd(){tseed=(tseed*16807)%2147483647;return tseed/2147483647;}
@@ -2408,6 +2522,7 @@ function genWorld(){
      the falls. It runs BEFORE the wild scatter below, so the scatter
      can keep out of the town and its water. */
   buildTownData();
+  buildAltoData();
   // trees & rocks scattered (avoid the spawn clearing), vegetation follows the region
   /* 512-tile expansion: the first scatter pass is pinned to the PREVIOUS
      world size (10400) with the exact same target, tries cap and trnd()
@@ -2475,6 +2590,20 @@ function genWorld(){
   decorations.push({x:4200,y:2400,kind:'lake',s:130});
   decorations.push({x:4750,y:4100,kind:'lava',s:150});
   decorations.push({x:7800,y:7800,kind:'lake',s:260}); // frontier lake (new lands, SE)
+  /* Alto cleanup: wild scatter that landed inside the village, in its
+     river or along the south road is removed again here — a post-filter
+     ONLY: the trnd() stream above is untouched, so every existing
+     area's scatter keeps its exact position. Alto's own trees (alto:true)
+     are never removed. */
+  for(var ai9=decorations.length-1;ai9>=0;ai9--){
+    var ad9=decorations[ai9];
+    if(ad9.alto)continue;
+    if(ad9.kind!=='tree'&&ad9.kind!=='snowtree'&&ad9.kind!=='rock'&&ad9.kind!=='cactus'&&ad9.kind!=='flower')continue;
+    var inV=Math.hypot(ad9.x-ALTO.x,ad9.y-ALTO.y)<560||altoRiverFrame(ad9.x,ad9.y).d<120||_segD(ad9.x,ad9.y,13700,15760,13700,16920)<70;
+    if(!inV)continue;
+    for(var ao9=obstacles.length-1;ao9>=0;ao9--){if(obstacles[ao9].ref===ad9)obstacles.splice(ao9,1);}
+    decorations.splice(ai9,1);
+  }
 }
 /* ============ FINITE-TOP OBSTACLES (every object) ============
    EVERY obstacle in the world ends at the height of its visible
@@ -2705,6 +2834,7 @@ function losClear(x1,y1,x2,y2){
   return true;
 }
 function zoneAt(x,y){
+  if(Math.hypot(x-ALTO.x,y-ALTO.y)<=ALTO_R) return "風見村アルト";
   /* new lands first: the old zones below use unbounded comparisons
      (e.g. snow is x>3350) that were implicitly capped by the old world
      edge at 5200 — without this branch they would claim the new lands */
@@ -2730,6 +2860,7 @@ function zoneAt(x,y){
 }
 function zoneColorAt(x,y){
   var z=zoneAt(x,y);
+  if(z.indexOf('アルト')>=0) return '#8a7f6a';
   if(z.indexOf('町')>=0) return '#8a7f6a';
   if(z.indexOf('雪原')>=0) return '#dfe9f2';
   if(z.indexOf('砂漠')>=0) return '#e0c084';
@@ -4443,6 +4574,10 @@ function drawMini(){
   mctx.stroke();mctx.lineWidth=1;
   mctx.fillStyle='#cfc8b4';mctx.beginPath();mctx.arc(MX(PLAZA.x),MY(PLAZA.y),Math.max(2,300*s),0,7);mctx.fill();
   mctx.fillStyle='#7ec3e8';mctx.beginPath();mctx.arc(MX(PLAZA.x),MY(PLAZA.y),Math.max(1.5,60*s),0,7);mctx.fill();
+  // Alto: its palisade ring, plaza disc and windmill point
+  mctx.strokeStyle='#8a6a44';mctx.lineWidth=2;mctx.beginPath();mctx.arc(MX(ALTO.x),MY(ALTO.y),500*s,0,7);mctx.stroke();mctx.lineWidth=1;
+  mctx.fillStyle='#cfc8b4';mctx.beginPath();mctx.arc(MX(ALTO.x),MY(ALTO.y),Math.max(2,150*s),0,7);mctx.fill();
+  mctx.fillStyle='#f0e7d3';mctx.beginPath();mctx.arc(MX(ALTO.x),MY(ALTO.y),Math.max(1.5,60*s),0,7);mctx.fill();
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
@@ -4515,7 +4650,7 @@ function drawWorldMap(){
   lbl(4300,700,'白銀の雪原'); lbl(4250,2400,'灼熱の砂漠'); lbl(750,3900,'深淵の森');
   lbl(700,4300,'翠玉湖'); lbl(4550,4550,'紅蓮火山');
   lbl(7800,1300,'東の草原'); lbl(7800,3900,'東の森'); lbl(1300,7800,'南の草原');
-  lbl(3900,7800,'南の丘陵'); lbl(6600,6600,'辺境の森'); lbl(9100,7800,'辺境の丘陵'); lbl(7800,7800,'辺境の湖');
+  lbl(3900,7800,'南の丘陵'); lbl(6600,6600,'辺境の森'); lbl(9100,7800,'辺境の丘陵'); lbl(7800,7800,'辺境の湖'); lbl(13700,15300,'風見村アルト');
   // player marker
   var px=TX(player.x), py=TY(player.y);
   if(px>=-20&&px<=S+20&&py>=-20&&py<=S+20){
@@ -4781,6 +4916,25 @@ function townTerrain(x,y,h){
 /* Rolling terrain height (world units) at game coords x,y: gentle hills and dips,
    smoothly flattened around the spawn clearing, the lakes and the ruins floors
    so key areas stay easy to walk. Everything standing on the ground follows this. */
+/* Alto's relief, layered over the base terrain right after Luminas's:
+   the village disc is levelled to ALTO_Z, the south road to the bridge
+   is kept level, and the river is carved exactly like Luminas's — banks
+   pulled to the local bank level, the bed dug below it so the water
+   surface sits under the banks, with a shallow ford under the bridge. */
+function villageTerrain(x,y,h){
+  var d=Math.hypot(x-ALTO.x,y-ALTO.y);
+  if(d<620) h=_lerpTo(h,ALTO_Z,_band(d,430,580));
+  var sd=_segD(x,y,ALTO.x,15760,ALTO.x,16920);
+  if(sd<170) h=_lerpTo(h,ALTO_Z,_band(sd,55,150));
+  var fr=altoRiverFrame(x,y);
+  if(fr.d<200){
+    h=_lerpTo(h,fr.bank,_band(fr.d,120,195));
+    h=_lerpTo(h,fr.bank-13,_band(fr.d,52,110));
+    var bd=Math.hypot(x-ALTO_BRIDGE.x,y-ALTO_BRIDGE.y);
+    if(bd<70) h=_lerpTo(h,fr.bank-2.5,_band(bd,30,60));
+  }
+  return h;
+}
 function terrainHBase(x,y){
   var h=Math.sin(x*0.0042+1.7)*Math.cos(y*0.0036+0.4)*9
        +Math.sin(x*0.0016-0.6)*Math.sin(y*0.0021+2.0)*8
@@ -4810,6 +4964,7 @@ function terrainHBase(x,y){
   /* the town of Luminas: its bowl, terraces, north mountain, gorge
      and river carve shape the land inside and around the wall */
   base=townTerrain(x,y,base);
+  base=villageTerrain(x,y,base);
   /* wild-lake basins, carved LAST so nothing can lift them: the lakes
      used to be flat discs laid over merely-flattened grass. Now every
      wild lake sits in a real depression and its water plane (z -0.8)
@@ -5292,9 +5447,14 @@ function fountainTopAt(x,y){
   if(d<=110)return gh+4;                 /* first step */
   return gh+4-(d-110)*1.0;               /* feather into the plaza */
 }
+/* Alto's wooden bridge deck: a gentle camber over the river where the
+   south road crosses it, blending into the banks at both ends — the
+   walking top buildAlto3D draws its planks on. */
+function altoBridgeTopAt(x,y){ var dx=x-ALTO_BRIDGE.x, dy=y-ALTO_BRIDGE.y; if(Math.abs(dx)>34||Math.abs(dy)>140) return -Infinity; var bank=altoRiverFrame(ALTO_BRIDGE.x,ALTO_BRIDGE.y).bank; var u=dy; if(Math.abs(u)<=95){var c=Math.max(0,1-(u/95)*(u/95)); return bank+6.5+4*c;} var t2=bank+6.5, g2=terrainH(x,y), k=1-(Math.abs(u)-95)/45; return g2+(t2-g2)*k; }
 function platformTopAt(x,y){
   var best=-Infinity;
   var tb=townBridgeTopAt(x,y); if(tb>best)best=tb;
+  var ta=altoBridgeTopAt(x,y); if(ta>best)best=ta;
   var tf=fountainTopAt(x,y); if(tf>best)best=tf;
   for(var i=0;i<placedObjects.length;i++){
     var o=placedObjects[i];
@@ -5931,6 +6091,17 @@ function init3D(){
          gradation — shallow margins, deep middle — never one flat
          sheet of blue */
       if(rd9<150){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((150-rd9)/110)*0.55);}
+      /* Alto: packed earth inside the palisade, stone on the plaza,
+         tilled soil on the fields, sandy banks and a teal bed along
+         its river, and the worn south road */
+      var aDist=Math.hypot(gx-ALTO.x,gy-ALTO.y);
+      if(aDist<505){gt.setHex(0xa39a86); gc.lerp(gt,_sm01((505-aDist)/90)*0.55);}
+      if(aDist<158){gt.setHex(0x9a917e); gc.lerp(gt,_sm01((158-aDist)/50)*0.75);}
+      for(var afi=0;afi<ALTO_FIELDS.length;afi++){var af9=ALTO_FIELDS[afi]; if(Math.abs(gx-af9.x)<af9.w/2+4&&Math.abs(gy-af9.y)<af9.d/2+4){gt.setHex(0x6e5136); gc.lerp(gt,0.85); break;}}
+      var aFr=altoRiverFrame(gx,gy);
+      if(aFr.d<120){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((120-aFr.d)/70)*0.6);}
+      if(aFr.d<62){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((62-aFr.d)/45)*0.5);}
+      if(_segD(gx,gy,13700,15440,13700,16900)<30){gt.setHex(0x8a6f4d); gc.lerp(gt,0.75);}
       /* pond beds darken toward the middle: seen through the water
          shader this is what gives the ponds — above all the east
          pond — their depth gradation instead of one flat plate of
@@ -6222,6 +6393,7 @@ function buildSmoke(){
   if(smokePts){scene.remove(smokePts);smokePts.geometry.dispose();smokePts=null;smokeParts=[];}
   var tops=[];
   townFeatures.forEach(function(f){
+    if(f.kind==='altohouse'){ if(f.smoke)tops.push([f.x+f.smoke.dx, f.y+f.smoke.dy, terrainH(f.x,f.y)-2+f.smoke.z]); return; }
     if(f.kind!=='house')return;
     var gh=terrainH(f.x,f.y);
     var lx=f.w*0.26, lz=-f.d*0.18, rot=f.rot||0;
@@ -6334,6 +6506,59 @@ function updateTownsfolk(now){
    the current visibly hurries and dawdles), white water streaks churn
    where aRapid is high, foam laces both banks, and pebbles / boulders /
    grass tufts dress the banks so the water sits in a real channel. */
+/* ============ ALTO VILLAGERS — the same quiet system as Luminas's
+   townsfolk, kept independent: five villagers strolling Alto's plaza,
+   lanes and fields between ALTO_FOLK_SPOTS. ============ */
+var altoFolk=[], altoFolkLastT=0;
+function altoPickTarget(f){
+  var cur=ALTO_FOLK_SPOTS[f.spot], near=[];
+  for(var i=0;i<ALTO_FOLK_SPOTS.length;i++){if(i!==f.spot)near.push([Math.hypot(ALTO_FOLK_SPOTS[i][0]-cur[0],ALTO_FOLK_SPOTS[i][1]-cur[1]),i]);}
+  near.sort(function(a,b){return a[0]-b[0];});
+  var pick=near[Math.floor(Math.random()*Math.min(4,near.length))];
+  f.spot=pick[1];
+  f.tx=ALTO_FOLK_SPOTS[pick[1]][0]+(Math.random()-0.5)*36;
+  f.ty=ALTO_FOLK_SPOTS[pick[1]][1]+(Math.random()-0.5)*36;
+}
+function ensureAltoFolk(){
+  if(altoFolk.length||!dynGroup)return;
+  var sd=424243; function srnd(){sd=(sd*16807)%2147483647;return sd/2147483647;}
+  for(var i=0;i<5;i++){
+    var si=Math.floor(srnd()*ALTO_FOLK_SPOTS.length);
+    var f={x:ALTO_FOLK_SPOTS[si][0]+(srnd()-0.5)*30,y:ALTO_FOLK_SPOTS[si][1]+(srnd()-0.5)*30,spot:si,tx:0,ty:0,wait:srnd()*2.5,walk:srnd()*6,face:srnd()*6.28,mesh:villagerModel(i+3)};
+    dynGroup.add(f.mesh);
+    altoPickTarget(f);
+    altoFolk.push(f);
+  }
+}
+function updateAltoFolk(now){
+  ensureAltoFolk();
+  if(!altoFolk.length)return;
+  var dt=altoFolkLastT?Math.min(0.05,(now-altoFolkLastT)/1000):0.016; altoFolkLastT=now;
+  for(var i=0;i<altoFolk.length;i++){
+    var f=altoFolk[i];
+    if(f.wait>0){f.wait-=dt;}
+    else{
+      var dx=f.tx-f.x, dy=f.ty-f.y, dist=Math.hypot(dx,dy);
+      if(dist<9){f.wait=1+Math.random()*3.5; altoPickTarget(f);}
+      else{
+        var sp=17*dt, nx=f.x+dx/dist*sp, ny=f.y+dy/dist*sp;
+        if(!collide(nx,ny,7)){f.x=nx;f.y=ny;}
+        else if(!collide(nx,f.y,7)){f.x=nx;}
+        else if(!collide(f.x,ny,7)){f.y=ny;}
+        else{f.wait=0.6; altoPickTarget(f);}
+        f.face=Math.atan2(dx,dy);
+        f.walk+=dt*7;
+      }
+    }
+    var bob=(f.wait>0)?0:Math.abs(Math.sin(f.walk))*0.7;
+    f.mesh.position.set(WX(f.x),terrainH(f.x,f.y)+bob+(f.mesh.userData.groundOff||0),WZ(f.y));
+    f.mesh.rotation.y=f.face;
+  }
+}
+/* the windmill's slow turn: about one revolution every 28 seconds —
+   the only always-on animation Alto adds */
+var altoMillBlades=null, altoMillLastT=0;
+function updateAltoMill(now){ if(!altoMillBlades)return; var dt=altoMillLastT?Math.min(0.05,(now-altoMillLastT)/1000):0.016; altoMillLastT=now; altoMillBlades.rotation.z-=dt*0.22; }
 var RIVER_MAT=null;
 function riverMats(){
   if(RIVER_MAT)return RIVER_MAT;
@@ -6498,6 +6723,205 @@ function buildRiver3D(){
    fountain plaza, market stalls, bridges, terrace steps and retaining
    skirts, plus the ponds / river / waterfall water. Everything goes into
    staticGroup and is merged by mergeStaticMeshes() as usual. */
+/* ============ ALTO — 3D builders ============
+   Renders everything buildAltoData() recorded: the six plaza-facing
+   houses (roof colour / style per house), the windmill (static tower in
+   staticGroup, its turning sails in dynGroup), the plaza, benches,
+   barrels, fields, the log palisade and south gate, and the wooden
+   bridge — plus the river ribbon. Static meshes go to staticGroup and
+   ride mergeStaticMeshes() like the rest of the world. */
+function buildAlto3D(){
+  var STONE=0xa8a294, STONE_D=0x8a8172, STONE_L=0xbcb6a8, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
+  townFeatures.forEach(function(f){
+    var gh=terrainH(f.x,f.y);
+    if(f.kind==='altohouse'){
+      var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); hg.rotation.y=f.rot||0; staticGroup.add(hg);
+      var roofH=f.roofH||30;
+      var plasterTints=[0xe6dcc4,0xdfd2b8,0xeee3cc,0xe8dcc6,0xdccfb4];
+      var pTint=plasterTints[Math.floor(f.seed*plasterTints.length)%plasterTints.length];
+      box(f.w+9,6,f.d+9,0x4a4238,0,3,0,hg);                            /* foundation plinth */
+      box(f.w+3,19,f.d+3,STONE_D,0,9.5,0,hg);                          /* stone ground floor */
+      box(f.w,19,f.d,pTint,0,28.5,0,hg);                               /* plastered upper floor */
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(8,38,8,WOOD_D,c[0]*(f.w/2-3),19,c[1]*(f.d/2-3),hg);}); /* corner timbers */
+      box(f.w+4,7,f.d+4,WOOD_D,0,36,0,hg);                             /* eaves beam */
+      if(f.style==='thatch'){
+        var tr=prism(f.w+26,roofH+4,f.d+24,f.roof); tr.position.y=38; hg.add(tr); /* a broad thatch cap, overhanging deep */
+        box(6,5,f.d+28,0xa8895f,0,38+roofH+5,0,hg);                    /* straw ridge roll */
+      }else{
+        var rf=prism(f.w+22,roofH,f.d+20,f.roof); rf.position.y=38; hg.add(rf);
+        box(6,5,f.d+24,WOOD_D,0,38+roofH+1,0,hg);                      /* ridge beam */
+      }
+      if(f.forge){ /* the smithy's tall stone chimney */
+        box(15,66,15,STONE_D,f.w*0.22,38+31,-f.d*0.10,hg);
+        box(18,5,18,STONE_D,f.w*0.22,38+66,-f.d*0.10,hg);
+      }else{
+        box(12,30,12,STONE_D,f.w*0.26,38+roofH*0.45,-f.d*0.18,hg);
+        box(15,5,15,STONE_D,f.w*0.26,38+roofH*0.45+16,-f.d*0.18,hg);
+      }
+      box(15,20,4,WOOD_D,0,10,f.d/2+2,hg);                             /* front door */
+      box(19,4,8,STONE_D,0,2,f.d/2+4,hg);                              /* door step */
+      box(14,14,2.6,WOOD_D,-f.w*0.28,11,f.d/2+1.6,hg); box(11,11,3,0xffd98a,-f.w*0.28,11,f.d/2+2,hg);
+      box(14,14,2.6,WOOD_D,f.w*0.28,11,-f.d/2-1.6,hg); box(11,11,3,0xffd98a,f.w*0.28,11,-f.d/2-2,hg);
+      box(14,15,2.6,WOOD_D,-f.w*0.28,29,f.d/2+1.6,hg); box(11,12,3,0xffd98a,-f.w*0.28,29,f.d/2+2,hg);
+      box(14,15,2.6,WOOD_D,f.w*0.30,29,-f.d/2-1.6,hg); box(11,12,3,0xffd98a,f.w*0.30,29,-f.d/2-2,hg);
+      if(f.sign){ /* bracket + hanging shop sign, as on Luminas's storefronts */
+        box(2,10,2,WOOD_D,25,27,f.d/2+8,hg); box(2,2,12,WOOD_D,25,31,f.d/2+13,hg);
+        box(12,9,1.6,0xc9a86a,25,24.5,f.d/2+18,hg);
+      }
+      if(f.props){ /* barrels and crates at the front corner */
+        var bx=-f.w/2+11, bz=f.d/2-4;
+        cyl(5,5.6,12,0x8a6a44,bx,6,bz,hg,8); cyl(5,5.6,12,0x74522f,bx+11,6,bz-3,hg,8);
+        cyl(5.9,5.9,1.7,0x3a3128,bx,9,bz,hg,8); cyl(5.9,5.9,1.7,0x3a3128,bx+11,9,bz-3,hg,8);
+        cyl(4.6,5.2,11,0x8a6a44,bx+5.5,17,bz-1.5,hg,8);
+        box(12,12,12,0xc9a86a,f.w/2-13,6,f.d/2-5,hg);
+        box(10,10,10,0xb08d54,f.w/2-13,17,f.d/2-5,hg);
+      }
+    }else if(f.kind==='windmill'){
+      var wg=new THREE.Group(); wg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(wg);
+      cyl(40,46,10,STONE_D,0,5,0,wg,16);                               /* stone base drum */
+      cyl(27,36,118,0xf0e7d3,0,69,0,wg,14);                            /* the white tapered tower */
+      cyl(29.5,29.5,6,STONE_L,0,100,0,wg,14);                          /* stone band near the top */
+      cone(43,48,0xc9a86a,0,152,0,wg,14);                              /* thatched cap */
+      sph(4,0xe8c268,0,178,0,wg);                                      /* gold finial ball */
+      box(16,22,4,WOOD_D,0,11,34.5,wg);                                /* door on the south face */
+      cyl(2.2,2.2,17,WOOD_D,-11,8.5,44,wg,6); cyl(2.2,2.2,17,WOOD_D,11,8.5,44,wg,6); /* porch posts */
+      rbox(32,3,24,0xc9a86a,0,20,44,wg,0,0.32,0);                       /* porch roof */
+      box(2,2,12,WOOD_D,24,30,36,wg);                                  /* sign bracket */
+      box(13,10,1.6,0xc9a86a,24,24.5,41,wg);                            /* hanging sign */
+      box(8,10,2,0xffd98a,0,55,-31,wg);                                /* north window */
+      box(8,10,2,0xffd98a,29,85,0,wg); box(8,10,2,0xffd98a,-29,85,0,wg); /* east / west windows */
+      /* the sails: a turning group in dynGroup, rebuilt fresh each
+         build so a world rebuild never stacks a second set */
+      if(altoMillBlades&&altoMillBlades.parent)altoMillBlades.parent.remove(altoMillBlades);
+      altoMillBlades=new THREE.Group();
+      altoMillBlades.position.set(WX(ALTO.x),terrainH(ALTO.x,ALTO.y)+106,WZ(ALTO.y)+36);
+      var hub=cyl(6,6,12,WOOD_D,0,0,0,altoMillBlades,10); hub.rotation.x=Math.PI/2;
+      for(var bk=0;bk<4;bk++){
+        var bg2=new THREE.Group(); bg2.rotation.z=Math.PI/4+bk*Math.PI/2; bg2.rotation.x=0.16; altoMillBlades.add(bg2);
+        box(14,88,2,0xe8e2d2,0,52,0,bg2);                              /* sail cloth */
+        box(2.5,88,3,WOOD_D,-6.2,52,0,bg2); box(2.5,88,3,WOOD_D,6.2,52,0,bg2); /* sail frame */
+        if(bk===0){ /* the blue crystal riding the first sail's tip, as in the illustration */
+          var cr2=sph(6,0x7ec3ff,0,94,0,bg2,{emissive:0x3a7bd5}); cr2.castShadow=false;
+          var gl2=sph(13,0x7ec3ff,0,94,0,bg2,{transparent:true,opacity:0.25,emissive:0x3a7bd5}); gl2.castShadow=false;
+        }
+      }
+      dynGroup.add(altoMillBlades);
+    }else if(f.kind==='altoplaza'){
+      var pg2=new THREE.Group(); pg2.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(pg2);
+      cyl(f.r,f.r,2.4,0xa8a294,0,0.6,0,pg2,40);
+      cyl(Math.round(f.r*0.78),Math.round(f.r*0.78),3.2,0xdcd4c2,0,1.2,0,pg2,36);
+      [0.9,0.55].forEach(function(kk){
+        var ring=new THREE.Mesh(G('altring'+Math.round(f.r*kk),function(){return new THREE.RingGeometry(f.r*kk-2.2,f.r*kk+2.2,44);}),M(0x9c968a));
+        ring.rotation.x=-Math.PI/2; ring.position.set(0,3.3,0); ring.receiveShadow=true; pg2.add(ring);
+      });
+    }else if(f.kind==='altobench'){
+      var bg3=new THREE.Group(); bg3.position.set(WX(f.x),gh,WZ(f.y)); bg3.rotation.y=f.rot||0; staticGroup.add(bg3);
+      box(30,3.5,10,WOOD,0,9,0,bg3);
+      box(4,9,9,WOOD_D,-11,4.5,0,bg3); box(4,9,9,WOOD_D,11,4.5,0,bg3);
+      box(30,11,3,WOOD,0,16,-5.5,bg3);
+    }else if(f.kind==='altobarrels'){
+      var bg4=new THREE.Group(); bg4.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(bg4);
+      cyl(5,5.6,12,0x8a6a44,0,6,0,bg4,8); cyl(5,5.6,12,0x8a6a44,11,6,-2,bg4,8); cyl(5,5.6,12,0x8a6a44,5.5,17,-1,bg4,8);
+      cyl(5.9,5.9,1.7,0x3a3128,0,9,0,bg4,8); cyl(5.9,5.9,1.7,0x3a3128,11,9,-2,bg4,8);
+    }else if(f.kind==='altofield'){
+      var fg=new THREE.Group(); fg.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(fg);
+      box(f.w,3,f.d,0x6e5136,0,1.5,0,fg);                              /* tilled soil bed */
+      var sdF=f.seed||0;
+      var srf=function(n){var v=Math.sin(sdF*127.1+n*311.7)*43758.5453;return v-Math.floor(v);};
+      for(var rz=-f.d/2+8;rz<f.d/2-4;rz+=13){
+        rbox(f.w-8,2.5,5,0x7d5c38,0,3.6,rz,fg);                        /* a raised furrow row */
+        for(var cx2=-f.w/2+10;cx2<f.w/2-6;cx2+=13){
+          if(srf(cx2*0.37+rz*1.7)<0.35)continue;
+          var cs=sph(3.2,0x548c46,cx2,5.6,rz,fg,{flatShading:true}); cs.castShadow=false; /* crop tufts along the row */
+        }
+      }
+    }else if(f.kind==='altofence'){
+      /* the palisade itself: a ring of upright logs of cycling heights
+         and tones, with two inner rails — the south gate left open */
+      var heights=[30,34,31,35], tones=[0x74522f,0x6b4a2c], fi2=0;
+      for(var fa2=0;fa2<Math.PI*2;fa2+=0.0175){
+        var fda2=Math.atan2(Math.sin(fa2-Math.PI/2),Math.cos(fa2-Math.PI/2));
+        if(Math.abs(fda2)>=0.19){
+          var fx=ALTO.x+Math.cos(fa2)*ALTO_R, fy=ALTO.y+Math.sin(fa2)*ALTO_R;
+          var fh=heights[fi2%4];
+          cyl(4.3,4.9,fh,tones[fi2%2],WX(fx),terrainH(fx,fy)+fh/2-1,WZ(fy),staticGroup,7);
+        }
+        fi2++;
+      }
+      for(var ha2=0;ha2<Math.PI*2;ha2+=0.092){
+        var hda2=Math.atan2(Math.sin(ha2-Math.PI/2),Math.cos(ha2-Math.PI/2));
+        if(Math.abs(hda2)<0.19)continue;
+        var hx=ALTO.x+Math.cos(ha2)*494, hy=ALTO.y+Math.sin(ha2)*494;
+        var hgh=terrainH(hx,hy);
+        rbox(48,4,4,WOOD_D,WX(hx),hgh+11,WZ(hy),staticGroup,-(ha2+Math.PI/2));
+        rbox(48,4,4,WOOD_D,WX(hx),hgh+24,WZ(hy),staticGroup,-(ha2+Math.PI/2));
+      }
+    }else if(f.kind==='altogate'){
+      var gg2=new THREE.Group(); gg2.position.set(WX(f.x),gh-1,WZ(f.y)); staticGroup.add(gg2);
+      cyl(7,8,48,WOOD_D,-42,24,0,gg2,8); cyl(7,8,48,WOOD_D,42,24,0,gg2,8); /* gate posts */
+      box(96,6,6,WOOD,0,44,0,gg2);                                       /* lintel */
+      box(20,12,2,0xc9a86a,0,36,3.5,gg2);                                /* hanging village sign */
+    }else if(f.kind==='altobridge'){
+      /* the wooden bridge over the river on the south road: cambered
+         planks laid on altoBridgeTopAt()'s own profile, side rails and
+         posts, and legs reaching down to the riverbed */
+      var bg5=new THREE.Group(); bg5.position.set(WX(f.x),0,WZ(f.y)); staticGroup.add(bg5);
+      var tones2=[0x8a6a44,0x74522f], pIdx=0;
+      for(var u=-95;u<=95;u+=13){
+        var topC=altoBridgeTopAt(f.x,f.y+u);
+        var topN=altoBridgeTopAt(f.x,f.y+u+6.5), topP=altoBridgeTopAt(f.x,f.y+u-6.5);
+        var pl=rbox(64,3,12.5,tones2[pIdx%2],0,topC-1.5,u,bg5);
+        pl.rotation.x=-Math.atan2(topN-topP,13);
+        pIdx++;
+      }
+      for(var ru=-84;ru<=84;ru+=24){
+        var topE=altoBridgeTopAt(f.x,f.y+ru);
+        box(4,12,4,WOOD_D,-30,topE+5,ru,bg5); box(4,12,4,WOOD_D,30,topE+5,ru,bg5);
+      }
+      for(var rm3=-72;rm3<84;rm3+=24){
+        var topR2=altoBridgeTopAt(f.x,f.y+rm3);
+        rbox(4,4,26,WOOD_D,-30,topR2+11,rm3,bg5); rbox(4,4,26,WOOD_D,30,topR2+11,rm3,bg5);
+      }
+      [-24,24].forEach(function(px2){ [-42,42].forEach(function(pz2){
+        var gy2=f.y+pz2, deckB=altoBridgeTopAt(f.x,gy2)-3, bed=terrainH(f.x+px2,gy2);
+        var len=Math.max(6,deckB-bed);
+        cyl(4,5,len,WOOD_D,px2,bed+len/2,pz2,bg5,7);
+      });});
+    }
+  });
+}
+/* Alto's river: the same flowing ribbon as Luminas's, shrunk to a
+   country stream — CatmullRom through ALTO_RIVER, surface at the local
+   bank level −5.5, half-width breathing between 52 and 72. */
+function buildAltoRiver3D(){
+  var g=ensureWaterGroup(); if(!g)return;
+  var pts=ALTO_RIVER.map(function(p){return new THREE.Vector3(WX(p[0]),0,WZ(p[1]));});
+  var curve=new THREE.CatmullRomCurve3(pts,false,'catmullrom',0.35);
+  var N=170, pos=[],uv=[],ph=[],rp=[],idx=[];
+  var phase=0, prev=null;
+  for(var i=0;i<=N;i++){
+    var t=i/N, p=curve.getPoint(t), tan=curve.getTangent(t);
+    var gx=p.x+W/2, gy=p.z+H/2;
+    if(prev)phase+=Math.hypot(gx-prev[0],gy-prev[1])/55;
+    prev=[gx,gy];
+    var wz=altoRiverFrame(gx,gy).bank-5.5;
+    var hw=62+10*Math.sin(phase*1.3); hw=Math.max(52,Math.min(72,hw));
+    var nx=-tan.z, nz=tan.x;
+    pos.push(p.x+nx*hw,wz,p.z+nz*hw, p.x-nx*hw,wz,p.z-nz*hw);
+    uv.push(0,t*40, 1,t*40);
+    ph.push(phase,phase); rp.push(0.15,0.15);
+    if(i<N){var a=i*2;idx.push(a,a+1,a+2, a+1,a+3,a+2);}
+  }
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+  geo.setAttribute('aPhase',new THREE.Float32BufferAttribute(ph,1));
+  geo.setAttribute('aRapid',new THREE.Float32BufferAttribute(rp,1));
+  geo.setIndex(idx);
+  var mesh=new THREE.Mesh(geo,riverMats());
+  mesh.renderOrder=2; mesh.frustumCulled=false;
+  g.add(mesh);
+}
 function buildTown3D(){
   if(!townFeatures.length)return;
   var STONE=0xa8a294, STONE_D=0x8a8172, STONE_L=0xbcb6a8, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4; /* bright grey ashlar, as in the photo: the whole town's stonework reads pale against the green */
@@ -6967,6 +7391,7 @@ function buildTown3D(){
       cyl(1.6,1.6,34,WOOD_D,0,17,29,ng,5);
     }
   });
+  buildAlto3D(); buildAltoRiver3D(); /* Alto's houses, windmill, palisade, bridge and river */
 }
 
 function buildWorld3D(){
@@ -7711,6 +8136,7 @@ function render3D(now){
   updateWaterFx(now); /* water shader time, waterfall scroll, spray */
   updateSmoke(now);   /* chimney smoke drifting over the rooftops */
   updateTownsfolk(now); /* villagers strolling the streets and plaza */
+  updateAltoFolk(now); updateAltoMill(now); /* Alto's villagers and its turning windmill */
   // entities
   var seen={};
   /* first-person: the player's own body is not rendered (camera sits at eye level) */
