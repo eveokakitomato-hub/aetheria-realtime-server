@@ -2433,7 +2433,7 @@ function buildAltoData(){
   }
   circ(13700-46,15800,9,{topKind:'prop',topH:46});
   circ(13700+46,15800,9,{topKind:'prop',topH:46});
-  townFeatures.push({kind:'altofence'});
+  townFeatures.push({kind:'altofence',x:ALTO.x,y:ALTO.y}); /* anchored at the village centre for bookkeeping only: buildAlto3D() chunks the ring PER LOG (see there), never by this centre */
   townFeatures.push({kind:'altogate',x:13700,y:15800});
   /* --- the windmill and its round stone plaza at the village's heart --- */
   townFeatures.push({kind:'windmill',x:ALTO.x,y:ALTO.y});
@@ -2454,38 +2454,57 @@ function buildAltoData(){
     {x:13960,y:15060,w:62,d:50,rot:-0.83,roof:0xc9a86a,roofH:30,style:'thatch',seed:0.3},
     {x:14040,y:15230,w:70,d:56,rot:-1.37,roof:0xb26a2e,roofH:30,style:'tile',seed:0.47},
     {x:14010,y:15410,w:68,d:54,rot:-1.91,roof:0x7a7d82,roofH:29,style:'tile',seed:0.81},
-    {x:13660,y:15620,w:76,d:60,rot:3.02,roof:0x9c6b3f,roofH:30,style:'tile',forge:true,seed:0.55},
+    {x:13585,y:15515,w:76,d:60,rot:3.02,roof:0x9c6b3f,roofH:30,style:'tile',forge:true,seed:0.55}, /* the smithy SHIFTED west/north off the south-gate road: at its old spot (13660,15620) its rotated east corners poked ~24 units into the dirt road (x 13677..13723) running from the south gate to the windmill plaza. At (13585,15515) every corner clears the road by ~51, the lane to its west by ~44, the south-west field (y from 15611) by ~62 and the plaza disc by ~54 — same size, same roof, same facing, still the plaza's south house */
     {x:13360,y:15370,w:60,d:48,rot:1.77,roof:0xa85f2c,roofH:26,style:'tile',seed:0.38}
   ];
   ALTO_HOUSES.forEach(function(hs){
     var ca=Math.abs(Math.cos(hs.rot)), sa=Math.abs(Math.sin(hs.rot));
     var o=rect(hs.x,hs.y,hs.w*ca+hs.d*sa,hs.w*sa+hs.d*ca,{house:true,topKind:'house'});
-    o._cx=hs.x; o._cy=hs.y; o._rotY=hs.rot; o._hw=hs.w/2; o._hd=hs.d/2; o._eave=38; o._roofH=hs.roofH;
+    o._cx=hs.x; o._cy=hs.y; o._rotY=hs.rot; o._hw=hs.w/2; o._hd=hs.d/2; o._eave=57; o._roofH=hs.roofH; /* _eave 57 (was 38): the houses grew by raising the WALL BODY only — footprint and roof size/shape are unchanged (see buildAlto3D), so the collision's eave follows the drawn walls up and the unchanged roof sits on top */
     var f={kind:'altohouse',x:hs.x,y:hs.y,w:hs.w,d:hs.d,rot:hs.rot,roof:hs.roof,roofH:hs.roofH,style:hs.style,sign:!!hs.sign,forge:!!hs.forge,props:!!hs.props,seed:hs.seed};
     var lx,lz,sz;
-    if(hs.forge){lx=hs.w*0.22; lz=-hs.d*0.10; sz=38+62;}
-    else{lx=hs.w*0.26; lz=-hs.d*0.18; sz=38+hs.roofH*0.45+24;}
+    if(hs.forge){lx=hs.w*0.22; lz=-hs.d*0.10; sz=57+89;}
+    else{lx=hs.w*0.26; lz=-hs.d*0.18; sz=57+hs.roofH*0.45+30;}
     f.smoke={dx:lx*Math.cos(hs.rot)+lz*Math.sin(hs.rot), dy:-lx*Math.sin(hs.rot)+lz*Math.cos(hs.rot), z:sz};
     townFeatures.push(f);
   });
-  /* --- the ADVENTURER'S GUILD: a big two-storey hall on the open
-     ground INSIDE the palisade's north side (centre 13700,14920),
-     clearly larger than any village house (170x115 against the
-     biggest house's 100x78), facing the windmill plaza down a short
-     dirt lane. The spot was checked clear of everything: its north
-     corners sit at radius ~446 from the village centre (fence line
-     500, fence posts bite to ~476), its south edge stops ~172 short
+  /* --- the ADVENTURER'S GUILD: a great hall on the open ground
+     INSIDE the palisade's north side (centre 13700,14920), now
+     ENLARGED to 230x140 (was 170x115) — still easily the village's
+     biggest building (biggest house footprint 100x78) — and HOLLOW:
+     the player walks in through the 44-wide double door on the
+     plaza face and around the hall inside. The spot was checked
+     clear of everything at the new size: its north corners sit at
+     radius ~465 from the village centre (fence line 500, fence
+     posts bite to ~476), its south edge (14990) stops ~160 short
      of the plaza disc (r 150), and the NW / NE houses' bounding
-     boxes end over 120 units west / east of it. Collision is the
-     same rotated-footprint rect the houses use, with the guild's
-     own eave / ridge heights so its roof top is standable like
-     every other building's. --- */
-  var go=rect(13700,14920,170,115,{house:true,topKind:'house'});
-  go._cx=13700; go._cy=14920; go._rotY=0; go._hw=85; go._hd=57.5; go._eave=58; go._roofH=52;
-  var gf={kind:'altoguild',x:13700,y:14920,w:170,d:115,rot:0,roof:0x8a4a28,roofH:52,seed:0.5};
-  gf.smoke={dx:52,dy:-14,z:100};
+     boxes end ~92 / ~106 units west / east of its walls.
+     Collision is NOT one solid rect any more: it is the four WALL
+     SEGMENTS themselves (thickness 8, the south wall split for the
+     door gap), the reception counter, the two hall tables and the
+     four pillars — plus ONE roof-only rect (roofOnly:true) that
+     carries the roof's standable top surface for topSurfaceAt()
+     but never blocks walking (collide() skips it), so the hall
+     interior stays open while the roof still lands like a house
+     roof from above. Wall segments use topKind 'prop' with the
+     wall-top height, so no invisible wall rises over them. --- */
+  var GCX=13700, GCY=14920, GW=230, GD=140, GHW=GW/2, GHD=GD/2, GWT=8, GDH=22; /* GDH = the door gap's half width */
+  function gwall(cx,cy,w,h){return rect(cx,cy,w,h,{topKind:'prop',topH:72});}
+  gwall(GCX,GCY-GHD+GWT/2,GW,GWT);                                   /* north wall */
+  gwall(GCX-(GDH+(GHW-GDH)/2),GCY+GHD-GWT/2,GHW-GDH,GWT);            /* south wall, west of the door */
+  gwall(GCX+(GDH+(GHW-GDH)/2),GCY+GHD-GWT/2,GHW-GDH,GWT);            /* south wall, east of the door */
+  gwall(GCX-GHW+GWT/2,GCY,GWT,GD-2*GWT);                             /* west wall */
+  gwall(GCX+GHW-GWT/2,GCY,GWT,GD-2*GWT);                             /* east wall */
+  rect(GCX,GCY-38,120,14,{topKind:'prop',topH:14});                  /* the reception counter */
+  rect(GCX-48,GCY+18,56,16,{topKind:'prop',topH:10});                /* hall table, west */
+  rect(GCX+48,GCY+18,56,16,{topKind:'prop',topH:10});                /* hall table, east */
+  [[-72,-8],[72,-8],[-72,34],[72,34]].forEach(function(pp){circ(GCX+pp[0],GCY+pp[1],7,{topKind:'prop',topH:66});}); /* the hall pillars */
+  var go=rect(GCX,GCY,GW,GD,{house:true,topKind:'house',roofOnly:true});
+  go._cx=GCX; go._cy=GCY; go._rotY=0; go._hw=GHW; go._hd=GHD; go._eave=74; go._roofH=56;
+  var gf={kind:'altoguild',x:GCX,y:GCY,w:GW,d:GD,rot:0,roof:0x8a4a28,roofH:56,seed:0.5};
+  gf.smoke={dx:52,dy:-14,z:122};
   townFeatures.push(gf);
-  street(13700,15150,13700,14990,40); /* the lane: plaza north rim -> the guild's front step */
+  street(13700,15150,13700,15002,40); /* the lane: plaza north rim -> the guild's front step */
   /* --- well, cart, fields, village trees, lanes --- */
   townFeatures.push({kind:'well',x:13430,y:15240});
   circ(13430,15240,16,{well:true,topKind:'prop',topH:40});
@@ -2767,6 +2786,7 @@ function topSurfaceAt(x,y){
 function collide(nx,ny,r,feetZ){
   if(nx<r||ny<r||nx>W-r||ny>H-r) return true;
   for(var i=0;i<obstacles.length;i++){var o=obstacles[i];
+    if(o.roofOnly)continue; /* a roof-only shell (the guild hall): it exists so topSurfaceAt() can land a falling / flying mover on its roof — it must never block walking, or the building it caps could not be entered */
     if(feetZ!==undefined){
       /* finite top (the standard for EVERY obstacle — explicit top
          data or the defaultTopH() fallback): a mover whose feet are
@@ -3260,8 +3280,9 @@ function killEnemy(e){
 }
 function gainExp(n){
   player.exp+=n;
+  var leveled=false;
   while(player.exp>=expNeed(player.lv)){
-    player.exp-=expNeed(player.lv);player.lv++;
+    player.exp-=expNeed(player.lv);player.lv++;leveled=true;
     var c=CLASSES[player.cls];
     player.maxHp+=14;player.maxMp+=6;player.atk+=3;player.hp=player.maxHp;player.mp=player.maxMp;
     $('levelUpText').textContent=player.name+' は Lv.'+player.lv+' になった！ HP/MP全回復';
@@ -3270,6 +3291,7 @@ function gainExp(n){
     burst(player.x,player.y,'#e8c268',30);
     chat('✦ <b>'+player.name+'</b> のレベルが '+player.lv+' に上がった！','sys');
   }
+  if(leveled)requestSaveNow(); /* level ups save immediately, no debounce wait */
 }
 function completeQuest(){
   var q=QUESTS[questIdx];
@@ -3278,6 +3300,7 @@ function completeQuest(){
   chat('◆ クエスト「'+q.title+'」完了！報酬を受け取った','sys');
   beep(784,0.12,'triangle',0.06);setTimeout(function(){beep(1046,0.2,'triangle',0.06);},120);
   questIdx++;questCount=0;updateQuest();updateHUD();
+  requestSaveNow(); /* quest completion (+ its gold/EXP reward) saves immediately */
 }
 function updateQuest(){
   var q=QUESTS[questIdx];if(!q)return;
@@ -3601,7 +3624,7 @@ function hurtPlayer(dmg,src){
    configured yet (503 accounts_not_configured), the game falls back
    to guest play + file export, exactly as before. */
 var API_BASE='https://aetheria-realtime-server.onrender.com';
-var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login'};
+var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login',lastKeySeen:'',lastChangeAt:0,lastSaveStart:0,saveQueued:false,failUntil:0};
 function acctSetStatus(text,ok){
   var st=$('acctStatus'); if(st){st.textContent=text; st.className=(ok===true)?'ok':((ok===false)?'ng':'');}
   var dot=$('acctDot'); if(dot) dot.className='net-dot '+((ok===true)?'ok':((ok===false)?'':'busy'));
@@ -3695,7 +3718,7 @@ function acctSetMode(mode){
 }
 function acctOnAuth(data){
   acct.token=data.token||null; acct.username=data.username||''; acct.character=data.character||null;
-  acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0;
+  acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0; acct.lastKeySeen=''; acct.lastChangeAt=0; acct.lastSaveStart=0; acct.saveQueued=false; acct.failUntil=0;
   /* Restore this account's settings at login (they live in the character save JSON) */
   if(acct.character&&acct.character.settings)applySettingsData(acct.character.settings);
   refreshAcctUI(); refreshSaveUI();
@@ -3739,40 +3762,87 @@ function acctSubmit(){
 }
 function serverSave(manual){
   if(!acct.token||!player||!started)return;
-  if(acct.saving)return;
-  acct.saving=true; refreshSaveUI();
+  if(acct.saving){acct.saveQueued=true;return;}
+  acct.saving=true; acct.lastSaveStart=performance.now(); refreshSaveUI();
   var data=buildSaveData();
+  /* The key of the snapshot actually sent — NOT the live progressKey() at
+     response time. Anything that changed while the request was in flight
+     must stay "unsaved" so it is written by the follow-up save below. */
+  var sentKey=progressKey();
   acctApi('/api/save',{method:'POST',body:{character:data},keepalive:true}).then(function(r){
     acct.saving=false;
     if(r.data&&r.data.ok){
-      acct.character=data; acct.lastAt=new Date(); acct.savedKey=progressKey(); acct.dirtySince=0;
+      acct.character=data; acct.lastAt=new Date(); acct.savedKey=sentKey;
       refreshAcctUI(); /* first save fixes this account's role from now on */
-      lastSaveAt=acct.lastAt; lastSavedKey=acct.savedKey;
+      lastSaveAt=acct.lastAt; lastSavedKey=sentKey;
       if(manual)toast('☁ サーバーに保存しました');
+      if(acct.saveQueued||progressKey()!==acct.savedKey){
+        /* Progress moved on during the save: mark it long-dirty so the
+           next acctTick writes the follow-up almost immediately. */
+        acct.saveQueued=false; acct.dirtySince=performance.now()-10000; acct.lastChangeAt=0;
+      }else{
+        acct.dirtySince=0;
+      }
     }else if(r.status===401){
       acct.token=null; acct.username=null; acct.character=null;
       refreshAcctUI();
       toast('ログインの有効期限が切れました。タイトルに戻って再ログインすると自動保存が再開します',4200);
-    }else if(manual){
-      toast('サーバー保存に失敗しました。少し待って再試行してください',3600);
+    }else{
+      acct.failUntil=performance.now()+6000; /* back off briefly instead of hammering a struggling server */
+      if(manual)toast('サーバー保存に失敗しました。少し待って再試行してください',3600);
     }
     refreshSaveUI();
   }).catch(function(){
     acct.saving=false;
+    acct.failUntil=performance.now()+6000;
     if(manual)toast('サーバー保存に失敗しました。接続を確認してください',3600);
     refreshSaveUI();
   });
 }
+/* Ask for an autosave right now — used by important events (level up,
+   quest completion). If a save is already in flight it is queued and
+   runs as soon as that one lands. Safe to call when logged out. */
+function requestSaveNow(){
+  if(!acct.token||!started||!player)return;
+  if(acct.saving){acct.saveQueued=true;return;}
+  serverSave(false);
+}
+function tryAutoSave(now,urgent){
+  if(acct.saving){acct.saveQueued=true;return;}
+  if(acct.failUntil&&now<acct.failUntil)return;
+  var sinceStart=now-(acct.lastSaveStart||0);
+  var minGap=urgent?350:1000; /* floor between save starts: responsive, but never a request storm */
+  if(sinceStart<minGap){
+    if(urgent){clearTimeout(acct._urgentT);acct._urgentT=setTimeout(requestSaveNow,minGap-sinceStart+30);}
+    return; /* non-urgent: the dirty state persists, a later tick retries */
+  }
+  serverSave(false);
+}
+/* The "important" slice of progressKey(): level, gold, kills, potions,
+   arrows, inventory, quest index and quest progress. A change in any of
+   these is saved immediately; position / exploration / settings changes
+   take the short settle path instead. */
+function importantKeyOf(key){
+  if(!key)return '';
+  var p=key.split('|');
+  return [p[0],p[2],p[3],p[4],p[5],p[6],p[7],p[8]].join('|');
+}
 function acctTick(now){
   if(!acct.token||!started||!player||player.dead)return;
-  if(progressKey()!==acct.savedKey){
-    if(!acct.dirtySince)acct.dirtySince=now;
-    if(now-acct.dirtySince>4000)serverSave(false);
-  }
+  var key=progressKey();
+  if(key!==acct.lastKeySeen){acct.lastKeySeen=key;acct.lastChangeAt=now;if(!acct.dirtySince)acct.dirtySince=now;}
+  if(key===acct.savedKey){acct.dirtySince=0;return;}
+  if(!acct.dirtySince)acct.dirtySince=now;
+  if(importantKeyOf(key)!==importantKeyOf(acct.savedKey)){tryAutoSave(now,true);return;}
+  /* Ordinary changes: save once they have settled for 700ms — and never
+     wait longer than 4s even while the player keeps moving. (The old
+     rule waited a flat 4s+ after the FIRST change, which is why saves
+     always felt late.) */
+  if(now-acct.lastChangeAt>=700||now-acct.dirtySince>=4000)tryAutoSave(now,false);
 }
 function acctLogout(){
   var token=acct.token;
-  acct.token=null; acct.username=null; acct.character=null; acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0;
+  acct.token=null; acct.username=null; acct.character=null; acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0; acct.lastKeySeen=''; acct.lastChangeAt=0; acct.saveQueued=false; acct.failUntil=0;
   saveGuestSettings(); /* keep the current settings on this device after logout */
   refreshAcctUI(); refreshSaveUI();
   acctSetMode('login');
@@ -3808,7 +3878,7 @@ function refreshSaveUI(){
   var dirty=player&&lastSavedKey&&progressKey()!==lastSavedKey;
   var label;
   if(acct.token&&player){
-    label=acct.saving?'☁ 保存中…':(acct.lastAt?((progressKey()!==acct.savedKey)?'☁ 自動保存まち':'☁ 自動保存済み '+acct.lastAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})):'☁ 自動保存 ON');
+    label=acct.saving?'☁ 保存中…':(acct.lastAt?((progressKey()!==acct.savedKey)?'☁ 自動保存まち':'☁ 自動保存済み '+acct.lastAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'})):'☁ 自動保存 ON');
   }else{
     label=!player?'未保存':(lastSaveAt?(dirty?'変更あり（未保存）':'保存済み '+lastSaveAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})):'未保存');
   }
@@ -6965,6 +7035,43 @@ function buildRiver3D(){
 function buildAlto3D(){
   var STONE=0xa8a294, STONE_D=0x8a8172, STONE_L=0xbcb6a8, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
   townFeatures.forEach(function(f){
+    if(f.kind==='altofence'){
+      /* THE PALISADE IS CHUNKED PER LOG, never by its centre. The
+         ring is one feature anchored at the village centre, but it
+         spans six 650-chunks (x 13200..14200, y 14800..15800): the
+         old loop-head filter judged the whole ring by f.x/f.y —
+         which were undefined (NaN !== any chunk), so NO chunk ever
+         built it and the fence vanished from every view once the
+         world went chunked, while its collision (built from data,
+         not meshes) stayed. Now each chunk pass emits only the
+         logs / rails whose own position falls in that chunk, so
+         the ring builds, discards and rebuilds arc by arc like
+         everything else — and a player standing inside the village
+         always has the arcs around them built. */
+      if(BUILD_MODE!=='chunk')return;
+      var heights=[30,34,31,35], tones=[0x74522f,0x6b4a2c], fi2=0;
+      for(var fa2=0;fa2<Math.PI*2;fa2+=0.0175){
+        var fda2=Math.atan2(Math.sin(fa2-Math.PI/2),Math.cos(fa2-Math.PI/2));
+        if(Math.abs(fda2)>=0.19){
+          var fx=ALTO.x+Math.cos(fa2)*ALTO_R, fy=ALTO.y+Math.sin(fa2)*ALTO_R;
+          if(Math.floor(fx/CHUNK_CH)===BUILD_CX&&Math.floor(fy/CHUNK_CH)===BUILD_CY){
+            var fh=heights[fi2%4];
+            cyl(4.3,4.9,fh,tones[fi2%2],WX(fx),terrainH(fx,fy)+fh/2-1,WZ(fy),staticGroup,7);
+          }
+        }
+        fi2++;
+      }
+      for(var ha2=0;ha2<Math.PI*2;ha2+=0.092){
+        var hda2=Math.atan2(Math.sin(ha2-Math.PI/2),Math.cos(ha2-Math.PI/2));
+        if(Math.abs(hda2)<0.19)continue;
+        var hx=ALTO.x+Math.cos(ha2)*494, hy=ALTO.y+Math.sin(ha2)*494;
+        if(Math.floor(hx/CHUNK_CH)!==BUILD_CX||Math.floor(hy/CHUNK_CH)!==BUILD_CY)continue;
+        var hgh=terrainH(hx,hy);
+        rbox(48,4,4,WOOD_D,WX(hx),hgh+11,WZ(hy),staticGroup,-(ha2+Math.PI/2));
+        rbox(48,4,4,WOOD_D,WX(hx),hgh+24,WZ(hy),staticGroup,-(ha2+Math.PI/2));
+      }
+      return;
+    }
     if(BUILD_MODE==='always'){ if(f.kind!=='windmill')return; } /* the always pass only (re)builds the windmill's sails, below */
     else if(Math.floor(f.x/CHUNK_CH)!==BUILD_CX||Math.floor(f.y/CHUNK_CH)!==BUILD_CY)return; /* not this chunk */
     var gh=terrainH(f.x,f.y);
@@ -6974,33 +7081,40 @@ function buildAlto3D(){
       var plasterTints=[0xe6dcc4,0xdfd2b8,0xeee3cc,0xe8dcc6,0xdccfb4];
       var pTint=plasterTints[Math.floor(f.seed*plasterTints.length)%plasterTints.length];
       box(f.w+9,6,f.d+9,0x4a4238,0,3,0,hg);                            /* foundation plinth */
-      box(f.w+3,19,f.d+3,STONE_D,0,9.5,0,hg);                          /* stone ground floor */
-      box(f.w,19,f.d,pTint,0,28.5,0,hg);                               /* plastered upper floor */
-      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(8,38,8,WOOD_D,c[0]*(f.w/2-3),19,c[1]*(f.d/2-3),hg);}); /* corner timbers */
-      box(f.w+4,7,f.d+4,WOOD_D,0,36,0,hg);                             /* eaves beam */
+      /* the houses grew TALLER IN THE BODY ONLY (at the user's word:
+         roof size and shape untouched, footprint untouched): the
+         stone ground floor rose 19 -> 28 and the plastered upper
+         floor 19 -> 29, so the eaves line moved 38 -> 57 — a real
+         two-storey height against the 1.7m player — and the SAME
+         roof (same w / h / d prism) simply sits on top at y 57.
+         The collision's _eave in buildAltoData rose to match. */
+      box(f.w+3,28,f.d+3,STONE_D,0,14,0,hg);                           /* stone ground floor, taller */
+      box(f.w,29,f.d,pTint,0,42.5,0,hg);                               /* plastered upper floor, taller */
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(8,57,8,WOOD_D,c[0]*(f.w/2-3),28.5,c[1]*(f.d/2-3),hg);}); /* corner timbers */
+      box(f.w+4,7,f.d+4,WOOD_D,0,55,0,hg);                             /* eaves beam */
       if(f.style==='thatch'){
-        var tr=prism(f.w+26,roofH+4,f.d+24,f.roof); tr.position.y=38; hg.add(tr); /* a broad thatch cap, overhanging deep */
-        box(6,5,f.d+28,0xa8895f,0,38+roofH+5,0,hg);                    /* straw ridge roll */
+        var tr=prism(f.w+26,roofH+4,f.d+24,f.roof); tr.position.y=57; hg.add(tr); /* a broad thatch cap, overhanging deep — same size as before, lifted with the walls */
+        box(6,5,f.d+28,0xa8895f,0,57+roofH+5,0,hg);                    /* straw ridge roll */
       }else{
-        var rf=prism(f.w+22,roofH,f.d+20,f.roof); rf.position.y=38; hg.add(rf);
-        box(6,5,f.d+24,WOOD_D,0,38+roofH+1,0,hg);                      /* ridge beam */
+        var rf=prism(f.w+22,roofH,f.d+20,f.roof); rf.position.y=57; hg.add(rf);
+        box(6,5,f.d+24,WOOD_D,0,57+roofH+1,0,hg);                      /* ridge beam */
       }
-      if(f.forge){ /* the smithy's tall stone chimney */
-        box(15,66,15,STONE_D,f.w*0.22,38+31,-f.d*0.10,hg);
-        box(18,5,18,STONE_D,f.w*0.22,38+66,-f.d*0.10,hg);
+      if(f.forge){ /* the smithy's tall stone chimney, stretched to clear the lifted roof */
+        box(15,84,15,STONE_D,f.w*0.22,57+40,-f.d*0.10,hg);
+        box(18,5,18,STONE_D,f.w*0.22,57+86,-f.d*0.10,hg);
       }else{
-        box(12,30,12,STONE_D,f.w*0.26,38+roofH*0.45,-f.d*0.18,hg);
-        box(15,5,15,STONE_D,f.w*0.26,38+roofH*0.45+16,-f.d*0.18,hg);
+        box(12,40,12,STONE_D,f.w*0.26,57+roofH*0.45+4,-f.d*0.18,hg);
+        box(15,5,15,STONE_D,f.w*0.26,57+roofH*0.45+26,-f.d*0.18,hg);
       }
-      box(15,20,4,WOOD_D,0,10,f.d/2+2,hg);                             /* front door */
+      box(15,26,4,WOOD_D,0,13,f.d/2+2,hg);                             /* front door, taller with the ground floor */
       box(19,4,8,STONE_D,0,2,f.d/2+4,hg);                              /* door step */
-      box(14,14,2.6,WOOD_D,-f.w*0.28,11,f.d/2+1.6,hg); box(11,11,3,0xffd98a,-f.w*0.28,11,f.d/2+2,hg);
-      box(14,14,2.6,WOOD_D,f.w*0.28,11,-f.d/2-1.6,hg); box(11,11,3,0xffd98a,f.w*0.28,11,-f.d/2-2,hg);
-      box(14,15,2.6,WOOD_D,-f.w*0.28,29,f.d/2+1.6,hg); box(11,12,3,0xffd98a,-f.w*0.28,29,f.d/2+2,hg);
-      box(14,15,2.6,WOOD_D,f.w*0.30,29,-f.d/2-1.6,hg); box(11,12,3,0xffd98a,f.w*0.30,29,-f.d/2-2,hg);
-      if(f.sign){ /* bracket + hanging shop sign, as on Luminas's storefronts */
-        box(2,10,2,WOOD_D,25,27,f.d/2+8,hg); box(2,2,12,WOOD_D,25,31,f.d/2+13,hg);
-        box(12,9,1.6,0xc9a86a,25,24.5,f.d/2+18,hg);
+      box(14,14,2.6,WOOD_D,-f.w*0.28,16,f.d/2+1.6,hg); box(11,11,3,0xffd98a,-f.w*0.28,16,f.d/2+2,hg);
+      box(14,14,2.6,WOOD_D,f.w*0.28,16,-f.d/2-1.6,hg); box(11,11,3,0xffd98a,f.w*0.28,16,-f.d/2-2,hg);
+      box(14,15,2.6,WOOD_D,-f.w*0.28,42,f.d/2+1.6,hg); box(11,12,3,0xffd98a,-f.w*0.28,42,f.d/2+2,hg);
+      box(14,15,2.6,WOOD_D,f.w*0.30,42,-f.d/2-1.6,hg); box(11,12,3,0xffd98a,f.w*0.30,42,-f.d/2-2,hg);
+      if(f.sign){ /* bracket + hanging shop sign, as on Luminas's storefronts — lifted with the taller front */
+        box(2,12,2,WOOD_D,25,36,f.d/2+8,hg); box(2,2,12,WOOD_D,25,41,f.d/2+13,hg);
+        box(12,9,1.6,0xc9a86a,25,34,f.d/2+18,hg);
       }
       if(f.props){ /* barrels and crates at the front corner */
         var bx=-f.w/2+11, bz=f.d/2-4;
@@ -7011,43 +7125,63 @@ function buildAlto3D(){
         box(10,10,10,0xb08d54,f.w/2-13,17,f.d/2-5,hg);
       }
     }else if(f.kind==='altoguild'){
-      /* the adventurer's guild hall: a two-storey great hall, plainly
-         bigger than every village house — a tall stone ground floor,
-         a plastered upper floor under a broad steep roof (eaves at
-         58, ridge at 110, matching the collision's _eave/_roofH), a
-         porch over the great double door on the plaza face, twin
-         chimneys, and a wide name board over the door that reads
-         冒険者ギルド so nobody can mistake the building */
+      /* the adventurer's guild hall, ENLARGED (230x140, see
+         buildAltoData) and HOLLOW: the shell is built as four real
+         walls — stone lower (local 2..36), plaster upper (36..70) —
+         with the south wall split for a 44-wide, 36-tall double-door
+         opening, so the player walks straight in off the lane. The
+         old solid-body boxes are gone: inside is one open great
+         hall with a wood floor, four pillars carrying a beamed
+         ceiling (the eaves slab at 66..74 doubles as the ceiling,
+         so from inside the roof reads as a proper closed ceiling,
+         never hollow backfaces), a reception counter across the
+         north end under a quest board, two long tables with
+         benches, a rug and hanging lanterns. The roof above the
+         ceiling keeps the old exterior silhouette (prism at 74,
+         ridge at 130, matching the roof-only collision's
+         _eave/_roofH), with twin chimneys and the same name board
+         over the door. Wall / counter / table / pillar meshes sit
+         exactly on their collision segments in buildAltoData. */
       var gg9=new THREE.Group(); gg9.position.set(WX(f.x),gh-2,WZ(f.y)); gg9.rotation.y=f.rot||0; staticGroup.add(gg9);
-      box(f.w+12,7,f.d+12,0x4a4238,0,3.5,0,gg9);                       /* foundation plinth */
-      box(f.w+4,26,f.d+4,STONE_D,0,13,0,gg9);                          /* stone ground floor */
-      box(f.w,32,f.d,0xe8dcc6,0,42,0,gg9);                             /* plastered upper floor */
-      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(10,58,10,WOOD_D,c[0]*(f.w/2-4),29,c[1]*(f.d/2-4),gg9);}); /* corner timbers */
-      box(f.w+5,8,f.d+5,WOOD_D,0,56,0,gg9);                            /* eaves beam */
-      var grf=prism(f.w+26,f.roofH,f.d+24,f.roof); grf.position.y=58; gg9.add(grf);
-      box(7,6,f.d+28,WOOD_D,0,58+f.roofH+1,0,gg9);                     /* ridge beam */
-      box(14,34,14,STONE_D,52,58+15,-14,gg9); box(17,5,17,STONE_D,52,58+34,-14,gg9);   /* main chimney (smoke rises from here) */
-      box(14,26,14,STONE_D,-58,58+9,10,gg9); box(17,5,17,STONE_D,-58,58+24,10,gg9);    /* second chimney */
-      box(28,30,4,WOOD_D,0,15,f.d/2+2,gg9);                            /* great double door, plaza face */
-      box(3,30,4.6,0x3a3128,0,15,f.d/2+2,gg9);                          /* door centre post */
-      box(38,5,13,STONE_D,0,2.5,f.d/2+6,gg9);                          /* front step */
-      cyl(3,3.4,30,WOOD_D,-22,15,f.d/2+13,gg9,6); cyl(3,3.4,30,WOOD_D,22,15,f.d/2+13,gg9,6); /* porch posts */
-      rbox(58,4,24,0x9c6b3f,0,32,f.d/2+13,gg9,0,0.30,0);                /* porch roof */
-      box(10,22,1.6,0xb03a30,-19,22,f.d/2+3.4,gg9); box(10,22,1.6,0x3a6bd5,19,22,f.d/2+3.4,gg9); /* guild banners flanking the door */
-      [-62,-40,40,62].forEach(function(wx9){ /* ground-floor windows, lit, in timber frames */
-        box(15,15,2.6,WOOD_D,wx9,15,f.d/2+1.6,gg9); box(12,12,3,0xffd98a,wx9,15,f.d/2+2,gg9);
-      });
-      [-62,62].forEach(function(wx9){ /* upper windows flanking the name board */
-        box(15,16,2.6,WOOD_D,wx9,47,f.d/2+1.6,gg9); box(12,13,3,0xffd98a,wx9,47,f.d/2+2,gg9);
-      });
-      [-24,24].forEach(function(wz9){ /* side windows, east and west walls */
-        box(2.6,15,15,WOOD_D,f.w/2+1.6,32,wz9,gg9); box(3,12,12,0xffd98a,f.w/2+2,32,wz9,gg9);
-        box(2.6,15,15,WOOD_D,-f.w/2-1.6,32,wz9,gg9); box(3,12,12,0xffd98a,-f.w/2-2,32,wz9,gg9);
+      var hw=f.w/2, hd=f.d/2, wt=8, dhw=22; /* wall thickness / door half width — mirror buildAltoData's GWT / GDH */
+      box(f.w+12,4,f.d+12,0x4a4238,0,0,0,gg9);                         /* foundation, its top flush with the ground so the doorway has no step up */
+      box(f.w-6,4.4,f.d-6,0x8a6a44,0,0,0,gg9);                         /* the hall's wood floor (top at local 2.2) */
+      function gwall(cx,cz,w,d){ box(w,34,d,STONE_D,cx,19,cz,gg9); box(w,34,d,0xe8dcc6,cx,53,cz,gg9); } /* one wall stretch: stone lower + plaster upper, 2..70 */
+      gwall(0,-hd+wt/2,f.w,wt);                                        /* north wall */
+      gwall(-(dhw+(hw-dhw)/2),hd-wt/2,hw-dhw,wt);                      /* south wall, west of the door */
+      gwall((dhw+(hw-dhw)/2),hd-wt/2,hw-dhw,wt);                       /* south wall, east of the door */
+      gwall(-hw+wt/2,0,wt,f.d-2*wt);                                   /* west wall */
+      gwall(hw-wt/2,0,wt,f.d-2*wt);                                    /* east wall */
+      box(dhw*2,32,wt,0xe8dcc6,0,54,hd-wt/2,gg9);                      /* plaster over the door opening (the opening itself is 2..38) */
+      box(dhw*2+4,4,wt+1.5,WOOD_D,0,39,hd-wt/2,gg9);                   /* the door lintel beam */
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(11,70,11,WOOD_D,c[0]*(hw-5),36,c[1]*(hd-5),gg9);}); /* corner timbers */
+      box(f.w+5,8,f.d+5,WOOD_D,0,70,0,gg9);                            /* eaves slab: eaves outside, the hall's ceiling inside (66..74) */
+      [-70,0,70].forEach(function(bx9){box(6,5,f.d-14,0x54382a,bx9,63.5,0,gg9);}); /* ceiling beams under the slab */
+      var grf=prism(f.w+26,f.roofH,f.d+24,f.roof); grf.position.y=74; gg9.add(grf);
+      box(7,6,f.d+28,WOOD_D,0,74+f.roofH+1,0,gg9);                     /* ridge beam */
+      box(14,44,14,STONE_D,52,74+20,-14,gg9); box(17,5,17,STONE_D,52,74+44,-14,gg9);   /* main chimney (smoke rises from here) */
+      box(14,36,14,STONE_D,-58,74+16,10,gg9); box(17,5,17,STONE_D,-58,74+36,10,gg9);   /* second chimney */
+      /* the double doors, swung OPEN flat against the front wall so
+         the doorway is genuinely passable (visual only — the gap in
+         the south wall segments is the passage) */
+      box(19,34,3,WOOD_D,-(dhw+10),19,hd+2,gg9); box(19,34,3,WOOD_D,(dhw+10),19,hd+2,gg9);
+      box(52,4,14,STONE_D,0,0,hd+7,gg9);                               /* front step, flush with the floor */
+      cyl(3,3.4,36,WOOD_D,-34,20,hd+14,gg9,6); cyl(3,3.4,36,WOOD_D,34,20,hd+14,gg9,6); /* porch posts */
+      rbox(84,4,26,0x9c6b3f,0,40,hd+13,gg9,0,0.30,0);                   /* porch roof */
+      box(10,22,1.6,0xb03a30,-52,22,hd+1,gg9); box(10,22,1.6,0x3a6bd5,52,22,hd+1,gg9); /* guild banners flanking the door */
+      /* windows pierce the walls (pane + frame run through the wall
+         thickness), so they glow from inside the hall as well as out */
+      [-58,58,-92,92].forEach(function(wx9){ box(17,17,10,WOOD_D,wx9,20,hd-wt/2,gg9); box(13,13,11,0xffd98a,wx9,20,hd-wt/2,gg9); }); /* south ground windows */
+      [-82,82].forEach(function(wx9){ box(17,17,10,WOOD_D,wx9,53,hd-wt/2,gg9); box(13,13,11,0xffd98a,wx9,53,hd-wt/2,gg9); });       /* south upper windows, flanking the name board */
+      [-40,40,-85,85].forEach(function(wx9){ box(17,17,10,WOOD_D,wx9,20,-hd+wt/2,gg9); box(13,13,11,0xffd98a,wx9,20,-hd+wt/2,gg9); box(17,17,10,WOOD_D,wx9,53,-hd+wt/2,gg9); box(13,13,11,0xffd98a,wx9,53,-hd+wt/2,gg9); }); /* north windows, both floors */
+      [-36,36].forEach(function(wz9){ /* side windows, east and west walls */
+        box(10,17,17,WOOD_D,hw-wt/2,20,wz9,gg9); box(11,13,13,0xffd98a,hw-wt/2,20,wz9,gg9);
+        box(10,17,17,WOOD_D,-hw+wt/2,20,wz9,gg9); box(11,13,13,0xffd98a,-hw+wt/2,20,wz9,gg9);
       });
       /* the name board: a broad wooden board over the door carrying a
          canvas-drawn sign — gold letters on dark wood, drawn once and
          shared by every rebuild */
-      box(100,20,3.5,WOOD_D,0,46,f.d/2+2.2,gg9);
+      box(116,22,3.5,WOOD_D,0,52,hd+2.2,gg9);
       if(!_guildSignTex){
         var gcv=document.createElement('canvas'); gcv.width=512; gcv.height=104;
         var gc9=gcv.getContext('2d');
@@ -7058,11 +7192,30 @@ function buildAlto3D(){
         _guildSignTex=new THREE.CanvasTexture(gcv);
         if(THREE.SRGBColorSpace!==undefined)_guildSignTex.colorSpace=THREE.SRGBColorSpace;
       }
-      var gsign=new THREE.Mesh(new THREE.PlaneGeometry(96,19),new THREE.MeshLambertMaterial({map:_guildSignTex}));
-      gsign.position.set(0,46,f.d/2+4.1); gg9.add(gsign);
+      var gsign=new THREE.Mesh(new THREE.PlaneGeometry(112,21),new THREE.MeshLambertMaterial({map:_guildSignTex}));
+      gsign.position.set(0,52,hd+4.15); gg9.add(gsign);
       /* a hanging sign on a bracket by the door, like the shops' */
-      box(2,10,2,WOOD_D,34,27,f.d/2+8,gg9); box(2,2,12,WOOD_D,34,31,f.d/2+13,gg9);
-      box(13,10,1.6,0xc9a86a,34,24.5,f.d/2+18,gg9);
+      box(2,10,2,WOOD_D,48,40,hd+8,gg9); box(2,2,12,WOOD_D,48,45,hd+13,gg9);
+      box(13,10,1.6,0xc9a86a,48,38,hd+18,gg9);
+      /* ---- the hall interior ---- */
+      [[-72,-8],[72,-8],[-72,34],[72,34]].forEach(function(pp){cyl(5,6.5,64,WOOD_D,pp[0],34,pp[1],gg9,8);}); /* pillars, floor to ceiling (on their collision circles) */
+      box(120,12,14,WOOD,0,8,-38,gg9);                                 /* the reception counter across the north end */
+      box(126,3,18,0xc9a86a,0,15.5,-38,gg9);                           /* counter top slab */
+      box(96,28,2.5,0x74522f,0,32,-hd+wt+1.5,gg9);                     /* the quest board on the north wall, behind the counter */
+      [-32,-11,11,32].forEach(function(px9,pi9){box(10,12,1,0xf2ead8,px9,32+(pi9%2?4:-3),-hd+wt+3.4,gg9,false);}); /* posted notices on the board */
+      box(10,22,1.6,0xb03a30,-70,44,-hd+wt+1,gg9); box(10,22,1.6,0x3a6bd5,70,44,-hd+wt+1,gg9); /* banners inside, flanking the board */
+      [-48,48].forEach(function(tx9){ /* two long hall tables with benches (on their collision rects) */
+        box(56,3,16,WOOD,tx9,9,18,gg9);
+        [[-24,-5],[24,-5],[-24,5],[24,5]].forEach(function(lg9){box(4,9,4,WOOD_D,tx9+lg9[0],4.5,18+lg9[1],gg9);});
+        box(44,2.5,6,WOOD_D,tx9,6,5,gg9); box(44,2.5,6,WOOD_D,tx9,6,31,gg9);
+      });
+      var rug9=box(96,1.2,64,0x8a3a30,0,2.8,8,gg9,false); rug9.receiveShadow=true; /* the hall rug */
+      [-48,0,48].forEach(function(lx9){ /* hanging lanterns under the ceiling beams */
+        cyl(0.8,0.8,10,0x3a3128,lx9,61,8,gg9,5);
+        var ltn=sph(5,0xffd98a,lx9,54,8,gg9,{emissive:0xcf9a3a}); ltn.castShadow=false;
+      });
+      cyl(5,5.6,12,0x8a6a44,-hw+18,8,hd-20,gg9,8); cyl(5,5.6,12,0x74522f,-hw+30,8,hd-17,gg9,8); /* barrels in the entrance corner */
+      box(12,12,12,0xc9a86a,hw-18,8,hd-20,gg9);                         /* a crate by the east wall */
     }else if(f.kind==='windmill'){
       if(BUILD_MODE!=='always'){ /* the static tower belongs to the windmill's own chunk */
       var wg=new THREE.Group(); wg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(wg);
@@ -7125,27 +7278,6 @@ function buildAlto3D(){
           if(srf(cx2*0.37+rz*1.7)<0.35)continue;
           var cs=sph(3.2,0x548c46,cx2,5.6,rz,fg,{flatShading:true}); cs.castShadow=false; /* crop tufts along the row */
         }
-      }
-    }else if(f.kind==='altofence'){
-      /* the palisade itself: a ring of upright logs of cycling heights
-         and tones, with two inner rails — the south gate left open */
-      var heights=[30,34,31,35], tones=[0x74522f,0x6b4a2c], fi2=0;
-      for(var fa2=0;fa2<Math.PI*2;fa2+=0.0175){
-        var fda2=Math.atan2(Math.sin(fa2-Math.PI/2),Math.cos(fa2-Math.PI/2));
-        if(Math.abs(fda2)>=0.19){
-          var fx=ALTO.x+Math.cos(fa2)*ALTO_R, fy=ALTO.y+Math.sin(fa2)*ALTO_R;
-          var fh=heights[fi2%4];
-          cyl(4.3,4.9,fh,tones[fi2%2],WX(fx),terrainH(fx,fy)+fh/2-1,WZ(fy),staticGroup,7);
-        }
-        fi2++;
-      }
-      for(var ha2=0;ha2<Math.PI*2;ha2+=0.092){
-        var hda2=Math.atan2(Math.sin(ha2-Math.PI/2),Math.cos(ha2-Math.PI/2));
-        if(Math.abs(hda2)<0.19)continue;
-        var hx=ALTO.x+Math.cos(ha2)*494, hy=ALTO.y+Math.sin(ha2)*494;
-        var hgh=terrainH(hx,hy);
-        rbox(48,4,4,WOOD_D,WX(hx),hgh+11,WZ(hy),staticGroup,-(ha2+Math.PI/2));
-        rbox(48,4,4,WOOD_D,WX(hx),hgh+24,WZ(hy),staticGroup,-(ha2+Math.PI/2));
       }
     }else if(f.kind==='altogate'){
       var gg2=new THREE.Group(); gg2.position.set(WX(f.x),gh-1,WZ(f.y)); staticGroup.add(gg2);
