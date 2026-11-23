@@ -24,7 +24,7 @@ const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 2567;
 const TICK_MS = 50;            // 20Hz
-const WORLD = { min: 0.5, max: 255.5 }; // 256x256 tile map inner bounds
+const WORLD = { min: 0.5, max: 511.5 }; // 512x512 tile map inner bounds
 const MAX_SPEED = 7;           // タイル/秒 (最速クラス 3.7 の約2倍まで許容)
 const SPEED_SLACK = 1.6;       // タイル (申告間隔の誤差吸収)
 const AOI_RADIUS = 20;         // タイル
