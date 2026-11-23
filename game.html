@@ -1018,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>世界が512×512タイルへ拡大！</b>世界の果てがさらに東と南へ大きく広がり、遠い東の草原と森、南の草原、そして南東の果ての新しい土地が開放されました。既存のエリアは今まで通りの場所にあり、新しい土地にもモンスターが出現します。探索マップと地形エディターの範囲も世界全体に広がりました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>消えていた大階段を復旧し、写真の規模に合わせて大きく作り直しました。</b>前回の作り替えで階段の高さ計算が壊れ、階段が地形に埋もれて見えなくなっていた問題を修正。あわせて全体を大型化しました：下段の橋階段は幅を広げ、川の上に太い橋脚3本と深い橋桁が立つ段々の橋に。中段テラスは大きく張り出した円形の台地に広げ、中央の噴水池と周りの岩も大きくしました。上段はテラスの北西から東へ長く折り返して上がるので、広場から見て「上がる→踊り場→逆向きに上がる」折り返しの形がはっきり分かります。両側の石壁は高く厚くし、テラスを囲む擁壁の石ドラムも深くして、階段全体が下の町より一段高い石の構造物としてそびえる形にしました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>大階段を、写真の折り返し式（スイッチバック）に作り替えました。</b>まっすぐ一本だった階段を、下段は広場の北のふちの真ん中から川を渡る橋階段として上がり、真ん中に岩で囲んだ小さな丸い噴水池のある中段テラスで折り返し、上段が礼拝堂前の高台へ上がる形に変更。階段の両側は城壁のような厚い石の側壁になり、高台の擁壁と一体になっています。段は幅広い石板のまま、上段の先では今まで通り二股に分かれて礼拝堂前と城前へつながります。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>大階段の登り口を、噴水広場の北のふちの真ん中へ付け替えました。</b>これまで広場の北東のふちから斜めに上がっていた大階段を、広場の北側の中央（噴水の真北）からまっすぐ始まるように位置と向きを調整。階段の幅・段数・段差と、上った先の分岐・礼拝堂と城への階段は今まで通りです。</span></li>
@@ -1066,7 +1067,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
         <section class="sec-panel" id="secWorld" aria-label="ワールド紹介">
           <h2>WORLD <span>— 舞台はルミナス地方</span></h2>
-          <p class="sec-sub">16のエリアが1つの世界につながっている（256×256タイル）</p>
+          <p class="sec-sub">16のエリアが1つの世界につながっている（512×512タイル）</p>
           <div class="zone-grid">
             <div class="zone-card"><b>🏰 ルミナスの町</b><p>冒険の始まりの地。丸い城壁・噴水広場・時計塔・礼拝堂・城と、滝から流れる川に囲まれた城壁の町。町の中は安全地帯で、HPも回復する。</p></div>
             <div class="zone-card"><b>🌿 始まりの草原</b><p>平原の北に広がる穏やかな草原。スライムが跳ねる、駆け出し冒険者の狩り場。</p></div>
@@ -1190,8 +1191,8 @@ var QUESTS=[
 ];
 
 /* ================= STATE ================= */
-var W=10400,H=10400; /* world is 256x256 tiles (was 128x128 / 5200 units) — existing areas keep their exact coordinates in the north-west 5200x5200; new lands (grassland / forest / hills / a frontier lake) were added to the EAST and SOUTH. Tile size is unchanged (10400/256 = 40.625 units). */
-var OLD_W=5200, OLD_H=5200; /* pre-expansion world size: saves written before the 256x256 expansion are migrated against this */
+var W=20800,H=20800; /* world is 512x512 tiles (was 256x256 / 10400 units, originally 128x128 / 5200 units) — existing areas keep their exact coordinates in the north-west; new lands were added to the EAST and SOUTH again. Tile size is unchanged (20800/512 = 40.625 units). */
+var OLD_W=5200, OLD_H=5200; /* ORIGINAL 128x128-tile world size: regionAt / zoneAt / terrain heights are defined against this boundary — do NOT change it for later expansions; saves written before the 256x256 expansion are also migrated against this */
 var canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 var mini=document.getElementById('minimap'),mctx=mini.getContext('2d');
 var started=false, soundOn=true, audioCtx=null;
@@ -1245,12 +1246,12 @@ var obstacles=[], decorations=[];
 /* crosshair identification: the one enemy currently captured by the center crosshair.
    Only this enemy's name / level / HP are ever shown. */
 var aimTarget=null;
-/* exploration (fog of war): 128x128 cells over the 256x256-tile world; a cell
+/* exploration (fog of war): 256x256 cells over the 512x512-tile world; a cell
    becomes explored once it enters the minimap's view radius. Saved with the
    character. The cell size (81.25 units) is unchanged from the old 64x64 grid
-   over the 128-tile world, so old saves map 1:1 onto the north-west quadrant
-   (see exploredFromString's migration). */
-var EXP_N=128, explored=[], exploredCount=0;
+   over the 128-tile world and the 128x128 grid over the 256-tile world, so old
+   saves map 1:1 onto the north-west (see exploredFromString's migration). */
+var EXP_N=256, explored=[], exploredCount=0;
 /* arrows stuck in the terrain: they stay for a while and can be picked back up with E */
 var stuckArrows=[];
 
@@ -1641,14 +1642,14 @@ function doLogout(){
 
 /* ================= REALTIME SYNC (public server) =================
    Protocol 2 client for the deployed sync server. Positions are sent in
-   tile coordinates (world is 256x256 tiles over W x H pixels). When the
+   tile coordinates (world is 512x512 tiles over W x H pixels). When the
    server is unreachable or asleep, the game runs offline (solo). */
 var NET_URL='wss://aetheria-realtime-server.onrender.com';
 var NET_HEALTH_URL='https://aetheria-realtime-server.onrender.com/health';
 var netWs=null, netStatus='idle', netMyId=null, netRetry=0, netClosed=false, netRetryTimer=null, netLastPosSent=0;
 var remoteTracks={}, remotes=[];
-function pxToTile(v){return v/(W/256);}
-function tileToPx(v){return v*(W/256);}
+function pxToTile(v){return v/(W/512);}
+function tileToPx(v){return v*(W/512);}
 function netSetStatus(s){
   netStatus=s;
   var dot=$('netDot'); if(dot) dot.style.background=(s==='online')?'#43d17c':(s==='connecting'||s==='reconnecting')?'#e8913a':'#8a97a0';
@@ -2408,10 +2409,17 @@ function genWorld(){
      can keep out of the town and its water. */
   buildTownData();
   // trees & rocks scattered (avoid the spawn clearing), vegetation follows the region
+  /* 512-tile expansion: the first scatter pass is pinned to the PREVIOUS
+     world size (10400) with the exact same target, tries cap and trnd()
+     consumption order as before, so every tree / rock / flower in the
+     existing lands keeps its bit-identical position and kind. A second
+     pass below then fills ONLY the new lands, continuing the same
+     trnd() stream. */
+  var PREV_W=10400;
   var tries=0;
   while(decorations.length<1750 && tries<30000){
     tries++;
-    var x=60+trnd()*(W-120), y=60+trnd()*(H-120); /* seeded (was Math.random): the scatter must be identical on every genWorld() so editor deletions of trees/rocks can be recorded by position and re-applied after a rebuild */
+    var x=60+trnd()*(PREV_W-120), y=60+trnd()*(PREV_W-120); /* seeded (was Math.random): the scatter must be identical on every genWorld() so editor deletions of trees/rocks can be recorded by position and re-applied after a rebuild */
     if(Math.hypot(x-SPAWN_X,y-SPAWN_Y)<130) continue;  // spawn clearing stays open
     if(townNorm(x,y)<1.12) continue;             // nor inside the town of Luminas (its own trees & rocks are placed by buildTownData)
     if(waterDepthAt(x,y)>0) continue;            // nor in any lake water
@@ -2429,6 +2437,34 @@ function genWorld(){
     var d={x:x,y:y,kind:kind,s:(kind==='tree'||kind==='snowtree')?20+trnd()*14:10+trnd()*8,seed:trnd()*10};
     decorations.push(d);
     if(kind!=='flower'){var ob={type:'circle',x:x,y:y,r:d.s*0.45,ref:d};if(kind==='rock'){ob.topKind='rock';ob.topH=d.s*1.2;}else if(kind==='cactus'){ob.topKind='cactus';ob.topH=d.s*2.45;}else{ob.topKind='tree';ob.topH=treeTopH(d);}obstacles.push(ob);}
+  }
+  /* second pass — NEW LANDS ONLY (512-tile expansion): sample the whole
+     20800 world and reject anything inside the previous 10400x10400
+     lands, so the first pass's layout is untouched. Same avoidance
+     checks and the same region-driven kind table as the first pass,
+     continuing the same trnd() stream. */
+  var tries2=0;
+  while(decorations.length<1750+5250 && tries2<150000){
+    tries2++;
+    var x2=60+trnd()*(W-120), y2=60+trnd()*(H-120);
+    if(x2<PREV_W && y2<PREV_W) continue;              // new lands only — never touch the existing world
+    if(Math.hypot(x2-SPAWN_X,y2-SPAWN_Y)<130) continue;  // spawn clearing stays open
+    if(townNorm(x2,y2)<1.12) continue;             // nor inside the town of Luminas
+    if(waterDepthAt(x2,y2)>0) continue;            // nor in any lake water
+    if(Math.hypot(x2-700,y2-4300)<330) continue;          // lake 2 (翠玉湖)
+    if(Math.hypot(x2-4200,y2-2400)<200) continue;         // desert oasis
+    if(Math.hypot(x2-4750,y2-4100)<210) continue;         // lava lake
+    if(Math.hypot(x2-4600,y2-4600)<330) continue;         // ifrit arena
+    if(Math.hypot(x2-7800,y2-7800)<330) continue;         // frontier lake (new lands)
+    var reg2=regionAt(x2,y2), kind2, roll2=trnd();
+    if(reg2==='desert') kind2=roll2<0.42?'cactus':'rock';
+    else if(reg2==='snow') kind2=roll2<0.68?'snowtree':'rock';
+    else if(reg2==='volcano') kind2='rock';
+    else if(reg2==='deepforest') kind2=roll2<0.82?'tree':(roll2<0.92?'rock':'flower');
+    else kind2=roll2<0.72?'tree':(roll2<0.86?'rock':'flower');
+    var d2={x:x2,y:y2,kind:kind2,s:(kind2==='tree'||kind2==='snowtree')?20+trnd()*14:10+trnd()*8,seed:trnd()*10};
+    decorations.push(d2);
+    if(kind2!=='flower'){var ob2={type:'circle',x:x2,y:y2,r:d2.s*0.45,ref:d2};if(kind2==='rock'){ob2.topKind='rock';ob2.topH=d2.s*1.2;}else if(kind2==='cactus'){ob2.topKind='cactus';ob2.topH=d2.s*2.45;}else{ob2.topKind='tree';ob2.topH=treeTopH(d2);}obstacles.push(ob2);}
   }
   // lakes: 翠玉湖 (deep south-west) / desert oasis — 月影湖 west of
   // Luminas is GONE: its water decoration is no longer placed, its
@@ -2732,14 +2768,21 @@ function exploredToString(){var s='';for(var i=0;i<EXP_N*EXP_N;i++)s+=explored[i
 function exploredFromString(s){
   resetExplored();
   if(typeof s!=='string')return;
-  /* Migration: saves from the 128x128-tile world stored a 64x64 grid whose
-     cells have the SAME world size (81.25 units) as today's 128x128 grid —
-     the old cell (ox,oy) is exactly the new cell (ox,oy), because the new
+  /* Migration: saves from the 128x128-tile world stored a 64x64 grid, and
+     saves from the 256x256-tile world stored a 128x128 grid — both with
+     cells of the SAME world size (81.25 units) as today's 256x256 grid.
+     The old cell (ox,oy) is exactly the new cell (ox,oy), because the new
      lands only extend east and south. Remap the stride instead of copying
      linearly, which would smear the old map across the new rows. */
   if(s.length===64*64){
     for(var oy=0;oy<64;oy++)for(var ox=0;ox<64;ox++){
       if(s.charAt(oy*64+ox)==='1'){explored[oy*EXP_N+ox]=1;exploredCount++;}
+    }
+    return;
+  }
+  if(s.length===128*128){
+    for(var oy2=0;oy2<128;oy2++)for(var ox2=0;ox2<128;ox2++){
+      if(s.charAt(oy2*128+ox2)==='1'){explored[oy2*EXP_N+ox2]=1;exploredCount++;}
     }
     return;
   }
@@ -2846,6 +2889,17 @@ function populate(){
   scatter('wolf',5,5400,7800,5600,10000);
   scatter('orc',6,8200,10100,5400,10100);
   scatter('gobpack',4,8200,10100,5400,10100);
+  // far new lands (512-tile expansion) — generic points, sparser than the
+  // existing tables: far-east grassland / far-east forest
+  scatter('slime',8,10600,20000,300,2400);
+  scatter('gobpack',4,10600,20000,300,2400);
+  scatter('gobpack',5,10600,20000,2800,5000);
+  scatter('wolf',4,10600,20000,2800,5000);
+  // far new lands — south grassland / south-east frontier
+  scatter('slime',6,300,2400,10600,20000);
+  scatter('gobpack',4,2800,5000,10600,20000);
+  scatter('slime',5,10600,20000,10600,20000);
+  scatter('gobpack',4,10600,20000,10600,20000);
   trySpawnNear(true); /* fill the area around the start position right away */
 }
 /* Minimum spacing between a freshly spawned mob and any other live mob
@@ -4771,8 +4825,8 @@ function terrainHBase(x,y){
    username is exactly "gamemaster". The Esc-menu entry is hidden for
    everyone else, openEditor() refuses, and world-edit data inside a save
    is applied only when isGameMaster() is true at load time.
-   Terrain edits live in a delta layer over terrainHBase(): a 221x221
-   vertex grid (matching the ground plane's 220x220 segments). terrainH()
+   Terrain edits live in a delta layer over terrainHBase(): a 441x441
+   vertex grid (matching the ground plane's 440x440 segments). terrainH()
    = base + bilinear(delta). Only non-zero vertices are serialised
    (sparse), inside the character save (buildSaveData().worldEdit), so
    they ride the account autosave and the file export like everything
@@ -4788,7 +4842,7 @@ function isGameMaster(){
 function gmSpeedMul(){
   return isGameMaster()?4:1;
 }
-var EDIT_SEG=220, EDIT_STEP=W/EDIT_SEG, EDIT_N=EDIT_SEG+1; /* 220 segments over 10400 units = the same 47.27-unit step the old 110-segment grid had over 5200, so brush feel and terrain resolution are unchanged after the expansion */
+var EDIT_SEG=440, EDIT_STEP=W/EDIT_SEG, EDIT_N=EDIT_SEG+1; /* 440 segments over 20800 units = the same 47.27-unit step the old 110-segment grid had over 5200 (and the 220-segment grid over 10400), so brush feel and terrain resolution are unchanged after the expansions */
 var terrainDelta=new Float32Array(EDIT_N*EDIT_N);
 var terrainChanged={}; /* idx -> true, for sparse serialisation */
 var placedObjects=[];  /* {id,t,x,y,rot(deg)} */
@@ -4839,7 +4893,7 @@ function serializeWorldEdit(){
     if(o.t==='water'&&isFinite(o.wl))p.wl=Math.round(o.wl);      /* placed water: surface height */
     return p;
   });
-  return {v:2,terrain:terr,placed:pl,del:deletedBuiltins.slice()};
+  return {v:3,terrain:terr,placed:pl,del:deletedBuiltins.slice()};
 }
 function clearWorldEditSilent(){
   var hadBuiltinDeletions=builtinsFiltered||deletedBuiltins.length>0;
@@ -4859,16 +4913,17 @@ function loadWorldEdit(we){
   clearWorldEditSilent();
   if(!we||typeof we!=='object')return;
   if(Array.isArray(we.terrain)){
-    /* Migration: v1 saves (128x128-tile world) index the delta grid with the
-       old stride (111). The grid step in world units is identical then and
-       now, and the old world is today's north-west quadrant, so an old
-       vertex (gx,gy) is exactly the new vertex (gx,gy) — only the stride
-       changes. v2 saves already use the current stride. */
-    var oldStride=(we.v&&we.v>=2)?0:111;
+    /* Migration: older saves index the delta grid with an older stride —
+       v1 saves (128x128-tile world) used 111, v2 saves (256x256-tile world)
+       used 221. The grid step in world units is identical in every version,
+       and the old worlds are today's north-west, so an old vertex (gx,gy)
+       is exactly the new vertex (gx,gy) — only the stride changes. v3
+       saves already use the current stride (EDIT_N). */
+    var oldStride=(we.v&&we.v>=3)?0:((we.v&&we.v===2)?221:111);
     we.terrain.forEach(function(pair){
       if(!Array.isArray(pair))return;
       var idx=Math.floor(Number(pair[0])), d=Number(pair[1]);
-      if(oldStride){ if(!(idx>=0&&idx<111*111))return; idx=Math.floor(idx/111)*EDIT_N+(idx%111); }
+      if(oldStride){ if(!(idx>=0&&idx<oldStride*oldStride))return; idx=Math.floor(idx/oldStride)*EDIT_N+(idx%oldStride); }
       if(!(idx>=0&&idx<EDIT_N*EDIT_N)||!isFinite(d))return;
       d=Math.max(-500,Math.min(500,d));
       if(Math.abs(d)>0.05){terrainDelta[idx]=d;terrainChanged[idx]=true;terrainHasEdits=true;}
@@ -5813,7 +5868,7 @@ function init3D(){
   staticGroup=new THREE.Group();scene.add(staticGroup);
   dynGroup=new THREE.Group();scene.add(dynGroup);
   // ground base — a subdivided plane displaced by terrainH() so the land rolls
-  var groundGeo=new THREE.PlaneGeometry(W,H,220,220); /* 220x220 segments over the 256-tile world: same vertex spacing as before the expansion */
+  var groundGeo=new THREE.PlaneGeometry(W,H,440,440); /* 440x440 segments over the 512-tile world: same 47.27-unit vertex spacing as before the expansions */
   var gp=groundGeo.attributes.position;
   for(var gi=0;gi<gp.count;gi++){
     // plane local (x,y) maps to game coords (x + W/2, H/2 - y) once rotated flat; local z becomes world height
@@ -6927,8 +6982,13 @@ function buildWorld3D(){
   }
   // grass patches (stable pseudo-random)
   var seed=12345;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
+  /* 512-tile expansion: the existing scatter passes below are pinned to
+     the PREVIOUS world size (10400) with unchanged counts and rnd()
+     consumption order, so the existing lands look exactly as before.
+     A separate batch at the end of this function fills the new lands. */
+  var PREV3D=10400;
   for(var i=0;i<880;i++){
-    var px=rnd()*W,pz=rnd()*H;
+    var px=rnd()*PREV3D,pz=rnd()*PREV3D;
     if(regionAt(px,pz)!=='green')continue;   // no grass patches in desert / snow / volcano / deep forest floor pads
     if(townNorm(px,pz)<1.05)continue;          // nor inside Luminas: the town floor is stone and packed earth now, not lawn
     var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
@@ -6944,7 +7004,7 @@ function buildWorld3D(){
     for(var tr=0;tr<24;tr++){
       var x,y;
       if(townOnly){x=600+rnd()*1560;y=1020+rnd()*1420;}
-      else{x=40+rnd()*(W-80);y=40+rnd()*(H-80);if(regionAt(x,y)!=='green')continue;}
+      else{x=40+rnd()*(PREV3D-80);y=40+rnd()*(PREV3D-80);if(regionAt(x,y)!=='green')continue;}
       if(waterDepthAt(x,y)>0)continue;
       if(stairProfileAt(x,y))continue;                    /* not on the grand staircase */
       if(Math.hypot(x-PLAZA.x,y-PLAZA.y)<312)continue;      /* not on the plaza paving */
@@ -6988,8 +7048,8 @@ function buildWorld3D(){
   flat(1950,2000,0xe0c084,4225,2400);       // desert
   flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
   flat(1500,1950,0x2c4a2c,750,4225);        // deep forest floor
-  flat(5200,2600,0x2f5a30,7800,3900);       // east forest floor (new lands)
-  flat(2800,5200,0x2c4a2c,6600,7800);       // frontier forest floor (new lands)
+  flat(15600,2600,0x2f5a30,13000,3900);     // east forest floor (extended east with the 512-tile expansion: covers x 5200..20800, same cover as before inside the old lands)
+  flat(2800,15600,0x2c4a2c,6600,13000);     // frontier forest floor (extended south with the 512-tile expansion: covers y 5200..20800, same cover as before inside the old lands)
   // (the two ruins floors' stone pads are gone with the ruins)
   // lakes — shader water discs, drawn only while the matching lake
   // decoration exists (a gamemaster can delete these water bodies in the
@@ -7099,6 +7159,52 @@ function buildWorld3D(){
       sph(4.5,Math.floor(d.seed)%2?0xffd34d:0xff8fb3,0,11,0,fg2);
     }
   });
+  /* NEW LANDS scatter (512-tile expansion): runs only AFTER every
+     existing rnd() draw above, so the old lands' scatter is untouched.
+     Samples the whole 20800 world and keeps only points outside the
+     previous 10400x10400 lands, with the same look (same colours,
+     sizes and builders) as the passes above: grass patches x3, and
+     ground scatter (tufts / flowers / pebbles) at 3x the counts. */
+  for(var npi=0;npi<2640;npi++){
+    var npx=rnd()*W,npz=rnd()*H;
+    if(npx<PREV3D&&npz<PREV3D)continue;      // new lands only
+    if(regionAt(npx,npz)!=='green')continue;
+    if(townNorm(npx,npz)<1.05)continue;
+    var np=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
+    np.rotation.x=-Math.PI/2;np.rotation.z=rnd()*3;np.position.set(WX(npx),terrainH(npx,npz)+0.6,WZ(npz));np.receiveShadow=true;staticGroup.add(np);
+  }
+  function scatterPointNew(){
+    for(var tr2=0;tr2<24;tr2++){
+      var nx=40+rnd()*(W-80), ny=40+rnd()*(H-80);
+      if(nx<PREV3D&&ny<PREV3D)continue;      // new lands only
+      if(regionAt(nx,ny)!=='green')continue;
+      if(waterDepthAt(nx,ny)>0)continue;
+      if(stairProfileAt(nx,ny))continue;
+      if(Math.hypot(nx-PLAZA.x,ny-PLAZA.y)<312)continue;
+      if(townNorm(nx,ny)<1.02)continue;
+      if(collide(nx,ny,7))continue;
+      return [nx,ny];
+    }
+    return null;
+  }
+  for(var ntui=0;ntui<620*3;ntui++){
+    var ntp=scatterPointNew(); if(!ntp)continue;
+    var ntc=cone(3.6+rnd()*2.6,8+rnd()*7,tuftGreens[Math.floor(rnd()*tuftGreens.length)],WX(ntp[0]),terrainH(ntp[0],ntp[1])+3.4,WZ(ntp[1]),staticGroup,5);
+    ntc.castShadow=false;
+  }
+  for(var nfli=0;nfli<300*3;nfli++){
+    var nfp=scatterPointNew(); if(!nfp)continue;
+    var nfh=terrainH(nfp[0],nfp[1]);
+    cyl(0.7,0.9,6,0x3f7a3a,WX(nfp[0]),nfh+3,WZ(nfp[1]),staticGroup,4).castShadow=false;
+    sph(2.6,flowerCols[Math.floor(rnd()*flowerCols.length)],WX(nfp[0]),nfh+7,WZ(nfp[1]),staticGroup).castShadow=false;
+  }
+  for(var npbi=0;npbi<240*3;npbi++){
+    var npp=scatterPointNew(); if(!npp)continue;
+    var npr=2+rnd()*3.4;
+    var npb=new THREE.Mesh(G('gpeb'+Math.round(npr*2),function(){return new THREE.DodecahedronGeometry(npr,0);}),M(rnd()<0.5?0x8d9299:0x7d7466));
+    npb.position.set(WX(npp[0]),terrainH(npp[0],npp[1])+npr*0.3,WZ(npp[1])); npb.rotation.set(rnd()*3,rnd()*3,0);
+    npb.receiveShadow=true; staticGroup.add(npb);
+  }
   buildTown3D();
   mergeStaticMeshes();
 }
