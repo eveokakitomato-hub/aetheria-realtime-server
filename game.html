@@ -1018,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>「ルミナスの町」の範囲を、石壁に囲まれた内側だけにしました。</b>これまで壁の東側の帯状の範囲まで町の扱いになっていましたが、マップ表示でもゾーン判定でも、町になるのは城壁の内側だけに統一。南と東に広げた新しい城壁の形にそのまま追随します。壁の外はルミナス平原など周囲の野原として表示されます（地形や木はそのまま）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>ルミナスの敷地を東へ少し広げ、通りと大階段を太くしました。</b>東の城壁だけを約8m東へ出し（南側の拡張はそのまま、北・西の壁とランドマークは不動）、川の水門と川の出口も新しい壁に合わせました。あわせて町の大通り・西への通り・壁際の北上路・住宅街や市場の通りを全体的に太くし、大階段も分岐の階段まで幅を広げました。さらに、家・城壁・門・塔・礼拝堂・城・木・岩・露店など全ての物の当たり判定を見た目の頂点の高さで終わらせ、上に乗って歩けるように統一（今後追加される物も自動で同じ仕様になります）。古代遺跡と忘れ去られた遺跡、町の西の月影湖は撤去して通常の野原に戻し、「ささやきの森」のゾーン名は廃止してルミナスの町として扱うようにしました（守護者ゴーレムは北東の丘に残ります）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>噴水広場をもう少し北へ寄せました。</b>東西の位置はそのままに、広場を約5m北へ移動。南門は広場の真下のまま、大通り・市場区画・スポーン・大階段の起点も広場に合わせて連動させました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>噴水広場を少し北へ、さらに東へ寄せました。</b>広場の移動に合わせて南門は広場の真下へ連動し、大通り・市場区画・スポーン・大階段の起点も広場にそろえました。東の池と川の入り口も東へずらして、広場のふちと水辺の間隔は今まで通り保っています。</span></li>
@@ -2611,8 +2612,7 @@ function zoneAt(x,y){
   /* the two ruins and 月影湖 no longer exist, so their names are gone
      from here too: those grounds now fall through to the ordinary
      field names below （始まりの草原 / 東の大平原 / ルミナス平原) */
-  if(townNorm(x,y)<=1.0) return "ルミナスの町"; /* inside the wall: the rebuilt town of Luminas */
-  if(x>1550&&x<=2650) return "ルミナスの町"; /* the old "ささやきの森" name is retired: this band east of the wall is treated as part of Luminas (its ground and trees are untouched — only the zone name went away) */
+  if(townNorm(x,y)<=1.0) return "ルミナスの町"; /* inside the wall ONLY: the town of Luminas is exactly the ground the stone wall encloses — townNorm() follows the wall's current shape, including the south (TOWN_RY_S) and east (TOWN_RX_E) expansions, so the zone, the HUD name and the world-map colour (zoneColorAt) all stop at the wall. Outside the wall the ground falls through to the ordinary field names below (ルミナス平原 / 始まりの草原 / 東の大平原 / 南の大平原): the old east band that used to be named as part of the town is gone, and the retired "ささやきの森" name stays retired */
   if(y<950) return "始まりの草原";
   if(x>=2650) return "東の大平原";
   if(y>=2650) return "南の大平原";
