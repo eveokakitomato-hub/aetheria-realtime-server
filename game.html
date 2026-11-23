@@ -1018,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>大階段の登り口を、噴水広場の北のふちの真ん中へ付け替えました。</b>これまで広場の北東のふちから斜めに上がっていた大階段を、広場の北側の中央（噴水の真北）からまっすぐ始まるように位置と向きを調整。階段の幅・段数・段差と、上った先の分岐・礼拝堂と城への階段は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>「ルミナスの町」の範囲を、石壁に囲まれた内側だけにしました。</b>これまで壁の東側の帯状の範囲まで町の扱いになっていましたが、マップ表示でもゾーン判定でも、町になるのは城壁の内側だけに統一。南と東に広げた新しい城壁の形にそのまま追随します。壁の外はルミナス平原など周囲の野原として表示されます（地形や木はそのまま）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>ルミナスの敷地を東へ少し広げ、通りと大階段を太くしました。</b>東の城壁だけを約8m東へ出し（南側の拡張はそのまま、北・西の壁とランドマークは不動）、川の水門と川の出口も新しい壁に合わせました。あわせて町の大通り・西への通り・壁際の北上路・住宅街や市場の通りを全体的に太くし、大階段も分岐の階段まで幅を広げました。さらに、家・城壁・門・塔・礼拝堂・城・木・岩・露店など全ての物の当たり判定を見た目の頂点の高さで終わらせ、上に乗って歩けるように統一（今後追加される物も自動で同じ仕様になります）。古代遺跡と忘れ去られた遺跡、町の西の月影湖は撤去して通常の野原に戻し、「ささやきの森」のゾーン名は廃止してルミナスの町として扱うようにしました（守護者ゴーレムは北東の丘に残ります）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>噴水広場をもう少し北へ寄せました。</b>東西の位置はそのままに、広場を約5m北へ移動。南門は広場の真下のまま、大通り・市場区画・スポーン・大階段の起点も広場に合わせて連動させました。</span></li>
@@ -1841,8 +1842,9 @@ function regionAt(x,y){
      measured (37.2%, 56.0%), just north of the market square.
    - the blue-glowing CHAPEL stands on the broad high NE terrace, the
      CASTLE well east of it in the NE corner on its own raised rock,
-     against the wall. A grand stone staircase climbs diagonally NE
-     from the plaza to the terrace fork, and climbs on to the
+     against the wall. A grand stone staircase climbs almost due
+     north from the middle of the plaza's north rim — its foot on the
+     fountain's own axis — to the terrace fork, and climbs on to the
      chapel (west branch) and the castle (east branch) — every flight
      built tread by tread with parapet walls, landings and lamps,
      its steps a true ≈17cm riser each (not a ramp), and the terrain
@@ -1937,7 +1939,7 @@ var TOWN_GREENERY=[
 ];
 var SPAWN_X=1990, SPAWN_Y=2590;     /* south side of the fountain plaza, on the boulevard (moved east +245 and north −50 with the plaza; on the plaza→gate axis, clear of the south housing row) */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
-/* ============ THE GRAND STAIRCASE (plaza → one long diagonal ramp → terrace-top fork → chapel / castle) ============
+/* ============ THE GRAND STAIRCASE (plaza's north rim centre → one long straight ramp → terrace-top fork → chapel / castle) ============
    Parametric stone flights, sized for the 1.7m body: riser ≈0.17m
    (1.7 units), broad shallow treads, a flat landing half-way up each
    flight, stone parapet walls on both sides and lamps at the landings.
@@ -1945,15 +1947,17 @@ var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData
    smooth profile, so the walkable ground IS the staircase (no separate
    platform collision, no snagging), and buildTown3D() draws one stone
    box per tread on exactly the same profile. Run A is ONE long straight
-   diagonal ramp from the plaza's NE edge all the way to the top of the
-   high terrace; the fork happens up there — run B crosses the terrace
-   west to the CHAPEL and run C climbs east to the CASTLE rock. */
+   ramp from the MIDDLE OF THE PLAZA'S NORTH RIM — its foot stands on
+   the fountain's own north-south axis, at the centre of the plaza
+   disc's north edge — all the way to the top of the high terrace; the
+   fork happens up there — run B crosses the terrace west to the
+   CHAPEL and run C climbs east to the CASTLE rock. */
 var STAIR_TREAD_A=5.6, STAIR_TREAD_B=4.6;
 var STAIRS=[
-  {x:2155,y:2070,dx:-93,dy:-720,w:110,z0:30,z1:168, tread:8.6,n:81,n1:40,land:30},
+  {x:1990,y:2020,dx:72,dy:-670,w:110,z0:30,z1:168, tread:7.95,n:81,n1:40,land:30},
   {x:2005,y:1345,dx:-185,dy:-72,w:76, z0:168,z1:168,tread:4.6,n:38,n1:19,land:20},
   {x:2120,y:1355,dx:200,dy:85, w:78, z0:168,z1:228,tread:5.6,n:35,n1:17, land:18}
-]; /* flights WIDENED with the town's streets (main 8m → 11m, branches ~5.5m → ~7.7m, fork branches included) — still a paved stair, not a broad stone slope: only the width (w) changed, so the treads, risers, landings, parapets and the carved profile all follow automatically. Run A starts at the (far-east, then slightly north-moved) plaza's NE rim — its foot shifted east +245 and north −50 with the plaza and its heading re-aimed (dx 152 → −93, dy −770 → −720; treads shortened 9.3 → 8.6 so the ≈17cm risers survive the shorter run) so the flight still lands on the same terrace fork; B crosses west to the chapel, C climbs east to the castle forecourt on its raised rock. THE STEPS THEMSELVES were rebuilt: the old flights spread their climb over 162 hair-thin risers (≈8.5cm each), which read as a smooth ramp no matter how the treads were drawn — runs A and C now climb in true stair steps of ≈17cm (1.7 units, matched to the 1.7m body) with deep treads and a flat mid landing, so every tread and the landing read as steps from any distance */
+]; /* flights WIDENED with the town's streets (main 8m → 11m, branches ~5.5m → ~7.7m, fork branches included) — still a paved stair, not a broad stone slope: only the width (w) changed, so the treads, risers, landings, parapets and the carved profile all follow automatically. Run A now starts at the MIDDLE OF THE PLAZA'S NORTH RIM (1990, 2020) — dead on the fountain's north-south axis, at the centre of the plaza disc's north edge (the disc is r 300 about (1990, 2320)) — re-aimed almost due north (dx 72, dy −670) so the flight leaves the plaza's north edge straight and still lands on the same terrace fork (2062, 1350); the run is shorter than the old NE-rim diagonal, so the treads shortened again (8.6 → 7.95) to keep the same step count and the ≈17cm risers (the flight crosses the river's eastern reach on its own causeway, exactly as the old diagonal did — see the depth-disc skip in buildTownData); B crosses west to the chapel, C climbs east to the castle forecourt on its raised rock. THE STEPS THEMSELVES were rebuilt: the old flights spread their climb over 162 hair-thin risers (≈8.5cm each), which read as a smooth ramp no matter how the treads were drawn — runs A and C now climb in true stair steps of ≈17cm (1.7 units, matched to the 1.7m body) with deep treads and a flat mid landing, so every tread and the landing read as steps from any distance */
 STAIRS.forEach(function(r){var l=Math.hypot(r.dx,r.dy);r.dx/=l;r.dy/=l;r.riser=(r.z1-r.z0)/r.n;r.len=r.n*r.tread+r.land;});
 var STAIR_FORK={x:2062,y:1350}; /* the fork landing at the top of the long ramp, where B and C diverge across the terrace */
 function stairRiserSmooth(u){u=Math.max(0,Math.min(1,u/0.32));return u*u*(3-2*u);} /* the rise happens over the first third of each tread and the rest of the tread is flat, so the carved ground itself steps (with the taller 17cm risers this is what makes the flight walk — and read — as stairs, not as a slope) */
