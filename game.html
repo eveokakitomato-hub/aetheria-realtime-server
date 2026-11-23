@@ -994,6 +994,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             </div>
             </div>
             <button id="startBtn">▶ &nbsp;ゲームスタート — ログイン</button>
+            <div id="genStatus" style="display:none;text-align:center;color:var(--gold);font-weight:700;padding:10px 0 2px">ワールドを生成中…</div>
             <button id="continueBtn" type="button">📂 &nbsp;つづきから — セーブデータを読み込む</button>
             <div class="online-box">
               <div class="ob-head"><span class="net-dot busy" id="siteNetDot"></span><b>オンライン接続</b><span id="siteServerStatus">同期サーバーの応答を確認中…</span></div>
@@ -1165,10 +1166,10 @@ var CLASSES={
 };
 var ETYPES={
   slime:{name:"スライム",emoji:"🟢",hp:38,atk:6,exp:22,gold:9,lv:1,speed:1.1,size:13,color:"#6fce62"},
-  goblin:{name:"ゴブリン",emoji:"👺",hp:62,atk:9,exp:42,gold:18,lv:3,speed:1.55,size:19,color:"#8a9a3a",fam:"gob"},
-  goblinArcher:{name:"ゴブリンアーチャー",emoji:"🏹",hp:55,atk:9,exp:50,gold:22,lv:3,speed:1.6,size:18,color:"#7a8a34",fam:"gob",ranged:330,keep:190},
-  goblinShaman:{name:"ゴブリンシャーマン",emoji:"🔮",hp:58,atk:12,exp:62,gold:26,lv:4,speed:1.35,size:18,color:"#4a8a72",fam:"gob",ranged:300,keep:210,healer:true},
-  goblinChief:{name:"ゴブリンチーフ",emoji:"👑",hp:340,atk:20,exp:170,gold:95,lv:6,speed:1.45,size:30,color:"#8a5a2e",fam:"gob"},
+  goblin:{name:"ゴブリン",emoji:"👺",hp:62,atk:9,exp:42,gold:18,lv:3,speed:1.55,size:6.1,color:"#8a9a3a",fam:"gob"},
+  goblinArcher:{name:"ゴブリンアーチャー",emoji:"🏹",hp:55,atk:9,exp:50,gold:22,lv:3,speed:1.6,size:5.8,color:"#7a8a34",fam:"gob",ranged:330,keep:190},
+  goblinShaman:{name:"ゴブリンシャーマン",emoji:"🔮",hp:58,atk:12,exp:62,gold:26,lv:4,speed:1.35,size:5.8,color:"#4a8a72",fam:"gob",ranged:300,keep:210,healer:true},
+  goblinChief:{name:"ゴブリンチーフ",emoji:"👑",hp:340,atk:20,exp:170,gold:95,lv:6,speed:1.45,size:9.7,color:"#8a5a2e",fam:"gob"},
   wolf:{name:"フォレストウルフ",emoji:"🐺",hp:110,atk:16,exp:68,gold:26,lv:5,speed:2.3,size:20,color:"#8d99a6"},
   orc:{name:"オークウォリアー",emoji:"👹",hp:185,atk:22,exp:110,gold:44,lv:7,speed:1.5,size:24,color:"#b0623a"},
   boss:{name:"丘の守護者ゴーレム",emoji:"🗿",hp:720,atk:30,exp:600,gold:500,lv:10,speed:1.25,size:38,color:"#9a8fb0",boss:true},
@@ -1316,7 +1317,7 @@ function setSoundOn(on,announce){
      calm scenes render at full quality.
    - manual mode: the settings slider fixes the scale (50%–150%).
    resMode/resScale live in `settings`, so they autosave with the rest. */
-var dynScale=1;            /* current scale while in auto mode (0.5–1) */
+var dynScale=1;            /* current scale while in auto mode (0.38–1) */
 var dynFps=0;              /* last measured FPS (0 = not measured yet) */
 var dynAccMs=0,dynFrames=0,dynLastEval=0,dynHoldUntil=0;
 function basePixelRatio(){return Math.min(1.5,window.devicePixelRatio||1);}
@@ -1346,7 +1347,7 @@ function setResMode(mode){
   settings.resMode=(mode==='manual')?'manual':'auto';
   if(settings.resMode==='auto'){
     /* start from the scale that was on screen so there is no sudden jump */
-    dynScale=Math.max(0.5,Math.min(1,settings.resScale));
+    dynScale=Math.max(0.38,Math.min(1,settings.resScale));
     dynAccMs=0;dynFrames=0;dynHoldUntil=0;
   }
   applyRenderScale();refreshResUI();markSettingsChanged();
@@ -1362,11 +1363,11 @@ function dynResTick(now,rawMs){
   dynAccMs=0;dynFrames=0;dynLastEval=now;
   if(settings.resMode!=='manual'&&now>=dynHoldUntil&&dynFps>0){
     var ns=dynScale;
-    if(dynFps<45)ns=Math.max(0.5,dynScale-0.12);       /* heavy: step down decisively */
-    else if(dynFps>=57)ns=Math.min(1,dynScale+0.06);   /* headroom: creep back up */
+    if(dynFps<48)ns=Math.max(0.38,dynScale-0.20);      /* heavy: step down HARD and fast (was -0.12 to a 0.5 floor — from 1.0 that took ~12s of lag to bottom out; now ~3 steps / ~3s to the 0.38 floor, ~62% fewer pixels than the old floor) */
+    else if(dynFps>=58)ns=Math.min(1,dynScale+0.05);   /* headroom: creep back up, a touch more cautiously than before */
     if(ns!==dynScale){
       dynScale=ns;applyRenderScale();
-      dynHoldUntil=now+1600; /* let the new scale settle before judging again */
+      dynHoldUntil=now+900; /* let the new scale settle briefly before judging again (was 1600) */
     }
   }
   if($('settingsModal').style.display==='grid')refreshResUI();
@@ -1945,7 +1946,7 @@ var TOWN_GREENERY=[
      chapel apron, the landing circle and the castle forecourt */
   [2050,1330,62],[2200,1300,58],[2130,1090,50],[1960,1420,44]
 ];
-var SPAWN_X=1990, SPAWN_Y=2590;     /* south side of the fountain plaza, on the boulevard (moved east +245 and north −50 with the plaza; on the plaza→gate axis, clear of the south housing row) */
+var SPAWN_X=13700, SPAWN_Y=15415;   /* INITIAL spawn (new characters / first login): the south side of Alto's windmill plaza — 115 units south of the windmill at the village centre (13700,15300), inside the plaza disc (r 150) and the village safe zone, clear of the windmill's own collision (r 38) and of every house. Saved characters keep their saved position: applySaveData() only falls back to this point when a saved position is missing or colliding. (The old Luminas plaza spawn is retired as the start point; Luminas itself is unchanged.) */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
 /* ============ THE GRAND STAIRCASE — the confirmed top-down plan (plaza's north rim centre → bridge-flight STRAIGHT north over the river → mid terrace centred on the plaza's axis → twin CURVED flights from the terrace's two south corners, hugging its rim, then straight up to the high terrace → flat runs into the terrace plaza → chapel due north) ============
    Parametric stone flights, sized for the 1.7m body: riser ≈0.17m
@@ -2467,6 +2468,24 @@ function buildAltoData(){
     f.smoke={dx:lx*Math.cos(hs.rot)+lz*Math.sin(hs.rot), dy:-lx*Math.sin(hs.rot)+lz*Math.cos(hs.rot), z:sz};
     townFeatures.push(f);
   });
+  /* --- the ADVENTURER'S GUILD: a big two-storey hall on the open
+     ground INSIDE the palisade's north side (centre 13700,14920),
+     clearly larger than any village house (170x115 against the
+     biggest house's 100x78), facing the windmill plaza down a short
+     dirt lane. The spot was checked clear of everything: its north
+     corners sit at radius ~446 from the village centre (fence line
+     500, fence posts bite to ~476), its south edge stops ~172 short
+     of the plaza disc (r 150), and the NW / NE houses' bounding
+     boxes end over 120 units west / east of it. Collision is the
+     same rotated-footprint rect the houses use, with the guild's
+     own eave / ridge heights so its roof top is standable like
+     every other building's. --- */
+  var go=rect(13700,14920,170,115,{house:true,topKind:'house'});
+  go._cx=13700; go._cy=14920; go._rotY=0; go._hw=85; go._hd=57.5; go._eave=58; go._roofH=52;
+  var gf={kind:'altoguild',x:13700,y:14920,w:170,d:115,rot:0,roof:0x8a4a28,roofH:52,seed:0.5};
+  gf.smoke={dx:52,dy:-14,z:100};
+  townFeatures.push(gf);
+  street(13700,15150,13700,14990,40); /* the lane: plaza north rim -> the guild's front step */
   /* --- well, cart, fields, village trees, lanes --- */
   townFeatures.push({kind:'well',x:13430,y:15240});
   circ(13430,15240,16,{well:true,topKind:'prop',topH:40});
@@ -3854,9 +3873,26 @@ function applySaveData(data){
   if(data.savedAt){var d=new Date(data.savedAt);if(!isNaN(d.getTime()))lastSaveAt=d;}
   lastSavedKey=progressKey();
 }
+/* Entry-time world generation, deferred by one painted frame: the
+   start screen first shows 「ワールドを生成中…」 (#genStatus) and gets
+   a frame on screen, THEN the (heavy, synchronous) genWorld() +
+   populate() run, then the caller's tail continues. genWorld itself
+   is untouched — same stream, same world, still regenerated on every
+   entry exactly as before; only WHEN it runs has moved. */
+function genWorldThen(tail){
+  var gs=$('genStatus');
+  if(gs)gs.style.display='block';
+  requestAnimationFrame(function(){
+    setTimeout(function(){
+      genWorld();populate();
+      if(gs)gs.style.display='none';
+      tail();
+    },30);
+  });
+}
 function startFromSave(source){
   setupSkillUI(player.cls);
-  genWorld();populate();
+  genWorldThen(function(){
   applyBuiltinDeletions(); /* deleted pre-existing objects stay deleted after the rebuild (gamemaster saves only) */
   syncPlacedObstacles(); placedSig='__dirty__'; refreshGroundAll(); /* world edits (gamemaster) re-applied */
   // genWorld rebuilt obstacles; if saved position now collides, fall back to town
@@ -3871,6 +3907,7 @@ function startFromSave(source){
   chat('<b>案内人リア</b>: おかえりなさい、'+escHtml(player.name)+'さん！冒険の続きをどうぞ。','world');
   toast(source==='server'?'サーバーの続きから再開しました — Lv.'+player.lv:'つづきから再開しました — Lv.'+player.lv,3200);
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
+  });
 }
 function openSavePicker(ctx){saveLoadContext=ctx||'title';var inp=$('saveFileInput');inp.value='';inp.click();}
 
@@ -4578,6 +4615,7 @@ function drawMini(){
   mctx.strokeStyle='#8a6a44';mctx.lineWidth=2;mctx.beginPath();mctx.arc(MX(ALTO.x),MY(ALTO.y),500*s,0,7);mctx.stroke();mctx.lineWidth=1;
   mctx.fillStyle='#cfc8b4';mctx.beginPath();mctx.arc(MX(ALTO.x),MY(ALTO.y),Math.max(2,150*s),0,7);mctx.fill();
   mctx.fillStyle='#f0e7d3';mctx.beginPath();mctx.arc(MX(ALTO.x),MY(ALTO.y),Math.max(1.5,60*s),0,7);mctx.fill();
+  mctx.fillStyle='#e8c268';mctx.fillRect(MX(13700)-3,MY(14920)-3,6,6); /* the adventurer's guild, north inside the palisade */
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
@@ -4699,7 +4737,7 @@ function refreshInteractPrompt(){
 
 /* ================= 3D ENGINE (Three.js) ================= */
 var THREE_OK=(typeof THREE!=='undefined');
-var renderer=null, scene=null, camera3d=null, sunLight=null, staticGroup=null, dynGroup=null;
+var renderer=null, scene=null, camera3d=null, sunLight=null, staticGroup=null, dynGroup=null, groundGroup=null;
 var clouds=[], staticSig='', entRegistry={}, projMeshes={}, partMeshes={}, stuckMeshes={}, eidSeq=0, hintT0=0;
 var matCache={}, geoCache={};
 /* ============ PROCEDURAL SURFACE TEXTURES (Canvas-generated) ============
@@ -5010,6 +5048,8 @@ var editorState={active:false,mode:'terrain',tool:'raise',brush:130,strength:5,
   applying:false,stroke:null,flatTarget:0,buildType:'house',rot:0,placeMode:'place',size:1,
   aim:null,lastEditBump:0,statusT:0};
 var groundGeo3D=null, groundMesh3D=null, vertexGameX=null, vertexGameY=null;
+var groundMat3D=null; /* the shared ground material (created in init3D); ground chunks are built lazily against it, one at a time, by buildGroundChunk() */
+var groundChunks=[]; /* the ground sheet, split into a 10x10 grid of chunk geometries {geo,vx,vy,mesh,built} living in groundGroup (see init3D): frustum culling can now skip whole ground chunks outside the view / past the far plane, where the old single 440x440 sheet (about 390k triangles) was drawn in full every frame. The editor's ground refresh walks these chunks instead of the old single geometry. Slots start out null and chunks are now BUILT LAZILY by the chunk manager (only near the player): an unbuilt slot is null, a discarded chunk keeps its entry with geo/mesh null and built=false, and the refresh functions below skip both. */
 var placedGroup=null, placedSig='', brushRing=null, ghostGroup=null, ghostKey='';
 var PLACED_TYPES={house:1,tree_b:1,tree_p:1,wall:1,lamp:1,fence:1,rock:1,bridge:1,steps:1,water:1};
 var terrainHasEdits=false;
@@ -5119,22 +5159,30 @@ function applyWorldEditFromSave(data){
 }
 /* ---- ground mesh refresh ---- */
 function refreshGroundVertices(cx,cy,r){
-  if(!groundGeo3D||!vertexGameX)return;
-  var pos=groundGeo3D.attributes.position;
+  if(!groundChunks.length)return;
   var x0=cx-r,x1=cx+r,y0=cy-r,y1=cy+r;
-  for(var i=0;i<pos.count;i++){
-    var gx=vertexGameX[i], gy=vertexGameY[i];
-    if(gx<x0||gx>x1||gy<y0||gy>y1)continue;
-    pos.setZ(i,terrainH(gx,gy));
+  for(var ci=0;ci<groundChunks.length;ci++){
+    var ch=groundChunks[ci]; if(!ch||!ch.geo)continue; /* unbuilt / discarded ground chunk: it is generated from terrainH (edits included) when the chunk manager builds it */
+    var pos=ch.geo.attributes.position, dirty=false;
+    for(var i=0;i<pos.count;i++){
+      var gx=ch.vx[i], gy=ch.vy[i];
+      if(gx<x0||gx>x1||gy<y0||gy>y1)continue;
+      pos.setZ(i,terrainH(gx,gy)); dirty=true;
+    }
+    if(dirty)pos.needsUpdate=true;
   }
-  pos.needsUpdate=true;
 }
 function refreshGroundAll(){
-  if(!groundGeo3D||!vertexGameX)return;
-  var pos=groundGeo3D.attributes.position;
-  for(var i=0;i<pos.count;i++)pos.setZ(i,terrainH(vertexGameX[i],vertexGameY[i]));
-  pos.needsUpdate=true;
-  groundGeo3D.computeVertexNormals();
+  for(var ci=0;ci<groundChunks.length;ci++){
+    var ch=groundChunks[ci]; if(!ch||!ch.geo)continue; /* unbuilt chunks pick the edits up from terrainH when generated */
+    var pos=ch.geo.attributes.position;
+    for(var i=0;i<pos.count;i++)pos.setZ(i,terrainH(ch.vx[i],ch.vy[i]));
+    pos.needsUpdate=true;
+    ch.geo.computeVertexNormals();
+  }
+}
+function refreshGroundNormals(){
+  for(var ci=0;ci<groundChunks.length;ci++){var ch=groundChunks[ci]; if(ch&&ch.geo)ch.geo.computeVertexNormals();}
 }
 /* ---- aim: ray-march the centre crosshair onto the terrain ---- */
 function computeEditorAim(){
@@ -5189,7 +5237,7 @@ function endStroke(){
     if(undoStack.length>60)undoStack.shift();
     terrainHasEdits=Object.keys(terrainChanged).length>0;
     markEditChanged();
-    if(groundGeo3D)groundGeo3D.computeVertexNormals();
+    refreshGroundNormals();
     placedSig='__dirty__'; /* reseat placed objects on the new ground */
   }
   refreshEditorUI();
@@ -5714,7 +5762,7 @@ function editorUndo(){
       if(gx<minx)minx=gx; if(gx>maxx)maxx=gx; if(gy<miny)miny=gy; if(gy>maxy)maxy=gy;
     });
     if(maxx>=minx)refreshGroundVertices((minx+maxx)/2,(miny+maxy)/2,Math.max(maxx-minx,maxy-miny)/2+EDIT_STEP*2);
-    if(groundGeo3D)groundGeo3D.computeVertexNormals();
+    refreshGroundNormals();
     placedSig='__dirty__';
   }else if(u.kind==='place'){
     for(var i=0;i<placedObjects.length;i++)if(placedObjects[i].id===u.id){placedObjects.splice(i,1);break;}
@@ -5992,13 +6040,280 @@ function buildViewModel(){
   viewModel=g;vmCls=clsKey;
 }
 
+/* ============ LAZY GROUND + STATIC CHUNKS ============
+   The world is no longer BUILT all at once. The ground sheet and the
+   merged static meshes are generated per chunk, only within
+   BUILD_R of the player (the draw distance is fog 1650 / far 1750,
+   so 3300 leaves a wide margin — even the gamemaster's 4x speed,
+   ~1138 units/s, cannot outrun the queue), and discarded beyond
+   DISCARD_R (hysteresis, so border chunks don't thrash). Analytical
+   data (terrainH, the full obstacles array) is untouched: collision
+   and heights work everywhere, built or not. Only the MESHES are
+   windowed. */
+var CHUNK_CH=650;              /* static chunk size (same grid mergeStaticMeshes uses) */
+var BUILD_R=3300, DISCARD_R=3750;
+var BUILD_MODE='always', BUILD_CX=0, BUILD_CY=0; /* current buildWorld3D pass: 'always' | 'chunk' | 'record' */
+var staticChunks={}, alwaysMeshes=[], scatterRecords=null, featureWaterDone={};
+var chunkQueue=[], chunkTargetAt=0;
+/* Per-vertex ground colour, extracted verbatim from the old full-sheet
+   colour pass: a pure function of (gx,gy) — same hash, same tints,
+   same extra terrainH samples — so a lazily built chunk's vertices
+   carry exactly the colours the full sheet gave them. */
+var _gvcC=null, _gvcT=null; /* created lazily inside groundVertexColor: nothing at top level may touch THREE, or the no-WebGL fallback path (THREE_OK=false) would break at load */
+function groundVertexColor(gx,gy){
+  if(!_gvcC){_gvcC=new THREE.Color();_gvcT=new THREE.Color();}
+  var gc=_gvcC, gt=_gvcT;
+  function hash2(x,y){var v=Math.sin(x*127.1+y*311.7)*43758.5453;return v-Math.floor(v);}
+  var LAKES=[[700,4300,262],[4200,2400,132],[7800,7800,262]]; /* shore tint for the remaining wild lakes （月影湖 removed) */
+  var hh=terrainH(gx,gy);
+  var slp=Math.abs(terrainH(gx+16,gy)-hh)+Math.abs(terrainH(gx,gy+16)-hh);
+  var nz=hash2(Math.floor(gx/38),Math.floor(gy/38))*0.6+hash2(Math.floor(gx/9),Math.floor(gy/9))*0.4;
+  var reg=regionAt(gx,gy);
+  if(reg==='snow')gc.setHex(0xdfe9f2);
+  else if(reg==='desert')gc.setHex(0xdbbd7f);
+  else if(reg==='volcano')gc.setHex(0x4a3a34);
+  else if(reg==='deepforest')gc.setHex(0x2e5230);
+  else gc.setHex(0x55a047);
+  if(reg==='green'||reg==='deepforest'){
+    gt.setHex(0x77b957); gc.lerp(gt,nz*0.55);
+    if(hash2(Math.floor(gx/23)+9,Math.floor(gy/23))>0.93){gt.setHex(0x9ab85e); gc.lerp(gt,0.5);}
+  }
+  /* the town of Luminas: kept lawns inside the wall, worn
+     stone-dirt around the plaza and along its streets, wet earth
+     on the river and pond banks */
+  var tn2=townNorm(gx,gy);
+  if(tn2<1.0){gt.setHex(nz>0.60?0x8a6f4d:0xa39a86); gc.lerp(gt,0.80);} /* inside the wall the ground is STONE AND PACKED EARTH, not lawn: pale cobble tones with dirt patches where the noise runs high — lawn survives only as traces outside the wall line */
+  /* the town's gardens: kept-lawn patches in the gaps between the
+     houses and along the lanes (see TOWN_GREENERY) — painted BEFORE
+     the plaza / street / bank tints below, so the stone heart of
+     the town stays stone and only the garden ground turns green;
+     dry ground only, never the carved pond beds */
+  if(tn2<1.0&&hh>8){for(var gp9=0;gp9<TOWN_GREENERY.length;gp9++){var gd9=Math.hypot(gx-TOWN_GREENERY[gp9][0],gy-TOWN_GREENERY[gp9][1]); if(gd9<TOWN_GREENERY[gp9][2]){gt.setHex(0x69b457); gc.lerp(gt,_sm01((TOWN_GREENERY[gp9][2]-gd9)/TOWN_GREENERY[gp9][2])*0.78); break;}}}
+  else if(tn2<1.10){gt.setHex(0x6fae54); gc.lerp(gt,Math.min(0.30,(1.10-tn2)*0.6));}
+  var pd2=Math.hypot(gx-PLAZA.x,gy-PLAZA.y);
+  if(pd2<330){gt.setHex(0xa89a78); gc.lerp(gt,_sm01((330-pd2)/120)*0.6);}
+  var mtd2=Math.hypot(gx-MID_TERRACE.x,gy-MID_TERRACE.y);
+  if(mtd2<MID_TERRACE.r+16){gt.setHex(0x9a917e); gc.lerp(gt,_sm01((MID_TERRACE.r+16-mtd2)/60)*0.8);} /* the switchback's mid terrace: stone paving tint under its platform, like the plaza's */
+  for(var st9=0;st9<STREETS.length;st9++){var ss9=STREETS[st9]; if(_segD(gx,gy,ss9.x1,ss9.y1,ss9.x2,ss9.y2)<ss9.w/2+16){gt.setHex(ss9.t==='s'?0x9a917e:0x8a6f4d); gc.lerp(gt,0.8); break;}}
+  var rd9=1e9; for(var rv9=0;rv9<RIVER.length-1;rv9++){var sd9=_segD(gx,gy,RIVER[rv9][0],RIVER[rv9][1],RIVER[rv9+1][0],RIVER[rv9+1][1]); if(sd9<rd9)rd9=sd9;}
+  var pcd=Math.hypot(gx-POND_C.x,gy-POND_C.y)-POND_C.r, ped=pondEMetric(gx,gy)-POND_E.r;
+  /* the river's banks, painted to match its carved profile: bare
+     sandy earth down the whole bank slope (out to the carve's
+     feather), darkening to wet earth right at the waterline, so
+     the shore BLENDS into the water instead of ending on the hard
+     edge the flat ribbon used to show */
+  var tbank=Math.min(rd9-150,pcd,ped);
+  if(tbank<65&&hh<40){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((65-tbank)/65)*0.65);}
+  if(tbank<16&&hh<26){gt.setHex(0x6e5b40); gc.lerp(gt,_sm01((16-tbank)/16)*0.6);} /* the wet waterline band */
+  /* the channel bed itself is tinted like the pond beds (below):
+     sandy at the edges deepening to teal at the centreline, so
+     through the translucent surface the river shows a real depth
+     gradation — shallow margins, deep middle — never one flat
+     sheet of blue */
+  if(rd9<150){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((150-rd9)/110)*0.55);}
+  /* Alto: packed earth inside the palisade, stone on the plaza,
+     tilled soil on the fields, sandy banks and a teal bed along
+     its river, and the worn south road */
+  var aDist=Math.hypot(gx-ALTO.x,gy-ALTO.y);
+  if(aDist<505){gt.setHex(0xa39a86); gc.lerp(gt,_sm01((505-aDist)/90)*0.55);}
+  if(aDist<158){gt.setHex(0x9a917e); gc.lerp(gt,_sm01((158-aDist)/50)*0.75);}
+  for(var afi=0;afi<ALTO_FIELDS.length;afi++){var af9=ALTO_FIELDS[afi]; if(Math.abs(gx-af9.x)<af9.w/2+4&&Math.abs(gy-af9.y)<af9.d/2+4){gt.setHex(0x6e5136); gc.lerp(gt,0.85); break;}}
+  var aFr=altoRiverFrame(gx,gy);
+  if(aFr.d<120){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((120-aFr.d)/70)*0.6);}
+  if(aFr.d<62){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((62-aFr.d)/45)*0.5);}
+  if(_segD(gx,gy,13700,15440,13700,16900)<30){gt.setHex(0x8a6f4d); gc.lerp(gt,0.75);}
+  /* pond beds darken toward the middle: seen through the water
+     shader this is what gives the ponds — above all the east
+     pond — their depth gradation instead of one flat plate of
+     colour (sandy rim → deep teal centre, following the same
+     wobbled shore as the carve) */
+  if(ped<0){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((-ped)/95)*0.6);}
+  if(pcd<0){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((-pcd)/85)*0.45);}
+  var bankD=1e9;
+  for(var lk=0;lk<LAKES.length;lk++){var ld=Math.hypot(gx-LAKES[lk][0],gy-LAKES[lk][1])-LAKES[lk][2]; if(ld<bankD)bankD=ld;}
+  if(bankD<26&&hh<26){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((26-bankD)/26)*0.75); if(bankD<7){gt.setHex(0x6e5b40); gc.lerp(gt,0.55);}}
+  var rockK=Math.max(_sm01((hh-100)/90),_sm01((slp-11)/16));
+  if(rockK>0){gt.setHex(0x8d8578); gc.lerp(gt,Math.min(1,rockK)*0.85);}
+  if(hh>235){gt.setHex(0xe8eef2); gc.lerp(gt,_sm01((hh-235)/60)*0.7);}
+  return [gc.r,gc.g,gc.b];
+}
+/* Build ONE ground chunk (gci,gcj) of the 10x10 grid: the same
+   44x44 cells / 2080 units the old split produced, with vertex
+   positions, UVs and colours identical to the full sheet's, and
+   normals taken from a one-vertex halo so chunk borders match the
+   sheet's computeVertexNormals (see the halo note inside). */
+function buildGroundChunk(gci,gcj){
+  var STEP=W/440;
+  var ix0=gci*44, iy0=gcj*44;
+  /* normals: a throwaway halo geometry one vertex wider than the
+     chunk on every side (clamped at the world edge, where only the
+     existing faces count — exactly as on the full sheet) is built
+     and computeVertexNormals'd; border vertices then accumulate
+     precisely the faces the full sheet gave them, and only the
+     inner 45x45 normals are kept (the float addition order inside
+     computeVertexNormals may differ in the last bit) */
+  var hx0=Math.max(0,ix0-1), hx1=Math.min(440,ix0+45);
+  var hy0=Math.max(0,iy0-1), hy1=Math.min(440,iy0+45);
+  var hw=hx1-hx0+1, hh2=hy1-hy0+1;
+  var hpos=new Float32Array(hw*hh2*3);
+  for(var hy=hy0;hy<=hy1;hy++)for(var hx=hx0;hx<=hx1;hx++){
+    var ogx=hx*STEP, ogy=hy*STEP, oo=((hy-hy0)*hw+(hx-hx0))*3;
+    hpos[oo]=ogx-W/2; hpos[oo+1]=H/2-ogy; hpos[oo+2]=terrainH(ogx,ogy);
+  }
+  var hgeo=new THREE.BufferGeometry();
+  hgeo.setAttribute('position',new THREE.BufferAttribute(hpos,3));
+  var hidx=[];
+  for(var cy9=hy0;cy9<hy1;cy9++)for(var cx9=hx0;cx9<hx1;cx9++){
+    var a9=(cy9-hy0)*hw+(cx9-hx0), b9=a9+hw, c9=b9+1, d9=a9+1;
+    hidx.push(a9,b9,d9, b9,c9,d9); /* PlaneGeometry's per-cell winding: (a,b,d),(b,c,d) */
+  }
+  hgeo.setIndex(hidx);
+  hgeo.computeVertexNormals();
+  var hnor=hgeo.attributes.normal;
+  var pos=[],nor=[],col=[],uv=[],idx=[];
+  var vx=new Float32Array(45*45), vy=new Float32Array(45*45);
+  for(var iy=iy0;iy<=iy0+44;iy++)for(var ix=ix0;ix<=ix0+44;ix++){
+    var gx=ix*STEP, gy=iy*STEP, vi=(iy-iy0)*45+(ix-ix0);
+    pos.push(gx-W/2,H/2-gy,terrainH(gx,gy));
+    var hn=(iy-hy0)*hw+(ix-hx0);
+    nor.push(hnor.getX(hn),hnor.getY(hn),hnor.getZ(hn));
+    var cc=groundVertexColor(gx,gy);
+    col.push(cc[0],cc[1],cc[2]);
+    uv.push(ix/440,1-iy/440);
+    vx[vi]=gx; vy[vi]=gy;
+  }
+  for(var cy8=0;cy8<44;cy8++)for(var cx8=0;cx8<44;cx8++){
+    var a8=cy8*45+cx8, b8=a8+45, c8=b8+1, d8=a8+1;
+    idx.push(a8,b8,d8, b8,c8,d8);
+  }
+  hgeo.dispose();
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+  geo.setIndex(idx);
+  geo.computeBoundingSphere();
+  var mesh=new THREE.Mesh(geo,groundMat3D);
+  mesh.rotation.x=-Math.PI/2; mesh.receiveShadow=true;
+  return {geo:geo,vx:vx,vy:vy,mesh:mesh,built:true};
+}
+function ensureGroundChunk(gci,gcj){
+  var idx=gcj*10+gci, e=groundChunks[idx];
+  if(e&&e.built){ if(e.mesh&&e.mesh.parent!==groundGroup)groundGroup.add(e.mesh); return e; }
+  var built=buildGroundChunk(gci,gcj);
+  groundChunks[idx]=built;
+  groundGroup.add(built.mesh);
+  return built;
+}
+/* Run one buildWorld3D pass into a throwaway group (the global
+   staticGroup is swapped for the duration — every builder helper
+   reads the global, so everything lands in the temp group), merge
+   there, then move the merged meshes into the real staticGroup and
+   return them. */
+function runStaticPass(mode,cx,cy){
+  var real=staticGroup;
+  var tmp=new THREE.Group();
+  BUILD_MODE=mode; BUILD_CX=cx; BUILD_CY=cy;
+  staticGroup=tmp;
+  buildWorld3D();
+  staticGroup=real;
+  BUILD_MODE='always';
+  var out=[];
+  while(tmp.children.length){var m=tmp.children[0];tmp.remove(m);real.add(m);out.push(m);}
+  return out;
+}
+function disposeStaticMeshes(list){
+  for(var i=0;i<list.length;i++){
+    var m=list[i];
+    if(m.parent)m.parent.remove(m);
+    if(m.userData&&m.userData._merged&&m.geometry)m.geometry.dispose();
+  }
+}
+function buildStaticChunk(cx,cy){
+  var key=cx+'_'+cy;
+  if(staticChunks[key])return;
+  staticChunks[key]=runStaticPass('chunk',cx,cy);
+}
+/* every chunk (static 650-grid and ground 2080-grid) whose centre is
+   within BUILD_R of (px,py), nearest first */
+function chunkTargets(px,py){
+  var out=[];
+  for(var cy=0;cy<32;cy++)for(var cx=0;cx<32;cx++){
+    var d=Math.hypot(cx*CHUNK_CH+CHUNK_CH/2-px,cy*CHUNK_CH+CHUNK_CH/2-py);
+    if(d<BUILD_R)out.push({kind:'s',cx:cx,cy:cy,d:d});
+  }
+  for(var gcj=0;gcj<10;gcj++)for(var gci=0;gci<10;gci++){
+    var gd=Math.hypot(gci*2080+1040-px,gcj*2080+1040-py);
+    if(gd<BUILD_R)out.push({kind:'g',gci:gci,gcj:gcj,d:gd});
+  }
+  out.sort(function(a,b){return a.d-b.d;});
+  return out;
+}
+/* sig-change rebuild (the old buildWorld3D trigger): throw away every
+   static chunk and the always-pass meshes, re-record the cosmetic
+   scatter, rebuild the always pass, then synchronously build
+   everything within 1750 of the player (so the first frame never
+   shows holes underfoot) and queue the rest out to BUILD_R. */
+function rebuildStaticWorld(){
+  for(var k in staticChunks)disposeStaticMeshes(staticChunks[k]);
+  staticChunks={};
+  disposeStaticMeshes(alwaysMeshes); alwaysMeshes=[];
+  featureWaterDone={};
+  runStaticPass('record',0,0); /* cosmetic scatter: record every parameter once — the rnd stream is consumed in exactly the old order */
+  alwaysMeshes=runStaticPass('always',0,0);
+  chunkQueue=[];
+  var px=player?player.x:W/2, py=player?player.y:H/2;
+  var targets=chunkTargets(px,py);
+  for(var i=0;i<targets.length;i++){
+    var tg=targets[i];
+    if(tg.d<=1750){ if(tg.kind==='s')buildStaticChunk(tg.cx,tg.cy); else ensureGroundChunk(tg.gci,tg.gcj); }
+    else chunkQueue.push(tg);
+  }
+  chunkTargetAt=performance.now();
+}
+/* Per-frame chunk manager: drain the build queue nearest-first
+   inside a ~7ms budget (always at least one chunk per frame), and
+   about every 250ms recompute the target set — queue what's missing
+   and discard what drifted beyond DISCARD_R. */
+function updateChunkManager(now){
+  var t0=performance.now(), built=0;
+  while(chunkQueue.length){
+    var q=chunkQueue.shift();
+    if(q.kind==='s'){ if(!staticChunks[q.cx+'_'+q.cy]){buildStaticChunk(q.cx,q.cy); built++;} }
+    else{ var qe=groundChunks[q.gcj*10+q.gci]; if(!qe||!qe.built){ensureGroundChunk(q.gci,q.gcj); built++;} }
+    if(built>0&&performance.now()-t0>7)break;
+  }
+  if(now-chunkTargetAt<250)return;
+  chunkTargetAt=now;
+  if(!player)return;
+  var px=player.x, py=player.y;
+  for(var k in staticChunks){
+    var cc=k.split('_');
+    if(Math.hypot((+cc[0])*CHUNK_CH+CHUNK_CH/2-px,(+cc[1])*CHUNK_CH+CHUNK_CH/2-py)>DISCARD_R){ disposeStaticMeshes(staticChunks[k]); delete staticChunks[k]; }
+  }
+  for(var gcj=0;gcj<10;gcj++)for(var gci=0;gci<10;gci++){
+    var e=groundChunks[gcj*10+gci];
+    if(e&&e.built&&Math.hypot(gci*2080+1040-px,gcj*2080+1040-py)>DISCARD_R){
+      groundGroup.remove(e.mesh); e.geo.dispose(); e.geo=null; e.mesh=null; e.built=false; /* the entry stays, so the editor's refresh walks past it (and a later rebuild regenerates it from terrainH, edits included) */
+    }
+  }
+  var targets=chunkTargets(px,py);
+  chunkQueue=[];
+  for(var i=0;i<targets.length;i++){
+    var tg=targets[i];
+    if(tg.kind==='s'){ if(!staticChunks[tg.cx+'_'+tg.cy])chunkQueue.push(tg); }
+    else{ var e2=groundChunks[tg.gcj*10+tg.gci]; if(!e2||!e2.built)chunkQueue.push(tg); else if(e2.mesh&&e2.mesh.parent!==groundGroup)groundGroup.add(e2.mesh); }
+  }
+}
+
 function init3D(){
   if(!THREE_OK)return;
   var holder=document.getElementById('game3d');
   renderer=new THREE.WebGLRenderer({antialias:true});
   if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.24;}
   renderer.setPixelRatio(Math.max(0.3,Math.min(2,basePixelRatio()*currentRenderScale())));
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap; /* PCF (was PCFSoft): the soft-kernel pass is a constant per-frame cost on integrated GPUs; plain PCF keeps the same shadow shapes at a lower price */
   holder.appendChild(renderer.domElement);
   canvas.style.display='none';
   scene=new THREE.Scene();
@@ -6010,127 +6325,43 @@ function init3D(){
   var skyTex=new THREE.CanvasTexture(skyCv);
   if(THREE.SRGBColorSpace!==undefined)skyTex.colorSpace=THREE.SRGBColorSpace;
   scene.background=skyTex;
-  scene.fog=new THREE.Fog(0xdceef8,1100,3100); /* pale daytime haze: far ridges fade into the bright sky without dulling the town's colours */
-  // near 0.3 / far 3200 (was 0.1 / 5000): a tighter depth range gives the
-  // depth buffer far more precision, which stops distant surfaces shimmering
-  camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,3200);
+  scene.fog=new THREE.Fog(0xdceef8,600,1650); /* DRAW DISTANCE SHORTENED at the user's word (was 1100→3100): the haze now closes in at 1650 units (~40 tiles), so far chunks of the merged static world are fogged out AND frustum-culled by the tighter camera far plane below — the single biggest constant frame-cost cut after the 512x512 expansion. Near views (a village, the town, a fight) sit well inside 600 and look exactly as before. The water shaders' own fog was shortened to match (see waterMats / riverMats). */
+  // near 0.3 / far 1750 (was 3200, before that 5000): matched to the fog's
+  // far edge so nothing beyond the haze is drawn at all; the tighter depth
+  // range also gives the depth buffer more precision up close
+  camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,1750);
   scene.add(camera3d);
   buildViewModel();
   var hemi=new THREE.HemisphereLight(0xcfe5ff,0x7d8f66,1.05);scene.add(hemi); /* bright daytime sky fill: shadows stay soft and colours stay vivid */
   sunLight=new THREE.DirectionalLight(0xfff6e6,1.55); /* high midday sun: bright near-white light, shorter shadows */
   sunLight.castShadow=true;
   if(sunLight.shadow.normalBias!==undefined)sunLight.shadow.normalBias=1.5; /* softens texture acne without peter-panning */
-  sunLight.shadow.mapSize.set(1536,1536);
+  sunLight.shadow.mapSize.set(1024,1024); /* 1536 -> 1024: the shadow map re-renders the near scene every frame, so its texel count is a constant cost; at the 520-unit shadow box the softer resolution is barely visible */
   sunLight.shadow.camera.left=-520;sunLight.shadow.camera.right=520;
   sunLight.shadow.camera.top=520;sunLight.shadow.camera.bottom=-520;
   sunLight.shadow.camera.far=2200;sunLight.shadow.bias=-0.0006;
   scene.add(sunLight);scene.add(sunLight.target);
   staticGroup=new THREE.Group();scene.add(staticGroup);
+  groundGroup=new THREE.Group();scene.add(groundGroup); /* the ground chunks live OUTSIDE staticGroup: the chunk manager rebuilds staticGroup's contents wholesale (per-chunk passes), and the ground must survive that untouched */
   dynGroup=new THREE.Group();scene.add(dynGroup);
-  // ground base — a subdivided plane displaced by terrainH() so the land rolls
-  var groundGeo=new THREE.PlaneGeometry(W,H,440,440); /* 440x440 segments over the 512-tile world: same 47.27-unit vertex spacing as before the expansions */
-  var gp=groundGeo.attributes.position;
-  for(var gi=0;gi<gp.count;gi++){
-    // plane local (x,y) maps to game coords (x + W/2, H/2 - y) once rotated flat; local z becomes world height
-    gp.setZ(gi,terrainH(gp.getX(gi)+W/2,H/2-gp.getY(gi)));
-  }
-  groundGeo.computeVertexNormals();
-  /* vertex-coloured ground, so the land itself is never one flat fill:
-     grass mottle and dry patches, brighter kept lawns in the town, worn
-     stone-dirt around the plaza, wet earth and sand along the river and
-     pond banks, bare rock on the heights and steep faces, snowy caps */
-  (function(){
-    var cols=[], gc=new THREE.Color(), gt=new THREE.Color();
-    function hash2(x,y){var v=Math.sin(x*127.1+y*311.7)*43758.5453;return v-Math.floor(v);}
-    var LAKES=[[700,4300,262],[4200,2400,132],[7800,7800,262]]; /* shore tint for the remaining wild lakes （月影湖 removed) */
-    for(var vi2=0;vi2<gp.count;vi2++){
-      var gx=gp.getX(vi2)+W/2, gy=H/2-gp.getY(vi2);
-      var hh=terrainH(gx,gy);
-      var slp=Math.abs(terrainH(gx+16,gy)-hh)+Math.abs(terrainH(gx,gy+16)-hh);
-      var nz=hash2(Math.floor(gx/38),Math.floor(gy/38))*0.6+hash2(Math.floor(gx/9),Math.floor(gy/9))*0.4;
-      var reg=regionAt(gx,gy);
-      if(reg==='snow')gc.setHex(0xdfe9f2);
-      else if(reg==='desert')gc.setHex(0xdbbd7f);
-      else if(reg==='volcano')gc.setHex(0x4a3a34);
-      else if(reg==='deepforest')gc.setHex(0x2e5230);
-      else gc.setHex(0x55a047);
-      if(reg==='green'||reg==='deepforest'){
-        gt.setHex(0x77b957); gc.lerp(gt,nz*0.55);
-        if(hash2(Math.floor(gx/23)+9,Math.floor(gy/23))>0.93){gt.setHex(0x9ab85e); gc.lerp(gt,0.5);}
-      }
-      /* the town of Luminas: kept lawns inside the wall, worn
-         stone-dirt around the plaza and along its streets, wet earth
-         on the river and pond banks */
-      var tn2=townNorm(gx,gy);
-      if(tn2<1.0){gt.setHex(nz>0.60?0x8a6f4d:0xa39a86); gc.lerp(gt,0.80);} /* inside the wall the ground is STONE AND PACKED EARTH, not lawn: pale cobble tones with dirt patches where the noise runs high — lawn survives only as traces outside the wall line */
-      /* the town's gardens: kept-lawn patches in the gaps between the
-         houses and along the lanes (see TOWN_GREENERY) — painted BEFORE
-         the plaza / street / bank tints below, so the stone heart of
-         the town stays stone and only the garden ground turns green;
-         dry ground only, never the carved pond beds */
-      if(tn2<1.0&&hh>8){for(var gp9=0;gp9<TOWN_GREENERY.length;gp9++){var gd9=Math.hypot(gx-TOWN_GREENERY[gp9][0],gy-TOWN_GREENERY[gp9][1]); if(gd9<TOWN_GREENERY[gp9][2]){gt.setHex(0x69b457); gc.lerp(gt,_sm01((TOWN_GREENERY[gp9][2]-gd9)/TOWN_GREENERY[gp9][2])*0.78); break;}}}
-      else if(tn2<1.10){gt.setHex(0x6fae54); gc.lerp(gt,Math.min(0.30,(1.10-tn2)*0.6));}
-      var pd2=Math.hypot(gx-PLAZA.x,gy-PLAZA.y);
-      if(pd2<330){gt.setHex(0xa89a78); gc.lerp(gt,_sm01((330-pd2)/120)*0.6);}
-      var mtd2=Math.hypot(gx-MID_TERRACE.x,gy-MID_TERRACE.y);
-      if(mtd2<MID_TERRACE.r+16){gt.setHex(0x9a917e); gc.lerp(gt,_sm01((MID_TERRACE.r+16-mtd2)/60)*0.8);} /* the switchback's mid terrace: stone paving tint under its platform, like the plaza's */
-      for(var st9=0;st9<STREETS.length;st9++){var ss9=STREETS[st9]; if(_segD(gx,gy,ss9.x1,ss9.y1,ss9.x2,ss9.y2)<ss9.w/2+16){gt.setHex(ss9.t==='s'?0x9a917e:0x8a6f4d); gc.lerp(gt,0.8); break;}}
-      var rd9=1e9; for(var rv9=0;rv9<RIVER.length-1;rv9++){var sd9=_segD(gx,gy,RIVER[rv9][0],RIVER[rv9][1],RIVER[rv9+1][0],RIVER[rv9+1][1]); if(sd9<rd9)rd9=sd9;}
-      var pcd=Math.hypot(gx-POND_C.x,gy-POND_C.y)-POND_C.r, ped=pondEMetric(gx,gy)-POND_E.r;
-      /* the river's banks, painted to match its carved profile: bare
-         sandy earth down the whole bank slope (out to the carve's
-         feather), darkening to wet earth right at the waterline, so
-         the shore BLENDS into the water instead of ending on the hard
-         edge the flat ribbon used to show */
-      var tbank=Math.min(rd9-150,pcd,ped);
-      if(tbank<65&&hh<40){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((65-tbank)/65)*0.65);}
-      if(tbank<16&&hh<26){gt.setHex(0x6e5b40); gc.lerp(gt,_sm01((16-tbank)/16)*0.6);} /* the wet waterline band */
-      /* the channel bed itself is tinted like the pond beds (below):
-         sandy at the edges deepening to teal at the centreline, so
-         through the translucent surface the river shows a real depth
-         gradation — shallow margins, deep middle — never one flat
-         sheet of blue */
-      if(rd9<150){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((150-rd9)/110)*0.55);}
-      /* Alto: packed earth inside the palisade, stone on the plaza,
-         tilled soil on the fields, sandy banks and a teal bed along
-         its river, and the worn south road */
-      var aDist=Math.hypot(gx-ALTO.x,gy-ALTO.y);
-      if(aDist<505){gt.setHex(0xa39a86); gc.lerp(gt,_sm01((505-aDist)/90)*0.55);}
-      if(aDist<158){gt.setHex(0x9a917e); gc.lerp(gt,_sm01((158-aDist)/50)*0.75);}
-      for(var afi=0;afi<ALTO_FIELDS.length;afi++){var af9=ALTO_FIELDS[afi]; if(Math.abs(gx-af9.x)<af9.w/2+4&&Math.abs(gy-af9.y)<af9.d/2+4){gt.setHex(0x6e5136); gc.lerp(gt,0.85); break;}}
-      var aFr=altoRiverFrame(gx,gy);
-      if(aFr.d<120){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((120-aFr.d)/70)*0.6);}
-      if(aFr.d<62){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((62-aFr.d)/45)*0.5);}
-      if(_segD(gx,gy,13700,15440,13700,16900)<30){gt.setHex(0x8a6f4d); gc.lerp(gt,0.75);}
-      /* pond beds darken toward the middle: seen through the water
-         shader this is what gives the ponds — above all the east
-         pond — their depth gradation instead of one flat plate of
-         colour (sandy rim → deep teal centre, following the same
-         wobbled shore as the carve) */
-      if(ped<0){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((-ped)/95)*0.6);}
-      if(pcd<0){gt.setHex(0x2a6d8a); gc.lerp(gt,_sm01((-pcd)/85)*0.45);}
-      var bankD=1e9;
-      for(var lk=0;lk<LAKES.length;lk++){var ld=Math.hypot(gx-LAKES[lk][0],gy-LAKES[lk][1])-LAKES[lk][2]; if(ld<bankD)bankD=ld;}
-      if(bankD<26&&hh<26){gt.setHex(0x9a8a68); gc.lerp(gt,_sm01((26-bankD)/26)*0.75); if(bankD<7){gt.setHex(0x6e5b40); gc.lerp(gt,0.55);}}
-      var rockK=Math.max(_sm01((hh-100)/90),_sm01((slp-11)/16));
-      if(rockK>0){gt.setHex(0x8d8578); gc.lerp(gt,Math.min(1,rockK)*0.85);}
-      if(hh>235){gt.setHex(0xe8eef2); gc.lerp(gt,_sm01((hh-235)/60)*0.7);}
-      cols.push(gc.r,gc.g,gc.b);
-    }
-    groundGeo.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
-  })();
+  // ground base — NO full sheet any more: the 441x441-vertex plane
+  // (and its ~194k terrainH + colour evaluations) is exactly the
+  // startup / rebuild cost this pass exists to remove. init3D only
+  // prepares the shared material and the empty 10x10 slot array;
+  // each chunk is generated lazily by buildGroundChunk() when the
+  // chunk manager wants it (positions / UVs / colours / normals all
+  // identical to the sheet's — see buildGroundChunk and
+  // groundVertexColor), and terrainHasEdits needs no catch-up here:
+  // unbuilt chunks are generated from terrainH, edits included.
   var groundNoise=makeTex('gnoise',128,function(c,S,r){
     c.fillStyle='#f6f4ee';c.fillRect(0,0,S,S);
     for(var i=0;i<2000;i++){c.fillStyle='rgba('+(r()<0.5?'96,92,84':'255,255,255')+','+(0.04+r()*0.07)+')';c.fillRect(r()*S,r()*S,1.4,1.4);}
   },555);
   groundNoise.repeat.set(420,420);
-  var ground=new THREE.Mesh(groundGeo,new THREE.MeshLambertMaterial({vertexColors:true,map:groundNoise,color:0xffffff}));
-  ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;staticGroup.add(ground);
-  /* editor: keep references so brush edits can rewrite the ground in place */
-  groundGeo3D=groundGeo; groundMesh3D=ground;
-  vertexGameX=new Float32Array(gp.count); vertexGameY=new Float32Array(gp.count);
-  for(var vi=0;vi<gp.count;vi++){vertexGameX[vi]=gp.getX(vi)+W/2;vertexGameY[vi]=H/2-gp.getY(vi);}
-  if(terrainHasEdits)refreshGroundAll();
+  groundMat3D=new THREE.MeshLambertMaterial({vertexColors:true,map:groundNoise,color:0xffffff});
+  groundChunks=[];
+  for(var gci0=0;gci0<100;gci0++)groundChunks.push(null);
+  groundGeo3D=null; groundMesh3D=null; /* the single-sheet references stay retired: the editor refresh functions walk groundChunks */
   // clouds
   for(var i=0;i<11;i++){
     var cl=new THREE.Group();
@@ -6213,7 +6444,7 @@ function waterMats(){
         ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.94);',
         ' float alpha=mix(0.92,0.98,fres);',
         ' alpha=mix(alpha,0.98,clamp(foam,0.0,1.0));',
-        ' float fogF=smoothstep(1500.0,3400.0,distance(cameraPosition,vW));',
+        ' float fogF=smoothstep(700.0,1650.0,distance(cameraPosition,vW));', /* matched to the shortened scene fog / draw distance (was 1500→3400) */
         ' col=mix(col,vec3(0.85,0.93,0.97),fogF*0.6);',
         ' gl_FragColor=vec4(col,alpha);',
         '}'
@@ -6393,7 +6624,7 @@ function buildSmoke(){
   if(smokePts){scene.remove(smokePts);smokePts.geometry.dispose();smokePts=null;smokeParts=[];}
   var tops=[];
   townFeatures.forEach(function(f){
-    if(f.kind==='altohouse'){ if(f.smoke)tops.push([f.x+f.smoke.dx, f.y+f.smoke.dy, terrainH(f.x,f.y)-2+f.smoke.z]); return; }
+    if(f.kind==='altohouse'||f.kind==='altoguild'){ if(f.smoke)tops.push([f.x+f.smoke.dx, f.y+f.smoke.dy, terrainH(f.x,f.y)-2+f.smoke.z]); return; }
     if(f.kind!=='house')return;
     var gh=terrainH(f.x,f.y);
     var lx=f.w*0.26, lz=-f.d*0.18, rot=f.rot||0;
@@ -6558,6 +6789,7 @@ function updateAltoFolk(now){
 /* the windmill's slow turn: about one revolution every 28 seconds —
    the only always-on animation Alto adds */
 var altoMillBlades=null, altoMillLastT=0;
+var _guildSignTex=null; /* the guild hall's name-board texture, drawn once on a canvas (see buildAlto3D) */
 function updateAltoMill(now){ if(!altoMillBlades)return; var dt=altoMillLastT?Math.min(0.05,(now-altoMillLastT)/1000):0.016; altoMillLastT=now; altoMillBlades.rotation.z-=dt*0.22; }
 var RIVER_MAT=null;
 function riverMats(){
@@ -6602,7 +6834,7 @@ function riverMats(){
       ' float streak2=noise(vec2(vUv.x*23.0+7.0,vPh*190.0-t*4.6));',
       ' foam=max(foam,vRp*smoothstep(0.34,0.62,streak*0.65+streak2*0.35)*(0.75+0.25*sin(t*5.0+vPh*300.0)));',
       ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.94);',
-      ' float fogF=smoothstep(1500.0,3400.0,distance(cameraPosition,vW));',
+      ' float fogF=smoothstep(700.0,1650.0,distance(cameraPosition,vW));', /* matched to the shortened scene fog / draw distance (was 1500→3400) */
       ' col=mix(col,vec3(0.85,0.93,0.97),fogF*0.6);',
       ' gl_FragColor=vec4(col,0.96);',
       '}'
@@ -6733,6 +6965,8 @@ function buildRiver3D(){
 function buildAlto3D(){
   var STONE=0xa8a294, STONE_D=0x8a8172, STONE_L=0xbcb6a8, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
   townFeatures.forEach(function(f){
+    if(BUILD_MODE==='always'){ if(f.kind!=='windmill')return; } /* the always pass only (re)builds the windmill's sails, below */
+    else if(Math.floor(f.x/CHUNK_CH)!==BUILD_CX||Math.floor(f.y/CHUNK_CH)!==BUILD_CY)return; /* not this chunk */
     var gh=terrainH(f.x,f.y);
     if(f.kind==='altohouse'){
       var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); hg.rotation.y=f.rot||0; staticGroup.add(hg);
@@ -6776,7 +7010,61 @@ function buildAlto3D(){
         box(12,12,12,0xc9a86a,f.w/2-13,6,f.d/2-5,hg);
         box(10,10,10,0xb08d54,f.w/2-13,17,f.d/2-5,hg);
       }
+    }else if(f.kind==='altoguild'){
+      /* the adventurer's guild hall: a two-storey great hall, plainly
+         bigger than every village house — a tall stone ground floor,
+         a plastered upper floor under a broad steep roof (eaves at
+         58, ridge at 110, matching the collision's _eave/_roofH), a
+         porch over the great double door on the plaza face, twin
+         chimneys, and a wide name board over the door that reads
+         冒険者ギルド so nobody can mistake the building */
+      var gg9=new THREE.Group(); gg9.position.set(WX(f.x),gh-2,WZ(f.y)); gg9.rotation.y=f.rot||0; staticGroup.add(gg9);
+      box(f.w+12,7,f.d+12,0x4a4238,0,3.5,0,gg9);                       /* foundation plinth */
+      box(f.w+4,26,f.d+4,STONE_D,0,13,0,gg9);                          /* stone ground floor */
+      box(f.w,32,f.d,0xe8dcc6,0,42,0,gg9);                             /* plastered upper floor */
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(10,58,10,WOOD_D,c[0]*(f.w/2-4),29,c[1]*(f.d/2-4),gg9);}); /* corner timbers */
+      box(f.w+5,8,f.d+5,WOOD_D,0,56,0,gg9);                            /* eaves beam */
+      var grf=prism(f.w+26,f.roofH,f.d+24,f.roof); grf.position.y=58; gg9.add(grf);
+      box(7,6,f.d+28,WOOD_D,0,58+f.roofH+1,0,gg9);                     /* ridge beam */
+      box(14,34,14,STONE_D,52,58+15,-14,gg9); box(17,5,17,STONE_D,52,58+34,-14,gg9);   /* main chimney (smoke rises from here) */
+      box(14,26,14,STONE_D,-58,58+9,10,gg9); box(17,5,17,STONE_D,-58,58+24,10,gg9);    /* second chimney */
+      box(28,30,4,WOOD_D,0,15,f.d/2+2,gg9);                            /* great double door, plaza face */
+      box(3,30,4.6,0x3a3128,0,15,f.d/2+2,gg9);                          /* door centre post */
+      box(38,5,13,STONE_D,0,2.5,f.d/2+6,gg9);                          /* front step */
+      cyl(3,3.4,30,WOOD_D,-22,15,f.d/2+13,gg9,6); cyl(3,3.4,30,WOOD_D,22,15,f.d/2+13,gg9,6); /* porch posts */
+      rbox(58,4,24,0x9c6b3f,0,32,f.d/2+13,gg9,0,0.30,0);                /* porch roof */
+      box(10,22,1.6,0xb03a30,-19,22,f.d/2+3.4,gg9); box(10,22,1.6,0x3a6bd5,19,22,f.d/2+3.4,gg9); /* guild banners flanking the door */
+      [-62,-40,40,62].forEach(function(wx9){ /* ground-floor windows, lit, in timber frames */
+        box(15,15,2.6,WOOD_D,wx9,15,f.d/2+1.6,gg9); box(12,12,3,0xffd98a,wx9,15,f.d/2+2,gg9);
+      });
+      [-62,62].forEach(function(wx9){ /* upper windows flanking the name board */
+        box(15,16,2.6,WOOD_D,wx9,47,f.d/2+1.6,gg9); box(12,13,3,0xffd98a,wx9,47,f.d/2+2,gg9);
+      });
+      [-24,24].forEach(function(wz9){ /* side windows, east and west walls */
+        box(2.6,15,15,WOOD_D,f.w/2+1.6,32,wz9,gg9); box(3,12,12,0xffd98a,f.w/2+2,32,wz9,gg9);
+        box(2.6,15,15,WOOD_D,-f.w/2-1.6,32,wz9,gg9); box(3,12,12,0xffd98a,-f.w/2-2,32,wz9,gg9);
+      });
+      /* the name board: a broad wooden board over the door carrying a
+         canvas-drawn sign — gold letters on dark wood, drawn once and
+         shared by every rebuild */
+      box(100,20,3.5,WOOD_D,0,46,f.d/2+2.2,gg9);
+      if(!_guildSignTex){
+        var gcv=document.createElement('canvas'); gcv.width=512; gcv.height=104;
+        var gc9=gcv.getContext('2d');
+        gc9.fillStyle='#4a3421'; gc9.fillRect(0,0,512,104);
+        gc9.strokeStyle='#e8c268'; gc9.lineWidth=5; gc9.strokeRect(6,6,500,92);
+        gc9.fillStyle='#f4d98a'; gc9.font='700 52px "Noto Sans JP","Hiragino Sans",sans-serif'; gc9.textAlign='center'; gc9.textBaseline='middle';
+        gc9.fillText('⚔ 冒険者ギルド',256,56);
+        _guildSignTex=new THREE.CanvasTexture(gcv);
+        if(THREE.SRGBColorSpace!==undefined)_guildSignTex.colorSpace=THREE.SRGBColorSpace;
+      }
+      var gsign=new THREE.Mesh(new THREE.PlaneGeometry(96,19),new THREE.MeshLambertMaterial({map:_guildSignTex}));
+      gsign.position.set(0,46,f.d/2+4.1); gg9.add(gsign);
+      /* a hanging sign on a bracket by the door, like the shops' */
+      box(2,10,2,WOOD_D,34,27,f.d/2+8,gg9); box(2,2,12,WOOD_D,34,31,f.d/2+13,gg9);
+      box(13,10,1.6,0xc9a86a,34,24.5,f.d/2+18,gg9);
     }else if(f.kind==='windmill'){
+      if(BUILD_MODE!=='always'){ /* the static tower belongs to the windmill's own chunk */
       var wg=new THREE.Group(); wg.position.set(WX(f.x),gh-2,WZ(f.y)); staticGroup.add(wg);
       cyl(40,46,10,STONE_D,0,5,0,wg,16);                               /* stone base drum */
       cyl(27,36,118,0xf0e7d3,0,69,0,wg,14);                            /* the white tapered tower */
@@ -6790,6 +7078,8 @@ function buildAlto3D(){
       box(13,10,1.6,0xc9a86a,24,24.5,41,wg);                            /* hanging sign */
       box(8,10,2,0xffd98a,0,55,-31,wg);                                /* north window */
       box(8,10,2,0xffd98a,29,85,0,wg); box(8,10,2,0xffd98a,-29,85,0,wg); /* east / west windows */
+      }
+      if(BUILD_MODE==='always'){ /* the sails live in dynGroup, outside the chunk system: the always pass (re)builds them, once per world build */
       /* the sails: a turning group in dynGroup, rebuilt fresh each
          build so a world rebuild never stacks a second set */
       if(altoMillBlades&&altoMillBlades.parent)altoMillBlades.parent.remove(altoMillBlades);
@@ -6800,12 +7090,13 @@ function buildAlto3D(){
         var bg2=new THREE.Group(); bg2.rotation.z=Math.PI/4+bk*Math.PI/2; bg2.rotation.x=0.16; altoMillBlades.add(bg2);
         box(14,88,2,0xe8e2d2,0,52,0,bg2);                              /* sail cloth */
         box(2.5,88,3,WOOD_D,-6.2,52,0,bg2); box(2.5,88,3,WOOD_D,6.2,52,0,bg2); /* sail frame */
-        if(bk===0){ /* the blue crystal riding the first sail's tip, as in the illustration */
-          var cr2=sph(6,0x7ec3ff,0,94,0,bg2,{emissive:0x3a7bd5}); cr2.castShadow=false;
-          var gl2=sph(13,0x7ec3ff,0,94,0,bg2,{transparent:true,opacity:0.25,emissive:0x3a7bd5}); gl2.castShadow=false;
-        }
+        /* (no blue crystal on the first sail's tip any more: the
+           glowing blue orb and its halo were removed at the user's
+           word — the four sails themselves and their rotation are
+           exactly as before) */
       }
       dynGroup.add(altoMillBlades);
+      }
     }else if(f.kind==='altoplaza'){
       var pg2=new THREE.Group(); pg2.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(pg2);
       cyl(f.r,f.r,2.4,0xa8a294,0,0.6,0,pg2,40);
@@ -6929,6 +7220,7 @@ function buildTown3D(){
      chain) — shader discs in waterGroup (never merged with the static
      world, so their per-disc uniforms and animation survive). Deleting
      a water body removes its decorations, so its surfaces vanish too. */
+  if(BUILD_MODE==='always'){ /* the town's water side — discs, river, falls, spray, mist, smoke — is world-fixed furniture: the always pass builds it once; chunk passes skip straight to the features */
   decorations.forEach(function(d){
     if(!d.townWater||d.river||d.ribbon)return; /* river-chain AND pond discs are depth-only: the ribbon below draws that water, swelling through the ponds as one surface */
     var zz=(d.wz||2.4)+(d.pond!=null?d.pond*0.18:0); /* stacked pond discs step up a hair each so overlaps never z-fight */
@@ -6957,9 +7249,13 @@ function buildTown3D(){
   buildFallsSpray(); /* animated spray mist at the three plunge bases */
   buildFallsMist();  /* drifting mist clouds + expanding ripple rings in the plunge pool */
   buildSmoke();      /* chimney smoke over every house (positions follow the house features, so it rebuilds with the town) */
+  } /* end of the town's always-only water side */
   /* ---- features ---- */
   var houseRoofSeq=0; /* round-robin roof colours: neighbouring houses never share a colour, and the palette's browns / greys / muted oranges land in near-equal shares across the town */
   townFeatures.forEach(function(f){
+    if(BUILD_MODE==='always')return; /* static features are built per chunk; the always pass above did the water side only */
+    var roofOrd=(f.kind==='house')?houseRoofSeq++:-1; /* count EVERY house in array order, whichever chunk it lands in: roof colours are round-robin over this sequence, so a chunked build must advance it for houses in other chunks too, or roofs would change colour as chunks come and go */
+    if(Math.floor(f.x/CHUNK_CH)!==BUILD_CX||Math.floor(f.y/CHUNK_CH)!==BUILD_CY)return; /* not this chunk */
     var gh=terrainH(f.x,f.y);
     if(f.kind==='wall'){
       var wc=f.seed<0.34?0xb8b2a4:(f.seed<0.67?STONE_L:0xc4beb0);  /* bright grey stone, tinted per segment so the ring never reads as one flat fill */
@@ -7004,7 +7300,7 @@ function buildTown3D(){
     }else if(f.kind==='house'){
       var hg=new THREE.Group(); hg.position.set(WX(f.x),gh-2,WZ(f.y)); hg.rotation.y=f.rot||0; if(f.hmul)hg.scale.y=f.hmul; staticGroup.add(hg);
       var roofs=[0x8a5a34,0xb26a2e,0x9c6b3f,0xa85f2c,0x8a4a28,0x7c4023,0xb5703a,0x96603a,0xa0522d,0xbf7434,0x8a5a34,0x9c6b3f]; /* warm browns, oranges and terracotta only — the photo's rooftops carry no dark blue or grey house roofs (the chapel's and castle's blue crystal spires are landmarks and stay) */
-      var rc=roofs[houseRoofSeq++%roofs.length];
+      var rc=roofs[roofOrd%roofs.length];
       var roofH=f.roofH||Math.round(f.w*0.42);                         /* per-house pitch from buildTownData (matches the roof collision) */
       var plasterTints=[0xe6dcc4,0xdfd2b8,0xeee3cc,0xe8dcc6,0xdccfb4];
       var pTint=plasterTints[Math.floor(f.seed*plasterTints.length)%plasterTints.length]; /* every house its own plaster tone */
@@ -7176,7 +7472,7 @@ function buildTown3D(){
       cyl(110,114,4,STONE_D,0,2,0,pg,32);            /* step 1 (top at +4) */
       cyl(96,100,8,STONE_D,0,4,0,pg,32);             /* step 2 (top at +8) */
       cyl(76,82,7,STONE_L,0,11.5,0,pg,28);           /* basin wall (rim at +15) */
-      addWaterDisc(f.x,f.y,gh+13.5,68,false);        /* basin water (shader disc, in waterGroup) */
+      if(!featureWaterDone['f'+f.x+'_'+f.y]){featureWaterDone['f'+f.x+'_'+f.y]=1;addWaterDisc(f.x,f.y,gh+13.5,68,false);}        /* basin water (shader disc, in waterGroup) — added ONCE per world build: waterGroup is cleared by the always pass, not per chunk, so a chunk rebuilt after a discard must not stack a second identical disc */
       for(var fbi=0;fbi<8;fbi++){var fa=fbi*Math.PI/4;sph(5,0xf4fbff,Math.cos(fa)*60,15.5,Math.sin(fa)*60,pg);} /* foam ring where the jets land */
       cyl(11,17,42,STONE_L,0,36,0,pg,12);            /* central column */
       cyl(37,23,9,STONE_L,0,57,0,pg,18);             /* lower tier bowl */
@@ -7301,7 +7597,7 @@ function buildTown3D(){
       var mf9=new THREE.Group(); mf9.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(mf9);
       cyl(64,70,9,STONE_D,0,4.5,0,mf9,24);               /* pond rim — enlarged with the terrace, so the fountain pond reads from the plaza below */
       cyl(56,62,6,STONE_L,0,6,0,mf9,24);                 /* rim cap course */
-      addWaterDisc(f.x,f.y,gh+8.5,52,false);             /* pond water (shader disc, in waterGroup) */
+      if(!featureWaterDone['m'+f.x+'_'+f.y]){featureWaterDone['m'+f.x+'_'+f.y]=1;addWaterDisc(f.x,f.y,gh+8.5,52,false);}             /* pond water (shader disc, in waterGroup) — once per world build, as with the fountain's basin above */
       cyl(12,17,17,STONE_L,0,13,0,mf9,12);               /* centre stone */
       var mfo9=sph(6,0xbfe6f7,0,25,0,mf9,{emissive:0x3a7bd5}); mfo9.castShadow=false; /* glowing droplet over the jet */
       for(var mfi=0;mfi<8;mfi++){var mfa=mfi*Math.PI/4;sph(4.5,0xf4fbff,Math.cos(mfa)*40,9.5,Math.sin(mfa)*40,mf9).castShadow=false;} /* foam ring */
@@ -7391,14 +7687,49 @@ function buildTown3D(){
       cyl(1.6,1.6,34,WOOD_D,0,17,29,ng,5);
     }
   });
-  buildAlto3D(); buildAltoRiver3D(); /* Alto's houses, windmill, palisade, bridge and river */
+  buildAlto3D(); if(BUILD_MODE==='always')buildAltoRiver3D(); /* Alto's houses, windmill, palisade, bridge (per chunk; the sails ride the always pass) and river (always only) */
+}
+
+/* Materialise ONE recorded cosmetic-scatter item (see the 'record'
+   pass in buildWorld3D): the exact mesh the old single build made,
+   from recorded parameters only — no rnd() is consumed here, so a
+   chunk rebuilt on a revisit scatters identically to the first. */
+function buildScatterRecord(sr9){
+  if(sr9.k==='patch'){
+    var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(sr9.c));
+    p.rotation.x=-Math.PI/2;p.rotation.z=sr9.r;p.position.set(WX(sr9.x),terrainH(sr9.x,sr9.y)+0.6,WZ(sr9.y));p.receiveShadow=true;staticGroup.add(p);
+  }else if(sr9.k==='tuft'){
+    var tc=cone(sr9.r,sr9.h,sr9.c,WX(sr9.x),terrainH(sr9.x,sr9.y)+3.4,WZ(sr9.y),staticGroup,5);
+    tc.castShadow=false;
+  }else if(sr9.k==='flower'){
+    var fh=terrainH(sr9.x,sr9.y);
+    cyl(0.7,0.9,6,0x3f7a3a,WX(sr9.x),fh+3,WZ(sr9.y),staticGroup,4).castShadow=false;
+    sph(2.6,sr9.c,WX(sr9.x),fh+7,WZ(sr9.y),staticGroup).castShadow=false;
+  }else if(sr9.k==='pebble'){
+    var sv=sr9.s;
+    var pb=new THREE.Mesh(G('gpeb'+Math.round(sv*2),function(){return new THREE.DodecahedronGeometry(sv,0);}),M(sr9.c));
+    pb.position.set(WX(sr9.x),terrainH(sr9.x,sr9.y)+sv*0.3,WZ(sr9.y)); pb.rotation.set(sr9.rx,sr9.ry,0);
+    pb.receiveShadow=true; staticGroup.add(pb);
+  }
 }
 
 function buildWorld3D(){
   if(!THREE_OK||!staticGroup)return;
-  // clear previous static meshes except ground (child 0)
-  while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);if(c.userData&&c.userData._merged&&c.geometry)c.geometry.dispose();}
-  clearWaterGroup(); /* shader water surfaces are rebuilt below / in buildTown3D() */
+  /* Chunked building: this function now runs as ONE pass selected by
+     BUILD_MODE, into whatever group the caller swapped into the
+     staticGroup global (see runStaticPass) — it no longer clears or
+     owns the real staticGroup.
+       'always' — once per sig change: region pads, lake / lava
+         surfaces, all water (buildTown3D's water side, both rivers),
+         the windmill sails. Kept for the whole session.
+       'record' — once per sig change: the cosmetic scatter loops
+         below run UNCHANGED, but instead of building meshes they
+         record every parameter into scatterRecords.
+       'chunk'  — per 650-unit chunk: the item loops (obstacles /
+         decorations / town + alto features), filtered to the chunk,
+         plus the recorded scatter for that chunk. */
+  var mode=BUILD_MODE;
+  if(mode==='always')clearWaterGroup(); /* shader water surfaces are rebuilt below / in buildTown3D() — the always pass is the only one that touches water */
   function flat(w,d,color,x,y2d,z,lift){
     var m=new THREE.Mesh(G('f'+w+'_'+d,function(){return new THREE.BoxGeometry(w,4,d);}),M(color));
     // overlapping pads get a small `lift` each so their top faces are never
@@ -7412,12 +7743,12 @@ function buildWorld3D(){
      consumption order, so the existing lands look exactly as before.
      A separate batch at the end of this function fills the new lands. */
   var PREV3D=10400;
+  if(mode==='record'){ scatterRecords=[];
   for(var i=0;i<880;i++){
     var px=rnd()*PREV3D,pz=rnd()*PREV3D;
     if(regionAt(px,pz)!=='green')continue;   // no grass patches in desert / snow / volcano / deep forest floor pads
     if(townNorm(px,pz)<1.05)continue;          // nor inside Luminas: the town floor is stone and packed earth now, not lawn
-    var p=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
-    p.rotation.x=-Math.PI/2;p.rotation.z=rnd()*3;p.position.set(WX(px),terrainH(px,pz)+0.6,WZ(pz));p.receiveShadow=true;staticGroup.add(p);
+    scatterRecords.push({k:'patch',x:px,y:pz,c:rnd()<0.5?0x35542f:0x40663c,r:rnd()*3}); /* record instead of building: the same rnd() draws the mesh build consumed, in the same order (colour, then rotation) */
   }
   /* ground scatter: grass tufts, wild flowers and pebbles sprinkled over
      every green region (and the town lawns) so no stretch of ground is
@@ -7452,23 +7783,21 @@ function buildWorld3D(){
   }
   for(var tui=0;tui<620;tui++){
     var tp=scatterPoint(tui<170); if(!tp)continue;
-    var tc=cone(3.6+rnd()*2.6,8+rnd()*7,tuftGreens[Math.floor(rnd()*tuftGreens.length)],WX(tp[0]),terrainH(tp[0],tp[1])+3.4,WZ(tp[1]),staticGroup,5);
-    tc.castShadow=false;
+    scatterRecords.push({k:'tuft',x:tp[0],y:tp[1],r:3.6+rnd()*2.6,h:8+rnd()*7,c:tuftGreens[Math.floor(rnd()*tuftGreens.length)]});
   }
   for(var fli=0;fli<300;fli++){
     var fp2=scatterPoint(false); if(!fp2)continue; /* flowers are NEVER sown inside the town wall any more (at the user's word every flower in Luminas was removed — flower beds and ground flowers alike): scatterPoint(false) already keeps out of the walled interior, so all 300 draws land in the fields outside, whose wild flowers are unchanged. (Grass tufts above still green the town's garden lawns — tufts are grass, not flowers.) */
-    var fh=terrainH(fp2[0],fp2[1]);
-    cyl(0.7,0.9,6,0x3f7a3a,WX(fp2[0]),fh+3,WZ(fp2[1]),staticGroup,4).castShadow=false;
-    sph(2.6,flowerCols[Math.floor(rnd()*flowerCols.length)],WX(fp2[0]),fh+7,WZ(fp2[1]),staticGroup).castShadow=false;
+    scatterRecords.push({k:'flower',x:fp2[0],y:fp2[1],c:flowerCols[Math.floor(rnd()*flowerCols.length)]});
   }
   for(var pbi=0;pbi<240;pbi++){
     var pp3=scatterPoint(false); if(!pp3)continue;
     var pr2=2+rnd()*3.4;
-    var pb=new THREE.Mesh(G('gpeb'+Math.round(pr2*2),function(){return new THREE.DodecahedronGeometry(pr2,0);}),M(rnd()<0.5?0x8d9299:0x7d7466));
-    pb.position.set(WX(pp3[0]),terrainH(pp3[0],pp3[1])+pr2*0.3,WZ(pp3[1])); pb.rotation.set(rnd()*3,rnd()*3,0);
-    pb.receiveShadow=true; staticGroup.add(pb);
+    scatterRecords.push({k:'pebble',x:pp3[0],y:pp3[1],s:pr2,c:rnd()<0.5?0x8d9299:0x7d7466,rx:rnd()*3,ry:rnd()*3});
   }
-  // region ground pads for the new lands
+  } /* end of the record pass's old-lands scatter (the loops above run verbatim; only the mesh builds became records) */
+  // region ground pads for the new lands — always pass only: fixed
+  // world furniture, built once per sig change and never chunked
+  if(mode==='always'){
   flat(1850,1350,0xdfe9f2,4275,675);        // snowfield
   flat(1950,2000,0xe0c084,4225,2400);       // desert
   flat(1350,1350,0x4a3532,4525,4525);       // volcano basalt
@@ -7485,17 +7814,21 @@ function buildWorld3D(){
   if(lakeAlive(7800,7800))addWaterDisc(7800,7800,-0.8,262,false);
   var lava=new THREE.Mesh(G('lava',function(){return new THREE.CircleGeometry(150,30);}),M(0xff5a1f,{emissive:0xcc3300}));
   lava.rotation.x=-Math.PI/2;lava.scale.y=0.78;lava.position.set(WX(4750),1.4,WZ(4100));staticGroup.add(lava);
-  // obstacles: the ruin blocks (the only standing structures)
-  obstacles.forEach(function(o){
+  } /* end of the always-only pads / lakes / lava */
+  // obstacles: the ruin blocks (the only standing structures) — chunk pass only, anchored at the rect's centre
+  if(mode==='chunk')obstacles.forEach(function(o){
     if(o.type!=='rect')return;
     if(o.town)return; // town structures are built by buildTown3D()
+    if(o.alto||o.placed||o.house||o.stall)return; /* Alto's houses / stall and editor-placed houses have their OWN renderers (buildAlto3D / the editor): drawing this generic stone block for them too buried a second block-house inside every Alto house — the "house inside a house" the user reported. Only a bare rect with no dedicated renderer (a true ruin block) may fall through to the generic block below. */
+    if(Math.floor((o.x+o.w/2)/CHUNK_CH)!==BUILD_CX||Math.floor((o.y+o.h/2)/CHUNK_CH)!==BUILD_CY)return; /* not this chunk */
     var h=60+((o.x*7+o.y*13)%50);
     var gh=terrainH(o.x+o.w/2,o.y+o.h/2);
     box(o.w,h,o.h,o.c,WX(o.x+o.w/2),h/2+gh,WZ(o.y+o.h/2),staticGroup);
     box(o.w+8,10,o.h+8,0x8a8496,WX(o.x+o.w/2),h+4+gh,WZ(o.y+o.h/2),staticGroup);
   });
-  // decorations
-  decorations.forEach(function(d){
+  // decorations — chunk pass only, anchored at (d.x,d.y)
+  if(mode==='chunk')decorations.forEach(function(d){
+    if(Math.floor(d.x/CHUNK_CH)!==BUILD_CX||Math.floor(d.y/CHUNK_CH)!==BUILD_CY)return; /* not this chunk */
     if(d.kind==='lake'||d.kind==='lava')return;
     var x=WX(d.x),z=WZ(d.y);
     if(d.kind==='cactus'){
@@ -7590,13 +7923,13 @@ function buildWorld3D(){
      previous 10400x10400 lands, with the same look (same colours,
      sizes and builders) as the passes above: grass patches x3, and
      ground scatter (tufts / flowers / pebbles) at 3x the counts. */
-  for(var npi=0;npi<2640;npi++){
+  if(mode==='record'){
+  for(var npi=0;npi<1700;npi++){ /* attempts trimmed 2640 -> 1700 (perf pass): the far new lands carry a little less grass-patch geometry; the old lands' pass above is untouched */
     var npx=rnd()*W,npz=rnd()*H;
     if(npx<PREV3D&&npz<PREV3D)continue;      // new lands only
     if(regionAt(npx,npz)!=='green')continue;
     if(townNorm(npx,npz)<1.05)continue;
-    var np=new THREE.Mesh(G('patch',function(){return new THREE.PlaneGeometry(90,90);}),M(rnd()<0.5?0x35542f:0x40663c));
-    np.rotation.x=-Math.PI/2;np.rotation.z=rnd()*3;np.position.set(WX(npx),terrainH(npx,npz)+0.6,WZ(npz));np.receiveShadow=true;staticGroup.add(np);
+    scatterRecords.push({k:'patch',x:npx,y:npz,c:rnd()<0.5?0x35542f:0x40663c,r:rnd()*3});
   }
   function scatterPointNew(){
     for(var tr2=0;tr2<24;tr2++){
@@ -7612,23 +7945,29 @@ function buildWorld3D(){
     }
     return null;
   }
-  for(var ntui=0;ntui<620*3;ntui++){
+  for(var ntui=0;ntui<400*3;ntui++){ /* trimmed 620*3 -> 400*3 (perf pass, new lands only) */
     var ntp=scatterPointNew(); if(!ntp)continue;
-    var ntc=cone(3.6+rnd()*2.6,8+rnd()*7,tuftGreens[Math.floor(rnd()*tuftGreens.length)],WX(ntp[0]),terrainH(ntp[0],ntp[1])+3.4,WZ(ntp[1]),staticGroup,5);
-    ntc.castShadow=false;
+    scatterRecords.push({k:'tuft',x:ntp[0],y:ntp[1],r:3.6+rnd()*2.6,h:8+rnd()*7,c:tuftGreens[Math.floor(rnd()*tuftGreens.length)]});
   }
-  for(var nfli=0;nfli<300*3;nfli++){
+  for(var nfli=0;nfli<200*3;nfli++){ /* trimmed 300*3 -> 200*3 (perf pass, new lands only) */
     var nfp=scatterPointNew(); if(!nfp)continue;
-    var nfh=terrainH(nfp[0],nfp[1]);
-    cyl(0.7,0.9,6,0x3f7a3a,WX(nfp[0]),nfh+3,WZ(nfp[1]),staticGroup,4).castShadow=false;
-    sph(2.6,flowerCols[Math.floor(rnd()*flowerCols.length)],WX(nfp[0]),nfh+7,WZ(nfp[1]),staticGroup).castShadow=false;
+    scatterRecords.push({k:'flower',x:nfp[0],y:nfp[1],c:flowerCols[Math.floor(rnd()*flowerCols.length)]});
   }
-  for(var npbi=0;npbi<240*3;npbi++){
+  for(var npbi=0;npbi<160*3;npbi++){ /* trimmed 240*3 -> 160*3 (perf pass, new lands only) */
     var npp=scatterPointNew(); if(!npp)continue;
     var npr=2+rnd()*3.4;
-    var npb=new THREE.Mesh(G('gpeb'+Math.round(npr*2),function(){return new THREE.DodecahedronGeometry(npr,0);}),M(rnd()<0.5?0x8d9299:0x7d7466));
-    npb.position.set(WX(npp[0]),terrainH(npp[0],npp[1])+npr*0.3,WZ(npp[1])); npb.rotation.set(rnd()*3,rnd()*3,0);
-    npb.receiveShadow=true; staticGroup.add(npb);
+    scatterRecords.push({k:'pebble',x:npp[0],y:npp[1],s:npr,c:rnd()<0.5?0x8d9299:0x7d7466,rx:rnd()*3,ry:rnd()*3});
+  }
+  } /* end of the record pass's new-lands scatter */
+  if(mode==='record')return; /* the record pass only fills scatterRecords — nothing is built or merged */
+  /* chunk pass: materialise this chunk's recorded cosmetic scatter
+     (no rnd() is consumed here — every parameter was recorded) */
+  if(mode==='chunk'&&scatterRecords){
+    for(var sri=0;sri<scatterRecords.length;sri++){
+      var sr9=scatterRecords[sri];
+      if(Math.floor(sr9.x/CHUNK_CH)!==BUILD_CX||Math.floor(sr9.y/CHUNK_CH)!==BUILD_CY)continue;
+      buildScatterRecord(sr9);
+    }
   }
   buildTown3D();
   mergeStaticMeshes();
@@ -7645,7 +7984,7 @@ function mergeStaticMeshes(){
   if(!staticGroup||!THREE_OK)return;
   staticGroup.updateMatrixWorld(true);
   var CH=650, groups={}, order=[], meshes=[];
-  for(var ci=1;ci<staticGroup.children.length;ci++){
+  for(var ci=0;ci<staticGroup.children.length;ci++){
     staticGroup.children[ci].traverse(function(m){if(m.isMesh)meshes.push(m);});
   }
   meshes.forEach(function(m){
@@ -7668,7 +8007,7 @@ function mergeStaticMeshes(){
     gr.vc+=pa.count;
     gg.dispose();
   });
-  while(staticGroup.children.length>1){var c=staticGroup.children[1];staticGroup.remove(c);if(c.userData&&c.userData._merged&&c.geometry)c.geometry.dispose();}
+  while(staticGroup.children.length){var c=staticGroup.children[0];staticGroup.remove(c);if(c.userData&&c.userData._merged&&c.geometry)c.geometry.dispose();}
   order.forEach(function(key){
     var gr=groups[key]; if(!gr.vc)return;
     var geo=new THREE.BufferGeometry();
@@ -7863,7 +8202,19 @@ function enemyModel(type){
       clubM=cyl(3*sc,4.6*sc,21*sc,0x6b4a2c,0,-3*sc,2.5*sc,hdR,7); clubM.rotation.x=0.5; /* heavy club gripped in the right hand */
     }
     g.userData.gob={torso:torso,head:head,shL:shL,shR:shR,elL:elL,elR:elR,legL:legL,legR:legR,bow:bowM,staffG:staffG,orb:orbM,club:clubM,baseTorsoX:0.55,baseHeadX:0.22,baseElX:-0.34,baseShZL:shL.rotation.z,baseShZR:shR.rotation.z,amp:0};
-    g.userData.groundOff=-1;
+    /* SIZE: the build above stands 31.04 units to the top of the head
+       (measured on the real geometry; the chief's 1.5x build reaches
+       46.55), but a goblin stands 1m tall in this world — 10 units at
+       10 units = 1m. So the finished model is scaled by 10 / 31.04 =
+       0.3222: the regular goblin, archer and shaman come out at
+       exactly 1m and the chief keeps his half-again build at 1.5m.
+       Proportions, pose and the all-rotation animation are untouched —
+       only the size changes. ETYPES.size (collision radius, combat
+       ranges, label height) and the walk bob in syncEntity are scaled
+       by the same factor, and groundOff scales with the model, as
+       humanoid()'s does. */
+    g.scale.setScalar(0.3222);
+    g.userData.groundOff=-0.32;
   }else if(type==='wolf'){
     var bd=box(20,16,38,0x8d99a6,0,24,0,g);
     box(13,13,16,0x7c8794,0,32,20,g);
@@ -7983,6 +8334,7 @@ function syncEntity(ent,kind,now){
   if(Math.abs(dx)+Math.abs(dy)>0.05){ent._face=Math.atan2(dx,dy);ent._px=ent.x;ent._py=ent.y;}
   else if(kind!=='e'&&ent.dir){/* keep last facing */}
   var bob=(kind==='e'&&(ent.type==='slime'||ent.type==='magma'))?Math.abs(Math.sin(now/700+(ent.walk||0)*0.4))*4:Math.abs(Math.sin(ent.walk||0))*(kind==='e'?2.2:0.7); /* slime bob: same height, ~2.5x slower cycle (ブヨブヨをゆっくりに) — player bob scaled to the 1.7m body */
+  if(kind==='e'&&ent.fam==='gob')bob*=0.3222; /* the goblin family stands 1m tall (see enemyModel), so its walk bob shrinks by the same factor instead of hopping the generic 2.2 units */
   var groundY=terrainH(ent.x,ent.y);
   mesh.position.set(WX(ent.x),groundY+bob+(mesh.userData.groundOff||0),WZ(ent.y));
   if(ent._face!==undefined){
@@ -8130,7 +8482,8 @@ function render3D(now){
   if(!scene)return;
   if(!_pv)_pv=new THREE.Vector3();
   var sig=obstacles.length+'_'+decorations.length+'_'+townFeatures.length+'_'+deletedBuiltins.length;
-  if(sig!==staticSig){staticSig=sig;buildWorld3D();}
+  if(sig!==staticSig){staticSig=sig;rebuildStaticWorld();} /* sig change = full chunked rebuild: always pass + near chunks now, the rest queued (see rebuildStaticWorld) */
+  updateChunkManager(now); /* build queued ground / static chunks near the player, discard the far ones */
   if(typeof currentPlacedSig==='function'&&placedSig!==currentPlacedSig())rebuildPlaced3D();
   if(typeof updateEditorVisuals==='function')updateEditorVisuals();
   updateWaterFx(now); /* water shader time, waterfall scroll, spray */
@@ -8765,7 +9118,7 @@ $('startBtn').addEventListener('click',function(){
   resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
   clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; topLift=0; /* a fresh character starts on a fresh world */
   setupSkillUI(selectedClass);
-  genWorld();populate();
+  genWorldThen(function(){
   started=true;
   $('startScreen').style.display='none';
   resize();updateHUD();updateQuest();updatePlayerList();drawMini();refreshSaveUI();
@@ -8776,6 +9129,7 @@ $('startBtn').addEventListener('click',function(){
   if(selectedClass==='archer')chat('<b>案内人リア</b>: アーチャーは矢を消費して戦います。最初に30本持たせてあります。矢は放物線を描いて飛び、地形に刺さった矢は近づいてEキーで回収できます。','world');
   if(acct.token){ setTimeout(function(){ serverSave(false); },700); }
   beep(523,0.1,'triangle',0.05);setTimeout(function(){beep(784,0.16,'triangle',0.05);},100);
+  });
 });
 
 /* ---- official site wiring (public release) ---- */
@@ -8824,8 +9178,11 @@ var healthBtn=$('healthBtn');
 if(healthBtn) healthBtn.addEventListener('click',function(){checkServerHealth(true);});
 checkServerHealth(false);
 
-/* init */
-genWorld();resize();drawPreview();
+/* init — NOTE: genWorld() is deliberately NOT run here any more. The
+   world is generated lazily when the player actually enters (see
+   genWorldThen), so the title / login screen is interactive the
+   moment the page opens instead of freezing on world generation. */
+resize();drawPreview();
 requestAnimationFrame(loop);
 setInterval(resize,1200);
 })();
