@@ -1872,6 +1872,7 @@ function regionAt(x,y){
    found inside are removed by the despawn sweep, and players inside
    slowly heal (isSafe). */
 var TOWN_CX=1560, TOWN_CY=1880, TOWN_RX=1040, TOWN_RY=930; /* EXPANDED SITE AGAIN: the wall ring grew once more (radii 920×810 → 1040×930, centre shifted east/south) and the whole town was re-laid on the photo's proportions with the extra room — the plaza sits SOUTH-EAST with the south gate on its axis, the housing packs the west half, the river corridor and the ponds stand open, and the west lake still stays just outside the west wall */
+var TOWN_RY_S=1030; /* SOUTH SIDE EXPANDED A LITTLE: the wall's southern half now uses this larger radius (930 → 1030, ≈+10m) while the northern half keeps TOWN_RY — so ONLY the south wall stepped south (its due-south point 2810 → 2910), opening extra room inside the town's south side, and the north / east / west walls and every landmark stand exactly where they were. townNorm() and townWallPoint() pick the radius by which side of the centre line a point lies on (the two radii agree on the centre line itself, so the outline stays one unbroken ring). The SOUTH GATE followed the new wall on the plaza's axis and the boulevard lengthened to meet it (see gateA / STREETS) */
 var TOWN_P=3.6; /* superellipse exponent: 2 = ellipse, higher = squarer with rounded corners (the photo's wall) */
 var PLAZA={x:1990,y:2320};          /* the fountain plaza: moved NORTH a little (y 2370 → 2320, −50 units ≈ 5m) at the user's word ("もう少し北"), on top of its earlier big EAST move (1745 → 1990, +245 units ≈ 24m, "もっともっと東"): it now stands well east of the town's centre line (1560), deep in the south-east quarter but a step closer to the river's eastern reach — its north rim still keeps a dry bank clear of the water (the river carve's feather just kisses the rim's edge, as the bank slope did before). The SOUTH GATE stands directly below it on the same north-south axis (see gateA in buildTownData), so the great boulevard runs dead straight from the fountain to the gate. The fountain is its centre. Everything plaza-linked (spawn, corner lamps, the grand staircase's foot, the plaza streets, the market district, townsfolk waypoints) moved north with it, and the east pond + the river's eastern reach shifted north-east out of its way so the plaza's rim keeps a dry bank clear of the water (see POND_E / RIVER). The market stalls are NOT here: they gather in the market district west of the plaza (see buildTownData) */
 /* (earlier history: the plaza's big east move, 1745 → 1990, is recorded in the note above) */
@@ -1899,7 +1900,7 @@ var BRIDGES=[{x:1350,y:1525,rot:0.85},{x:2215,y:1928,rot:1.45},{x:2420,y:2300,ro
    (chunked paving strips in buildTown3D) and init3D() tints the ground
    vertices along them, so the town floor reads as streets, not lawn. --- */
 var STREETS=[
-  {x1:1990,y1:2400,x2:1990,y2:2799,w:64,t:'s'},  /* THE GREAT BOULEVARD: plaza → south gate, one dead-straight run down the shared north-south axis (the gate stands directly below the plaza on its new, far-east axis), and WIDE — a proper stone-paved avenue at the photo's breadth, not a lane */
+  {x1:1990,y1:2400,x2:1990,y2:2898,w:64,t:'s'},  /* THE GREAT BOULEVARD: plaza → south gate, one dead-straight run down the shared north-south axis (the gate stands directly below the plaza on its new, far-east axis), and WIDE — a proper stone-paved avenue at the photo's breadth, not a lane. LENGTHENED (2799 → 2898) to reach the south gate on the expanded south wall (see TOWN_RY_S) */
   {x1:1690,y1:2320,x2:600,y2:2320,w:56,t:'s'},   /* THE WEST STREET: from the plaza's west rim (moved east with the plaza) straight through the housing blocks to the west wall by the clock tower, as in the photo — widened to a full stone street like the boulevard, and kept clear of houses and stalls along its whole run so it reads (and walks) as a street */
   {x1:600,y1:2320,x2:600,y2:1240,w:40,t:'s'},    /* at the west wall the street TURNS NORTH and runs up along the inside of the wall to the north-west district, exactly as the photo's road does — widened with the west street */
   {x1:600,y1:1240,x2:1150,y2:1240,w:24,t:'d'},   /* …and bends east into the NW block at the top */
@@ -1983,12 +1984,12 @@ function stairProfileAt(x,y){
   return best;
 }
 var SAFE_R=170;
-function townNorm(x,y){var dx=Math.abs((x-TOWN_CX)/TOWN_RX), dy=Math.abs((y-TOWN_CY)/TOWN_RY); return Math.pow(Math.pow(dx,TOWN_P)+Math.pow(dy,TOWN_P),1/TOWN_P);}
+function townNorm(x,y){var dx=Math.abs((x-TOWN_CX)/TOWN_RX), dy=Math.abs((y-TOWN_CY)/(y>=TOWN_CY?TOWN_RY_S:TOWN_RY)); return Math.pow(Math.pow(dx,TOWN_P)+Math.pow(dy,TOWN_P),1/TOWN_P);}
 /* point on the wall outline in ray direction t (radians, game plane):
    the ray from the town centre meets the superellipse at norm 1 */
 function townWallPoint(t){
   var c=Math.cos(t), s=Math.sin(t);
-  var r=1/Math.pow(Math.pow(Math.abs(c)/TOWN_RX,TOWN_P)+Math.pow(Math.abs(s)/TOWN_RY,TOWN_P),1/TOWN_P);
+  var r=1/Math.pow(Math.pow(Math.abs(c)/TOWN_RX,TOWN_P)+Math.pow(Math.abs(s)/(s>=0?TOWN_RY_S:TOWN_RY),TOWN_P),1/TOWN_P);
   return {x:TOWN_CX+c*r, y:TOWN_CY+s*r};
 }
 function inTown(x,y){return townNorm(x,y)<=1.0;}
@@ -2005,7 +2006,7 @@ function buildTownData(){
   function circ(x,y,r,flags){var o={type:'circle',x:x,y:y,r:r,town:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
   /* --- city wall: stone segments following the rounded-square outline,
      with gaps at the two gates and at the river's water gate --- */
-  var gateA=[64.93*Math.PI/180,128*Math.PI/180]; /* south gate — moved so it stands DIRECTLY BELOW the fountain plaza on its new far-east axis: at 64.93° the wall point lands at (1990, 2799), exactly on the plaza's north-south axis, so the boulevard runs dead straight from the fountain to the gate — then the south-west corner gate (its dirt road runs out diagonally) */
+  var gateA=[67.10*Math.PI/180,128*Math.PI/180]; /* south gate — stands DIRECTLY BELOW the fountain plaza on its far-east axis, FOLLOWING THE EXPANDED SOUTH WALL (see TOWN_RY_S): at 67.10° the wall point lands at (1990, 2898), exactly on the plaza's north-south axis, so the boulevard runs dead straight from the fountain to the gate (it stood at 64.93° / (1990, 2799) before the south side grew) — then the south-west corner gate (its dirt road runs out diagonally) */
   var riverA=Math.atan2(RIVER[RIVER.length-2][1]-TOWN_CY,RIVER[RIVER.length-2][0]-TOWN_CX); /* direction of the river's wall crossing (its water-gate point) */
   function wallTan(a){var p1=townWallPoint(a-0.02), p2=townWallPoint(a+0.02); var dx=p2.x-p1.x, dy=p2.y-p1.y, l=Math.hypot(dx,dy)||1; return {x:dx/l,y:dy/l};}
   var wallStep=0;
