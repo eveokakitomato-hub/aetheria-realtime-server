@@ -2363,6 +2363,25 @@ function buildTownData(){
     [[1620,1330,34],[1740,1290,42],[2085,1480,30],[2285,1405,44],[2472,1392,32],[1691,936,38],[1910,924,30],[2135,942,42],[2410,936,34],[2516,1105,30],[2222,1061,26],[1772,1330,24],[2560,1330,28],[2150,1180,26],[2050,1290,22]].forEach(function(rk2){townRock(rk2[0],rk2[1],rk2[2]);}); /* terrace-edge crags — the last two stud the green slope between the landing circle and the two forecourts; the 1st and 2nd stepped west / north off the folded-back upper flight's corridor when the staircase grew (its foot now starts at the mid terrace's NW rim, (1720,1440)), so no crag stands on its treads */
     [[1904,1518,27],[1904,1602,25],[1830,1640,29],[1756,1602,26],[1746,1545,24],[1872,1486,22]].forEach(function(rk5){townRock(rk5[0],rk5[1],rk5[2]);}); /* the mid terrace fountain pond's rock ring: six BIG boulders hugging the enlarged pond's rim (r ≈85 about MID_TERRACE), as in the photo — clear of both flight corridors where they meet the terrace */
   })();
+  /* --- NO TREES INSIDE THE WALL (at the user's word): every tree
+     planted above whose trunk stands inside the town wall
+     (townNorm <= 1.0) is removed again here, together with its
+     collision — the garden shade trees between the houses, the
+     street-side trees, the terrace trees, the gorge-shoulder pines
+     and any mountain-slope pine that landed inside the wall line.
+     Trees OUTSIDE the wall (the west grove, the south grassland
+     pines, the falls screen's outer ring, the mountain slopes
+     beyond the wall and all the conifer forest bands) are NOT
+     touched and stand exactly as before. The placement calls above
+     are left in place on purpose, so the seeded rnd() sequence —
+     and therefore every outside tree's position — is unchanged. --- */
+  for(var ti9=decorations.length-1;ti9>=0;ti9--){
+    var td9=decorations[ti9];
+    if((td9.kind==='tree'||td9.kind==='snowtree'||td9.kind==='flower')&&townNorm(td9.x,td9.y)<=1.0){
+      for(var oi9=obstacles.length-1;oi9>=0;oi9--){if(obstacles[oi9].ref===td9)obstacles.splice(oi9,1);}
+      decorations.splice(ti9,1);
+    }
+  }
 }
 function genWorld(){
   obstacles=[];decorations=[];
@@ -6554,10 +6573,9 @@ function buildTown3D(){
       var shutCols=[0x3a6b4f,0x7a3a2e,0x35507a,0x6b4a2c];
       var shutC=shutCols[Math.floor(f.seed*shutCols.length)%shutCols.length];
       box(5,15,1.6,shutC,-f.w*0.28-10,29,f.d/2+2,hg); box(5,15,1.6,shutC,-f.w*0.28+10,29,f.d/2+2,hg); /* shutters on the front upper window */
-      if(f.seed>0.30&&f.seed<0.72){ /* flower box under that window */
-        box(15,4.5,5.5,WOOD_D,-f.w*0.28,20.5,f.d/2+3.4,hg);
-        sph(2.6,0xe5484d,-f.w*0.28-4.5,23.6,f.d/2+3.6,hg); sph(2.6,0xffd34d,-f.w*0.28,24,f.d/2+3.6,hg); sph(2.6,0xff8fb3,-f.w*0.28+4.5,23.6,f.d/2+3.6,hg);
-      }
+      /* (no flower box under the window any more: every flower
+         inside the town wall was removed at the user's word — the
+         window itself and its shutters above stay as they were) */
       if(f.seed>0.55){ /* coloured shop awning over the front, like the photo's storefronts */
         var awnCols=[0xb03a30,0x3a7a5a,0x3a6bd5,0xc9862b];
         rbox(46,3,26,awnCols[Math.floor(f.seed*4)%4],0,17,f.d/2+13,hg,0,0.32,0);
@@ -6586,10 +6604,10 @@ function buildTown3D(){
           log.rotation.x=Math.PI/2;
         }
       }
-      /* garden strip along the front wall: a low hedge with flowers */
-      box(f.w*0.62,5,5,0x3e7a3e,-f.w*0.10,2.5,f.d/2+4.5,hg);
-      var gfl=[0xe5484d,0xffd34d,0xff8fb3,0xf2ead8];
-      for(var gfi=0;gfi<4;gfi++)sph(2.4,gfl[gfi%4],-f.w*0.10-f.w*0.24+gfi*f.w*0.16,6.4,f.d/2+4.5,hg);
+      /* (no garden strip / flower bed along the front wall any
+         more: every flower bed inside the town wall was removed at
+         the user's word — barrels, crates and the wood pile above
+         are the house's yard furniture and stay) */
     }else if(f.kind==='clocktower'){
       var cg=new THREE.Group(); cg.position.set(WX(f.x),gh-2,WZ(f.y)); cg.scale.set(1.06,1.2,1.06); staticGroup.add(cg); /* grown ~20% taller: a landmark over the west rooftops, as in the photo (footprint stays inside its collision) */
       box(84,26,84,STONE_D,0,13,0,cg);                                 /* squat stone base (inside the existing r42 collision) */
@@ -6983,7 +7001,7 @@ function buildWorld3D(){
     tc.castShadow=false;
   }
   for(var fli=0;fli<300;fli++){
-    var fp2=scatterPoint(fli<110); if(!fp2)continue;
+    var fp2=scatterPoint(false); if(!fp2)continue; /* flowers are NEVER sown inside the town wall any more (at the user's word every flower in Luminas was removed — flower beds and ground flowers alike): scatterPoint(false) already keeps out of the walled interior, so all 300 draws land in the fields outside, whose wild flowers are unchanged. (Grass tufts above still green the town's garden lawns — tufts are grass, not flowers.) */
     var fh=terrainH(fp2[0],fp2[1]);
     cyl(0.7,0.9,6,0x3f7a3a,WX(fp2[0]),fh+3,WZ(fp2[1]),staticGroup,4).castShadow=false;
     sph(2.6,flowerCols[Math.floor(rnd()*flowerCols.length)],WX(fp2[0]),fh+7,WZ(fp2[1]),staticGroup).castShadow=false;
