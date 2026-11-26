@@ -245,13 +245,8 @@ body.bag-open #hotbar,body.bag-open #itemHotbar{z-index:65} /* while the bag is 
 
 /* ===== START SCREEN ===== */
 #startScreen{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(900px 500px at 50% -10%,#2a4432 0%,transparent 60%),linear-gradient(180deg,#0d1711,#070b09);overflow-y:auto}
-.start-card{width:min(920px,100%);display:grid;grid-template-columns:1.05fr .95fr;gap:0;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:0 30px 80px rgba(0,0,0,.6)}
-.start-visual{position:relative;min-height:420px;background:radial-gradient(720px 340px at 50% -60px,rgba(232,194,104,.16),transparent 62%),linear-gradient(168deg,#22392a 0%,#16241b 55%,#0d1711 100%);overflow:hidden}
-.start-visual::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 200px at 82% 18%,rgba(126,240,212,.07),transparent 65%),radial-gradient(360px 260px at 12% 78%,rgba(232,194,104,.06),transparent 65%)}
-.start-visual .caption{position:absolute;left:16px;bottom:14px;right:16px;background:rgba(7,12,9,.82);border:1px solid var(--line2);border-radius:8px;padding:11px 13px;z-index:2}
-.start-visual .caption b{font-family:Cinzel,serif;letter-spacing:.12em;font-size:13px;color:var(--gold)}
-.start-visual .caption p{margin:4px 0 0;font-size:12px;color:#cfe0d4;line-height:1.6}
-.start-form{padding:26px 26px 22px}
+.start-card{width:100%;display:block;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.start-form{padding:30px 34px 26px}
 .start-form .eyebrow{font-family:Cinzel,serif;letter-spacing:.22em;color:var(--gold);font-size:11px}
 .start-form h1{font-family:Cinzel,serif;font-size:34px;line-height:.95;margin:8px 0 4px;letter-spacing:.02em}
 .start-form h1 span{color:var(--gold)}
@@ -470,8 +465,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   #cdPanel{left:10px;top:148px}
   .cd-row{min-width:148px;padding:4px 7px 4px 5px}
   #itemHotbar{right:10px;bottom:10px;gap:6px}
-  .start-card{grid-template-columns:1fr}
-  .start-visual{min-height:210px}
+  .start-form{padding:20px 16px 18px}
   .brand span{display:none}
 }
 @media(pointer:coarse){#joystick{display:block}}
@@ -930,9 +924,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
       <div class="start-wrap" id="secPlay">
         <div class="start-card">
-          <div class="start-visual">
-            <div class="caption"><b>WELCOME TO AETHERIA</b><p>歩ける・会える・戦える世界が、ブラウザの中に広がっています。同じリンクを開いた友だちとは、スポーン地点で落ち合えます。</p></div>
-          </div>
           <div class="start-form">
             <div class="eyebrow">BROWSER MMORPG — 正式サービス中</div>
             <h1>AETHERIA<br><span>ONLINE</span></h1>
@@ -1018,6 +1009,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">サイト</span><span><b>ログイン画面が、画面の幅いっぱいに広がりました。</b>タイトル画面の左側にあったパネルを取り払い、アカウントのログイン・アカウント作成・ゲストプレイのフォームが、左のスペースまで画面いっぱいに表示されるようになりました。ログインまわりの機能や入力項目は今まで通りです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>アルトの南門から風車への道に被っていた家を撤去しました。</b>南門から風車広場へまっすぐ続く道の脇に建っていた家（高い煙突の鍛冶屋の家）を取り壊しました。建物が大きくなったことで、屋根や土台が道に被るようになっていたためです。道は南門から風車まで、家に遮られずまっすぐ通れるようになりました。他の家・冒険者ギルド・風車は今まで通りです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログイン時の再開位置が、保存した場所の近くになりました。</b>保存した位置が建物などと重なっていた場合、これまでは初期スポーン（アルト風車広場の南）まで戻されていましたが、保存位置のすぐ近くで当たり判定に触れない空き場所を探して、そこから再開するようになりました。近くに空き場所がどうしても見つからない場合のみ、初期スポーンに戻ります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">サイト</span><span><b>公式サイトのドット絵を取り除きました。</b>タイトル画面に表示されていたドット絵（ピクセルアート調のイラスト）を撤去し、すっきりした見た目に整えました。タイトルやお知らせ、ワールド紹介などの文章とレイアウト、ゲーム本編の見た目は今まで通りです。</span></li>
@@ -1037,7 +1029,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">戦闘</span><span><b>弓矢の射程が伸びました。</b>矢の初速を上げ、矢にかかる重力を弱めたことで、フルに引いて水平に撃つと約30mまで届くようになりました（これまでは約18m）。軽く引いただけのタップ撃ちも少しだけ伸びていますが、引き具合で飛距離が変わる感覚は今まで通りです。敵の矢の飛び方は変わっていません。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>アルトの木柵が高くなり、南門が大きくなりました。</b>村を囲う丸太の柵を背の高い柵に作り替え、当たり判定も新しい高さに合わせました。南門は門柱・横木ともに大きな門に建て替え、開口部も広くなっています。あわせて、門と柵の間に空いていた隙間をなくし、柵が門柱までつながるようにしました（門の通り抜けは今まで通りできます）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの南門まわりの道のズレを直しました。</b>門の柱の見た目と当たり判定の位置がずれていたのをそろえ、南門の南で川に架かる木の橋も、道の真ん中の軸に合わせてかけ直しました。南門から風車広場まで、道がまっすぐ一本につながっています。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">システム</span><span><b>自動保存が速くなりました。</b>これまでは進捗が変わってから保存まで数秒の待ち時間がありましたが、通常の変化はほぼすぐに、レベルアップ・クエスト完了・ゴールドや持ち物の変化はその場で保存されるようになりました。画面の「自動保存済み」の時刻も、実際に保存できた瞬間と一致するようになっています。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
