@@ -246,8 +246,8 @@ body.bag-open #hotbar,body.bag-open #itemHotbar{z-index:65} /* while the bag is 
 /* ===== START SCREEN ===== */
 #startScreen{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(900px 500px at 50% -10%,#2a4432 0%,transparent 60%),linear-gradient(180deg,#0d1711,#070b09);overflow-y:auto}
 .start-card{width:min(920px,100%);display:grid;grid-template-columns:1.05fr .95fr;gap:0;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:0 30px 80px rgba(0,0,0,.6)}
-.start-visual{position:relative;min-height:420px;background:linear-gradient(180deg,#79a86b 0%,#4a7a4e 34%,#2e5d3a 34.2%,#24492e 100%);overflow:hidden}
-.start-visual canvas{position:absolute;inset:0;width:100%;height:100%}
+.start-visual{position:relative;min-height:420px;background:radial-gradient(720px 340px at 50% -60px,rgba(232,194,104,.16),transparent 62%),linear-gradient(168deg,#22392a 0%,#16241b 55%,#0d1711 100%);overflow:hidden}
+.start-visual::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 200px at 82% 18%,rgba(126,240,212,.07),transparent 65%),radial-gradient(360px 260px at 12% 78%,rgba(232,194,104,.06),transparent 65%)}
 .start-visual .caption{position:absolute;left:16px;bottom:14px;right:16px;background:rgba(7,12,9,.82);border:1px solid var(--line2);border-radius:8px;padding:11px 13px;z-index:2}
 .start-visual .caption b{font-family:Cinzel,serif;letter-spacing:.12em;font-size:13px;color:var(--gold)}
 .start-visual .caption p{margin:4px 0 0;font-size:12px;color:#cfe0d4;line-height:1.6}
@@ -931,7 +931,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="start-wrap" id="secPlay">
         <div class="start-card">
           <div class="start-visual">
-            <canvas id="previewCanvas" width="600" height="520"></canvas>
             <div class="caption"><b>WELCOME TO AETHERIA</b><p>歩ける・会える・戦える世界が、ブラウザの中に広がっています。同じリンクを開いた友だちとは、スポーン地点で落ち合えます。</p></div>
           </div>
           <div class="start-form">
@@ -1019,6 +1018,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">サイト</span><span><b>公式サイトのドット絵を取り除きました。</b>タイトル画面に表示されていたドット絵（ピクセルアート調のイラスト）を撤去し、すっきりした見た目に整えました。タイトルやお知らせ、ワールド紹介などの文章とレイアウト、ゲーム本編の見た目は今まで通りです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドの中が明るくなりました。</b>ホールの吊りランプを3つから7つに増やしてひと回り大きくし、柔らかい光の輪も付けました。床とラグの色も少し明るくし、窓ガラスも昼の光を返すようになっています。ギルドの外観や屋外の明るさは今まで通りです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>風見村アルトの建物が、ひと回り大きくなりました。</b>家6軒・冒険者ギルド・風車のすべてを約1.3倍に建て替えました（間取りも高さも）。当たり判定と屋根の上も新しい大きさに合わせてあります。村で一番大きな建物は、これまで通り冒険者ギルドです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>アルトの建物の窓の位置が、家ごとに少しずつ違うようになりました。</b>これまで全軒同じだった窓の配置を、家ごとに左右・高さを少しずつずらしました。冒険者ギルドの窓も、少しだけ位置にばらつきをつけています。</span></li>
@@ -1038,7 +1038,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">システム</span><span><b>自動保存が速くなりました。</b>これまでは進捗が変わってから保存まで数秒の待ち時間がありましたが、通常の変化はほぼすぐに、レベルアップ・クエスト完了・ゴールドや持ち物の変化はその場で保存されるようになりました。画面の「自動保存済み」の時刻も、実際に保存できた瞬間と一致するようになっています。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>風見村アルトの家が大きくなりました。</b>屋根はそのままに壁だけを高くして、家の中が広々としました。あわせて、南門から風車へ続く道に被っていた家を、道にかからない位置へ移しました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドが大きくなり、中に入れるようになりました。</b>建物をひと回り大きくし、南側の両開きドアからホールへ入れるようになりました。ホールには受付カウンターや掲示板、テーブルがあります。アルトへお越しの際はぜひ中をのぞいてみてください。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの木柵が消える不具合を修正しました。</b>読み込み方式の変更が影響して、村を囲う丸い木柵が表示されなくなっていた問題を修正。木柵は一周、元通り見えるようになっています。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -1635,7 +1634,7 @@ function doLogout(){
   $('startScreen').style.display='flex';
   $('startScreen').scrollTop=0;
   if(typeof refreshAcctUI==='function')refreshAcctUI();
-  resize();drawPreview();
+  resize();
   chat('— ログアウトしました —','sys');
 }
 
@@ -9060,26 +9059,6 @@ function setupCameraControls(){
   el.addEventListener('wheel',function(e){e.preventDefault();camFov=Math.max(42,Math.min(75,camFov+e.deltaY*0.03));if(camera3d){camera3d.fov=camFov;camera3d.updateProjectionMatrix();}},{passive:false});
 }
 
-/* ================= PREVIEW (start screen) ================= */
-function drawPreview(){
-  var c=$('previewCanvas');if(!c)return;var g=c.getContext('2d');
-  g.fillStyle='#4a7a4e';g.fillRect(0,0,600,330);
-  for(var i=0;i<130;i++){g.fillStyle=i%3?'#527f52':'#43704a';g.fillRect((i*47)%600,(i*83)%320,26,10);}
-  g.fillStyle='#8d8574';g.fillRect(0,330,600,190);
-  g.fillStyle='#9a917e';g.fillRect(270,0,60,520);
-  g.font='44px serif';g.textAlign='center';
-  var t=performance.now()/600;
-  [['🌲',60,90],['🌲',520,70],['🌲',110,250],['🌳',480,260],['🌲',40,300],['🌳',560,180]].forEach(function(tr){g.fillText(tr[0],tr[1],tr[2]);});
-  g.fillText('🏠',180,190);g.fillText('🏰',420,150);g.fillText('⛲',300,300);
-  g.font='30px serif';
-  g.fillText('⚔️',250+Math.sin(t)*16,400);g.fillText('🔮',330,385+Math.sin(t*1.3)*5);g.fillText('🏹',370+Math.cos(t)*10,420);
-  g.fillText('🟢',140,440+Math.sin(t*2)*4);g.fillText('🟢',470,460);g.fillText('👺',500,120);
-  g.font='700 12px "Noto Sans JP"';g.fillStyle='rgba(0,0,0,.55)';
-  g.fillRect(196,352,86,17);g.fillRect(96,408,74,17);
-  g.fillStyle='#ffd873';g.fillText('Lv.1 ソラ',239,364);g.fillStyle='#fff';g.fillText('スライム',133,420);
-  if(!started)requestAnimationFrame(drawPreview);
-}
-
 /* ================= LOOP ================= */
 var lastT=performance.now(),miniT=0,listT=0,exploreT=0,spawnT=0;
 function loop(now){
@@ -9505,7 +9484,7 @@ checkServerHealth(false);
    world is generated lazily when the player actually enters (see
    genWorldThen), so the title / login screen is interactive the
    moment the page opens instead of freezing on world generation. */
-resize();drawPreview();
+resize();
 requestAnimationFrame(loop);
 setInterval(resize,1200);
 })();
