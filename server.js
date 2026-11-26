@@ -64,7 +64,7 @@ const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 const ACCOUNTS_ENABLED = !!(SUPABASE_URL && SUPABASE_SERVICE_KEY);
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30日
-const CHAR_MAX_BYTES = 256 * 1024;
+const CHAR_MAX_BYTES = 2 * 1024 * 1024; /* raised from 256KB (2026-11-27): a gamemaster save carries worldEdit terrain/building data on top of the character, and oversized saves were rejected with 413 — the client then retried silently forever, so the stored character (including its position) never updated and login kept resuming at an old spot. 2MB leaves ample headroom while still bounding abuse. */
 const loginFails = new Map(); // username -> {count, lockedUntil}
 
 async function sb(pathname, { method = 'GET', body = null, prefer = '' } = {}) {
