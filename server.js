@@ -112,7 +112,7 @@ function readJsonBody(req) {
     let size = 0;
     req.on('data', (c) => {
       size += c.length;
-      if (size > 512 * 1024) { req.destroy(); resolve(null); return; }
+      if (size > 3 * 1024 * 1024) { req.destroy(); resolve(null); return; } /* body cap raised 512KB -> 3MB (2026-11-27): the old 512KB cap destroyed save requests mid-flight (clients saw an empty 502), so any character save over ~512KB — e.g. a gamemaster save carrying worldEdit data — could NEVER be stored, and login kept resuming at a stale position. The cap stays above CHAR_MAX_BYTES (2MB) plus the JSON envelope so the 413 check, not a dead connection, is what rejects oversize characters. */
       chunks.push(c);
     });
     req.on('end', () => {
