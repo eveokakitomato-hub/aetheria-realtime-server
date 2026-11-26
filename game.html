@@ -280,6 +280,12 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .death-card p{color:#c9a3a3;font-size:13px;line-height:1.7}
 .death-card button{background:var(--red);color:#fff;border:0;border-radius:6px;padding:12px 22px;font-weight:900;width:100%}
 #toast{position:absolute;left:50%;top:112px;transform:translateX(-50%);z-index:35;background:rgba(10,14,12,.92);border:1px solid var(--gold2);color:var(--gold);padding:9px 16px;border-radius:999px;font-size:12px;font-weight:700;display:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#saveWarn{position:absolute;left:50%;top:64px;transform:translateX(-50%);z-index:36;display:none;align-items:center;gap:10px;max-width:min(680px,94vw);background:rgba(46,10,12,.96);border:2px solid var(--red);color:#ffd7d7;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:700;line-height:1.6;box-shadow:0 10px 34px rgba(0,0,0,.6)}
+#saveWarn button{flex-shrink:0;background:var(--red);color:#fff;border:0;border-radius:6px;padding:9px 14px;font-weight:900;font-size:12px;min-height:38px}
+#saveWarn button:hover{background:#f0565c}
+.save-status-line{display:none;margin-top:10px;border-radius:8px;padding:10px 12px;font-size:12px;font-weight:700;line-height:1.7}
+.save-status-line.ok{display:block;background:#12241a;border:1px solid #2f5d3f;color:#8fe3ae}
+.save-status-line.ng{display:block;background:#2e0a0c;border:1px solid var(--red);color:#ffb9b9}
 #continueBtn{width:100%;background:transparent;color:var(--gold);border:1px solid var(--gold2);border-radius:7px;padding:12px;font-weight:900;font-size:14px;margin-top:10px}
 #continueBtn:hover{background:#2a2413;border-color:var(--gold)}
 .save-note{font-size:11px;color:var(--muted);line-height:1.6;margin:8px 0 0;text-align:center}
@@ -634,6 +640,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 
     <div id="targetInfo"><b id="targetName">スライム Lv.1</b><div class="tbar"><i id="targetHp"></i></div></div>
     <div id="toast"></div>
+    <div id="saveWarn" role="alert"><span id="saveWarnText">⚠ 自動保存ができていません</span><button type="button" id="saveWarnRetry">今すぐ再試行</button></div>
 
     <!-- HUD -->
     <div id="hud">
@@ -884,6 +891,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <h2>💾 セーブ</h2>
       <p class="sub">アカウントでログイン中は、進捗はサーバーへ自動保存されるので、この画面を開く必要はありません。ここでは手動での同期と、バックアップ用のファイル書き出しができます。</p>
       <div class="save-summary" id="saveSummary">—</div>
+      <div class="save-status-line" id="saveStatusLine" role="status"></div>
       <div class="save-actions">
         <button id="serverSaveBtn" type="button" style="display:none">☁ サーバーへ今すぐ保存（自動保存ON）</button>
         <button id="downloadSaveBtn" type="button">⬇ セーブデータを保存する</button>
@@ -1009,6 +1017,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログアウトした瞬間の場所が、確実に保存されるようになりました。</b>これまでは、歩いた直後にログアウトすると自動保存が間に合わず、少し前の場所から再開してしまうことがありました。数秒待たなくても、ログアウト操作そのものでその場所が保存されます。次回はログアウトした場所からそのまま再開できます。</span></li>
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存に失敗したとき、画面に警告が出るようになりました。</b>これまで自動保存がサーバーに届かなかった場合、そのまま気づけずに古い保存位置から再開してしまうことがありました。保存が続けて失敗すると「自動保存ができていません」という警告が画面に表示され、セーブ画面でも保存の状態が確認できるようになりました。保存が成功すると警告は消えます。あわせて、サーバー側で保存できるデータの上限も引き上げました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">サイト</span><span><b>ログイン画面が、画面の幅いっぱいに広がりました。</b>タイトル画面の左側にあったパネルを取り払い、アカウントのログイン・アカウント作成・ゲストプレイのフォームが、左のスペースまで画面いっぱいに表示されるようになりました。ログインまわりの機能や入力項目は今まで通りです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>アルトの南門から風車への道に被っていた家を撤去しました。</b>南門から風車広場へまっすぐ続く道の脇に建っていた家（高い煙突の鍛冶屋の家）を取り壊しました。建物が大きくなったことで、屋根や土台が道に被るようになっていたためです。道は南門から風車まで、家に遮られずまっすぐ通れるようになりました。他の家・冒険者ギルド・風車は今まで通りです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログイン時の再開位置が、保存した場所の近くになりました。</b>保存した位置が建物などと重なっていた場合、これまでは初期スポーン（アルト風車広場の南）まで戻されていましたが、保存位置のすぐ近くで当たり判定に触れない空き場所を探して、そこから再開するようになりました。近くに空き場所がどうしても見つからない場合のみ、初期スポーンに戻ります。</span></li>
@@ -1027,8 +1037,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの風車広場と道のめり込みを直しました。</b>風車のある円形の石畳広場に、南門からの土の道が食い込んで見えていたのを修正。重なる部分では広場の石畳が上に来るよう、広場の石畳を少し高くしました。道の通り道は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>露店の陳列台を低くしました。</b>ルミナスの市場と風見村アルトの露店で、商品を置く台が高すぎたのを、腰から胸くらいの自然な高さ（約1m）に下げました。台の上に並ぶ商品や木箱も、新しい台の高さに合わせて置き直しています。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">戦闘</span><span><b>弓矢の射程が伸びました。</b>矢の初速を上げ、矢にかかる重力を弱めたことで、フルに引いて水平に撃つと約30mまで届くようになりました（これまでは約18m）。軽く引いただけのタップ撃ちも少しだけ伸びていますが、引き具合で飛距離が変わる感覚は今まで通りです。敵の矢の飛び方は変わっていません。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>アルトの木柵が高くなり、南門が大きくなりました。</b>村を囲う丸太の柵を背の高い柵に作り替え、当たり判定も新しい高さに合わせました。南門は門柱・横木ともに大きな門に建て替え、開口部も広くなっています。あわせて、門と柵の間に空いていた隙間をなくし、柵が門柱までつながるようにしました（門の通り抜けは今まで通りできます）。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの南門まわりの道のズレを直しました。</b>門の柱の見た目と当たり判定の位置がずれていたのをそろえ、南門の南で川に架かる木の橋も、道の真ん中の軸に合わせてかけ直しました。南門から風車広場まで、道がまっすぐ一本につながっています。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -1611,7 +1619,15 @@ function refreshPlayersUI(){
 }
 function doLogout(){
   if(typeof editorState!=='undefined'&&editorState&&editorState.active){editorState.active=false;editorState.applying=false;var ep=$('editorPanel');if(ep)ep.style.display='none';}
-  if(acct.token)serverSave(false); /* save FIRST (buildSaveData runs synchronously), then clear */
+  /* LOGOUT = FINAL SAVE: capture the exact logout-moment snapshot NOW
+     (buildSaveData runs synchronously) and hand it to serverSave. If
+     another save is already in flight, serverSave parks it as
+     acct.pendingFinal and flushPendingFinal() sends it the moment that
+     save lands — the old code only set saveQueued, which acctTick never
+     consumed after logout (started=false), so the final position was
+     silently lost unless the player had stood still a few seconds. */
+  if(acct.token&&player){var lgSnap=buildSaveData();serverSave(false,lgSnap,progressKey());}
+  else if(acct.token)serverSave(false);
   clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); /* world edits never leak into the next session */
   returnToMenu=false;closeGameMenu(true);
   document.body.classList.remove('bag-open');bagAssignMode=false;bagSelAct=null;closeItemPicker();
@@ -3661,7 +3677,7 @@ function hurtPlayer(dmg,src){
    configured yet (503 accounts_not_configured), the game falls back
    to guest play + file export, exactly as before. */
 var API_BASE='https://aetheria-realtime-server.onrender.com';
-var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login',lastKeySeen:'',lastChangeAt:0,lastSaveStart:0,saveQueued:false,failUntil:0};
+var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login',lastKeySeen:'',lastChangeAt:0,lastSaveStart:0,saveQueued:false,failUntil:0,failCount:0,lastErr:'',pendingFinal:null};
 function acctSetStatus(text,ok){
   var st=$('acctStatus'); if(st){st.textContent=text; st.className=(ok===true)?'ok':((ok===false)?'ng':'');}
   var dot=$('acctDot'); if(dot) dot.className='net-dot '+((ok===true)?'ok':((ok===false)?'':'busy'));
@@ -3684,6 +3700,7 @@ function acctErrorText(code){
     case 'wrong_credentials': return 'ユーザー名またはパスワードが違います。';
     case 'too_many_attempts': return 'ログイン試行が多すぎます。5分ほど待ってから再試行してください。';
     case 'not_logged_in': return 'ログインの有効期限が切れました。再度ログインしてください。';
+    case 'character_too_large': return 'セーブデータが大きすぎて、サーバーに保存できませんでした。';
     default: return 'サーバーでエラーが発生しました。少し待って再試行してください。';
   }
 }
@@ -3756,6 +3773,7 @@ function acctSetMode(mode){
 function acctOnAuth(data){
   acct.token=data.token||null; acct.username=data.username||''; acct.character=data.character||null;
   acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0; acct.lastKeySeen=''; acct.lastChangeAt=0; acct.lastSaveStart=0; acct.saveQueued=false; acct.failUntil=0;
+  clearSaveWarn(); acct.pendingFinal=null;
   /* Restore this account's settings at login (they live in the character save JSON) */
   if(acct.character&&acct.character.settings)applySettingsData(acct.character.settings);
   refreshAcctUI(); refreshSaveUI();
@@ -3797,18 +3815,86 @@ function acctSubmit(){
     acctMsg('サーバーに接続できませんでした。サーバーがスリープしている場合は、1分ほど待ってからもう一度お試しください。',true);
   });
 }
-function serverSave(manual){
-  if(!acct.token||!player||!started)return;
-  if(acct.saving){acct.saveQueued=true;return;}
+/* ===== AUTOSAVE FAILURE WARNING =====
+   Autosave used to fail silently: the request errored, a short backoff
+   was set, and the player was never told — so they kept playing on a
+   stale server save and "continued" from an old position next login.
+   Now consecutive failures (and a 413 character_too_large, which no
+   retry can fix) raise a persistent on-screen warning plus a status
+   line in the save modal. A successful save clears both. Save timing
+   and frequency are unchanged. */
+function showSaveWarn(){
+  var w=$('saveWarn'); if(!w)return;
+  var t=$('saveWarnText');
+  if(t){
+    if(acct.lastErr==='character_too_large'){
+      t.textContent='⚠ 自動保存ができていません — セーブデータが大きすぎてサーバーに保存できませんでした。このまま遊んでも進捗が残らないことがあります。セーブ画面の「⬇ セーブデータを保存する」でファイルにバックアップしてください。';
+    }else{
+      t.textContent='⚠ 自動保存ができていません — サーバーへの保存が'+acct.failCount+'回続けて失敗しています。このまま遊んでも進捗が残らないことがあります。接続を確認してください（自動で再試行は続きます）。';
+    }
+  }
+  if(w.style.display!=='flex'){
+    chat('⚠ <b>自動保存ができていません</b> — サーバーへの保存に失敗しています。進捗が残らないことがあるので、セーブ画面で状態を確認してください。','sys');
+  }
+  w.style.display='flex';
+}
+function clearSaveWarn(){
+  acct.failCount=0; acct.lastErr='';
+  var w=$('saveWarn'); if(w)w.style.display='none';
+}
+function noteSaveFailure(code,status,manual){
+  acct.failCount=(acct.failCount||0)+1;
+  acct.lastErr=code||(status?('http_'+status):'network');
+  acct.failUntil=performance.now()+6000; /* same backoff as before: brief, instead of hammering a struggling server */
+  if(manual||status===413||acct.lastErr==='character_too_large'||acct.failCount>=2)showSaveWarn();
+  refreshSaveUI();
+}
+/* Send the parked logout snapshot (acct.pendingFinal), if any. Called
+   every time an in-flight save settles: the final position captured at
+   the logout moment is written right after, with keepalive, so logout
+   itself is the save — no standing still and waiting for autosave. */
+function flushPendingFinal(){
+  var pf=acct.pendingFinal; if(!pf)return;
+  if(!acct.token){acct.pendingFinal=null;return;}
+  if(acct.saving)return; /* the in-flight save's settle handler calls us again */
+  acct.pendingFinal=null;
   acct.saving=true; acct.lastSaveStart=performance.now(); refreshSaveUI();
-  var data=buildSaveData();
+  acctApi('/api/save',{method:'POST',body:{character:pf.data},keepalive:true}).then(function(r){
+    acct.saving=false;
+    if(r.data&&r.data.ok){
+      clearSaveWarn();
+      acct.character=pf.data; acct.lastAt=new Date(); acct.savedKey=pf.key;
+      lastSaveAt=acct.lastAt; lastSavedKey=pf.key; acct.dirtySince=0;
+    }else if(r.status===401){
+      acct.token=null; acct.username=null; acct.character=null; refreshAcctUI();
+    }else{
+      noteSaveFailure(r.data&&r.data.error,r.status,false);
+      acctMsg('ログアウト時の最終保存に失敗しました。次回は前回保存できた位置から始まります。',true);
+    }
+    refreshSaveUI();
+    flushPendingFinal();
+  }).catch(function(){
+    acct.saving=false;
+    noteSaveFailure('',0,false);
+    acctMsg('ログアウト時の最終保存に失敗しました。次回は前回保存できた位置から始まります。',true);
+    refreshSaveUI();
+    flushPendingFinal();
+  });
+}
+function serverSave(manual,snapData,snapKey){
+  if(!acct.token||!player)return;
+  if(acct.saving){acct.saveQueued=true;if(snapData)acct.pendingFinal={data:snapData,key:snapKey||progressKey()};return;}
+  if(!started&&!snapData)return;
+  acct.saving=true; acct.lastSaveStart=performance.now(); refreshSaveUI();
+  var data=snapData||buildSaveData();
   /* The key of the snapshot actually sent — NOT the live progressKey() at
      response time. Anything that changed while the request was in flight
      must stay "unsaved" so it is written by the follow-up save below. */
-  var sentKey=progressKey();
+  var sentKey=snapKey||progressKey();
   acctApi('/api/save',{method:'POST',body:{character:data},keepalive:true}).then(function(r){
     acct.saving=false;
     if(r.data&&r.data.ok){
+      clearSaveWarn(); /* a successful save clears the failure warning */
       acct.character=data; acct.lastAt=new Date(); acct.savedKey=sentKey;
       refreshAcctUI(); /* first save fixes this account's role from now on */
       lastSaveAt=acct.lastAt; lastSavedKey=sentKey;
@@ -3825,15 +3911,17 @@ function serverSave(manual){
       refreshAcctUI();
       toast('ログインの有効期限が切れました。タイトルに戻って再ログインすると自動保存が再開します',4200);
     }else{
-      acct.failUntil=performance.now()+6000; /* back off briefly instead of hammering a struggling server */
       if(manual)toast('サーバー保存に失敗しました。少し待って再試行してください',3600);
+      noteSaveFailure(r.data&&r.data.error,r.status,manual);
     }
     refreshSaveUI();
+    flushPendingFinal(); /* a parked logout snapshot goes out right after this save lands */
   }).catch(function(){
     acct.saving=false;
-    acct.failUntil=performance.now()+6000;
     if(manual)toast('サーバー保存に失敗しました。接続を確認してください',3600);
+    noteSaveFailure('',0,manual);
     refreshSaveUI();
+    flushPendingFinal();
   });
 }
 /* Ask for an autosave right now — used by important events (level up,
@@ -3880,6 +3968,7 @@ function acctTick(now){
 function acctLogout(){
   var token=acct.token;
   acct.token=null; acct.username=null; acct.character=null; acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0; acct.lastKeySeen=''; acct.lastChangeAt=0; acct.saveQueued=false; acct.failUntil=0;
+  clearSaveWarn(); acct.pendingFinal=null;
   saveGuestSettings(); /* keep the current settings on this device after logout */
   refreshAcctUI(); refreshSaveUI();
   acctSetMode('login');
@@ -3894,8 +3983,12 @@ $('acctPass').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preve
 $('acctContinueBtn').addEventListener('click',function(){acctStartFromCharacter();});
 $('acctLogoutBtn').addEventListener('click',acctLogout);
 $('serverSaveBtn').addEventListener('click',function(){serverSave(true);});
+$('saveWarnRetry').addEventListener('click',function(){acct.failUntil=0;serverSave(true);});
 window.addEventListener('pagehide',function(){
   if(acct.token&&started&&player){ try{ acctApi('/api/save',{method:'POST',body:{character:buildSaveData()},keepalive:true}); }catch(e){} }
+  /* Logged out to the title a moment ago and the tab closes before the
+     parked final save fired: send the logout snapshot itself. */
+  else if(acct.token&&acct.pendingFinal){ try{ acctApi('/api/save',{method:'POST',body:{character:acct.pendingFinal.data},keepalive:true}); }catch(e){} }
 });
 refreshAcctUI();
 
@@ -3931,6 +4024,19 @@ function refreshSaveUI(){
   var note=$('lastSaveNote');
   if(note&&lastSaveAt)note.textContent='前回の保存: '+lastSaveAt.toLocaleString('ja-JP')+(dirty?' — そのあと進捗が進んでいます。再度保存すると最新になります。':'');
   if(note&&acct.token)note.textContent='☁ @'+acct.username+' でログイン中 — 進捗はサーバーへ自動保存されます'+(acct.lastAt?'（前回の保存: '+acct.lastAt.toLocaleString('ja-JP')+'）':'')+'。下のボタンはバックアップ用のファイル書き出しです。';
+  /* 保存状態（成功／失敗）はセーブ画面のこの行でも分かるようにする */
+  var sl=$('saveStatusLine');
+  if(sl){
+    if(acct.token&&acct.failCount>0){
+      sl.className='save-status-line ng';
+      sl.textContent='⚠ 自動保存ができていません（'+acct.failCount+'回連続で失敗'+(acct.lastErr==='character_too_large'?'：セーブデータが大きすぎてサーバーに保存できませんでした':'')+'）。最後に保存できたのは '+(acct.lastAt?acct.lastAt.toLocaleString('ja-JP'):'まだありません')+' です。このままでは進捗が残らないことがあります。「☁ サーバーへ今すぐ保存」で再試行するか、下のボタンでファイルにバックアップしてください。';
+    }else if(acct.token){
+      sl.className='save-status-line ok';
+      sl.textContent='☁ 自動保存は正常です'+(acct.lastAt?'（前回の保存: '+acct.lastAt.toLocaleString('ja-JP')+'）':'（まだ保存されていません）');
+    }else{
+      sl.className='save-status-line'; sl.textContent='';
+    }
+  }
 }
 function downloadSave(){
   if(!player){toast('ゲームを開始してからセーブできます');return;}
