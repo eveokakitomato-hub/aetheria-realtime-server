@@ -64,7 +64,7 @@ const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 const ACCOUNTS_ENABLED = !!(SUPABASE_URL && SUPABASE_SERVICE_KEY);
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30日
-const CHAR_MAX_BYTES = 2 * 1024 * 1024; /* raised from 256KB (2026-11-27): a gamemaster save carries worldEdit terrain/building data on top of the character, and oversized saves were rejected with 413 — the client then retried silently forever, so the stored character (including its position) never updated and login kept resuming at an old spot. 2MB leaves ample headroom while still bounding abuse. */
+const CHAR_MAX_BYTES = 8 * 1024 * 1024; /* raised 256KB -> 2MB -> 8MB (2026-11-27): a gamemaster save carries worldEdit terrain/building data on top of the character, and oversized saves were rejected — the client then retried silently forever, so the stored character (including its position) never updated and login kept resuming at an old spot. The real gamemaster save outgrew 2MB as well; 8MB leaves ample headroom while still bounding abuse. */
 const loginFails = new Map(); // username -> {count, lockedUntil}
 
 async function sb(pathname, { method = 'GET', body = null, prefer = '' } = {}) {
@@ -112,7 +112,7 @@ function readJsonBody(req) {
     let size = 0;
     req.on('data', (c) => {
       size += c.length;
-      if (size > 3 * 1024 * 1024) { req.destroy(); resolve(null); return; } /* body cap raised 512KB -> 3MB (2026-11-27): the old 512KB cap destroyed save requests mid-flight (clients saw an empty 502), so any character save over ~512KB — e.g. a gamemaster save carrying worldEdit data — could NEVER be stored, and login kept resuming at a stale position. The cap stays above CHAR_MAX_BYTES (2MB) plus the JSON envelope so the 413 check, not a dead connection, is what rejects oversize characters. */
+      if (size > 10 * 1024 * 1024) { req.destroy(); resolve(null); return; } /* body cap raised 512KB -> 3MB -> 10MB (2026-11-27): the old 512KB cap destroyed save requests mid-flight (clients saw an empty 502), so any character save over ~512KB — e.g. a gamemaster save carrying worldEdit data — could NEVER be stored, and login kept resuming at a stale position. The cap stays above CHAR_MAX_BYTES (8MB) plus the JSON envelope so the 413 check, not a dead connection, is what rejects oversize characters. */
       chunks.push(c);
     });
     req.on('end', () => {
