@@ -1019,6 +1019,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>アルトの風車の出入り口まわりを取り払いました。</b>風車塔の南面にあったドアとポーチ（柱と小さい屋根）、吊り看板とその金具を撤去しました。塔や石の土台、茅葺きの帽子、窓、回る羽根は今まで通りです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>風見村アルトの家が、さらに大きくなりました。</b>村の家6軒すべてをひと回り大きく建て替えました。間取りが広くなり、壁もさらに高く、屋根も大きくなっています（茅葺き・オレンジ・グレーなど、家ごとの屋根の色と形は今まで通り）。当たり判定と屋根の上にも新しい大きさに合わせてあります。村で一番大きな建物は、これまで通り冒険者ギルドです。ルミナスの建物に変更はありません。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>スライムは、攻撃を受けると固まらなくなりました。</b>体当たりのあと元の位置に戻っている最中や、戻って0.8秒止まっている最中にプレイヤーの攻撃を1度でも受けると、その場でサイクルの拘束が解けて、すぐに通常の追跡・攻撃に戻るようになりました。マグマスライムも同じです。攻撃を受けていないときの動き（戻って0.8秒待つサイクル）や、スライムの強さは今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>ゴブリンが群れで連携して攻撃してくるようになりました。</b>近接ゴブリンは一箇所に固まらず、プレイヤーを囲むように位置をずらして取り囲み、攻撃も全員同時ではなく少しずつタイミングをずらして波のように順番に仕掛けてきます。アーチャーとシャーマンは距離を保って支援に回り、シャーマンは傷ついた仲間を優先して回復します（届かない仲間には近寄って回復します）。チーフのいる群れは攻撃の間隔が短く、より手強くなっています。ゴブリンの強さ（HP・攻撃力）や出現数は今まで通りです。</span></li>
@@ -1038,7 +1039,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>新しい村「風見村アルト」が南東の辺境にオープン！</b>白い風車塔が目印の、丸い木柵に囲まれた小さな村です。家6軒と畑、村人たち、そして大きな冒険者ギルドがあります。新しいキャラクターの冒険の始まり（初期リスポーン地点）は、アルトの風車広場になりました。柵の中は安全地帯です。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>世界が512×512タイルへ拡大！</b>世界の果てがさらに東と南へ大きく広がり、遠い東の草原と森、南の草原、そして南東の果ての新しい土地が開放されました。既存のエリアは今まで通りの場所にあり、新しい土地にもモンスターが出現します。探索マップと地形エディターの範囲も世界全体に広がりました。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>消えていた大階段を復旧し、写真の規模に合わせて大きく作り直しました。</b>前回の作り替えで階段の高さ計算が壊れ、階段が地形に埋もれて見えなくなっていた問題を修正。あわせて全体を大型化しました：下段の橋階段は幅を広げ、川の上に太い橋脚3本と深い橋桁が立つ段々の橋に。中段テラスは大きく張り出した円形の台地に広げ、中央の噴水池と周りの岩も大きくしました。上段はテラスの北西から東へ長く折り返して上がるので、広場から見て「上がる→踊り場→逆向きに上がる」折り返しの形がはっきり分かります。両側の石壁は高く厚くし、テラスを囲む擁壁の石ドラムも深くして、階段全体が下の町より一段高い石の構造物としてそびえる形にしました。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>大階段を、写真の折り返し式（スイッチバック）に作り替えました。</b>まっすぐ一本だった階段を、下段は広場の北のふちの真ん中から川を渡る橋階段として上がり、真ん中に岩で囲んだ小さな丸い噴水池のある中段テラスで折り返し、上段が礼拝堂前の高台へ上がる形に変更。階段の両側は城壁のような厚い石の側壁になり、高台の擁壁と一体になっています。段は幅広い石板のまま、上段の先では今まで通り二股に分かれて礼拝堂前と城前へつながります。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -7393,11 +7393,11 @@ function buildAlto3D(){
       cyl(29.5,29.5,6,STONE_L,0,100,0,wg,14);                          /* stone band near the top */
       cone(43,48,0xc9a86a,0,152,0,wg,14);                              /* thatched cap */
       sph(4,0xe8c268,0,178,0,wg);                                      /* gold finial ball */
-      box(16,22,4,WOOD_D,0,11,34.5,wg);                                /* door on the south face */
-      cyl(2.2,2.2,17,WOOD_D,-11,8.5,44,wg,6); cyl(2.2,2.2,17,WOOD_D,11,8.5,44,wg,6); /* porch posts */
-      rbox(32,3,24,0xc9a86a,0,20,44,wg,0,0.32,0);                       /* porch roof */
-      box(2,2,12,WOOD_D,24,30,36,wg);                                  /* sign bracket */
-      box(13,10,1.6,0xc9a86a,24,24.5,41,wg);                            /* hanging sign */
+      /* (the entrance dressing on the south face is gone at the
+         user's word: the door, both porch posts, the porch roof and
+         the hanging sign with its bracket were all removed — the
+         tower, stone base, thatched cap, gold finial, the windows
+         and the turning sails are exactly as before) */
       box(8,10,2,0xffd98a,0,55,-31,wg);                                /* north window */
       box(8,10,2,0xffd98a,29,85,0,wg); box(8,10,2,0xffd98a,-29,85,0,wg); /* east / west windows */
       }
