@@ -582,41 +582,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   .hero-frame img{height:230px}
   .quest-chain .q-reward{display:none}
 }
-/* ===== TERRAIN / BUILDING EDITOR (gamemaster only) ===== */
-#editorPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:520px;max-width:calc(100vw - 16px);z-index:66;background:rgba(10,15,13,.96);border:1px solid var(--gold2);border-radius:12px;padding:12px 14px;box-shadow:0 18px 50px rgba(0,0,0,.6);max-height:52vh;overflow-y:auto}
-#editorPanel h2{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
-#editorPanel h2 .gm-tag{font-size:10px;background:#2a2413;border:1px solid var(--gold2);color:var(--gold);border-radius:999px;padding:2px 8px;letter-spacing:.08em}
-#edCloseBtn{margin-left:auto;background:var(--gold);color:#1c1503;border:0;border-radius:6px;padding:7px 13px;font-weight:900;font-size:12px}
-.ed-tabs{display:flex;gap:6px;margin:10px 0 4px}
-.ed-tabs button{flex:1;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);border-radius:7px;padding:9px;font-weight:900;font-size:13px}
-.ed-tabs button.on{background:#2a2413;border-color:var(--gold);color:var(--gold)}
-.ed-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.ed-tools button,.ed-pal button{background:var(--panel2);border:1px solid var(--line2);color:var(--paper);border-radius:7px;padding:9px 4px;font-weight:900;font-size:12px;line-height:1.35}
-.ed-tools button.on,.ed-pal button.on{border-color:var(--gold);background:#2a2413;color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
-.ed-pal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.ed-pal button span{display:block;font-size:19px}
-.ed-row{display:flex;align-items:center;gap:9px;margin-top:9px;font-size:12px}
-.ed-row label{width:86px;flex-shrink:0;font-weight:700;color:var(--muted)}
-.ed-row input[type=range]{flex:1;accent-color:var(--gold);min-height:28px}
-.ed-row .ed-val{font-weight:900;color:var(--gold);min-width:52px;text-align:right}
-.ed-actions{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
-.ed-actions button{flex:1;border-radius:7px;padding:11px 6px;font-weight:900;font-size:13px;border:1px solid var(--line2);background:var(--panel2);color:var(--paper);min-width:100px}
-.ed-actions button.primary{background:var(--gold);border-color:var(--gold);color:#1c1503}
-.ed-actions button.danger{border-color:#5a2b2e;color:#f0a3a8}
-.ed-actions button.danger.armed{background:#7a1f22;color:#fff;border-color:#e5484d}
-.ed-actions button:disabled{opacity:.38}
-#edApplyBtn{touch-action:none;user-select:none;-webkit-user-select:none}
-#edApplyBtn.holding{background:#f2d07e}
-#edStatus{font-size:11px;color:var(--muted);line-height:1.6;margin:9px 0 0}
-#edStatus b{color:var(--gold)}
+/* ===== HOVER (float) banner ===== */
 #hoverBanner{display:none;margin:0 auto 8px;width:fit-content;max-width:100%;padding:6px 14px;border-radius:99px;background:rgba(46,32,8,.92);border:1px solid var(--gold2);color:#ffe9a8;font-size:12px;font-weight:700;text-align:center}
-.ed-note{font-size:11px;color:var(--dim);line-height:1.6;margin:6px 0 0}
-@media(max-width:900px){
-  #editorPanel{bottom:6px;max-height:56vh;padding:10px 11px}
-  .ed-tools{grid-template-columns:repeat(4,1fr)}
-  .ed-pal{grid-template-columns:repeat(4,1fr)}
-  .ed-actions button{min-width:84px;padding:12px 4px}
-}
 </style>
 </head>
 <body>
@@ -748,7 +715,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>ジャンプ</td><td><kbd>Space</kbd> でジャンプ。空中でも移動でき、地形の高さに着地します</td></tr>
         <tr><td>しゃがむ</td><td><kbd>Q</kbd> でしゃがみます。視点（目の高さ）が下がって背が低くなり、移動は少し遅くなりますが、<b>敵に発見される距離が半分</b>になるので、近づきすぎなければ気づかれずにそばを通れます。<kbd>Q</kbd> を短く押すともう一度押すまでしゃがんだまま、長押しすると離したときに立ち上がります。ジャンプ・泳ぎ・浮遊では自動で立ち上がります</td></tr>
         <tr><td>浮遊（飛行）</td><td>空中でもう一度 <kbd>Space</kbd> を押すと、その高さで宙に浮けます（重力が止まり、空中をそのまま移動できます）。浮いている間に <kbd>Space</kbd> を<b>長押しすると上昇</b>します（押すたびにも少し上がります）。<kbd>Q</kbd> を<b>長押しすると、浮遊を解除せずに下降</b>できます（地面に着くと着地します）。浮遊の解除は、<kbd>Space</kbd> を<b>短く2回すばやく押す</b>（ダブルタップ）ときだけです。長押しでは解除されず、上昇し続けます。着地すると通常状態に戻ります</td></tr>
-        <tr><td>地形エディター</td><td>ゲームマスター（ユーザー名 <b>gamemaster</b>）でログイン中のみ、Escメニューに「地形エディター」が現れます。地形の上げ下げ・平坦化と、家や木・橋・石段・水（池）などの配置（大きさの変更つき）ができ、削除モードでは町の家・城壁・木・岩に加えて川・池の水、橋、石段など既存の物も消せます。編集も削除の記録もセーブデータに保存され、「全リセット」で元に戻ります</td></tr>
         <tr><td>ダッシュ</td><td><kbd>Shift</kbd> を押しながら移動すると速く走れます。ダッシュ中はMPを毎秒1消費し、MPが尽きるとダッシュできません</td></tr>
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
@@ -804,7 +770,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span><span class="mi-key">R</span></button>
         <button type="button" class="menu-item" id="menuPlayersBtn"><span class="mi-ico">◆</span><span class="mi-body"><b>オンラインプレイヤー</b><small>今つながっている実プレイヤーの一覧を見る</small></span></button>
         <button type="button" class="menu-item" id="menuMapBtn"><span class="mi-ico">🗺️</span><span class="mi-body"><b>全体マップ</b><small>探索済みエリアの地図を見る（歩いた場所だけが描かれる）</small></span><span class="mi-key">M</span></button>
-        <button type="button" class="menu-item" id="menuEditorBtn" style="display:none"><span class="mi-ico">🏗️</span><span class="mi-body"><b>地形エディター</b><small>地形を掘ったり盛ったり、建物や木を置いて街並みを作る（ゲームマスター専用）</small></span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSoundBtn"><span class="mi-ico">♪</span><span class="mi-body"><b>サウンド設定</b><small>効果音の ON / OFF と音量（全体・効果音）を変更する</small></span></button>
         <button type="button" class="menu-item" id="menuSaveBtn"><span class="mi-ico">💾</span><span class="mi-body"><b>セーブ</b><small>自動保存の状態確認・手動同期とファイル書き出し</small></span></button>
@@ -839,53 +804,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="bag-actions"><button id="closePlayersBtn" type="button">閉じる</button></div>
     </div></div>
 
-    <div id="editorPanel" style="display:none" role="dialog" aria-label="地形エディター">
-      <h2>🏗️ 地形エディター <span class="gm-tag">GAMEMASTER</span><button type="button" id="edCloseBtn">閉じてゲームに戻る</button></h2>
-      <div class="ed-tabs">
-        <button type="button" id="edTabTerrain" class="on">⛰ 地形を編集</button>
-        <button type="button" id="edTabBuild">🏠 建物を置く</button>
-      </div>
-      <div id="edTerrainBox">
-        <div class="ed-tools" role="group" aria-label="地形ツール">
-          <button type="button" class="ed-tool on" data-tool="raise">▲<br>上げる</button>
-          <button type="button" class="ed-tool" data-tool="lower">▼<br>下げる</button>
-          <button type="button" class="ed-tool" data-tool="flatten">＝<br>平らにする</button>
-          <button type="button" class="ed-tool" data-tool="smooth">〜<br>なだらかに</button>
-        </div>
-        <div class="ed-row"><label for="edBrushRange">ブラシの大きさ</label><input type="range" id="edBrushRange" min="50" max="320" step="10" value="130"/><span class="ed-val" id="edBrushVal">130</span></div>
-        <div class="ed-row"><label for="edStrRange">強さ</label><input type="range" id="edStrRange" min="1" max="10" step="1" value="5"/><span class="ed-val" id="edStrVal">5</span></div>
-        <div class="ed-actions">
-          <button type="button" class="primary" id="edApplyBtn">⛏ 照準の場所を編集（長押し）</button>
-        </div>
-        <p class="ed-note">照準（画面中央）がブラシの中心です。PCでは画面をクリック／ドラッグしながらでも編集できます。視点はドラッグ、移動は WASD のまま使えます。</p>
-      </div>
-      <div id="edBuildBox" style="display:none">
-        <div class="ed-pal" role="group" aria-label="置く物">
-          <button type="button" class="ed-pal-btn on" data-type="house"><span>🏠</span>木組みの家</button>
-          <button type="button" class="ed-pal-btn" data-type="tree_b"><span>🌳</span>木（広葉樹）</button>
-          <button type="button" class="ed-pal-btn" data-type="tree_p"><span>🌲</span>木（針葉樹）</button>
-          <button type="button" class="ed-pal-btn" data-type="wall"><span>🧱</span>石壁</button>
-          <button type="button" class="ed-pal-btn" data-type="lamp"><span>🏮</span>街灯</button>
-          <button type="button" class="ed-pal-btn" data-type="fence"><span>🚧</span>柵</button>
-          <button type="button" class="ed-pal-btn" data-type="rock"><span>🪨</span>岩</button>
-          <button type="button" class="ed-pal-btn" data-type="bridge"><span>🌉</span>橋</button>
-          <button type="button" class="ed-pal-btn" data-type="steps"><span>🪜</span>石段</button>
-          <button type="button" class="ed-pal-btn" data-type="water"><span>💧</span>水（池）</button>
-        </div>
-        <div class="ed-row"><label>向き</label><button type="button" class="sound-toggle off" id="edRotL" style="min-width:52px">⟲ -15°</button><span class="ed-val" id="edRotVal" style="min-width:44px">0°</span><button type="button" class="sound-toggle off" id="edRotR" style="min-width:52px">⟳ +15°</button><span style="font-size:11px;color:var(--muted)">キー: R / Shift+R</span></div>
-        <div class="ed-row"><label for="edSizeRange">大きさ</label><input type="range" id="edSizeRange" min="50" max="250" step="5" value="100"/><span class="ed-val" id="edSizeVal">100%</span><span style="font-size:11px;color:var(--muted)">キー: [ / ]</span></div>
-        <div class="ed-actions">
-          <button type="button" id="edPlaceModeBtn">モード: 配置</button>
-          <button type="button" class="primary" id="edPlaceBtn">📌 照準の場所に置く</button>
-        </div>
-        <p class="ed-note">半透明のプレビューが照準の場所に出ます。プレビューの段階で「大きさ」も変えられ、当たり判定も大きさに合わせて変わります。「モード: 削除」に切り替えると、照準に一番近い物が赤く光り、「削除する」で消せます。消せるのは置いた物だけでなく、町の家・城壁・門・時計塔・礼拝堂・城・噴水・街灯・露店や、木・岩・遺跡などの既存の物に加えて、川・池の水（つながった水場ごと）、橋、石段も対象です。水を消すと泳げなくなります。既存の物を消した記録も自動保存され、次回も消えたままになります。「編集を全部リセット」で元に戻ります。置いた物には当たり判定が付きます。置いた橋は上を歩いて渡れ、置いた石段は歩いて登れます。置いた水（池）は、水面の高さと広さを持ち、深い場所では泳げます。</p>
-      </div>
-      <div class="ed-actions">
-        <button type="button" id="edUndoBtn">↩ 元に戻す</button>
-        <button type="button" class="danger" id="edResetBtn">🗑 編集を全部リセット</button>
-      </div>
-      <p id="edStatus">エディター起動中は敵が湧かず、攻撃もできません（安全な作業モード）。編集は自動保存の対象です。</p>
-    </div>
 
     <div id="saveModal"><div class="save-card">
       <h2>💾 セーブ</h2>
@@ -1017,6 +935,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>地形エディターを終了し、セーブデータが大幅に小さくなりました。</b>ゲームマスター専用だった地形・建物の編集機能を取り除きました。これまでセーブに含まれていた地形の編集データは、今後は保存されず、読み込みのときも反映されません。地形と建物は標準の状態に戻ります。編集データが無くなったぶんセーブが軽くなるため、自動保存が失敗しにくくなります。浮遊とゲームマスターの高速移動は、今まで通り使えます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存まわりを直し、失敗の理由がセーブ画面で分かるようになりました。</b>保存済みの地形編集データを読み込むとき、保存されていた編集そのものだけを再現するよう見直しました。読み込むたびにセーブデータが少しずつ膨らんでしまうことがなくなり、すでに大きくなったセーブも次回の保存で縮みます。あわせて、セーブ画面の保存状態に、直近の保存で送ったデータの大きさと、サーバーが返した応答（ステータスとエラー内容）がそのまま表示されるようになりました。保存に失敗したときは、その行を見れば理由が分かります。サーバー側で保存できるデータの上限も、すでに大きく引き上げ済みです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログアウトした瞬間の場所が、確実に保存されるようになりました。</b>これまでは、歩いた直後にログアウトすると自動保存が間に合わず、少し前の場所から再開してしまうことがありました。数秒待たなくても、ログアウト操作そのものでその場所が保存されます。次回はログアウトした場所からそのまま再開できます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存に失敗したとき、画面に警告が出るようになりました。</b>これまで自動保存がサーバーに届かなかった場合、そのまま気づけずに古い保存位置から再開してしまうことがありました。保存が続けて失敗すると「自動保存ができていません」という警告が画面に表示され、セーブ画面でも保存の状態が確認できるようになりました。保存が成功すると警告は消えます。あわせて、サーバー側で保存できるデータの上限も引き上げました。</span></li>
@@ -1036,7 +955,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>スライムの体当たりに攻撃サイクルがつきました。</b>スライムは1度体当たりすると、攻撃を始めた位置まで戻り、その場で0.8秒止まってから次の攻撃に移るようになりました。マグマスライムも同じ動きです。戻って止まっている間が反撃の狙い目です。体当たりの当たり方（着弾した時だけダメージ）や強さは今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>土の道の見た目を、草のない土の地面らしくしました。</b>アルトの南門から風車広場への道など、土の道が板を敷いたように見えていたのを、継ぎ目のない一色の土が地面に沿う素朴な見た目に変えました。ルミナスの土の小道も同じ見た目に揃えています。道の通り道と幅は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの風車広場と道のめり込みを直しました。</b>風車のある円形の石畳広場に、南門からの土の道が食い込んで見えていたのを修正。重なる部分では広場の石畳が上に来るよう、広場の石畳を少し高くしました。道の通り道は今まで通りです。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>露店の陳列台を低くしました。</b>ルミナスの市場と風見村アルトの露店で、商品を置く台が高すぎたのを、腰から胸くらいの自然な高さ（約1m）に下げました。台の上に並ぶ商品や木箱も、新しい台の高さに合わせて置き直しています。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -1461,7 +1379,6 @@ function isAnyOverlayOpen(){
    body.hide-cursor の CSS でカーソルは表示されない（次のクリックでロックされる）。 */
 var _cursorHideState=null;
 function shouldHideCursor(){
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return false; /* editor: cursor needed for the panel */
   if(!started||!player||player.dead)return false;
   if(menuOpen||isAnyOverlayOpen())return false;
   if($('gameMenu').style.display==='grid')return false;
@@ -1485,7 +1402,6 @@ function relockPointer(){
 function openGameMenu(){
   if(!started||!player||player.dead)return;
   menuOpen=true;keys={};joyVec.x=0;joyVec.y=0;
-  var edBtn=$('menuEditorBtn'); if(edBtn)edBtn.style.display=isGameMaster()?'':'none'; /* editor entry: gamemaster only */
   $('menuCharLine').textContent=player.name+' ／ '+CLASSES[player.cls].name+' Lv.'+player.lv+' ／ '+zoneAt(player.x,player.y);
   $('gameMenu').style.display='grid';
   if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
@@ -1544,7 +1460,6 @@ function toggleBag(){
   syncCursorHide();
 }
 function handleEscape(){
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active){closeEditor();return true;}
   if(menuOpen){closeGameMenu();return true;}
   if($('worldMapModal').style.display==='grid'){closeWorldMap();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
@@ -1618,7 +1533,6 @@ function refreshPlayersUI(){
   list.innerHTML=html;
 }
 function doLogout(){
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active){editorState.active=false;editorState.applying=false;var ep=$('editorPanel');if(ep)ep.style.display='none';}
   /* LOGOUT = FINAL SAVE: capture the exact logout-moment snapshot NOW
      (buildSaveData runs synchronously) and hand it to serverSave. If
      another save is already in flight, serverSave parks it as
@@ -1628,7 +1542,7 @@ function doLogout(){
      silently lost unless the player had stood still a few seconds. */
   if(acct.token&&player){var lgSnap=buildSaveData();serverSave(false,lgSnap,progressKey());}
   else if(acct.token)serverSave(false);
-  clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); /* world edits never leak into the next session */
+  hovering=false; hoverTapT=0; clearHoverPress();
   returnToMenu=false;closeGameMenu(true);
   document.body.classList.remove('bag-open');bagAssignMode=false;bagSelAct=null;closeItemPicker();
   ['settingsModal','saveModal','helpModal','bagModal','playersModal','worldMapModal'].forEach(function(id){$(id).style.display='none';});
@@ -3177,7 +3091,6 @@ function spawnGoblinPack(sp){
    the player. Called from the main loop roughly every 2.6 seconds. */
 function trySpawnNear(immediate){
   if(!player)return;
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: no spawns */
   var now=performance.now(), made=0;
   for(var i=0;i<spawnPoints.length;i++){
     var sp=spawnPoints[i];
@@ -3377,7 +3290,6 @@ var BOW_FULL_MS=900;
 var bowDraw={active:false,start:0,power:0,fullPinged:false};
 function bowPower(){ if(!bowDraw.active)return 0; return Math.min(1,(performance.now()-bowDraw.start)/BOW_FULL_MS); }
 function startBowDraw(){
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return false;
   if(!started||!player||player.dead||player.cls!=='archer')return false;
   if(!bowEquipped()){noBowNotice();return false;} /* no bow in hand: no draw, no shot */
   if(bowDraw.active)return true;
@@ -3417,7 +3329,6 @@ function fireArrow(power,mult,full){
 }
 function playerAttack(mult,skillKey){
   if(!started||player.dead)return;
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: no attacks */
   var now=performance.now(),c=CLASSES[player.cls];
   if(!skillKey){if(now-lastAttack<380)return;lastAttack=now;}
   /* ARCHER skills fire instantly at a solid draw; the BASIC attack goes
@@ -3453,7 +3364,6 @@ function swingFx(){
 }
 function useSkill(n){
   if(!started||player.dead)return;
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
   var c=CLASSES[player.cls],key='s'+n,sk=c[key],now=performance.now();
   if(now<skillCd[key])return;
   if(player.cls==='archer'&&!bowEquipped()){noBowNotice();return;} /* every archer skill is a bow skill: no bow in hand, no skill (and no MP / cooldown spent) */
@@ -3658,7 +3568,6 @@ function closeItemPicker(){var pk=$('itemPicker');if(pk)pk.style.display='none';
 function hurtPlayer(dmg,src){
   if(player.dead||isSafe(player.x,player.y))return;
   if(src&&hovering)return; /* HOVER ONLY: while floating, enemy attacks cannot reach — jumping / falling players are seen and hit normally — see the HOVER SAFETY note in update() */
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return; /* editor work mode: invulnerable */
   var real=Math.max(1,dmg-player.def);
   player.hp-=real;addDmg(player.x,player.y,'-'+real,'#ff8a8a');
   burst(player.x,player.y,'#e5484d',5);
@@ -4030,14 +3939,13 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey(),worldEditKey()].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
     player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
     quest:{idx:questIdx,count:questCount},
     explored:exploredToString(),
-    worldEdit:serializeWorldEdit(),
     settings:snapshotSettings()};
 }
 function refreshSaveUI(){
@@ -4102,7 +4010,6 @@ function setupSkillUI(clsKey){
 function applySaveData(data){
   if(!data||data.app!=='AETHERIA ONLINE'||!data.player||!CLASSES[data.player.cls])throw new Error('invalid save');
   if(data.settings)applySettingsData(data.settings);
-  applyWorldEditFromSave(data); /* terrain/building edits: applied ONLY for gamemaster */
   var p=data.player;
   function num(v,fallback,min,max){var n=Number(v);if(!isFinite(n))n=fallback;return Math.max(min,Math.min(max,n));}
   var np=makePlayer(String(p.name||'冒険者').slice(0,12),p.cls);
@@ -4145,8 +4052,6 @@ function genWorldThen(tail){
 function startFromSave(source){
   setupSkillUI(player.cls);
   genWorldThen(function(){
-  applyBuiltinDeletions(); /* deleted pre-existing objects stay deleted after the rebuild (gamemaster saves only) */
-  syncPlacedObstacles(); placedSig='__dirty__'; refreshGroundAll(); /* world edits (gamemaster) re-applied */
   // genWorld rebuilt obstacles; if the saved position now collides, resume on the nearest open ground beside it (initial spawn only when nothing nearby is free)
   if(collide(player.x,player.y,player.r)){var fs1=nearestFreeSpot(player.x,player.y,player.r);if(fs1){player.x=fs1.x;player.y=fs1.y;}else{player.x=SPAWN_X;player.y=SPAWN_Y;}lastSavedKey=progressKey();}
   started=true;
@@ -4266,14 +4171,7 @@ function waterDepthAt(x,y){
     if(o.kind!=='lake')continue;
     var dist=Math.hypot(x-o.x,y-o.y);
     if(dist<o.s){
-      if(o.placedWater){
-        /* placed ponds: real depth = water level (o.wz) minus the ground
-           underfoot, faded out at the rim — dig deeper to swim deeper */
-        var pd=Math.max(0,Math.min(120,o.wz-terrainH(x,y)))*(1-dist/o.s);
-        if(pd>d)d=pd;
-      }else{
-        var dep=(1-dist/o.s)*120;if(dep>d)d=dep;
-      }
+      var dep=(1-dist/o.s)*120;if(dep>d)d=dep;
     }
   }
   return d;
@@ -4306,7 +4204,6 @@ function updateHoverBanner(){
 }
 function handleJumpKey(){
   if(!started||!player||player.dead)return;
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
   if(player.swimming){hovering=false;hoverTapT=0;clearHoverPress();updateHoverBanner();return;}
   var now=performance.now();
   if(hovering){
@@ -4348,7 +4245,6 @@ function handleJumpRelease(){
    hold crouches only while the key is down. */
 function handleCrouchKey(){
   if(!started||!player||player.dead)return;
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active)return;
   if(hovering)return; /* Q while floating = descend (held) — update() reads keys['KeyQ'] */
   if(player.swimming||jumpY>0||jumpVY!==0)return; /* grounded and on dry land only */
   if(crouchLatch){standUpCrouch();return;} /* latched: press Q again to stand */
@@ -4525,7 +4421,7 @@ function update(dt,now){
      the water below is. */
   var groundedNow=(jumpY<=0&&jumpVY===0&&!hovering);
   player.swimDepth=groundedNow?waterDepthAt(player.x,player.y):0;
-  /* standing on a placed bridge / stair platform whose top is at or above
+  /* standing on a bridge / stair platform whose top is at or above
      the water surface means dry feet, however deep the water below is */
   if(player.swimDepth>0&&typeof platformTopAt==='function'){
     var pTop=platformTopAt(player.x,player.y);
@@ -4611,11 +4507,11 @@ function update(dt,now){
   if(hovering){
     jumpVY=0;
     if(player.swimming){hovering=false;hoverTapT=0;clearHoverPress();}
-    else if(keys['Space']&&hoverPressT&&now-hoverPressT>=HOVER_HOLD_MS&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
+    else if(keys['Space']&&hoverPressT&&now-hoverPressT>=HOVER_HOLD_MS){
       hoverTapT=0;hoverPressWasSecond=false; /* this press is a hold now, not a tap */
       jumpY=Math.min(HOVER_MAX_Y,jumpY+HOVER_RISE_PER_MS*gmSpeedMul()*dt); /* float rise is gamemaster-only, so it takes the same 4x */
     }
-    if(hovering&&keys['KeyQ']&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
+    if(hovering&&keys['KeyQ']){
       /* Q while floating: descend at the same speed as the rise,
          WITHOUT cancelling the float — altitude only. Reaching the
          ground is an ordinary landing (which ends the float, as
@@ -5403,17 +5299,13 @@ function terrainHBase(x,y){
   return base;
 }
 
-/* ================= TERRAIN EDITOR + BUILDING PLACEMENT (gamemaster only) =================
-   Access rule: the whole feature exists ONLY while the logged-in account's
-   username is exactly "gamemaster". The Esc-menu entry is hidden for
-   everyone else, openEditor() refuses, and world-edit data inside a save
-   is applied only when isGameMaster() is true at load time.
-   Terrain edits live in a delta layer over terrainHBase(): a 441x441
-   vertex grid (matching the ground plane's 440x440 segments). terrainH()
-   = base + bilinear(delta). Only non-zero vertices are serialised
-   (sparse), inside the character save (buildSaveData().worldEdit), so
-   they ride the account autosave and the file export like everything
-   else. Placed buildings are a sparse list too, with real collision. */
+/* ================= GAMEMASTER ACCOUNT =================
+   The gamemaster account (username exactly "gamemaster") keeps two
+   privileges: mid-air float (see the HOVER section) and 4x movement
+   speed. The terrain / building editor that used to live here was
+   removed: world-edit data is no longer written into character saves
+   and is ignored on load, so the terrain and buildings are always the
+   standard world. */
 function isGameMaster(){
   return !!(typeof acct!=='undefined'&&acct&&acct.token&&acct.username==='gamemaster');
 }
@@ -5425,437 +5317,22 @@ function isGameMaster(){
 function gmSpeedMul(){
   return isGameMaster()?4:1;
 }
-var EDIT_SEG=440, EDIT_STEP=W/EDIT_SEG, EDIT_N=EDIT_SEG+1; /* 440 segments over 20800 units = the same 47.27-unit step the old 110-segment grid had over 5200 (and the 220-segment grid over 10400), so brush feel and terrain resolution are unchanged after the expansions */
-var terrainDelta=new Float32Array(EDIT_N*EDIT_N);
-var terrainChanged={}; /* idx -> true, for sparse serialisation */
-var placedObjects=[];  /* {id,t,x,y,rot(deg)} */
-var placedSeq=0;
-var deletedBuiltins=[]; /* bids ("kind@x,y") of PRE-EXISTING world objects deleted in the editor: town houses/walls/landmarks, trees, rocks, ruins */
-var builtinsFiltered=false; /* true while the live obstacles/decorations/townFeatures arrays have those deletions applied */
-var editSeq=0;         /* bumped on any world edit; part of progressKey() */
-var undoStack=[];
-var editorState={active:false,mode:'terrain',tool:'raise',brush:130,strength:5,
-  applying:false,stroke:null,flatTarget:0,buildType:'house',rot:0,placeMode:'place',size:1,
-  aim:null,lastEditBump:0,statusT:0};
+/* the ground height at a point: with the editor gone there is no edit
+   delta layer any more, so this is simply the base terrain */
+function terrainH(x,y){
+  return terrainHBase(x,y);
+}
+
 var groundGeo3D=null, groundMesh3D=null, vertexGameX=null, vertexGameY=null;
 var groundMat3D=null; /* the shared ground material (created in init3D); ground chunks are built lazily against it, one at a time, by buildGroundChunk() */
-var groundChunks=[]; /* the ground sheet, split into a 10x10 grid of chunk geometries {geo,vx,vy,mesh,built} living in groundGroup (see init3D): frustum culling can now skip whole ground chunks outside the view / past the far plane, where the old single 440x440 sheet (about 390k triangles) was drawn in full every frame. The editor's ground refresh walks these chunks instead of the old single geometry. Slots start out null and chunks are now BUILT LAZILY by the chunk manager (only near the player): an unbuilt slot is null, a discarded chunk keeps its entry with geo/mesh null and built=false, and the refresh functions below skip both. */
-var placedGroup=null, placedSig='', brushRing=null, ghostGroup=null, ghostKey='';
-var PLACED_TYPES={house:1,tree_b:1,tree_p:1,wall:1,lamp:1,fence:1,rock:1,bridge:1,steps:1,water:1};
-var terrainHasEdits=false;
-function terrainH(x,y){
-  return terrainHBase(x,y)+editDeltaAt(x,y);
-}
-function editDeltaAt(x,y){
-  if(!terrainHasEdits)return 0;
-  var fx=x/EDIT_STEP, fy=y/EDIT_STEP;
-  var x0=Math.max(0,Math.min(EDIT_SEG-1,Math.floor(fx))), y0=Math.max(0,Math.min(EDIT_SEG-1,Math.floor(fy)));
-  var tx=Math.max(0,Math.min(1,fx-x0)), ty=Math.max(0,Math.min(1,fy-y0));
-  var i00=y0*EDIT_N+x0, i10=i00+1, i01=i00+EDIT_N, i11=i01+1;
-  var d00=terrainDelta[i00],d10=terrainDelta[i10],d01=terrainDelta[i01],d11=terrainDelta[i11];
-  if(d00===0&&d10===0&&d01===0&&d11===0)return 0;
-  return (d00*(1-tx)+d10*tx)*(1-ty)+(d01*(1-tx)+d11*tx)*ty;
-}
-function markEditChanged(){
-  editSeq++;
-  if(typeof refreshSaveUI==='function')refreshSaveUI();
-}
-function worldEditKey(){
-  var n=0; for(var k in terrainChanged)n++;
-  return 'WE'+editSeq+':'+n+':'+placedObjects.length+':'+deletedBuiltins.length;
-}
-function serializeWorldEdit(){
-  var n=0; for(var k in terrainChanged)n++;
-  if(n===0&&placedObjects.length===0&&deletedBuiltins.length===0)return null;
-  var terr=[];
-  for(var idx in terrainChanged){
-    var d=terrainDelta[Number(idx)];
-    if(Math.abs(d)>0.05)terr.push([Number(idx),Math.round(d*10)/10]);
-  }
-  var pl=placedObjects.map(function(o){
-    var p={t:o.t,x:Math.round(o.x),y:Math.round(o.y),rot:Math.round(o.rot)};
-    if(o.s&&Math.abs(o.s-1)>0.01)p.s=Math.round(o.s*100)/100;   /* placement size scale */
-    if(o.t==='water'&&isFinite(o.wl))p.wl=Math.round(o.wl);      /* placed water: surface height */
-    return p;
-  });
-  return {v:3,terrain:terr,placed:pl,del:deletedBuiltins.slice()};
-}
-function clearWorldEditSilent(){
-  var hadBuiltinDeletions=builtinsFiltered||deletedBuiltins.length>0;
-  terrainDelta=new Float32Array(EDIT_N*EDIT_N);
-  terrainChanged={}; terrainHasEdits=false; placedObjects=[]; placedSeq=0; undoStack=[];
-  deletedBuiltins=[]; builtinsFiltered=false;
-  editorState.stroke=null; editorState.applying=false;
-  placedSig='__dirty__';
-  if(typeof obstacles!=='undefined')syncPlacedObstacles();
-  refreshGroundAll();
-  /* if pre-existing objects had been deleted from the live world, rebuild
-     the pristine world so they come back (used by 全リセット, logout and
-     by non-gamemaster loads, whose clients must never see deletions) */
-  if(hadBuiltinDeletions&&typeof genWorld==='function'){genWorld();syncPlacedObstacles();placedSig='__dirty__';}
-}
-function loadWorldEdit(we){
-  clearWorldEditSilent();
-  if(!we||typeof we!=='object')return;
-  if(Array.isArray(we.terrain)){
-    /* Migration: older saves index the delta grid with an older stride —
-       v1 saves (128x128-tile world) used 111, v2 saves (256x256-tile world)
-       used 221. The grid step in world units is identical in every version,
-       and the old worlds are today's north-west, so an old vertex (gx,gy)
-       is exactly the new vertex (gx,gy) — only the stride changes. v3
-       saves already use the current stride (EDIT_N). */
-    var oldStride=(we.v&&we.v>=3)?0:((we.v&&we.v===2)?221:111);
-    /* Restore EXACTLY the saved entries — nothing else. The restored
-       delta layer and changed-set are built in locals first and then
-       swapped in whole, so applying a save can never mark tiles the
-       save itself did not contain (no smoothing / neighbour bleed on
-       load): a load -> save round trip reproduces the saved terrain
-       set as-is instead of growing it, which is what let gamemaster
-       saves swell login after login until they no longer fit the
-       server limit. Duplicate indices in the save collapse to one
-       entry and sub-threshold values are dropped, so an already
-       bloated stored save also shrinks back on its next save. Tiles
-       the user actually touches with the editor brush are still
-       recorded by applyBrush() exactly as before. */
-    var restoredDelta=new Float32Array(EDIT_N*EDIT_N);
-    var restoredChanged={};
-    we.terrain.forEach(function(pair){
-      if(!Array.isArray(pair))return;
-      var idx=Math.floor(Number(pair[0])), d=Number(pair[1]);
-      if(oldStride){ if(!(idx>=0&&idx<oldStride*oldStride))return; idx=Math.floor(idx/oldStride)*EDIT_N+(idx%oldStride); }
-      if(!(idx>=0&&idx<EDIT_N*EDIT_N)||!isFinite(d))return;
-      d=Math.max(-500,Math.min(500,d));
-      if(Math.abs(d)>0.05){restoredDelta[idx]=d;restoredChanged[idx]=true;}
-    });
-    terrainDelta=restoredDelta;
-    terrainChanged=restoredChanged;
-    terrainHasEdits=Object.keys(restoredChanged).length>0;
-  }
-  if(Array.isArray(we.placed)){
-    we.placed.slice(0,300).forEach(function(o){
-      if(!o||!PLACED_TYPES[o.t])return;
-      var x=Number(o.x),y=Number(o.y),rot=Number(o.rot)||0;
-      if(!isFinite(x)||!isFinite(y))return;
-      x=Math.max(30,Math.min(W-30,x)); y=Math.max(30,Math.min(H-30,y));
-      var po={id:++placedSeq,t:o.t,x:x,y:y,rot:((rot%360)+360)%360};
-      var sc=Number(o.s); if(isFinite(sc)&&sc>=0.4&&sc<=3&&Math.abs(sc-1)>0.01)po.s=Math.round(sc*100)/100;
-      if(o.t==='water'){var wl=Number(o.wl); po.wl=isFinite(wl)?wl:terrainH(x,y)+1;}
-      placedObjects.push(po);
-    });
-  }
-  /* deleted pre-existing objects: validated bid strings, re-applied to
-     the live world now and again after every genWorld() rebuild */
-  deletedBuiltins=[];
-  if(Array.isArray(we.del)){
-    we.del.slice(0,400).forEach(function(b){
-      if(typeof b!=='string'||!/^[a-z]+@-?\d+,-?\d+$/.test(b))return;
-      if(deletedBuiltins.indexOf(b)<0)deletedBuiltins.push(b);
-    });
-  }
-  applyBuiltinDeletions();
-  editSeq++;
-  refreshGroundAll();
-  syncPlacedObstacles();
-  placedSig='__dirty__';
-}
-/* Called from applySaveData(): the save's world edits are honoured ONLY
-   for gamemaster. Anyone else's client ignores them completely. */
-function applyWorldEditFromSave(data){
-  if(isGameMaster()&&data&&data.worldEdit)loadWorldEdit(data.worldEdit);
-  else clearWorldEditSilent();
-}
-/* ---- ground mesh refresh ---- */
-function refreshGroundVertices(cx,cy,r){
-  if(!groundChunks.length)return;
-  var x0=cx-r,x1=cx+r,y0=cy-r,y1=cy+r;
-  for(var ci=0;ci<groundChunks.length;ci++){
-    var ch=groundChunks[ci]; if(!ch||!ch.geo)continue; /* unbuilt / discarded ground chunk: it is generated from terrainH (edits included) when the chunk manager builds it */
-    var pos=ch.geo.attributes.position, dirty=false;
-    for(var i=0;i<pos.count;i++){
-      var gx=ch.vx[i], gy=ch.vy[i];
-      if(gx<x0||gx>x1||gy<y0||gy>y1)continue;
-      pos.setZ(i,terrainH(gx,gy)); dirty=true;
-    }
-    if(dirty)pos.needsUpdate=true;
-  }
-}
-function refreshGroundAll(){
-  for(var ci=0;ci<groundChunks.length;ci++){
-    var ch=groundChunks[ci]; if(!ch||!ch.geo)continue; /* unbuilt chunks pick the edits up from terrainH when generated */
-    var pos=ch.geo.attributes.position;
-    for(var i=0;i<pos.count;i++)pos.setZ(i,terrainH(ch.vx[i],ch.vy[i]));
-    pos.needsUpdate=true;
-    ch.geo.computeVertexNormals();
-  }
-}
-function refreshGroundNormals(){
-  for(var ci=0;ci<groundChunks.length;ci++){var ch=groundChunks[ci]; if(ch&&ch.geo)ch.geo.computeVertexNormals();}
-}
-/* ---- aim: ray-march the centre crosshair onto the terrain ---- */
-function computeEditorAim(){
-  if(!player)return null;
-  var eyeY=playerGroundZ()+eyeHNow()+jumpY;
-  if(player.swimming){var swZ2=swimSurfaceZ(player.x,player.y);eyeY=(swZ2>-Infinity?swZ2:terrainH(player.x,player.y))+1;}
-  var cp=Math.cos(camPitch);
-  var dx=-Math.sin(camYaw)*cp, dy=-Math.cos(camYaw)*cp, dz=Math.sin(camPitch);
-  var px=player.x, py=player.y, pz=eyeY;
-  var prevT=0, prevAbove=true;
-  for(var t=8;t<=1100;t+=8){
-    var x=px+dx*t, y=py+dy*t, z=pz+dz*t;
-    if(x<0||y<0||x>W||y>H)break;
-    var g=terrainH(x,y);
-    var above=z>g;
-    if(!above&&prevAbove){
-      var lo=prevT, hi=t;
-      for(var it=0;it<7;it++){
-        var mid=(lo+hi)/2, mx=px+dx*mid, my=py+dy*mid, mz=pz+dz*mid;
-        if(mz>terrainH(mx,my))lo=mid; else hi=mid;
-      }
-      var fx=px+dx*hi, fy=py+dy*hi;
-      return {x:fx,y:fy,z:terrainH(fx,fy)};
-    }
-    prevT=t; prevAbove=above;
-  }
-  var bx=px+dx*420, by=py+dy*420;
-  bx=Math.max(20,Math.min(W-20,bx)); by=Math.max(20,Math.min(H-20,by));
-  return {x:bx,y:by,z:terrainH(bx,by)};
-}
-/* ---- brush ---- */
-function strokeRecord(idx){
-  var s=editorState.stroke;
-  if(s&&!(idx in s.backup))s.backup[idx]=terrainDelta[idx];
-}
-function beginStroke(){
-  if(editorState.stroke)endStroke();
-  editorState.stroke={backup:{}};
-  var aim=editorState.aim||computeEditorAim();
-  editorState.flatTarget=aim?terrainH(aim.x,aim.y):0;
-}
-function endStroke(){
-  var s=editorState.stroke; editorState.stroke=null;
-  if(!s)return;
-  var changes=[];
-  for(var idx in s.backup){
-    var i=Number(idx);
-    if(terrainDelta[i]!==s.backup[idx])changes.push([i,s.backup[idx],terrainDelta[i]]);
-  }
-  if(changes.length){
-    undoStack.push({kind:'terrain',changes:changes});
-    if(undoStack.length>60)undoStack.shift();
-    terrainHasEdits=Object.keys(terrainChanged).length>0;
-    markEditChanged();
-    refreshGroundNormals();
-    placedSig='__dirty__'; /* reseat placed objects on the new ground */
-  }
-  refreshEditorUI();
-}
-function applyBrush(dt){
-  var aim=editorState.aim; if(!aim)return;
-  if(!editorState.stroke)beginStroke();
-  var cx=aim.x, cy=aim.y, radius=editorState.brush, str=editorState.strength;
-  var gx0=Math.max(0,Math.floor((cx-radius)/EDIT_STEP)), gx1=Math.min(EDIT_SEG,Math.ceil((cx+radius)/EDIT_STEP));
-  var gy0=Math.max(0,Math.floor((cy-radius)/EDIT_STEP)), gy1=Math.min(EDIT_SEG,Math.ceil((cy+radius)/EDIT_STEP));
-  var amt=str*dt/90;
-  var tool=editorState.tool;
-  var snap=null;
-  if(tool==='smooth'){
-    snap={};
-    for(var gy2=gy0;gy2<=gy1;gy2++)for(var gx2=gx0;gx2<=gx1;gx2++){
-      var ii=gy2*EDIT_N+gx2; snap[ii]=terrainHBase(gx2*EDIT_STEP,gy2*EDIT_STEP)+terrainDelta[ii];
-    }
-  }
-  var touchedBounds=false;
-  for(var gy=gy0;gy<=gy1;gy++)for(var gx=gx0;gx<=gx1;gx++){
-    var wx=gx*EDIT_STEP, wy=gy*EDIT_STEP;
-    var d=Math.hypot(wx-cx,wy-cy);
-    if(d>radius)continue;
-    var w=0.5+0.5*Math.cos(Math.PI*d/radius);
-    var idx=gy*EDIT_N+gx;
-    strokeRecord(idx);
-    if(tool==='raise')terrainDelta[idx]+=amt*w;
-    else if(tool==='lower')terrainDelta[idx]-=amt*w;
-    else if(tool==='flatten'){
-      var cur=terrainHBase(wx,wy)+terrainDelta[idx];
-      var k=Math.min(1,w*(0.05+str*0.022)*(dt/16.7));
-      terrainDelta[idx]+=(editorState.flatTarget-cur)*k;
-    }else if(tool==='smooth'){
-      var curH=snap[idx], sum=0, cnt=0;
-      [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(off){
-        var nx=gx+off[0], ny=gy+off[1];
-        if(nx<0||ny<0||nx>EDIT_SEG||ny>EDIT_SEG)return;
-        var ni=ny*EDIT_N+nx;
-        sum+=(snap[ni]!=null?snap[ni]:terrainHBase(nx*EDIT_STEP,ny*EDIT_STEP)+terrainDelta[ni]); cnt++;
-      });
-      if(cnt){
-        var avg=sum/cnt;
-        var k2=Math.min(1,w*(0.05+str*0.02)*(dt/16.7));
-        terrainDelta[idx]+=(avg-curH)*k2;
-      }
-    }
-    terrainDelta[idx]=Math.max(-500,Math.min(500,terrainDelta[idx]));
-    if(Math.abs(terrainDelta[idx])>0.05){terrainChanged[idx]=true;terrainHasEdits=true;} else delete terrainChanged[idx];
-    touchedBounds=true;
-  }
-  if(touchedBounds){
-    refreshGroundVertices(cx,cy,radius+EDIT_STEP*1.6);
-    var now=performance.now();
-    if(now-editorState.lastEditBump>600){editorState.lastEditBump=now;markEditChanged();}
-  }
-}
-/* ---- placed objects: models + collision ---- */
-function buildPlacedModel(o){
-  var g=new THREE.Group();
-  var STONE=0x8a8172, STONE_D=0x776f61, WOOD=0x6b4a2c, WOOD_D=0x54382a, CREAM=0xe6dcc4;
-  if(o.t==='house'){
-    box(110,58,95,CREAM,0,29,0,g);
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){box(9,58,9,WOOD_D,c[0]*51,29,c[1]*43,g);});
-    box(114,9,99,WOOD_D,0,55,0,g);
-    var roof=prism(132,55,115,0x7a4a30); roof.position.y=58; g.add(roof);
-    box(17,32,5,WOOD_D,0,16,49,g);
-    box(13,13,4,0xffd98a,-30,36,49,g); box(13,13,4,0xffd98a,30,36,49,g);
-    box(13,26,13,STONE_D,30,72,-18,g);
-  }else if(o.t==='tree_b'){
-    /* placed broadleaf: same per-tree shape variety as the wild ones —
-       a seeded silhouette (round / tall / wide), trunk girth, lean and
-       3–5 canopy blobs, all derived from the placement id + position
-       so a given placed tree always grows the same shape. The canopy
-       top stays under 116 (placedObstaclesFor's topH). */
-    var psd=(o.id||1)*31.7+o.x*0.37+o.y*0.73;
-    var psr=function(n){var v=Math.sin(psd*12.9+n*78.2)*43758.5;return v-Math.floor(v);};
-    var pth2=46+psr(1)*14, ptw2=0.85+psr(2)*0.4;
-    var ptr=cyl(5*ptw2,8*ptw2,pth2,0x6b4a2c,0,pth2/2,0,g,7); ptr.rotation.z=(psr(3)-0.5)*0.18;
-    var par=psr(4);
-    var pcols=[0x3e7a3e,0x2c5a30,0x477d43,0x548c46,0x356b38];
-    var pnb=3+Math.floor(psr(5)*3);
-    for(var pbi=0;pbi<pnb;pbi++){
-      var pcr,pX,pY,pZ;
-      if(pbi===0){pcr=29+psr(6)*9;pX=0;pY=pth2+15+psr(7)*9;pZ=0;}
-      else{
-        var paa=psr(pbi+8)*Math.PI*2, prr=(par<0.4?17:(par<0.7?10:27))+psr(pbi+10)*10;
-        pcr=16+psr(pbi+12)*10;pX=Math.cos(paa)*prr;pY=pth2+(par<0.7?2+psr(pbi+14)*24:-3+psr(pbi+14)*10);pZ=Math.sin(paa)*prr;
-      }
-      if(pY+pcr>114)pY=114-pcr;
-      sph(pcr,pcols[Math.floor(psr(pbi+16)*pcols.length)],pX,pY,pZ,g,{flatShading:true});
-    }
-  }else if(o.t==='tree_p'){
-    /* placed pine: seeded tier widths / heights / counts and a slight
-       lean, again from id + position. Tier tops stay under 146. */
-    var qsd=(o.id||1)*47.3+o.x*0.53+o.y*0.19;
-    var qsr=function(n){var v=Math.sin(qsd*12.9+n*78.2)*43758.5;return v-Math.floor(v);};
-    var qtw=0.85+qsr(2)*0.4;
-    var qtr=cyl(4.5*qtw,7*qtw,64,0x5d3f27,0,32,0,g,7); qtr.rotation.z=(qsr(3)-0.5)*0.1;
-    var qcols=[0x2c5a30,0x356b38,0x3e7a3e,0x2a5230];
-    var qlev=[[30,52,72],[23,44,102],[15,36,128]];
-    if(qsr(4)<0.4)qlev.push([9,22,134]); /* an occasional fourth, spire tier */
-    for(var qti=0;qti<qlev.length;qti++){
-      var qcr=qlev[qti][0]*(0.85+qsr(qti+6)*0.35), qch=qlev[qti][1]*(0.92+qsr(qti+8)*0.14), qcy=qlev[qti][2]+(qsr(qti+10)-0.5)*5;
-      if(qcy+qch/2>145)qcy=145-qch/2;
-      cone(qcr,qch,qcols[Math.floor(qsr(qti+12)*qcols.length)],(qsr(qti+14)-0.5)*4,qcy,(qsr(qti+15)-0.5)*4,g,9);
-    }
-  }else if(o.t==='wall'){
-    box(96,72,24,STONE,0,36,0,g);
-    box(102,10,30,STONE_D,0,76,0,g);
-    box(14,12,14,STONE,-32,86,0,g); box(14,12,14,STONE,32,86,0,g);
-  }else if(o.t==='lamp'){
-    cyl(2.6,3.4,52,0x3a3f45,0,26,0,g,6);
-    box(16,4,16,0x3a3f45,0,54,0,g);
-    var lb=sph(6.5,0xffd98a,0,48,0,g,{emissive:0xcf9a3a}); lb.castShadow=false;
-  }else if(o.t==='fence'){
-    [-44,0,44].forEach(function(px){box(7,30,7,WOOD_D,px,15,0,g);});
-    box(100,7,4,WOOD,0,24,3,g); box(100,7,4,WOOD,0,11,3,g);
-  }else if(o.t==='rock'){
-    var r=new THREE.Mesh(new THREE.DodecahedronGeometry(26,0),M(0x8d9299));
-    r.position.y=12; r.rotation.set(0.7,1.9,0.3); r.castShadow=true; r.receiveShadow=true; g.add(r);
-    var r2=new THREE.Mesh(new THREE.DodecahedronGeometry(15,0),M(0x7d848c));
-    r2.position.set(24,7,10); r2.rotation.set(1.7,0.4,0.9); r2.castShadow=true; g.add(r2);
-  }else if(o.t==='bridge'){
-    box(150,7,66,0x8a6a44,0,16,0,g);
-    box(150,5,5,WOOD_D,0,30,30,g); box(150,5,5,WOOD_D,0,30,-30,g);
-    [-58,-20,20,58].forEach(function(px){cyl(3,3,13,WOOD_D,px,23,30,g,5);cyl(3,3,13,WOOD_D,px,23,-30,g,5);});
-    box(16,20,60,STONE,-64,2,0,g); box(16,20,60,STONE,64,2,0,g);
-  }else if(o.t==='steps'){
-    /* stone staircase: six treads climbing toward local +X; the matching
-       walkable ramp lives in platformTopAt() */
-    box(126,5,98,STONE_D,0,-2,0,g);
-    for(var si2=0;si2<6;si2++){
-      var sh=9*(si2+1);
-      box(20,sh,90,si2%2?STONE:STONE_D,-50+si2*20,sh/2,0,g);
-    }
-  }else if(o.t==='water'){
-    /* a placed pond: a shader water disc whose surface sits at o.wl (the
-       water level captured at placement). The matching 'lake' decoration
-       (syncPlacedWater) drives waterDepthAt(), so deep spots are swimmable. */
-    var wsc=o.s||1;
-    var wlv=(o.wl!=null&&isFinite(o.wl))?o.wl:terrainH(o.x,o.y)+1;
-    var wdisc2=waterSurfaceMesh(85*wsc,false);
-    wdisc2.position.y=wlv-terrainH(o.x,o.y)+1; /* group origin is terrainH-1, so this lands the disc exactly on wlv */
-    g.add(wdisc2);
-  }
-  g.position.set(WX(o.x),terrainH(o.x,o.y)-1,WZ(o.y));
-  g.rotation.y=-(o.rot*Math.PI/180);
-  return g;
-}
-function placedObstaclesFor(o){
-  var rad=o.rot*Math.PI/180, dirx=Math.sin(rad), diry=Math.cos(rad);
-  var sc=o.s||1; /* placement size scale: every footprint grows/shrinks with it */
-  var out=[];
-  function circ(x,y,r,extra){var ob={type:'circle',x:x,y:y,r:r,placed:true,_pid:o.id};if(extra)for(var k in extra)ob[k]=extra[k];out.push(ob);}
-  if(o.t==='house'){
-    var snap=((o.rot%90)+90)%90;
-    if(snap<2||snap>88){
-      var swap=(((o.rot%180)+180)%180)>45;
-      var w=(swap?95:110)*sc, h=(swap?110:95)*sc;
-      out.push({type:'rect',x:o.x-w/2,y:o.y-h/2,w:w,h:h,c:'#8a8172',house:true,placed:true,_pid:o.id,topKind:'house',_rot:o.rot,_sc:sc,_cx:o.x,_cy:o.y});
-    }else circ(o.x,o.y,58*sc,{house:true,topKind:'house',_rot:o.rot,_sc:sc,_cx:o.x,_cy:o.y});
-  }else if(o.t==='tree_b'||o.t==='tree_p'){
-    /* topH: each placed tree model's visible top (broadleaf canopy
-       blobs reach y≈116, the pine's top cone y≈146), scaled */
-    circ(o.x,o.y,11*sc,{ref:{kind:'tree'},topKind:'prop',topH:(o.t==='tree_p'?146:116)*sc-1});
-  }else if(o.t==='wall'){
-    /* topH: the model's cap slab top (81) above its ground seat (terrainH-1), scaled */
-    [-32,0,32].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,17*sc,{topKind:'wall',topH:81*sc-1});});
-  }else if(o.t==='lamp'){
-    circ(o.x,o.y,6*sc,{pillar:true,topKind:'prop',topH:56*sc-1}); /* the lamp model's cap slab top (y≈56), scaled */
-  }else if(o.t==='fence'){
-    [-36,0,36].forEach(function(off){circ(o.x+dirx*off*sc,o.y+diry*off*sc,10*sc,{topKind:'prop',topH:30*sc-1});}); /* fence post tops (y=30), scaled */
-  }else if(o.t==='rock'){
-    /* topH: the main boulder's visible top (38) above its ground seat (terrainH-1), scaled */
-    circ(o.x,o.y,22*sc,{topKind:'rock',topH:38*sc-1});
-  }else if(o.t==='bridge'){
-    [-52,0,52].forEach(function(off){
-      circ(o.x+dirx*off*sc-diry*30*sc,o.y+diry*off*sc+dirx*30*sc,8*sc,{topKind:'prop',topH:32.5*sc-1}); /* railing top (y≈32.5), scaled */
-      circ(o.x+dirx*off*sc+diry*30*sc,o.y+diry*off*sc-dirx*30*sc,8*sc,{topKind:'prop',topH:32.5*sc-1});
-    });
-  }
-  /* steps and water get NO collision: steps are climbed, water is waded/swum */
-  return out;
-}
-function syncPlacedObstacles(){
-  for(var i=obstacles.length-1;i>=0;i--)if(obstacles[i].placed)obstacles.splice(i,1);
-  placedObjects.forEach(function(o){placedObstaclesFor(o).forEach(function(ob){obstacles.push(ob);});});
-  _losSrc=null;
-  syncPlacedWater();
-}
-/* Placed ponds live in the decorations array as 'lake' entries (flagged
-   placedWater, with wz = the water level captured at placement), so the
-   ordinary waterDepthAt() / minimap / 2D lake rendering pick them up with
-   no special cases. Rebuilt from placedObjects on every sync, exactly
-   like the placed obstacles above. */
-function syncPlacedWater(){
-  if(typeof decorations==='undefined')return;
-  for(var i=decorations.length-1;i>=0;i--)if(decorations[i].placedWater)decorations.splice(i,1);
-  placedObjects.forEach(function(o){
-    if(o.t!=='water')return;
-    decorations.push({x:o.x,y:o.y,kind:'lake',s:85*(o.s||1),wz:(o.wl!=null&&isFinite(o.wl))?o.wl:terrainH(o.x,o.y)+1,placedWater:true,pid:o.id});
-  });
-}
-/* ---- walkable platforms: placed bridges & stairs ----
-   The player is glued to terrainH(); placed bridges and stairs add a
-   deck / ramp top above the terrain, and standH() (used for the player's
-   eye height and projectiles) takes the higher of the two, so a placed
-   bridge can be walked across and placed stairs can be climbed. The
-   local axes follow the MODEL's true orientation: local +X maps to game
-   (cos rot, sin rot), local +Z to (-sin rot, cos rot). */
+var groundChunks=[]; /* the ground sheet, split into a 10x10 grid of chunk geometries {geo,vx,vy,mesh,built} living in groundGroup (see init3D): frustum culling can now skip whole ground chunks outside the view / past the far plane, where the old single 440x440 sheet (about 390k triangles) was drawn in full every frame. Slots start out null and chunks are now BUILT LAZILY by the chunk manager (only near the player): an unbuilt slot is null, a discarded chunk keeps its entry with geo/mesh null and built=false, and the refresh functions below skip both. */
+
+/* ---- walkable platforms: bridges, the great stairs, the fountain ----
+   The player is glued to terrainH(); the town and Alto bridges, the
+   great stairs and the fountain basin add a deck / ramp top above the
+   terrain, and standH() (used for the player's eye height and
+   projectiles) takes the higher of the two, so a bridge can be walked
+   across and the stairs can be climbed. */
 /* town bridge deck: a cambered (arched) stone deck — the walking top
    follows the same profile the builder draws, so the player rises over
    the crown and descends the far side. u = along the span, v = across. */
@@ -5911,20 +5388,6 @@ function platformTopAt(x,y){
   var tb=townBridgeTopAt(x,y); if(tb>best)best=tb;
   var ta=altoBridgeTopAt(x,y); if(ta>best)best=ta;
   var tf=fountainTopAt(x,y); if(tf>best)best=tf;
-  for(var i=0;i<placedObjects.length;i++){
-    var o=placedObjects[i];
-    if(o.t!=='bridge'&&o.t!=='steps')continue;
-    var sc=o.s||1, dx=x-o.x, dy=y-o.y;
-    if(Math.abs(dx)>170*sc||Math.abs(dy)>170*sc)continue;
-    var rad=o.rot*Math.PI/180, ca=Math.cos(rad), sa=Math.sin(rad);
-    var u=dx*ca+dy*sa, v=-dx*sa+dy*ca;
-    var base=terrainH(o.x,o.y)-1; /* buildPlacedModel seats groups at terrainH-1 */
-    if(o.t==='bridge'){
-      if(Math.abs(u)<=75*sc&&Math.abs(v)<=33*sc){var tb=base+19.5*sc; if(tb>best)best=tb;}
-    }else{ /* steps: a smooth ramp through the six tread tops */
-      if(Math.abs(u)<=60*sc&&Math.abs(v)<=45*sc){var ts=base+4.5*sc+((u+60*sc)/(120*sc))*54*sc; if(ts>best)best=ts;}
-    }
-  }
   return best;
 }
 function standH(x,y){
@@ -5953,7 +5416,7 @@ function waterLevelAt(x,y){
 }
 /* the ACTUAL height of the water surface over a point: wild lakes sit
    at z -0.8 (see buildWorld3D's discs), town ponds at their recorded
-   wz, placed ponds at the level captured when they were dug. Swimming
+   wz. Swimming
    heights (camera / body) must come from THIS — never from terrain +
    swimDepth, because swimDepth is an abstract 0..120 scale while the
    wild-lake beds are only carved ~5 units below the surface: adding
@@ -5964,393 +5427,12 @@ function swimSurfaceZ(x,y){
     var o=decorations[i];
     if(o.kind!=='lake')continue;
     if(Math.hypot(x-o.x,y-o.y)<o.s){
-      var z=o.placedWater?(o.wz!=null?o.wz:-0.8):(o.townWater?(o.wz!=null?o.wz:2.4):-0.8);
+      var z=(o.townWater?(o.wz!=null?o.wz:2.4):-0.8);
       if(z>lv)lv=z;
     }
   }
   return lv;
 }
-function placedObjSig(o){return o.id+':'+o.t+':'+Math.round(o.x)+':'+Math.round(o.y)+':'+o.rot+':'+(o.s||1)+':'+(o.t==='water'?Math.round(o.wl||0):'');}
-function rebuildPlaced3D(){
-  if(!THREE_OK||!scene)return;
-  if(!placedGroup){placedGroup=new THREE.Group();scene.add(placedGroup);}
-  while(placedGroup.children.length)placedGroup.remove(placedGroup.children[0]);
-  placedObjects.forEach(function(o){
-    var g=buildPlacedModel(o);
-    /* size scale: grow/shrink the whole model from its ground seat. Water
-       is exempt — its disc radius and level are handled inside the model
-       so the surface stays exactly at o.wl. */
-    if(o.t!=='water'&&(o.s||1)!==1)g.scale.setScalar(o.s);
-    placedGroup.add(g);
-  });
-  placedSig=placedObjects.map(placedObjSig).join('|')+'#'+editSeq;
-}
-function currentPlacedSig(){
-  return placedObjects.map(placedObjSig).join('|')+'#'+editSeq;
-}
-function nearestPlaced(x,y,maxD){
-  var best=null,bd=maxD;
-  placedObjects.forEach(function(o){var d=Math.hypot(o.x-x,o.y-y);if(d<bd){bd=d;best=o;}});
-  return best;
-}
-/* ---- pre-existing (built-in) objects: deletable in the editor ----
-   Every deletable built-in gets a stable bid "kind@x,y" from its centre
-   coordinates. The world generation is deterministic (seeded), so the
-   same object reappears at the same centre after every genWorld() and
-   the bid keeps identifying it across sessions. Deleting removes the
-   render record (townFeatures / decorations / the ruin obstacle) AND
-   its collision obstacle(s); the bid list is serialised in the save
-   (worldEdit.del) and re-applied after each world rebuild. Restoring
-   (undo / 全リセット) regenerates the pristine world and re-applies
-   whatever deletions remain. Bridges and terrace steps ARE deletable
-   (they are pure render features; the bridge fords are terrain and stay
-   wadeable). Rivers and ponds are deletable too, one connected WATER
-   BODY at a time: every 'lake' decoration in the body is removed, which
-   also removes its water surface and its swimming depth. Only the
-   retaining skirts and the waterfall sheets stay fixed — the terrain
-   itself depends on them. */
-var BUILTIN_FEATURE_KINDS={house:1,wall:1,gate:1,watergate:1,clocktower:1,chapel:1,castle:1,fountain:1,lamp:1,stall:1,bridge:1,steps:1,stairs:1,watchtower:1,tent:1,well:1};
-var BUILTIN_LABEL={house:'家',wall:'城壁',gate:'門',watergate:'水門',clocktower:'時計塔',chapel:'礼拝堂',castle:'城',fountain:'噴水',lamp:'街灯',stall:'市場の露店',tree:'木',snowtree:'雪の木',cactus:'サボテン',rock:'岩',ruin:'遺跡の石柱',bridge:'橋',steps:'石段',stairs:'大階段',water:'川・池の水',watchtower:'見張り塔',tent:'テント',well:'井戸'};
-var BUILTIN_RADIUS={house:80,wall:42,gate:95,watergate:95,clocktower:55,chapel:115,castle:125,fountain:62,lamp:26,stall:48,ruin:62,bridge:85,steps:78,stairs:120,watchtower:48,tent:44,well:26};
-function builtinBid(kind,x,y){return kind+'@'+Math.round(x)+','+Math.round(y);}
-function builtinTargets(){
-  var out=[];
-  townFeatures.forEach(function(f){
-    if(!BUILTIN_FEATURE_KINDS[f.kind])return;
-    out.push({bid:builtinBid(f.kind,f.x,f.y),kind:f.kind,x:f.x,y:f.y,r:BUILTIN_RADIUS[f.kind]||50});
-  });
-  decorations.forEach(function(d){
-    if(d.kind!=='tree'&&d.kind!=='snowtree'&&d.kind!=='cactus'&&d.kind!=='rock')return;
-    out.push({bid:builtinBid(d.kind,d.x,d.y),kind:d.kind,x:d.x,y:d.y,r:Math.max(26,(d.s||14)*1.15)});
-  });
-  obstacles.forEach(function(o){
-    if(o.ruin&&!o.town&&o.type==='rect')out.push({bid:builtinBid('ruin',o.x+o.w/2,o.y+o.h/2),kind:'ruin',x:o.x+o.w/2,y:o.y+o.h/2,r:BUILTIN_RADIUS.ruin});
-  });
-  /* water bodies: group the 'lake' decorations into connected bodies
-     (discs that overlap belong to the same river / pond system). A body
-     is deleted as one target carrying every member's bid. Placed ponds
-     (placedWater) are NOT built-ins — they are deleted as placed objects. */
-  var lakes=decorations.filter(function(d){return d.kind==='lake'&&!d.placedWater;});
-  var seenL={};
-  lakes.forEach(function(l0){
-    var k0=l0.x+','+l0.y;
-    if(seenL[k0])return;
-    var body=[],queue=[l0]; seenL[k0]=true;
-    while(queue.length){
-      var cur=queue.pop(); body.push(cur);
-      lakes.forEach(function(l2){
-        var k2=l2.x+','+l2.y;
-        if(seenL[k2])return;
-        if(Math.hypot(cur.x-l2.x,cur.y-l2.y)<(cur.s+l2.s)*0.92){seenL[k2]=true;queue.push(l2);}
-      });
-    }
-    var rep=body[0];
-    body.forEach(function(l3){if(l3.s>rep.s)rep=l3;});
-    out.push({bid:builtinBid('lake',rep.x,rep.y),bids:body.map(function(l4){return builtinBid('lake',l4.x,l4.y);}),kind:'water',x:rep.x,y:rep.y,r:rep.s});
-  });
-  return out;
-}
-function nearestBuiltin(x,y){
-  var best=null,bs=1e9;
-  builtinTargets().forEach(function(t){
-    if(deletedBuiltins.indexOf(t.bid)>=0)return;
-    var d=Math.hypot(t.x-x,t.y-y);
-    if(d<t.r+38){var s=d-t.r;if(s<bs){bs=s;best={t:t,d:d,score:s};}}
-  });
-  return best;
-}
-/* choose what a delete action at (x,y) hits: a placed object or a
-   pre-existing one, whichever the aim is effectively closest to */
-function pickDeleteTarget(x,y){
-  var o=nearestPlaced(x,y,130);
-  var b=nearestBuiltin(x,y);
-  if(b&&(!o||b.score<Math.hypot(o.x-x,o.y-y)-50))return {builtin:b.t};
-  if(o)return {placed:o};
-  if(b)return {builtin:b.t};
-  return null;
-}
-function removeBuiltinNow(bid){
-  var parts=bid.split('@'); if(parts.length!==2)return false;
-  var kind=parts[0], xy=parts[1].split(','), cx=Number(xy[0]), cy=Number(xy[1]);
-  if(!isFinite(cx)||!isFinite(cy))return false;
-  function near(x,y,tol){return Math.abs(x-cx)<=tol&&Math.abs(y-cy)<=tol;}
-  var removed=false;
-  if(BUILTIN_FEATURE_KINDS[kind]){
-    for(var i=townFeatures.length-1;i>=0;i--){var f=townFeatures[i];if(f.kind===kind&&near(f.x,f.y,3)){townFeatures.splice(i,1);removed=true;}}
-    if(!removed)return false;
-    for(var j=obstacles.length-1;j>=0;j--){var o=obstacles[j];if(!o.town||o.placed)continue;
-      var ox=(o.type==='rect')?o.x+o.w/2:o.x, oy=(o.type==='rect')?o.y+o.h/2:o.y;
-      if(kind==='gate'||kind==='watergate'){if(o.tower&&Math.hypot(ox-cx,oy-cy)<=95)obstacles.splice(j,1);}
-      else if(kind==='stairs'){if(o.stair&&o._smx===Math.round(cx)&&o._smy===Math.round(cy))obstacles.splice(j,1);}
-      else if(near(ox,oy,4))obstacles.splice(j,1);
-    }
-  }else if(kind==='ruin'){
-    for(var k=obstacles.length-1;k>=0;k--){var ro=obstacles[k];if(ro.ruin&&!ro.town&&ro.type==='rect'&&near(ro.x+ro.w/2,ro.y+ro.h/2,3)){obstacles.splice(k,1);removed=true;}}
-  }else if(kind==='lake'){
-    /* one member of a water body: dropping the decoration removes its
-       water surface (rendering derives from decorations) and its
-       swimming depth (waterDepthAt reads the same array) */
-    for(var q=decorations.length-1;q>=0;q--){var ld=decorations[q];if(ld.kind==='lake'&&!ld.placedWater&&near(ld.x,ld.y,3)){decorations.splice(q,1);removed=true;}}
-  }else{ /* decoration kinds: tree / snowtree / cactus / rock */
-    for(var m=decorations.length-1;m>=0;m--){var d=decorations[m];
-      if(d.kind===kind&&near(d.x,d.y,3)){
-        for(var n=obstacles.length-1;n>=0;n--)if(obstacles[n].ref===d)obstacles.splice(n,1);
-        decorations.splice(m,1);removed=true;
-      }}
-  }
-  if(removed)_losSrc=null;
-  return removed;
-}
-function applyBuiltinDeletions(){
-  if(!deletedBuiltins.length){builtinsFiltered=false;return;}
-  deletedBuiltins.forEach(function(bid){removeBuiltinNow(bid);});
-  builtinsFiltered=true;
-}
-function restoreBuiltinsWorld(){
-  genWorld();
-  applyBuiltinDeletions();
-  syncPlacedObstacles();
-  placedSig='__dirty__';
-}
-function deleteBuiltinTarget(t){
-  /* a target may carry several bids (a whole water body); all of them are
-     recorded and removed together, and one undo entry restores them all */
-  var bids=t.bids||[t.bid];
-  var fresh=bids.filter(function(b){return deletedBuiltins.indexOf(b)<0;});
-  if(!fresh.length)return;
-  fresh.forEach(function(b){deletedBuiltins.push(b);removeBuiltinNow(b);});
-  builtinsFiltered=true;
-  undoStack.push({kind:'builtin',bids:fresh});
-  if(undoStack.length>60)undoStack.shift();
-  markEditChanged(); refreshEditorUI();
-  beep(330,0.07,'square',0.04);
-  toast('既存の'+(BUILTIN_LABEL[t.kind]||'オブジェクト')+'を削除しました（自動保存されます）');
-}
-function placeObjectAtAim(){
-  if(placedObjects.length>=300){toast('置ける物の上限（300個）に達しました');return;}
-  var aim=editorState.aim||computeEditorAim(); if(!aim)return;
-  var o={id:++placedSeq,t:editorState.buildType,x:Math.round(aim.x),y:Math.round(aim.y),rot:editorState.rot};
-  if(Math.abs(editorState.size-1)>0.01)o.s=Math.round(editorState.size*100)/100;
-  /* placed water captures its surface level at placement time: the pond
-     keeps this level (and its radius) whatever the terrain does later */
-  if(o.t==='water')o.wl=Math.round(terrainH(aim.x,aim.y)+1);
-  placedObjects.push(o);
-  undoStack.push({kind:'place',id:o.id});
-  if(undoStack.length>60)undoStack.shift();
-  syncPlacedObstacles(); placedSig='__dirty__';
-  markEditChanged(); refreshEditorUI();
-  beep(660,0.07,'triangle',0.04);
-  toast('置きました（合計 '+placedObjects.length+' 個）');
-}
-function deletePlacedAtAim(){
-  var aim=editorState.aim||computeEditorAim(); if(!aim)return;
-  var pick=pickDeleteTarget(aim.x,aim.y);
-  if(!pick){toast('近くに消せる物がありません');return;}
-  if(pick.builtin){deleteBuiltinTarget(pick.builtin);return;}
-  var o=pick.placed;
-  var idx=placedObjects.indexOf(o);
-  placedObjects.splice(idx,1);
-  undoStack.push({kind:'delete',obj:o,index:idx});
-  if(undoStack.length>60)undoStack.shift();
-  syncPlacedObstacles(); placedSig='__dirty__';
-  markEditChanged(); refreshEditorUI();
-  beep(330,0.07,'square',0.04);
-  toast('削除しました（残り '+placedObjects.length+' 個）');
-}
-function editorUndo(){
-  var u=undoStack.pop();
-  if(!u){toast('戻せる編集がありません');return;}
-  if(u.kind==='terrain'){
-    var minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
-    u.changes.forEach(function(ch){
-      terrainDelta[ch[0]]=ch[1];
-      if(Math.abs(ch[1])>0.05){terrainChanged[ch[0]]=true;terrainHasEdits=true;} else delete terrainChanged[ch[0]];
-      var gx=(ch[0]%EDIT_N)*EDIT_STEP, gy=Math.floor(ch[0]/EDIT_N)*EDIT_STEP;
-      if(gx<minx)minx=gx; if(gx>maxx)maxx=gx; if(gy<miny)miny=gy; if(gy>maxy)maxy=gy;
-    });
-    if(maxx>=minx)refreshGroundVertices((minx+maxx)/2,(miny+maxy)/2,Math.max(maxx-minx,maxy-miny)/2+EDIT_STEP*2);
-    refreshGroundNormals();
-    placedSig='__dirty__';
-  }else if(u.kind==='place'){
-    for(var i=0;i<placedObjects.length;i++)if(placedObjects[i].id===u.id){placedObjects.splice(i,1);break;}
-    syncPlacedObstacles(); placedSig='__dirty__';
-  }else if(u.kind==='delete'){
-    placedObjects.splice(Math.min(u.index,placedObjects.length),0,u.obj);
-    syncPlacedObstacles(); placedSig='__dirty__';
-  }else if(u.kind==='builtin'){
-    var ubids=u.bids||(u.bid?[u.bid]:[]);
-    ubids.forEach(function(b){var bi=deletedBuiltins.indexOf(b);if(bi>=0)deletedBuiltins.splice(bi,1);});
-    restoreBuiltinsWorld(); /* regenerate the pristine world, then re-apply the deletions that remain */
-  }
-  markEditChanged(); refreshEditorUI();
-  beep(520,0.06,'triangle',0.04);
-  toast('↩ 元に戻しました');
-}
-function editorResetAll(){
-  clearWorldEditSilent();
-  editSeq++; markEditChanged();
-  refreshGroundAll(); syncPlacedObstacles();
-  refreshEditorUI();
-  toast('編集を全部リセットしました');
-}
-/* ---- editor visuals: brush ring + translucent ghost ---- */
-function ensureEditorVisuals(){
-  if(!THREE_OK||!scene)return;
-  if(!brushRing){
-    brushRing=new THREE.Mesh(new THREE.RingGeometry(0.93,1,44),new THREE.MeshBasicMaterial({color:0xe8c268,transparent:true,opacity:0.95,side:THREE.DoubleSide,depthWrite:false}));
-    brushRing.rotation.x=-Math.PI/2; brushRing.visible=false; scene.add(brushRing);
-  }
-}
-function setGhostFor(type,rot){
-  var key=type+':'+rot+':'+editorState.size;
-  if(ghostGroup&&ghostKey===key)return;
-  if(ghostGroup){scene.remove(ghostGroup);ghostGroup=null;}
-  var tmp={id:-1,t:type,x:0,y:0,rot:rot,s:editorState.size};
-  ghostGroup=buildPlacedModel(tmp);
-  if(type!=='water'&&editorState.size!==1)ghostGroup.scale.setScalar(editorState.size);
-  ghostGroup.traverse(function(m){
-    if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=0.55;m.material.depthWrite=false;m.castShadow=false;m.receiveShadow=false;}
-  });
-  ghostKey=key;
-  scene.add(ghostGroup);
-}
-function updateEditorVisuals(){
-  ensureEditorVisuals();
-  if(!editorState.active||!editorState.aim){
-    if(brushRing)brushRing.visible=false;
-    if(ghostGroup)ghostGroup.visible=false;
-    return;
-  }
-  var aim=editorState.aim;
-  if(editorState.mode==='terrain'){
-    if(ghostGroup)ghostGroup.visible=false;
-    if(brushRing){
-      brushRing.visible=true;
-      brushRing.material.color.setHex(0xe8c268);
-      brushRing.position.set(WX(aim.x),aim.z+2.5,WZ(aim.y));
-      brushRing.scale.set(editorState.brush,editorState.brush,editorState.brush);
-    }
-  }else if(editorState.placeMode==='place'){
-    if(brushRing)brushRing.visible=false;
-    setGhostFor(editorState.buildType,editorState.rot);
-    if(ghostGroup){
-      ghostGroup.visible=true;
-      ghostGroup.position.set(WX(aim.x),terrainH(aim.x,aim.y)-1,WZ(aim.y));
-      ghostGroup.rotation.y=-(editorState.rot*Math.PI/180);
-    }
-  }else{ /* delete mode: highlight the nearest deletable object, placed or pre-existing */
-    if(ghostGroup)ghostGroup.visible=false;
-    var pick=pickDeleteTarget(aim.x,aim.y);
-    if(brushRing){
-      if(pick){
-        var tx=pick.builtin?pick.builtin.x:pick.placed.x, ty=pick.builtin?pick.builtin.y:pick.placed.y;
-        var tr=pick.builtin?Math.max(30,pick.builtin.r):64;
-        var th2=terrainH(tx,ty)+3;
-        if(pick.builtin&&pick.builtin.kind==='water')th2=waterLevelAt(tx,ty)+3; /* ring floats on the water surface, not the pond bed */
-        brushRing.visible=true;
-        brushRing.material.color.setHex(0xff5560);
-        brushRing.position.set(WX(tx),th2,WZ(ty));
-        brushRing.scale.set(tr,tr,tr);
-      }else brushRing.visible=false;
-    }
-  }
-}
-/* ---- editor open / close / tick / UI ---- */
-function openEditor(){
-  if(!isGameMaster()){toast('地形エディターはゲームマスター専用です');return;}
-  if(!started||!player||player.dead)return;
-  returnToMenu=false; closeGameMenu(true);
-  editorState.active=true;
-  /* safe work mode: clear the field; spawns & attacks are blocked while active */
-  enemies.forEach(function(e){if(e._sp){e._sp.e=null;e._sp.coolUntil=performance.now()+90000;}});
-  enemies=[]; target=null; aimTarget=null; projectiles=[];
-  if(bowDraw.active)cancelBowDraw();
-  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
-  $('editorPanel').style.display='block';
-  editorState.aim=computeEditorAim();
-  refreshEditorUI();
-  syncCursorHide();
-  chat('🏗️ <b>地形エディター</b> — 安全な作業モードです。編集は自動保存されます','sys');
-  beep(700,0.07,'triangle',0.04);
-}
-function closeEditor(){
-  if(editorState.applying||editorState.stroke)endStroke();
-  editorState.applying=false; editorState.active=false;
-  $('editorPanel').style.display='none';
-  if(brushRing)brushRing.visible=false;
-  if(ghostGroup)ghostGroup.visible=false;
-  markEditChanged(); /* make sure the autosave picks the final state up */
-  relockPointer();
-  toast('エディターを閉じました — 編集は保存されます');
-}
-function editorTick(now,dt){
-  if(!editorState.active)return;
-  editorState.aim=computeEditorAim();
-  if(editorState.applying&&editorState.mode==='terrain')applyBrush(dt);
-  if(now-editorState.statusT>200){
-    editorState.statusT=now;
-    refreshEditorStatus();
-  }
-}
-function refreshEditorStatus(){
-  var st=$('edStatus'); if(!st||!editorState.active)return;
-  var n=0; for(var k in terrainChanged)n++;
-  var aim=editorState.aim;
-  var pos=aim?('照準: '+Math.round(aim.x)+', '+Math.round(aim.y)+'（高さ '+Math.round(aim.z)+'）'):'';
-  st.innerHTML='作業モード中は敵が湧かず攻撃できません。 '+pos+'<br>編集中の地形セル <b>'+n+'</b> ／ 置いた物 <b>'+placedObjects.length+'</b> 個 ／ 消した既存の物 <b>'+deletedBuiltins.length+'</b> 件 ／ 編集はキャラクターと一緒に自動保存されます。';
-  var ub=$('edUndoBtn'); if(ub)ub.disabled=undoStack.length===0;
-}
-function refreshEditorUI(){
-  document.querySelectorAll('.ed-tool').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tool')===editorState.tool);});
-  document.querySelectorAll('.ed-pal-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-type')===editorState.buildType);});
-  var tt=$('edTabTerrain'),tb=$('edTabBuild');
-  if(tt)tt.classList.toggle('on',editorState.mode==='terrain');
-  if(tb)tb.classList.toggle('on',editorState.mode==='build');
-  var bx1=$('edTerrainBox'),bx2=$('edBuildBox');
-  if(bx1)bx1.style.display=editorState.mode==='terrain'?'block':'none';
-  if(bx2)bx2.style.display=editorState.mode==='build'?'block':'none';
-  var bv=$('edBrushVal'); if(bv)bv.textContent=editorState.brush;
-  var sv=$('edStrVal'); if(sv)sv.textContent=editorState.strength;
-  var rv=$('edRotVal'); if(rv)rv.textContent=editorState.rot+'°';
-  var zv=$('edSizeVal'); if(zv)zv.textContent=Math.round(editorState.size*100)+'%';
-  var zr=$('edSizeRange'); if(zr&&Math.round(Number(zr.value))!==Math.round(editorState.size*100))zr.value=Math.round(editorState.size*100);
-  var pm=$('edPlaceModeBtn'); if(pm)pm.textContent='モード: '+(editorState.placeMode==='place'?'配置':'削除');
-  var pb=$('edPlaceBtn'); if(pb)pb.textContent=editorState.placeMode==='place'?'📌 照準の場所に置く':'🗑 照準に近い物を削除する';
-  var rb=$('edResetBtn'); if(rb){rb.classList.remove('armed');rb.textContent='🗑 編集を全部リセット';}
-  ghostKey=''; /* force ghost rebuild after palette/rotation changes */
-  refreshEditorStatus();
-}
-/* editor UI wiring (DOM exists: this script runs after the markup) */
-(function wireEditor(){
-  var closeBtn=$('edCloseBtn'); if(closeBtn)closeBtn.addEventListener('click',closeEditor);
-  var menuBtn=$('menuEditorBtn'); if(menuBtn)menuBtn.addEventListener('click',function(){openEditor();});
-  var tt=$('edTabTerrain'),tb=$('edTabBuild');
-  if(tt)tt.addEventListener('click',function(){editorState.mode='terrain';refreshEditorUI();});
-  if(tb)tb.addEventListener('click',function(){editorState.mode='build';if(editorState.stroke)endStroke();editorState.applying=false;refreshEditorUI();});
-  document.querySelectorAll('.ed-tool').forEach(function(b){b.addEventListener('click',function(){editorState.tool=b.getAttribute('data-tool');refreshEditorUI();beep(600,0.05,'square',0.03);});});
-  document.querySelectorAll('.ed-pal-btn').forEach(function(b){b.addEventListener('click',function(){editorState.buildType=b.getAttribute('data-type');editorState.placeMode='place';refreshEditorUI();beep(600,0.05,'square',0.03);});});
-  var br=$('edBrushRange'); if(br)br.addEventListener('input',function(){editorState.brush=Number(this.value);var v=$('edBrushVal');if(v)v.textContent=this.value;});
-  var zr2=$('edSizeRange'); if(zr2)zr2.addEventListener('input',function(){editorState.size=Number(this.value)/100;var v=$('edSizeVal');if(v)v.textContent=this.value+'%';ghostKey='';});
-  var sr=$('edStrRange'); if(sr)sr.addEventListener('input',function(){editorState.strength=Number(this.value);var v=$('edStrVal');if(v)v.textContent=this.value;});
-  var rl=$('edRotL'),rr=$('edRotR');
-  if(rl)rl.addEventListener('click',function(){editorState.rot=((editorState.rot-15)%360+360)%360;refreshEditorUI();});
-  if(rr)rr.addEventListener('click',function(){editorState.rot=(editorState.rot+15)%360;refreshEditorUI();});
-  var pm=$('edPlaceModeBtn'); if(pm)pm.addEventListener('click',function(){editorState.placeMode=editorState.placeMode==='place'?'delete':'place';refreshEditorUI();});
-  var pb=$('edPlaceBtn'); if(pb)pb.addEventListener('click',function(){if(editorState.placeMode==='place')placeObjectAtAim();else deletePlacedAtAim();});
-  var ab=$('edApplyBtn');
-  if(ab){
-    ab.addEventListener('pointerdown',function(e){e.preventDefault();editorState.aim=computeEditorAim();beginStroke();editorState.applying=true;ab.classList.add('holding');});
-    var stop=function(){if(editorState.applying){editorState.applying=false;endStroke();}ab.classList.remove('holding');};
-    ab.addEventListener('pointerup',stop); ab.addEventListener('pointerleave',stop); ab.addEventListener('pointercancel',stop);
-  }
-  var ub=$('edUndoBtn'); if(ub)ub.addEventListener('click',editorUndo);
-  var rb=$('edResetBtn');
-  if(rb)rb.addEventListener('click',function(){
-    if(!rb.classList.contains('armed')){rb.classList.add('armed');rb.textContent='本当に全部消しますか？ もう一度押すとリセット';setTimeout(function(){rb.classList.remove('armed');rb.textContent='🗑 編集を全部リセット';},3200);return;}
-    editorResetAll();
-  });
-})();
-
 /* first-person weapon viewmodel (attached to the camera) */
 var viewModel=null, vmCls='';
 /* archer draw rig: string segments + the nocked arrow are rebuilt every frame
@@ -6762,8 +5844,8 @@ function init3D(){
   // each chunk is generated lazily by buildGroundChunk() when the
   // chunk manager wants it (positions / UVs / colours / normals all
   // identical to the sheet's — see buildGroundChunk and
-  // groundVertexColor), and terrainHasEdits needs no catch-up here:
-  // unbuilt chunks are generated from terrainH, edits included.
+  // groundVertexColor): unbuilt chunks are generated from terrainH
+  // on demand, so the ground always matches the current terrain.
   var groundNoise=makeTex('gnoise',128,function(c,S,r){
     c.fillStyle='#f6f4ee';c.fillRect(0,0,S,S);
     for(var i=0;i<2000;i++){c.fillStyle='rgba('+(r()<0.5?'96,92,84':'255,255,255')+','+(0.04+r()*0.07)+')';c.fillRect(r()*S,r()*S,1.4,1.4);}
@@ -8976,11 +8058,9 @@ function render3D(now){
   }
   if(!scene)return;
   if(!_pv)_pv=new THREE.Vector3();
-  var sig=obstacles.length+'_'+decorations.length+'_'+townFeatures.length+'_'+deletedBuiltins.length;
+  var sig=obstacles.length+'_'+decorations.length+'_'+townFeatures.length;
   if(sig!==staticSig){staticSig=sig;rebuildStaticWorld();} /* sig change = full chunked rebuild: always pass + near chunks now, the rest queued (see rebuildStaticWorld) */
   updateChunkManager(now); /* build queued ground / static chunks near the player, discard the far ones */
-  if(typeof currentPlacedSig==='function'&&placedSig!==currentPlacedSig())rebuildPlaced3D();
-  if(typeof updateEditorVisuals==='function')updateEditorVisuals();
   updateWaterFx(now); /* water shader time, waterfall scroll, spray */
   updateSmoke(now);   /* chimney smoke drifting over the rooftops */
   updateAltoMill(now); /* Alto's turning windmill */
@@ -9161,7 +8241,7 @@ function setupCameraControls(){
   /* while locked, pressing is an attack (aim is the center crosshair);
      for the archer, pressing STARTS the draw and releasing looses the arrow */
   document.addEventListener('pointerdown',function(e){
-    if(isLocked()&&e.target===el&&started&&player&&!player.dead&&!(typeof editorState!=='undefined'&&editorState&&editorState.active)){
+    if(isLocked()&&e.target===el&&started&&player&&!player.dead){
       if(player.cls==='archer')startBowDraw(); else playerAttack(1);
     }
   });
@@ -9176,11 +8256,6 @@ function setupCameraControls(){
   el.addEventListener('pointerdown',function(e){
     dragging=true;moved=0;lx=e.clientX;ly=e.clientY;downT=performance.now();
     try{el.setPointerCapture(e.pointerId);}catch(err){}
-    /* editor (gamemaster): pressing on the view paints with the brush at the crosshair */
-    if(typeof editorState!=='undefined'&&editorState&&editorState.active&&started&&player&&!player.dead){
-      if(editorState.mode==='terrain'){editorState.aim=computeEditorAim();beginStroke();editorState.applying=true;}
-      return;
-    }
     /* archer: pressing on the view starts the draw (aim can still be dragged) */
     if(started&&player&&!player.dead&&player.cls==='archer'&&!isLocked())startBowDraw();
   });
@@ -9193,11 +8268,6 @@ function setupCameraControls(){
   });
   function up(e){
     if(!dragging)return;dragging=false;
-    if(typeof editorState!=='undefined'&&editorState&&editorState.active){
-      if(editorState.mode==='terrain'){if(editorState.applying){editorState.applying=false;endStroke();}}
-      else if(moved<7){editorState.aim=computeEditorAim();if(editorState.placeMode==='place')placeObjectAtAim();else deletePlacedAtAim();}
-      return;
-    }
     if(isLocked())return;
     if(player&&player.cls==='archer'&&bowDraw.active){
       /* releasing looses the drawn arrow; no pointer-lock request mid-shot */
@@ -9240,7 +8310,6 @@ function loop(now){
   syncCursorHide();
   if(started){
     update(dt,now);
-    if(typeof editorTick==='function')editorTick(now,dt);
     /* mob population maintenance is deliberately infrequent (~1.4s):
        spawn near mobs in small batches and despawn far ones */
     if(now-spawnT>2600){spawnT=now;despawnFar();trySpawnNear(false);}
@@ -9294,17 +8363,12 @@ window.addEventListener('resize',resize);
 document.addEventListener('keydown',function(e){
   if(captureBind){handleBindCapture(e);return;}
   if(e.code==='Escape'){if(handleEscape()){e.preventDefault();return;}}
-  if(typeof editorState!=='undefined'&&editorState&&editorState.active&&started&&document.activeElement!==$('chatInput')){
-    if(e.code==='KeyR'){e.preventDefault();editorState.rot=((editorState.rot+(e.shiftKey?-15:15))%360+360)%360;refreshEditorUI();return;}
-    if(e.code==='BracketLeft'||e.code==='BracketRight'){e.preventDefault();editorState.size=Math.max(0.5,Math.min(2.5,Math.round((editorState.size+(e.code==='BracketRight'?0.05:-0.05))*100)/100));refreshEditorUI();return;}
-    if(e.code==='KeyZ'&&(e.ctrlKey||e.metaKey)){e.preventDefault();editorUndo();return;}
-  }
   if(started&&e.code==='KeyM'&&$('worldMapModal').style.display==='grid'){closeWorldMap();e.preventDefault();return;}
   if($('settingsModal').style.display==='grid')return;
   if(started&&player&&e.code==='KeyR'&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput')){
     /* R toggles the bag directly — handled before the modal early-return
        below so R can also CLOSE the bag; ignored while another modal is
-       up (the editor's own R = rotate placement is handled earlier) */
+       up */
     if($('bagModal').style.display==='grid'||menuOpen||!isAnyOverlayOpen()){e.preventDefault();toggleBag();return;}
   }
   if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid')return;
@@ -9590,7 +8654,7 @@ $('startBtn').addEventListener('click',function(){
   player=makePlayer(name,selectedClass);
   questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
   resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
-  clearWorldEditSilent(); hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; topLift=0; /* a fresh character starts on a fresh world */
+  hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; topLift=0; /* a fresh character starts on a fresh world */
   setupSkillUI(selectedClass);
   genWorldThen(function(){
   started=true;
