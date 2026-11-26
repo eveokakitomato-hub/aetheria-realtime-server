@@ -1017,6 +1017,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存まわりを直し、失敗の理由がセーブ画面で分かるようになりました。</b>保存済みの地形編集データを読み込むとき、保存されていた編集そのものだけを再現するよう見直しました。読み込むたびにセーブデータが少しずつ膨らんでしまうことがなくなり、すでに大きくなったセーブも次回の保存で縮みます。あわせて、セーブ画面の保存状態に、直近の保存で送ったデータの大きさと、サーバーが返した応答（ステータスとエラー内容）がそのまま表示されるようになりました。保存に失敗したときは、その行を見れば理由が分かります。サーバー側で保存できるデータの上限も、すでに大きく引き上げ済みです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログアウトした瞬間の場所が、確実に保存されるようになりました。</b>これまでは、歩いた直後にログアウトすると自動保存が間に合わず、少し前の場所から再開してしまうことがありました。数秒待たなくても、ログアウト操作そのものでその場所が保存されます。次回はログアウトした場所からそのまま再開できます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存に失敗したとき、画面に警告が出るようになりました。</b>これまで自動保存がサーバーに届かなかった場合、そのまま気づけずに古い保存位置から再開してしまうことがありました。保存が続けて失敗すると「自動保存ができていません」という警告が画面に表示され、セーブ画面でも保存の状態が確認できるようになりました。保存が成功すると警告は消えます。あわせて、サーバー側で保存できるデータの上限も引き上げました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">サイト</span><span><b>ログイン画面が、画面の幅いっぱいに広がりました。</b>タイトル画面の左側にあったパネルを取り払い、アカウントのログイン・アカウント作成・ゲストプレイのフォームが、左のスペースまで画面いっぱいに表示されるようになりました。ログインまわりの機能や入力項目は今まで通りです。</span></li>
@@ -1036,7 +1037,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>土の道の見た目を、草のない土の地面らしくしました。</b>アルトの南門から風車広場への道など、土の道が板を敷いたように見えていたのを、継ぎ目のない一色の土が地面に沿う素朴な見た目に変えました。ルミナスの土の小道も同じ見た目に揃えています。道の通り道と幅は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの風車広場と道のめり込みを直しました。</b>風車のある円形の石畳広場に、南門からの土の道が食い込んで見えていたのを修正。重なる部分では広場の石畳が上に来るよう、広場の石畳を少し高くしました。道の通り道は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>露店の陳列台を低くしました。</b>ルミナスの市場と風見村アルトの露店で、商品を置く台が高すぎたのを、腰から胸くらいの自然な高さ（約1m）に下げました。台の上に並ぶ商品や木箱も、新しい台の高さに合わせて置き直しています。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">戦闘</span><span><b>弓矢の射程が伸びました。</b>矢の初速を上げ、矢にかかる重力を弱めたことで、フルに引いて水平に撃つと約30mまで届くようになりました（これまでは約18m）。軽く引いただけのタップ撃ちも少しだけ伸びていますが、引き具合で飛距離が変わる感覚は今まで通りです。敵の矢の飛び方は変わっていません。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -3677,7 +3677,7 @@ function hurtPlayer(dmg,src){
    configured yet (503 accounts_not_configured), the game falls back
    to guest play + file export, exactly as before. */
 var API_BASE='https://aetheria-realtime-server.onrender.com';
-var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login',lastKeySeen:'',lastChangeAt:0,lastSaveStart:0,saveQueued:false,failUntil:0,failCount:0,lastErr:'',pendingFinal:null};
+var acct={token:null,username:null,character:null,enabled:null,saving:false,lastAt:null,savedKey:'',dirtySince:0,mode:'login',lastKeySeen:'',lastChangeAt:0,lastSaveStart:0,saveQueued:false,failUntil:0,failCount:0,lastErr:'',pendingFinal:null,lastSentBytes:0,lastHttpStatus:0,lastAttemptErr:'',lastAttemptOk:false,lastAttemptAt:null};
 function acctSetStatus(text,ok){
   var st=$('acctStatus'); if(st){st.textContent=text; st.className=(ok===true)?'ok':((ok===false)?'ng':'');}
   var dot=$('acctDot'); if(dot) dot.className='net-dot '+((ok===true)?'ok':((ok===false)?'':'busy'));
@@ -3773,6 +3773,7 @@ function acctSetMode(mode){
 function acctOnAuth(data){
   acct.token=data.token||null; acct.username=data.username||''; acct.character=data.character||null;
   acct.savedKey=''; acct.lastAt=null; acct.dirtySince=0; acct.lastKeySeen=''; acct.lastChangeAt=0; acct.lastSaveStart=0; acct.saveQueued=false; acct.failUntil=0;
+  acct.lastSentBytes=0; acct.lastHttpStatus=0; acct.lastAttemptErr=''; acct.lastAttemptOk=false; acct.lastAttemptAt=null;
   clearSaveWarn(); acct.pendingFinal=null;
   /* Restore this account's settings at login (they live in the character save JSON) */
   if(acct.character&&acct.character.settings)applySettingsData(acct.character.settings);
@@ -3849,6 +3850,32 @@ function noteSaveFailure(code,status,manual){
   if(manual||status===413||acct.lastErr==='character_too_large'||acct.failCount>=2)showSaveWarn();
   refreshSaveUI();
 }
+/* ---- last-save-attempt diagnostics -----------------------------------
+   Every server save records what was actually sent and what the server
+   actually answered: the request body's size in bytes, the HTTP status
+   (0 = no response at all, i.e. a network-level failure) and the
+   server's own error code, verbatim. refreshSaveUI() shows these in
+   the save modal's status line, so the NEXT failure explains itself at
+   a glance (too large? rejected? unreachable?) instead of just saying
+   "not saved yet". */
+function saveBodyBytes(data){
+  try{return unescape(encodeURIComponent(JSON.stringify({character:data}))).length;}catch(e){return 0;}
+}
+function noteSaveAttempt(status,errCode,ok){
+  acct.lastHttpStatus=status||0;
+  acct.lastAttemptErr=errCode||'';
+  acct.lastAttemptOk=!!ok;
+  acct.lastAttemptAt=new Date();
+}
+function saveAttemptText(){
+  if(!acct.lastAttemptAt)return '';
+  var kb=acct.lastSentBytes?((Math.round(acct.lastSentBytes/102.4)/10).toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1})):'不明';
+  var s='直近の保存試行（'+acct.lastAttemptAt.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'）: 送信データ 約'+kb+' KB ／ ';
+  if(acct.lastAttemptOk)s+='サーバーの応答: 成功（HTTP '+(acct.lastHttpStatus||200)+'）';
+  else if(!acct.lastHttpStatus)s+='サーバーの応答: なし（通信エラー — サーバーに届きませんでした）';
+  else s+='サーバーの応答: HTTP '+acct.lastHttpStatus+(acct.lastAttemptErr?(' ／ エラー: '+acct.lastAttemptErr+(acct.lastAttemptErr==='character_too_large'?'（セーブデータが大きすぎて保存できませんでした）':'')):'');
+  return s;
+}
 /* Send the parked logout snapshot (acct.pendingFinal), if any. Called
    every time an in-flight save settles: the final position captured at
    the logout moment is written right after, with keepalive, so logout
@@ -3858,16 +3885,19 @@ function flushPendingFinal(){
   if(!acct.token){acct.pendingFinal=null;return;}
   if(acct.saving)return; /* the in-flight save's settle handler calls us again */
   acct.pendingFinal=null;
-  acct.saving=true; acct.lastSaveStart=performance.now(); refreshSaveUI();
+  acct.saving=true; acct.lastSaveStart=performance.now(); acct.lastSentBytes=saveBodyBytes(pf.data); refreshSaveUI();
   acctApi('/api/save',{method:'POST',body:{character:pf.data},keepalive:true}).then(function(r){
     acct.saving=false;
     if(r.data&&r.data.ok){
+      noteSaveAttempt(r.status,'',true);
       clearSaveWarn();
       acct.character=pf.data; acct.lastAt=new Date(); acct.savedKey=pf.key;
       lastSaveAt=acct.lastAt; lastSavedKey=pf.key; acct.dirtySince=0;
     }else if(r.status===401){
+      noteSaveAttempt(r.status,(r.data&&r.data.error)||'not_logged_in',false);
       acct.token=null; acct.username=null; acct.character=null; refreshAcctUI();
     }else{
+      noteSaveAttempt(r.status,(r.data&&r.data.error)||'',false);
       noteSaveFailure(r.data&&r.data.error,r.status,false);
       acctMsg('ログアウト時の最終保存に失敗しました。次回は前回保存できた位置から始まります。',true);
     }
@@ -3875,6 +3905,7 @@ function flushPendingFinal(){
     flushPendingFinal();
   }).catch(function(){
     acct.saving=false;
+    noteSaveAttempt(0,'network',false);
     noteSaveFailure('',0,false);
     acctMsg('ログアウト時の最終保存に失敗しました。次回は前回保存できた位置から始まります。',true);
     refreshSaveUI();
@@ -3891,9 +3922,11 @@ function serverSave(manual,snapData,snapKey){
      response time. Anything that changed while the request was in flight
      must stay "unsaved" so it is written by the follow-up save below. */
   var sentKey=snapKey||progressKey();
+  acct.lastSentBytes=saveBodyBytes(data);
   acctApi('/api/save',{method:'POST',body:{character:data},keepalive:true}).then(function(r){
     acct.saving=false;
     if(r.data&&r.data.ok){
+      noteSaveAttempt(r.status,'',true);
       clearSaveWarn(); /* a successful save clears the failure warning */
       acct.character=data; acct.lastAt=new Date(); acct.savedKey=sentKey;
       refreshAcctUI(); /* first save fixes this account's role from now on */
@@ -3907,10 +3940,12 @@ function serverSave(manual,snapData,snapKey){
         acct.dirtySince=0;
       }
     }else if(r.status===401){
+      noteSaveAttempt(r.status,(r.data&&r.data.error)||'not_logged_in',false);
       acct.token=null; acct.username=null; acct.character=null;
       refreshAcctUI();
       toast('ログインの有効期限が切れました。タイトルに戻って再ログインすると自動保存が再開します',4200);
     }else{
+      noteSaveAttempt(r.status,(r.data&&r.data.error)||'',false);
       if(manual)toast('サーバー保存に失敗しました。少し待って再試行してください',3600);
       noteSaveFailure(r.data&&r.data.error,r.status,manual);
     }
@@ -3918,6 +3953,7 @@ function serverSave(manual,snapData,snapKey){
     flushPendingFinal(); /* a parked logout snapshot goes out right after this save lands */
   }).catch(function(){
     acct.saving=false;
+    noteSaveAttempt(0,'network',false);
     if(manual)toast('サーバー保存に失敗しました。接続を確認してください',3600);
     noteSaveFailure('',0,manual);
     refreshSaveUI();
@@ -4024,15 +4060,18 @@ function refreshSaveUI(){
   var note=$('lastSaveNote');
   if(note&&lastSaveAt)note.textContent='前回の保存: '+lastSaveAt.toLocaleString('ja-JP')+(dirty?' — そのあと進捗が進んでいます。再度保存すると最新になります。':'');
   if(note&&acct.token)note.textContent='☁ @'+acct.username+' でログイン中 — 進捗はサーバーへ自動保存されます'+(acct.lastAt?'（前回の保存: '+acct.lastAt.toLocaleString('ja-JP')+'）':'')+'。下のボタンはバックアップ用のファイル書き出しです。';
-  /* 保存状態（成功／失敗）はセーブ画面のこの行でも分かるようにする */
+  /* 保存状態（成功／失敗）はセーブ画面のこの行でも分かるようにする。
+     直近の保存試行の詳細（送信データの大きさとサーバーの応答）も必ず
+     添える：失敗したとき、その理由がこの行だけで切り分けられる。 */
   var sl=$('saveStatusLine');
   if(sl){
+    var att=saveAttemptText();
     if(acct.token&&acct.failCount>0){
       sl.className='save-status-line ng';
-      sl.textContent='⚠ 自動保存ができていません（'+acct.failCount+'回連続で失敗'+(acct.lastErr==='character_too_large'?'：セーブデータが大きすぎてサーバーに保存できませんでした':'')+'）。最後に保存できたのは '+(acct.lastAt?acct.lastAt.toLocaleString('ja-JP'):'まだありません')+' です。このままでは進捗が残らないことがあります。「☁ サーバーへ今すぐ保存」で再試行するか、下のボタンでファイルにバックアップしてください。';
+      sl.textContent='⚠ 自動保存ができていません（'+acct.failCount+'回連続で失敗）。最後に保存できたのは '+(acct.lastAt?acct.lastAt.toLocaleString('ja-JP'):'まだありません')+' です。'+(att?att+'。':'')+'このままでは進捗が残らないことがあります。「☁ サーバーへ今すぐ保存」で再試行するか、下のボタンでファイルにバックアップしてください。';
     }else if(acct.token){
       sl.className='save-status-line ok';
-      sl.textContent='☁ 自動保存は正常です'+(acct.lastAt?'（前回の保存: '+acct.lastAt.toLocaleString('ja-JP')+'）':'（まだ保存されていません）');
+      sl.textContent='☁ 自動保存は正常です'+(acct.lastAt?'（前回の保存: '+acct.lastAt.toLocaleString('ja-JP')+'）':'（まだ保存されていません）')+(att?'。'+att:'');
     }else{
       sl.className='save-status-line'; sl.textContent='';
     }
@@ -5466,14 +5505,31 @@ function loadWorldEdit(we){
        is exactly the new vertex (gx,gy) — only the stride changes. v3
        saves already use the current stride (EDIT_N). */
     var oldStride=(we.v&&we.v>=3)?0:((we.v&&we.v===2)?221:111);
+    /* Restore EXACTLY the saved entries — nothing else. The restored
+       delta layer and changed-set are built in locals first and then
+       swapped in whole, so applying a save can never mark tiles the
+       save itself did not contain (no smoothing / neighbour bleed on
+       load): a load -> save round trip reproduces the saved terrain
+       set as-is instead of growing it, which is what let gamemaster
+       saves swell login after login until they no longer fit the
+       server limit. Duplicate indices in the save collapse to one
+       entry and sub-threshold values are dropped, so an already
+       bloated stored save also shrinks back on its next save. Tiles
+       the user actually touches with the editor brush are still
+       recorded by applyBrush() exactly as before. */
+    var restoredDelta=new Float32Array(EDIT_N*EDIT_N);
+    var restoredChanged={};
     we.terrain.forEach(function(pair){
       if(!Array.isArray(pair))return;
       var idx=Math.floor(Number(pair[0])), d=Number(pair[1]);
       if(oldStride){ if(!(idx>=0&&idx<oldStride*oldStride))return; idx=Math.floor(idx/oldStride)*EDIT_N+(idx%oldStride); }
       if(!(idx>=0&&idx<EDIT_N*EDIT_N)||!isFinite(d))return;
       d=Math.max(-500,Math.min(500,d));
-      if(Math.abs(d)>0.05){terrainDelta[idx]=d;terrainChanged[idx]=true;terrainHasEdits=true;}
+      if(Math.abs(d)>0.05){restoredDelta[idx]=d;restoredChanged[idx]=true;}
     });
+    terrainDelta=restoredDelta;
+    terrainChanged=restoredChanged;
+    terrainHasEdits=Object.keys(restoredChanged).length>0;
   }
   if(Array.isArray(we.placed)){
     we.placed.slice(0,300).forEach(function(o){
