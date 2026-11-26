@@ -1018,6 +1018,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>アルトの南門から風車への道に被っていた家を撤去しました。</b>南門から風車広場へまっすぐ続く道の脇に建っていた家（高い煙突の鍛冶屋の家）を取り壊しました。建物が大きくなったことで、屋根や土台が道に被るようになっていたためです。道は南門から風車まで、家に遮られずまっすぐ通れるようになりました。他の家・冒険者ギルド・風車は今まで通りです。</span></li>
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログイン時の再開位置が、保存した場所の近くになりました。</b>保存した位置が建物などと重なっていた場合、これまでは初期スポーン（アルト風車広場の南）まで戻されていましたが、保存位置のすぐ近くで当たり判定に触れない空き場所を探して、そこから再開するようになりました。近くに空き場所がどうしても見つからない場合のみ、初期スポーンに戻ります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">サイト</span><span><b>公式サイトのドット絵を取り除きました。</b>タイトル画面に表示されていたドット絵（ピクセルアート調のイラスト）を撤去し、すっきりした見た目に整えました。タイトルやお知らせ、ワールド紹介などの文章とレイアウト、ゲーム本編の見た目は今まで通りです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドの中が明るくなりました。</b>ホールの吊りランプを3つから7つに増やしてひと回り大きくし、柔らかい光の輪も付けました。床とラグの色も少し明るくし、窓ガラスも昼の光を返すようになっています。ギルドの外観や屋外の明るさは今まで通りです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>風見村アルトの建物が、ひと回り大きくなりました。</b>家6軒・冒険者ギルド・風車のすべてを約1.3倍に建て替えました（間取りも高さも）。当たり判定と屋根の上も新しい大きさに合わせてあります。村で一番大きな建物は、これまで通り冒険者ギルドです。</span></li>
@@ -1036,8 +1038,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>アルトの木柵が高くなり、南門が大きくなりました。</b>村を囲う丸太の柵を背の高い柵に作り替え、当たり判定も新しい高さに合わせました。南門は門柱・横木ともに大きな門に建て替え、開口部も広くなっています。あわせて、門と柵の間に空いていた隙間をなくし、柵が門柱までつながるようにしました（門の通り抜けは今まで通りできます）。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの南門まわりの道のズレを直しました。</b>門の柱の見た目と当たり判定の位置がずれていたのをそろえ、南門の南で川に架かる木の橋も、道の真ん中の軸に合わせてかけ直しました。南門から風車広場まで、道がまっすぐ一本につながっています。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">システム</span><span><b>自動保存が速くなりました。</b>これまでは進捗が変わってから保存まで数秒の待ち時間がありましたが、通常の変化はほぼすぐに、レベルアップ・クエスト完了・ゴールドや持ち物の変化はその場で保存されるようになりました。画面の「自動保存済み」の時刻も、実際に保存できた瞬間と一致するようになっています。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>風見村アルトの家が大きくなりました。</b>屋根はそのままに壁だけを高くして、家の中が広々としました。あわせて、南門から風車へ続く道に被っていた家を、道にかからない位置へ移しました。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドが大きくなり、中に入れるようになりました。</b>建物をひと回り大きくし、南側の両開きドアからホールへ入れるようになりました。ホールには受付カウンターや掲示板、テーブルがあります。アルトへお越しの際はぜひ中をのぞいてみてください。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -1943,7 +1943,7 @@ var TOWN_GREENERY=[
      chapel apron, the landing circle and the castle forecourt */
   [2050,1330,62],[2200,1300,58],[2130,1090,50],[1960,1420,44]
 ];
-var SPAWN_X=13700, SPAWN_Y=15415;   /* INITIAL spawn (new characters / first login): the south side of Alto's windmill plaza — 115 units south of the windmill at the village centre (13700,15300), inside the plaza disc (r 150) and the village safe zone, clear of the windmill's own collision (r 49) and of every house. Saved characters keep their saved position: applySaveData() only falls back to this point when a saved position is missing or colliding. (The old Luminas plaza spawn is retired as the start point; Luminas itself is unchanged.) */
+var SPAWN_X=13700, SPAWN_Y=15415;   /* INITIAL spawn (new characters / first login): the south side of Alto's windmill plaza — 115 units south of the windmill at the village centre (13700,15300), inside the plaza disc (r 150) and the village safe zone, clear of the windmill's own collision (r 49) and of every house. Saved characters keep their saved position: applySaveData() falls back to this point only when a saved position is missing, or colliding with no open ground nearby (nearestFreeSpot() handles the usual case). (The old Luminas plaza spawn is retired as the start point; Luminas itself is unchanged.) */
 var TOWN_PADS=[]; /* flat building pads {x0,y0,x1,y1,h}: filled by buildTownData() before any terrain is meshed, so every house / the clock tower stands on level ground instead of sinking into (or floating over) the bowl slope */
 /* ============ THE GRAND STAIRCASE — the confirmed top-down plan (plaza's north rim centre → bridge-flight STRAIGHT north over the river → mid terrace centred on the plaza's axis → twin CURVED flights from the terrace's two south corners, hugging its rim, then straight up to the high terrace → flat runs into the terrace plaza → chapel due north) ============
    Parametric stone flights, sized for the 1.7m body: riser ≈0.17m
@@ -2000,7 +2000,7 @@ STAIRS.forEach(function(r){
   r.len=r.n*r.tread+r.land;
   r.riser=(r.z1-r.z0)/r.n;
 });
-/* ============ KAZAMI VILLAGE "ALTO" — the new village in the south-east frontier (centre 13700,15300), built to the user's illustration: a round log palisade with a SOUTH gate, a windmill on a round stone plaza at its heart, six houses facing the plaza, fields, a well and cart to the west, and a river that winds down from the north-east hills along the village's east side and crosses the south road on a wooden bridge. Luminas and every existing area are untouched: Alto lives entirely in its own constants, its own data builder and its own renderers, hooked into the shared systems at the same points Luminas uses. ============ */
+/* ============ KAZAMI VILLAGE "ALTO" — the new village in the south-east frontier (centre 13700,15300), built to the user's illustration: a round log palisade with a SOUTH gate, a windmill on a round stone plaza at its heart, five houses facing the plaza, fields, a well and cart to the west, and a river that winds down from the north-east hills along the village's east side and crosses the south road on a wooden bridge. Luminas and every existing area are untouched: Alto lives entirely in its own constants, its own data builder and its own renderers, hooked into the shared systems at the same points Luminas uses. ============ */
 var ALTO={x:13700,y:15300}; var ALTO_R=500; var ALTO_Z=26;
 var ALTO_BRIDGE={x:13700,y:16760}; /* ON the south road's axis (x=13700, the same line as the gate, the plaza and the windmill): the bridge used to sit 10 units EAST of the road, so the deck — and the walkable band altoBridgeTopAt() carves around it — stepped sideways off the road the player walks in on. Centred on the axis, deck and road now meet in one straight line. */
 var ALTO_RIVER=[[15300,13600],[15000,14150],[14620,14700],[14490,15250],[14510,15800],[14340,16200],[14050,16420],[13830,16600],[13690,16830],[13640,17100],[13850,17450],[14250,17800],[14800,18150],[15350,18600],[15800,19200]];
@@ -2450,7 +2450,7 @@ function buildAltoData(){
   townFeatures.push({kind:'altobench',x:13540,y:15260,rot:Math.atan2(160,40)});
   townFeatures.push({kind:'altobench',x:13700,y:15135,rot:Math.PI});
   townFeatures.push({kind:'altobarrels',x:13840,y:15420});
-  /* --- the six houses, placed exactly as the illustration lays them
+  /* --- the five houses, placed exactly as the illustration lays them
      out around the plaza; every front faces the plaza centre (front
      vector (sin rot, cos rot)), collision is the rotated footprint's
      bounding box in the same shape as Luminas's houses --- */
@@ -2459,9 +2459,8 @@ function buildAltoData(){
     {x:13960,y:15060,w:105,d:85,rot:-0.83,roof:0xc9a86a,roofH:47,style:'thatch',seed:0.3},
     {x:14040,y:15230,w:118,d:95,rot:-1.37,roof:0xb26a2e,roofH:47,style:'tile',seed:0.47},
     {x:14010,y:15410,w:114,d:91,rot:-1.91,roof:0x7a7d82,roofH:46,style:'tile',seed:0.81},
-    {x:13585,y:15515,w:129,d:101,rot:3.02,roof:0x9c6b3f,roofH:47,style:'tile',forge:true,seed:0.55}, /* the smithy SHIFTED west/north off the south-gate road: at its old spot (13660,15620) its rotated east corners poked ~24 units into the dirt road (x 13677..13723) running from the south gate to the windmill plaza. At (13585,15515), GROWN ~1.3x in plan (was 76x60), its bounding box still clears the road by ~38, the lane to its west by ~21 (edge to edge), the south-west field (y from 15611) by ~51 and the plaza disc by ~31 — same roof colour, same facing, still the plaza's south house */
     {x:13360,y:15370,w:101,d:81,rot:1.77,roof:0xa85f2c,roofH:40,style:'tile',seed:0.38}
-  ]; /* ALL SIX houses grew a THIRD time at the user's word — every Alto building (houses, guild, windmill) scaled 1.3x in plan AND height: footprints and roof prisms here are 1.3x the previous round, and buildAlto3D draws each house at its old size inside a 1.3-scaled group, so the wall body, doors and windows grow by the same 1.3 (eave 68 -> 88, see the collision below). Centres are UNCHANGED and were re-verified at the new size: every corner stays inside the palisade (worst corner reaches radius ~473 against the fence logs' ~476 bite), no house touches the plaza disc, the lanes, the fields or a neighbour (the NW house's east corner now grazes the little lane's old end, so that lane was pulled back a little — see the street() calls below), and the biggest house (169x131) is still far smaller than the guild hall (299x182), which stays the village's largest building. */
+  ]; /* ALL the houses grew a THIRD time at the user's word — every Alto building (houses, guild, windmill) scaled 1.3x in plan AND height: footprints and roof prisms here are 1.3x the previous round, and buildAlto3D draws each house at its old size inside a 1.3-scaled group, so the wall body, doors and windows grow by the same 1.3 (eave 68 -> 88, see the collision below). Centres are UNCHANGED and were re-verified at the new size: every corner stays inside the palisade (worst corner reaches radius ~473 against the fence logs' ~476 bite), no house touches the plaza disc, the lanes, the fields or a neighbour (the NW house's east corner now grazes the little lane's old end, so that lane was pulled back a little — see the street() calls below), and the biggest house (169x131) is still far smaller than the guild hall (299x182), which stays the village's largest building. */
   ALTO_HOUSES.forEach(function(hs){
     var ca=Math.abs(Math.cos(hs.rot)), sa=Math.abs(Math.sin(hs.rot));
     var o=rect(hs.x,hs.y,hs.w*ca+hs.d*sa,hs.w*sa+hs.d*ca,{house:true,topKind:'house'});
@@ -2817,6 +2816,26 @@ function unstickEnemy(e){
       if(!collide(nx,ny,e.r*0.7)){e.x=nx;e.y=ny;return;}
     }
   }
+}
+/* The nearest spot to (x,y) where a mover of radius r does NOT collide,
+   or null when the whole search area is solid. Expanding rings of
+   candidate points, nearest ring first, so the result is the closest
+   open ground to where the mover wanted to be. Used when a saved
+   login position turns out to sit inside a building (a house grew, a
+   wall moved): the player resumes on the open ground right beside the
+   spot instead of being sent back to the initial spawn. */
+function nearestFreeSpot(x,y,r){
+  if(!collide(x,y,r))return {x:x,y:y};
+  var dirs=[];
+  for(var a=0;a<16;a++){var t=a/16*Math.PI*2;dirs.push([Math.cos(t),Math.sin(t)]);}
+  for(var step=10;step<=600;step+=10){
+    for(var i=0;i<16;i++){
+      var nx=x+dirs[i][0]*step, ny=y+dirs[i][1]*step;
+      if(nx<40||ny<40||nx>W-40||ny>H-40)continue;
+      if(!collide(nx,ny,r))return {x:nx,y:ny};
+    }
+  }
+  return null;
 }
 /* ============ LINE OF SIGHT (wall occlusion) ============
    Plan-view sight test between two game-space points. Sight is blocked by
@@ -3962,7 +3981,7 @@ function applySaveData(data){
   if(isGameMaster())np.arrows=1000; /* gamemaster account: every game start (incl. loading a saved/server character) begins with 1000 arrows */
   exploredFromString(data.explored);
   np.x=num(p.x,SPAWN_X,40,W-40);np.y=num(p.y,SPAWN_Y,40,H-40);
-  if(collide(np.x,np.y,np.r)){np.x=SPAWN_X;np.y=SPAWN_Y;}
+  if(collide(np.x,np.y,np.r)){var fs0=nearestFreeSpot(np.x,np.y,np.r);if(fs0){np.x=fs0.x;np.y=fs0.y;}else{np.x=SPAWN_X;np.y=SPAWN_Y;}} /* a saved spot that now sits inside a building resumes on the nearest open ground beside it; the initial spawn is only the last resort when nothing nearby is free */
   player=np;selectedClass=np.cls;
   var q=data.quest||{};
   questIdx=Math.floor(num(q.idx,0,0,QUESTS.length-1));questCount=Math.floor(num(q.count,0,0,99));
@@ -3992,8 +4011,8 @@ function startFromSave(source){
   genWorldThen(function(){
   applyBuiltinDeletions(); /* deleted pre-existing objects stay deleted after the rebuild (gamemaster saves only) */
   syncPlacedObstacles(); placedSig='__dirty__'; refreshGroundAll(); /* world edits (gamemaster) re-applied */
-  // genWorld rebuilt obstacles; if saved position now collides, fall back to town
-  if(collide(player.x,player.y,player.r)){player.x=SPAWN_X;player.y=SPAWN_Y;lastSavedKey=progressKey();}
+  // genWorld rebuilt obstacles; if the saved position now collides, resume on the nearest open ground beside it (initial spawn only when nothing nearby is free)
+  if(collide(player.x,player.y,player.r)){var fs1=nearestFreeSpot(player.x,player.y,player.r);if(fs1){player.x=fs1.x;player.y=fs1.y;}else{player.x=SPAWN_X;player.y=SPAWN_Y;}lastSavedKey=progressKey();}
   started=true;
   $('startScreen').style.display='none';$('saveModal').style.display='none';
   markExplored();
@@ -7078,7 +7097,7 @@ function buildRiver3D(){
    skirts, plus the ponds / river / waterfall water. Everything goes into
    staticGroup and is merged by mergeStaticMeshes() as usual. */
 /* ============ ALTO — 3D builders ============
-   Renders everything buildAltoData() recorded: the six plaza-facing
+   Renders everything buildAltoData() recorded: the plaza-facing
    houses (roof colour / style per house), the windmill (static tower in
    staticGroup, its turning sails in dynGroup), the plaza, benches,
    barrels, fields, the log palisade and south gate, and the wooden
