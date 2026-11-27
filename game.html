@@ -943,6 +943,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンの明かりを5倍にしました。</b>ギルド・宿屋・酒場の吊りランタンの光量を、これまでの5倍に引き上げました。夜の室内がぐっと明るくなっています。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドに依頼掲示板ができました。</b>受付カウンターを低くして見通しを良くし、入って左側の壁に依頼掲示板を用意しました。掲示板の前に立ってEキーを押すと依頼一覧が開き、その場で今の依頼を受けることができます。これまでの依頼の達成状況や報酬も一覧で確認できます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンがもっと明るくなりました。</b>ギルド・宿屋・酒場の吊りランタンの明かりを強くし、光の届く範囲も広げました。夜の室内がこれまでより明るく、過ごしやすくなっています。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルド・宿屋・酒場のランタンが、本当に周りを照らすようになりました。</b>これまで光って見えるだけだった吊りランタンに、本物の明かりが灯りました。夕方から夜にかけて自動で点灯し、床やテーブル、壁を暖かい光で照らします。明かりは炎のように小さく揺れるので、夜のホールや客室がいっそう落ち着いた雰囲気になりました。</span></li>
@@ -9354,7 +9355,7 @@ function skyTick(){
      and tavern each carry a real PointLight (lanternPointLights). They
      burn from dusk to dawn with a gentle flame flicker, and only while
      the camera is within 700 units, so distant interiors cost nothing.
-     Intensity 8000 in physical falloff units (decay 1.45, reach 380). ---- */
+     Intensity 40000 in physical falloff units (decay 1.45, reach 380). ---- */
   var darkF2=Math.max(0,Math.min(1,1-sky.sun*1.5));
   if(!skyState.ltmp)skyState.ltmp=new THREE.Vector3();
   for(var nq9=0;nq9<lanternPointLights.length;nq9++){
@@ -9362,7 +9363,7 @@ function skyTick(){
     if(darkF2<=0.02){NL9.intensity=0;continue;}
     NL9.getWorldPosition(skyState.ltmp);
     var ndx9=skyState.ltmp.x-camera3d.position.x, ndz9=skyState.ltmp.z-camera3d.position.z;
-    NL9.intensity=(ndx9*ndx9+ndz9*ndz9<490000)?8000*darkF2*(0.92+0.08*Math.sin(Date.now()/90+nq9*1.7)):0;
+    NL9.intensity=(ndx9*ndx9+ndz9*ndz9<490000)?40000*darkF2*(0.92+0.08*Math.sin(Date.now()/90+nq9*1.7)):0;
   }
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
