@@ -361,6 +361,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .menu-note{font-size:11px;color:var(--dim);line-height:1.6;margin:12px 0 0}
 #bagModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #boardModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+#innModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+#innStatus{font-size:14px;margin:10px 0 4px;color:var(--paper)}
 #playersModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
 .bag-card h2{margin:0 0 4px;font-size:18px}
@@ -805,6 +807,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="bag-actions"><button id="closeBoardBtn" type="button">閉じる</button></div>
     </div></div>
 
+    <div id="innModal"><div class="bag-card">
+      <h2>🛏️ 宿屋の主人</h2>
+      <p class="sub">「いらっしゃい、冒険者さん。旅の疲れを癒していきなさい。」</p>
+      <div id="innStatus"></div>
+      <div class="bag-actions"><button id="restBtn" type="button">宿で休憩する（30 G）</button><button id="closeInnBtn" type="button">閉じる</button></div>
+    </div></div>
+
     <div id="playersModal"><div class="bag-card">
       <h2>◆ オンラインプレイヤー</h2>
       <p class="sub" id="playersSub">接続中のプレイヤー</p>
@@ -943,6 +952,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>宿屋に主人がやってきました。</b>風見村アルトの宿屋に主人が常駐するようになりました。カウンター越しに近づいてEキーで話しかけると、30 Gで「宿で休憩する」ことができ、HPとMPが全回復します。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルドへの道のベンチを撤去しました。</b>風見村アルトの広場から冒険者ギルドへ続く小道にあったベンチを取り払い、道が通りやすくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>建物内のランタンが一日中灯るようになりました。</b>冒険者ギルド・宿屋・酒場のランタンは、これまで夕方から夜の点灯でしたが、昼間も含めて常に灯り続けます。村の街灯は今まで通り、夕方から夜の点灯です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>畑前の街灯を撤去しました。</b>村の南西、畑の前にあった街灯を取り払いました。村の街灯は残り7基です。</span></li>
@@ -1396,7 +1406,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid';
 }
 /* ===== カーソル表示制御 =====
    マップ／メニューなどの画面を開いている間だけカーソルを使い、
@@ -1490,6 +1500,7 @@ function handleEscape(){
   if($('worldMapModal').style.display==='grid'){closeWorldMap();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
   if($('boardModal').style.display==='grid'){closeSubModal('boardModal');return true;}
+  if($('innModal').style.display==='grid'){closeSubModal('innModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
   if($('saveModal').style.display==='grid'){closeSubModal('saveModal');return true;}
@@ -5270,10 +5281,52 @@ function openQuestBoard(){
   if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
   syncCursorHide();
 }
+/* ================= THE INNKEEPER (Alto inn NPC) =================
+   A stationary host behind the inn's reception counter. His model is
+   built and placed by the AETHERIA SKY section — parented to dynGroup
+   there, because mergeStaticMeshes() discards every non-mesh child of
+   the static builder groups; that block publishes his world spot in
+   innkeeperPos. Talk to him with E: resting at the inn costs 30 G and
+   fully restores HP and MP. */
+var INN_REST_COST=30;
+var innkeeperPos=null; /* {x,y,cx,cy,rot}: his world spot, plus the inn's centre/rotation for the inside check */
+function nearInnkeeper(){
+  if(!player||!innkeeperPos)return false;
+  var dx=player.x-innkeeperPos.x, dy=player.y-innkeeperPos.y;
+  if(dx*dx+dy*dy>9025)return false;
+  var c=Math.cos(innkeeperPos.rot), s=Math.sin(innkeeperPos.rot);
+  var px=player.x-innkeeperPos.cx, py=player.y-innkeeperPos.cy;
+  var lx=px*c-py*s, lz=px*s+py*c; /* the inverse of the builders' l2w */
+  return Math.abs(lx)<54&&Math.abs(lz)<44; /* inside the inn's walls — no talking through them */
+}
+function refreshInnUI(){
+  $('innStatus').innerHTML='HP <b>'+Math.ceil(player.hp)+' / '+player.maxHp+'</b>　MP <b>'+Math.floor(player.mp)+' / '+player.maxMp+'</b>　所持金 <b>'+player.gold+' G</b>';
+  $('restBtn').textContent='宿で休憩する（'+INN_REST_COST+' G）';
+}
+function openInn(){
+  if(!started||!player)return;
+  refreshInnUI();
+  $('innModal').style.display='grid';
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  syncCursorHide();
+}
+function restAtInn(){
+  if(!player)return;
+  if(player.hp>=player.maxHp&&player.mp>=player.maxMp){toast('HP/MPは満タンです');return;}
+  if(player.gold<INN_REST_COST){toast('Gが足りません（'+INN_REST_COST+' G必要です）');return;}
+  player.gold-=INN_REST_COST;
+  player.hp=player.maxHp; player.mp=player.maxMp;
+  beep(660,0.08,'triangle',0.05); setTimeout(function(){beep(880,0.1,'triangle',0.05);},70);
+  toast('🛏️ 宿で休憩した。HP/MPが全回復！');
+  updateHUD();
+  requestSaveNow();
+  closeSubModal('innModal');
+}
 function tryInteract(){
   if(!started||!player||player.dead)return;
   var a=nearestStuckArrow(95);
   if(nearGuildBoard()){openQuestBoard();return;}
+  if(nearInnkeeper()){openInn();return;}
   if(a){
     stuckArrows.splice(stuckArrows.indexOf(a),1);
     player.arrows++;
@@ -5287,6 +5340,7 @@ function refreshInteractPrompt(){
   var el=$('interactPrompt'); if(!el)return;
   if(!started||!player||player.dead||menuOpen||isAnyOverlayOpen()){el.style.display='none';return;}
   if(nearGuildBoard()){el.innerHTML='<b>E</b>：依頼掲示板を見る';el.style.display='block';return;}
+  if(nearInnkeeper()){el.innerHTML='<b>E</b>：宿屋の主人に話す';el.style.display='block';return;}
   if(nearestStuckArrow(95)){el.innerHTML='<b>E</b>：刺さった矢を回収する';el.style.display='block';return;}
   el.style.display='none';
 }
@@ -8154,6 +8208,25 @@ function humanoid(clsKey){
   g.userData.groundOff=-10*HS;
   return g;
 }
+function innkeeperModel(){
+  /* the innkeeper of Alto's inn: a broad, aproned host authored at the
+     same 52-unit scale as humanoid() and shrunk by the same factor to
+     a 1.7m person. No weapons — a white apron and a towel over one
+     shoulder instead. He never walks (see the AETHERIA SKY section,
+     which places him behind the inn's reception counter). */
+  var g=new THREE.Group();
+  cyl(5,5,20,0x4a4238,-11,20,0,g,7);cyl(5,5,20,0x4a4238,11,20,0,g,7);   /* legs: dark trousers */
+  cyl(8.5,10.5,26,0x7a5a3a,0,30,0,g,10);                                /* body: brown shirt */
+  box(14,20,3,0xf2ead8,0,27,9,g);                                       /* the white apron, on the front (+z) */
+  cyl(4,4,20,0x7a5a3a,-15,36,0,g,7);cyl(4,4,20,0x7a5a3a,15,36,0,g,7);   /* arms */
+  box(7,10,3,0xffffff,15,44,3,g);                                       /* a towel over the right shoulder */
+  sph(10,0xf2c89b,0,52,0,g);                                            /* head */
+  cyl(10.5,10.5,5,0xe8dcc6,0,60.5,0,g,10);                              /* a cloth cap */
+  var HS=17/52;
+  g.scale.setScalar(HS);
+  g.userData.groundOff=-10*HS;
+  return g;
+}
 /* ---- slime puddle skirt: a wavy-edged jelly pool built as a small
    custom disc (rings × segments). Every vertex's base position, angle
    and radial fraction are kept in geometry.userData so syncEntity can
@@ -9093,6 +9166,8 @@ $('menuHelpBtn').addEventListener('click',function(){openFromMenu('helpModal');}
 $('menuLogoutBtn').addEventListener('click',function(){doLogout();});
 $('closeBagBtn').addEventListener('click',function(){closeSubModal('bagModal');});
 $('closeBoardBtn').addEventListener('click',function(){closeSubModal('boardModal');});
+$('closeInnBtn').addEventListener('click',function(){closeSubModal('innModal');});
+$('restBtn').addEventListener('click',function(){restAtInn();});
 $('bagGrid').addEventListener('click',function(e){
   var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
   if(!slot||!player)return;
@@ -9421,6 +9496,42 @@ function skyTick(){
       else SL9.intensity=0;
     }
   }else{for(var sz9=0;sz9<skyState.streetLights.length;sz9++)skyState.streetLights[sz9].intensity=0;}
+  /* ---- the innkeeper (Alto inn): a stationary NPC behind the
+     reception counter, built HERE and parented to dynGroup for the
+     same reason as the lights — mergeStaticMeshes() would discard
+     him from any static builder group. He never walks; only his
+     name label is refreshed each frame, projected like the players'
+     labels. His world spot is published in innkeeperPos so the
+     E-key talk check (nearInnkeeper) can find him. ---- */
+  if(skyState.innScene!==scene){
+    if(skyState.innLabel&&skyState.innLabel.parentNode)skyState.innLabel.parentNode.removeChild(skyState.innLabel);
+    skyState.innScene=scene; skyState.innkeeper=null; skyState.innLabel=null; innkeeperPos=null;
+  }
+  if(!skyState.innkeeper){
+    var innF9=null;
+    for(var fi9=0;fi9<townFeatures.length;fi9++){if(townFeatures[fi9].kind==='altoinn'){innF9=townFeatures[fi9];break;}}
+    if(innF9&&dynGroup){
+      var ir9=innF9.rot||0, ic9=Math.cos(ir9), is9=Math.sin(ir9);
+      var inx9=innF9.x+26*ic9+6*is9, iny9=innF9.y-26*is9+6*ic9; /* local (26,6): just behind the counter (the counter stands at local (26,16)) — the builders' l2w, inlined */
+      var ikg9=innkeeperModel();
+      ikg9.position.set(WX(inx9),terrainH(inx9,iny9)+(ikg9.userData.groundOff||0),WZ(iny9));
+      ikg9.rotation.y=ir9; /* face the inn's front door, across the counter */
+      dynGroup.add(ikg9);
+      skyState.innkeeper=ikg9;
+      innkeeperPos={x:inx9,y:iny9,cx:innF9.x,cy:innF9.y,rot:ir9};
+      var ilb9=document.createElement('div');
+      ilb9.className='nametag'; ilb9.textContent='🛏️ 宿屋の主人'; ilb9.style.display='none';
+      document.getElementById('labels').appendChild(ilb9);
+      skyState.innLabel=ilb9;
+    }
+  }
+  if(skyState.innkeeper&&skyState.innLabel&&innkeeperPos&&camera3d&&player){
+    if(!skyState.pv)skyState.pv=new THREE.Vector3();
+    var idp=Math.hypot(player.x-innkeeperPos.x,player.y-innkeeperPos.y);
+    var isp=(idp<700)?projectToScreen(WX(innkeeperPos.x),terrainH(innkeeperPos.x,innkeeperPos.y)+25,WZ(innkeeperPos.y),skyState.pv):null;
+    if(isp){skyState.innLabel.style.display='block';skyState.innLabel.style.transform='translate(-50%,-100%) translate('+isp.x.toFixed(1)+'px,'+isp.y.toFixed(1)+'px)';}
+    else skyState.innLabel.style.display='none';
+  }
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
   var ctx=cvs.getContext('2d');ctx.clearRect(0,0,wpx,hpx);
