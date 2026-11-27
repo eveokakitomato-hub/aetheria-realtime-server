@@ -377,11 +377,11 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 #boardModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #innModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #statusModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
-.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;margin-top:8px}
+.status-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:2px 20px;margin-top:8px} /* column flow: entries fill the LEFT column top-to-bottom first, so the list reads in STATUS_DEFS order down the left side (12 rows = 24 entries / 2 columns) */
 .st-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line2);padding:5px 2px;font-size:13px}
 .st-row span{color:var(--muted)}
 .st-row b{color:var(--paper);font-weight:900}
-@media (max-width:560px){.status-grid{grid-template-columns:1fr}}
+@media (max-width:560px){.status-grid{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 #innStatus{font-size:14px;margin:10px 0 4px;color:var(--paper)}
 #playersModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
@@ -988,6 +988,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ステータス画面の並び順を調整しました。</b>左の列を上から順に読むと、HP・攻撃力・防御力…と仕様どおりの順番で並ぶようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>食事での回復は空腹値を消費しなくなりました。</b>スライムゼリーなど、食事で回復したHPについては空腹値が減りません。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>回復の仕様を調整しました。</b>SPの自然回復が最大SPの5%/秒になりました。あわせて、SPが15回復するごとに渇き値が1減り、HPが最大値の10%回復するごとに空腹値が1減るようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>空腹と渇きの減り方を緩やかにしました。</b>空腹値は45分、渇き値は30分でゼロになるペースに調整しました。</span></li>
