@@ -988,6 +988,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>空腹と渇きの減り方を緩やかにしました。</b>空腹値は45分、渇き値は30分でゼロになるペースに調整しました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SP（スタミナ）と空腹・渇きを追加しました。</b>移動や水泳、ウォーリアーとアーチャーの攻撃でSPを消費するようになりました。SPはHPバーの下に常時表示され、止まっていると回復します。また時間とともに減る空腹値と渇き値を追加。どちらもHPバーの右に円形ゲージで常時表示され、ゼロになるとHPに割合ダメージを受けます。スライムゼリーで空腹、ポーションで渇きを回復できます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ステータス画面を追加しました。</b>Zキーを押すとステータス画面が開き、HP・MPや物理攻撃力、防御力、会心率など24項目の能力値を確認できます。ゲームメニューからも開けます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>宿屋に主人がやってきました。</b>風見村アルトの宿屋に主人が常駐するようになりました。カウンター越しに近づいてEキーで話しかけると、30 Gで「宿で休憩する」ことができ、HPとMPが全回復します。</span></li>
@@ -4460,7 +4461,7 @@ var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
    thirst drain with time; at zero, each empty gauge eats 1% of max
    HP per second (STARVE_HP_PER_SEC) until the player eats/drinks. */
 var SP_ATTACK_COST=5, SP_MOVE_PER_SEC=2, SP_SWIM_PER_SEC=4, SP_REGEN_PER_SEC=8;
-var HUNGER_PER_SEC=100/900, THIRST_PER_SEC=100/600, STARVE_HP_PER_SEC=1;
+var HUNGER_PER_SEC=100/2700, THIRST_PER_SEC=100/1800, STARVE_HP_PER_SEC=1; /* hunger empties in 45 min, thirst in 30 min (the user's rates) */
 var starveTickT=0, spWarnT=0;
 function spendSP(n){
   if(player.sp>=n){player.sp-=n;return true;}
