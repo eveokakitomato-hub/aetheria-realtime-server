@@ -770,7 +770,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>アイテムホットバー</td><td>画面右下の4マス。バッグのアイテムを登録しておけば、<kbd>5</kbd>〜<kbd>8</kbd> キーかクリックで即座に使えます。登録は、バッグを開いてアイテムをマスへドラッグ＆ドロップするか、バッグの「ホットバー登録モード」でアイテムを選んでからマスをクリック。マスの右クリックでも変更できます</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>4</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
-        <tr><td>パリィ</td><td><kbd>Q</kbd> キーを<b>敵の攻撃が当たる瞬間</b>に押すとパリィが発動し、ダメージを受けずに敵をノックバックして<b>2秒間スタン</b>させます（Qはしゃがみと同じキーです。パリィが成功するとしゃがみは解除されます）</td></tr>
+        <tr><td>パリィ</td><td><kbd>Q</kbd> キーを<b>敵の攻撃が当たる瞬間</b>に押すとパリィが発動し、ダメージを受けずに敵をノックバックして<b>2秒間スタン</b>させます。遠距離攻撃の場合は、敵はスタンせず、その弾だけを消します（Qはしゃがみと同じキーです。パリィが成功するとしゃがみは解除されます）</td></tr>
         <tr><td>バッグ</td><td><kbd>R</kbd> キーでバッグ（所持品）を直接開閉できます。アイテム欄は最大26種類まで入るスクロール式で、ポーションや矢などが種類ごとに個数付きで並び、クリックで使用・装備できます</td></tr>
         <tr><td>設定</td><td>Escメニューの「設定」から、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
         <tr><td>サウンド設定</td><td>Escメニューの「サウンド設定」から、効果音の ON/OFF と音量（全体・効果音）を変更できます。テスト再生で今の音量を確認できます</td></tr>
@@ -1014,6 +1014,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>パリィの仕様を調整しました。</b>遠距離攻撃をパリィした場合は、敵をノックバック・スタンさせず、その攻撃（弾）だけを消すようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>パリィが追加されました。</b>敵の攻撃が当たる瞬間にQキーを押すと、ダメージを受けずに敵をノックバックし、2秒間スタンさせます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>飛び道具が壁をすり抜ける問題を修正しました。</b>矢や魔法、敵の射撃が壁に当たると止まるようになりました。矢は壁に刺さり、近づいてEキーで回収もできます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アイテムに重量が追加されました。</b>持ち物の総重量が上限の50を超えると、移動速度が大きく低下します。現在の重量はステータス画面（Zキー）とバッグで確認でき、アイテムごとの重さはバッグの詳細に表示されます。</span></li>
@@ -3954,8 +3955,11 @@ function closeItemPicker(){var pk=$('itemPicker');if(pk)pk.style.display='none';
    opens a short parry window alongside the crouch, and a successful
    parry consumes the press (the player springs back up instead of
    staying crouched). All enemy damage flows through hurtPlayer with
-   the enemy as src (melee, slams and enemy shots alike), so the
-   check lives there. */
+   the enemy as src (melee and slams), so the check lives there.
+   RANGED attacks are the exception (the user's follow-up spec):
+   parrying one simply ERASES the shot — a distant shooter is
+   neither knocked back nor stunned; that case is handled in the
+   projectile pass, before hurtPlayer is ever called. */
 var PARRY_WINDOW_MS=300, PARRY_CD_MS=800, PARRY_STUN_MS=2000, PARRY_KNOCKBACK=70;
 var parryUntil=0, parryCdUntil=0;
 function tryParry(){
@@ -3964,6 +3968,11 @@ function tryParry(){
   if(now<parryCdUntil)return;
   parryUntil=now+PARRY_WINDOW_MS;
   parryCdUntil=now+PARRY_CD_MS;
+}
+function parrySpark(x,y){ /* the shared parry flash: floater, sparks and the metallic ring */
+  addDmg(player.x,player.y,'パリィ！','#ffd75e',true);
+  burst(x,y,'#ffd75e',14);
+  beep(1250,0.09,'square',0.06); setTimeout(function(){beep(1900,0.12,'sine',0.05);},40);
 }
 function doParry(e){
   parryUntil=0; /* the window is spent */
@@ -3980,10 +3989,8 @@ function doParry(e){
     e.x=nx; e.y=ny;
   }
   e.tx=0; e.ty=0; /* drop its current move target */
-  addDmg(player.x,player.y,'パリィ！','#ffd75e',true);
+  parrySpark(e.x,e.y);
   addDmg(e.x,e.y-10,'スタン！','#ffd75e');
-  burst(e.x,e.y,'#ffd75e',14);
-  beep(1250,0.09,'square',0.06); setTimeout(function(){beep(1900,0.12,'sine',0.05);},40);
 }
 function hurtPlayer(dmg,src){
   if(player.dead)return;
@@ -5274,7 +5281,10 @@ function update(dt,now){
          the same HOVER SAFETY rule as every melee attack; hurtPlayer
          itself handles the safe zone and death */
       if(Math.hypot(player.x-p.x,player.y-p.y)<player.r+10){
-        if(!hovering){hurtPlayer(p.dmg,p.src||null);beep(120,0.06,'square',0.03);return false;}
+        if(!hovering){
+          if(performance.now()<parryUntil){parryUntil=0;standUpCrouch();parrySpark(p.x,p.y);return false;} /* PARRY vs a ranged attack: the shot itself is erased — the distant shooter is neither knocked back nor stunned */
+          hurtPlayer(p.dmg,p.src||null);beep(120,0.06,'square',0.03);return false;
+        }
       }
     }
     return true;
