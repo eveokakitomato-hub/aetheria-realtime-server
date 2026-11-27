@@ -4832,6 +4832,9 @@ function goblinStrikeSeq(e,now,edt){
     return;
   }
   if(!aa.hitDone){aa.hitDone=true;
+    var fx=aa.sx+aa.dx*20, fy=aa.sy+aa.dy*20; /* land exactly at the end of the 2m lunge */
+    if(!collide(fx,e.y,e.r*0.7))e.x=fx;
+    if(!collide(e.x,fy,e.r*0.7))e.y=fy;
     /* the SAME hover check as every other enemy attack: a floating
        player cannot be hit — the chop whiffs underneath them */
     if(!hovering&&Math.hypot(player.x-e.x,player.y-e.y)<e.r+player.r+18){hurtPlayer(aa.dmg,e);beep(120,0.06,'square',0.03);}
