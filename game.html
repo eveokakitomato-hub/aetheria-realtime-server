@@ -1013,6 +1013,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>飛び道具が壁をすり抜ける問題を修正しました。</b>矢や魔法、敵の射撃が壁に当たると止まるようになりました。矢は壁に刺さり、近づいてEキーで回収もできます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アイテムに重量が追加されました。</b>持ち物の総重量が上限の50を超えると、移動速度が大きく低下します。現在の重量はステータス画面（Zキー）とバッグで確認でき、アイテムごとの重さはバッグの詳細に表示されます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>川の水深が色でわかるようになりました。</b>深いところほど濃い青に、浅瀬は淡く砂色がかって見えます。泳げる深さかどうか、岸からでも見分けやすくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>画面まわりのアイコンを整理しました。</b>チャット欄の上のスキルホットバー、攻撃ボタン、AETHERIA ONLINEのロゴを非表示にしました。スキル（1〜3キー）と攻撃（Fキー）、ポーション（4キー）は今まで通り使えます。</span></li>
@@ -2964,6 +2965,63 @@ function topSurfaceNear(x,y,capZ){
     if(tz>best&&tz<=capZ)best=tz;
   }
   return best;
+}
+/* ---- projectiles vs walls ----
+   Projectiles used to fly straight through buildings — the terrain
+   was the only stopper. These helpers test a flying point against
+   the same obstacles collide() uses, with their real tops from
+   obstacleTopZAt(): a point is "in a wall" when it is inside the
+   footprint AND below the top, so shots still sail over low props
+   and any roof they clear. Roof-only shells (the enterable
+   buildings' roofs) stop only a shot that ENTERS through them —
+   one loosed indoors (p.roofIn already set) flies on. */
+function projInsideFootprint(o,x,y){
+  if(o.type==='circle')return Math.hypot(x-o.x,y-o.y)<o.r;
+  if(o._rotY!==undefined&&o._cx!==undefined){
+    var dx=x-o._cx, dy=y-o._cy, c=Math.cos(o._rotY), s=Math.sin(o._rotY);
+    var lx=dx*c-dy*s, lz=dx*s+dy*c;
+    return Math.abs(lx)<o._hw&&Math.abs(lz)<o._hd;
+  }
+  return x>o.x&&x<o.x+o.w&&y>o.y&&y<o.y+o.h;
+}
+function roofShellAt(x,y,z){
+  for(var i=0;i<obstacles.length;i++){var o=obstacles[i];
+    if(!o.roofOnly)continue;
+    if(!projInsideFootprint(o,x,y))continue;
+    var tz=obstacleTopZAt(o,x,y,0);
+    if(tz>-Infinity&&z<tz)return o;
+  }
+  return null;
+}
+function projSolidHit(x,y,z,p){
+  if(z<terrainH(x,y)-2)return false; /* buried in the slope: the terrain case, not a wall */
+  for(var i=0;i<obstacles.length;i++){var o=obstacles[i];
+    if(o.floorSlab)continue;
+    if(!projInsideFootprint(o,x,y))continue;
+    var tz=obstacleTopZAt(o,x,y,0);
+    if(tz<=-Infinity||z>=tz)continue; /* clears the top: flies over */
+    if(o.roofOnly&&p.roofIn===o)continue; /* loosed indoors: already inside this shell */
+    return true;
+  }
+  return false;
+}
+/* sweep one frame of flight in ~5-unit steps (a full-draw arrow
+   covers 30/frame and walls are ~10 thick — endpoint tests would
+   tunnel). Returns the last FREE point when a wall is hit, else
+   null. flat shots (mage bolts, enemy shots) fly at chest height
+   terrain+14, the height their meshes render at. */
+function projSweep(x0,y0,z0,x1,y1,z1,p,flat){
+  if(p.roofIn===undefined)p.roofIn=roofShellAt(x0,y0,flat?terrainH(x0,y0)+14:z0);
+  var dist=Math.hypot(x1-x0,y1-y0), steps=Math.max(1,Math.ceil(dist/5));
+  var lx=x0, ly=y0, lz=flat?terrainH(x0,y0)+14:z0;
+  for(var i=1;i<=steps;i++){
+    var t=i/steps, sx=x0+(x1-x0)*t, sy=y0+(y1-y0)*t;
+    var sz=flat?terrainH(sx,sy)+14:z0+(z1-z0)*t;
+    if(projSolidHit(sx,sy,sz,p))return {x:lx,y:ly,z:lz};
+    lx=sx; ly=sy; lz=sz;
+  }
+  p.roofIn=roofShellAt(x1,y1,flat?terrainH(x1,y1)+14:z1);
+  return null;
 }
 function collide(nx,ny,r,feetZ){
   if(nx<r||ny<r||nx>W-r||ny>H-r) return true;
@@ -5144,8 +5202,11 @@ function update(dt,now){
   // picked back up), and damage the first enemy they actually touch.
   projectiles=projectiles.filter(function(p){
     if(p.arrow){
+      var ax0=p.x, ay0=p.y, az0=p.z;
       p.x+=p.vx;p.y+=p.vy;p.vz-=(p.grav||0.32);p.z+=p.vz;p.life--; /* player arrows carry their own lighter gravity (see fireArrow); anything else keeps the legacy 0.32 */
       if(p.life<=0)return false;
+      var wallHit=projSweep(ax0,ay0,az0,p.x,p.y,p.z,p,false); /* walls stop arrows: they stick in the masonry (and can be picked back up) instead of passing through */
+      if(wallHit){stuckArrows.push({x:wallHit.x,y:wallHit.y,z:wallHit.z,vx:p.vx,vy:p.vy,vz:p.vz,wall:true,until:performance.now()+120000});burst(wallHit.x,wallHit.y,'#c9b98a',3);return false;}
       var groundZ=terrainH(p.x,p.y);
       if(p.z<=groundZ+3){
         stuckArrows.push({x:p.x,y:p.y,z:groundZ,vx:p.vx,vy:p.vy,until:performance.now()+120000});
@@ -5157,8 +5218,10 @@ function update(dt,now){
           var acrit=Math.random()<0.15;damageEnemy(ae,Math.round(p.dmg*(acrit?1.7:1)),acrit);beep(300,0.06,'square',0.04);return false;}}
       return true;
     }
+    var bx0=p.x, by0=p.y;
     p.x+=p.vx;p.y+=p.vy;p.life--;
     if(p.life<=0)return false;
+    if(projSweep(bx0,by0,0,p.x,p.y,0,p,true)){burst(p.x,p.y,p.color||'#c9b98a',3);return false;} /* walls stop bolts and enemy shots too: they burst on the masonry instead of passing through */
     if(p.from==='player'){
       for(var i=0;i<enemies.length;i++){var e=enemies[i];
         if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<e.r+9){var crit=Math.random()<0.15;damageEnemy(e,Math.round(p.dmg*(crit?1.7:1)),crit);beep(300,0.06,'square',0.04);return false;}}
@@ -9106,8 +9169,8 @@ function render3D(now){
       dynGroup.add(sm);stuckMeshes[a._mid]=sm;
       // stick into the ground along the impact direction, tip buried
       // (real-scale arrow: sits lower than the old 3m shaft did)
-      sm.position.set(WX(a.x),a.z+2.5,WZ(a.y));
-      _pv.set(WX(a.x)+a.vx,a.z+2.5-14,WZ(a.y)+a.vy);
+      if(a.wall){sm.position.set(WX(a.x),a.z,WZ(a.y));_pv.set(WX(a.x)+a.vx,a.z+(a.vz||0),WZ(a.y)+a.vy);} /* in a wall: keep the flight line, tip in the masonry */
+      else{sm.position.set(WX(a.x),a.z+2.5,WZ(a.y));_pv.set(WX(a.x)+a.vx,a.z+2.5-14,WZ(a.y)+a.vy);}
       sm.lookAt(_pv);
     }
   });
