@@ -1048,6 +1048,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SPが回復しやすくなりました。</b>これまで立ち止まっている時だけだったSPの回復が、ダッシュ中と水泳中以外はいつでも回復するようになりました。歩きながらでも少しずつ戻ります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アビリティツリーが進化しました。</b>ツリーをドラッグで動かしたり、ホイールやピンチで拡大・縮小できるようになりました。また、同じアビリティを重ねて解放できるようになり（1段階目 最大8回／2段階目 最大5回／3段階目 最大3回）、効果も回数分かかります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アビリティツリーが追加されました。</b>Cキー（またはメニュー）で開き、レベルアップで得るアビリティポイントを使って5系統・全30種のアビリティを習得できます。攻撃・防御・俊敏・魔力・技巧を伸ばして、自分だけのビルドを作りましょう。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ゴブリンの攻撃モーションを変更しました。</b>2.4m手前で立ち止まって拳を溜め、2m踏み込みながら振り下ろす攻撃になりました。踏み込む瞬間に離れれば避けることもできます。</span></li>
@@ -4766,7 +4767,7 @@ var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
    land. Hunger and
    thirst drain with time; at zero, each empty gauge eats 1% of max
    HP per second (STARVE_HP_PER_SEC) until the player eats/drinks. */
-var SP_ATTACK_COST=5, SP_DASH_PER_SEC=4, SP_SWIM_PER_SEC=4, SP_REGEN_PCT=5; /* SP regen: 5% of max SP per second while standing still (the user's rate) */
+var SP_ATTACK_COST=5, SP_DASH_PER_SEC=4, SP_SWIM_PER_SEC=4, SP_REGEN_PCT=5; /* SP regen: 5% of max SP per second whenever not dashing or swimming (the user's rate and rule) */
 var HUNGER_PER_SEC=100/2700, THIRST_PER_SEC=100/1800, STARVE_HP_PER_SEC=1; /* hunger empties in 45 min, thirst in 30 min (the user's rates) */
 var starveTickT=0, spWarnT=0, spThirstAcc=0, hpHealAcc=0, hpSampleV=-1, foodHealCredit=0;
 function spendSP(n){
@@ -5219,10 +5220,11 @@ function update(dt,now){
   foodBuffTick(); /* tavern food buffs: drop the max-stat boosts whose time is up */
   var owNow=isOverweight(); /* carry weight: warn as the limit is crossed either way */
   if(owNow!==weightOverPrev){weightOverPrev=owNow;if(owNow){toast('⚖️ 重量オーバー！持ち物が重すぎて移動速度が大きく低下しています',3400);beep(180,0.12,'square',0.05);}else toast('⚖️ 重量オーバーが解消されました');}
-  /* SP (stamina) regen: standing still on land refills 5% of max
-     SP per second. Recovering stamina works up a thirst: every 15
-     SP regained this way costs 1 thirst. */
-  if(!player.swimming&&!(keys['KeyW']||keys['KeyS']||keys['KeyA']||keys['KeyD']||joyVec.x||joyVec.y)){
+  /* SP (stamina) regen: refills 5% of max SP per second whenever
+     the player is neither dashing nor swimming — plain walking
+     included (the user's rule). Recovering stamina works up a
+     thirst: every 15 SP regained this way costs 1 thirst. */
+  if(!dashingNow&&!player.swimming){
     var spBef=player.sp;
     player.sp=Math.min(player.maxSp,player.sp+dt*0.001*player.maxSp*SP_REGEN_PCT/100);
     if(player.sp>spBef){spThirstAcc+=player.sp-spBef;while(spThirstAcc>=15){spThirstAcc-=15;player.thirst=Math.max(0,player.thirst-1);}}
