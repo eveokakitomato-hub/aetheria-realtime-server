@@ -213,8 +213,11 @@ body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 /* ===== HOTBAR (bottom-left, floating just above the chat box so the
    two never overlap: skill 1 / skill 2 / skill 3 / potion, keys 1-4) ===== */
 #hotbar{position:absolute;left:12px;bottom:196px;z-index:22;display:flex;gap:8px;align-items:flex-start}
-/* skill cooldown panel — top-left vertical stack under the attack button */
-#cdPanel{position:absolute;left:12px;top:158px;z-index:21;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+/* skill cooldown panel — vertical stack floating just above the
+   bottom-right item hotbar (moved from the top-left at the user's
+   word, 2026-11-27): the item hotbar occupies the bottom ~86px
+   (58px button + label, bottom:12), so the panel starts at 98px */
+#cdPanel{position:absolute;right:12px;bottom:98px;z-index:21;display:flex;flex-direction:column;gap:6px;pointer-events:none;align-items:flex-end}
 .cd-row{display:flex;align-items:center;gap:8px;background:rgba(10,14,12,.78);border:1px solid var(--line2);border-radius:8px;padding:5px 9px 5px 6px;min-width:176px}
 .cd-row .cd-ico{font-size:17px;width:23px;text-align:center;flex-shrink:0}
 .cd-row .cd-main{flex:1;min-width:0}
@@ -495,7 +498,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
   .srv-sep,.srv-name{display:none}
   #targetInfo{top:58px;min-width:0;max-width:44vw}
   #camHint{display:none}
-  #cdPanel{left:10px;top:148px}
+  #cdPanel{right:10px;bottom:70px} /* mobile: the item hotbar is 50px tall with no labels (bottom:10), so the panel starts at 70px */
   .cd-row{min-width:148px;padding:4px 7px 4px 5px}
   #itemHotbar{right:10px;bottom:10px;gap:6px}
   .start-form{padding:20px 16px 18px}
@@ -687,7 +690,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="skill atk-skill"><button id="attackBtn">⚔</button><small id="atkLabel">攻撃 / F</small></div>
     </div>
 
-    <!-- SKILL COOLDOWN PANEL (top-left, vertical): per skill, the
+    <!-- SKILL COOLDOWN PANEL (bottom-right, above the item hotbar, vertical): per skill, the
          remaining seconds and a draining gauge while on cooldown;
          the row flashes bright the moment the skill is ready again -->
     <div id="cdPanel" aria-label="スキルクールダウン">
@@ -754,7 +757,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>全体マップ</td><td><kbd>M</kbd> キーで全体マップを開きます。表示されるのは、これまでに歩いて探索したエリアだけです（探索記録はセーブされます）</td></tr>
         <tr><td>敵の情報</td><td>敵の名前・レベル・HPは、画面中央の照準（クロスヘア）で敵を捉えたときだけ表示されます。ミニマップの敵も、一度視認した敵だけが載ります</td></tr>
         <tr><td>矢（アーチャー）</td><td>アーチャーの射撃は矢を1本ずつ消費し、矢が0本だと攻撃できません。矢は放った方向へ放物線を描いて飛び、地形に刺さった矢は近づいて <kbd>E</kbd> キーで回収できます</td></tr>
-        <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。画面左下のホットバーのクリックでも使えます。MPとクールダウンに注意。クールダウンの残り時間は画面左上のパネル（残り秒数＋ゲージ、使えるようになると光ります）でも確認できます</td></tr>
+        <tr><td>スキル</td><td>初期設定は <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> キー。画面左下のホットバーのクリックでも使えます。MPとクールダウンに注意。クールダウンの残り時間は画面右下のアイテムホットバーの上のパネル（残り秒数＋ゲージ、使えるようになると光ります）でも確認できます</td></tr>
         <tr><td>アイテムホットバー</td><td>画面右下の4マス。バッグのアイテムを登録しておけば、<kbd>5</kbd>〜<kbd>8</kbd> キーかクリックで即座に使えます。登録は、バッグを開いてアイテムをマスへドラッグ＆ドロップするか、バッグの「ホットバー登録モード」でアイテムを選んでからマスをクリック。マスの右クリックでも変更できます。左下ホットバーの4マス目（ポーション枠）も同じ方法で別のアイテムに入れ替えられます（初期設定のキーは <kbd>4</kbd>）</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>4</kbd> キー（ホットバーの4マス目）。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
@@ -1001,6 +1004,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>クールダウン表示の位置を変更しました。</b>スキルのクールダウン表示（残り秒数とゲージ）が、画面左上から右下のアイテムホットバーの上へ移動しました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ダッシュのSP消費を減らしました。</b>ダッシュ中のSP消費が5/秒から4/秒になりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SPの仕様を微調整しました。</b>水泳中はSPが減るようになり、ダッシュ中のSP消費をこれまでの半分に減らしました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SPの仕様を変更しました。</b>SPは通常の移動や水泳では減らなくなり、ダッシュ中と攻撃の発動時に消費されるようになりました。</span></li>
@@ -1242,7 +1246,7 @@ var player=null, enemies=[], projectiles=[], particles=[], dmgTexts=[], drops=[]
 var questIdx=0, questCount=0, target=null, lastAttack=0, potionCd=0;
 var boardAcceptedFor=-1; /* quest index accepted at the guild request board (-1 = none yet) */
 var skillCd={s1:0,s2:0,s3:0};
-var cdPrev={}, cdPanelCls=null; /* top-left cooldown panel state */
+var cdPrev={}, cdPanelCls=null; /* cooldown panel state */
 /* item hotbar state: the bottom-right bar's 4 slots and the bottom-left
    hotbar's item slot (the old potion slot) each hold one item id
    ('potion' / 'weapon' / 'arrows' / 'gold', or null for an empty slot) */
@@ -4436,8 +4440,9 @@ function updateSkillUI(now){
   /* the left slot's cooldown shade is the potion's own — it only shows
      while the potion is what the slot currently holds */
   if(leftSlotItem==='potion'&&pr>0){pb.style.display='block';pb.style.height=Math.min(100,pr/900*100)+'%';pb.textContent=(pr/1000).toFixed(1);}else pb.style.display='none';
-  /* top-left cooldown panel: per skill, remaining seconds + a draining
-     gauge while cooling down, and a bright flash the moment it readies */
+  /* cooldown panel (bottom-right, above the item hotbar): per
+     skill, remaining seconds + a draining gauge while cooling down,
+     and a bright flash the moment it readies */
   if(player){
     var cls=CLASSES[player.cls];
     if(cdPanelCls!==player.cls){
