@@ -375,7 +375,11 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .menu-note{font-size:11px;color:var(--dim);line-height:1.6;margin:12px 0 0}
 #bagModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #boardModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
-#innModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+#innModal,#tavernModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+.tavern-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.09);text-align:left}
+.tavern-item .t-name{font-weight:700}
+.tavern-item .t-fx{font-size:12px;opacity:.78;margin-top:1px}
+.tavern-item button{flex:none}
 #statusModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .status-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:2px 20px;margin-top:8px} /* column flow: entries fill the LEFT column top-to-bottom first, so the list reads in STATUS_DEFS order down the left side (12 rows = 24 entries / 2 columns) */
 .st-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line2);padding:5px 2px;font-size:13px}
@@ -843,6 +847,15 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="bag-actions"><button id="restBtn" type="button">宿で休憩する（30 G）</button><button id="closeInnBtn" type="button">閉じる</button></div>
     </div></div>
 
+    <div id="tavernModal"><div class="bag-card">
+      <h2>🍺 酒場の店主</h2>
+      <p class="sub">「よく来たね。腹が減ってちゃ冒険はできねえ。何か食っていきな。」</p>
+      <div id="tavernStatus"></div>
+      <div id="tavernBuffs" class="sub" style="display:none"></div>
+      <div id="tavernMenu"></div>
+      <div class="bag-actions"><button id="closeTavernBtn" type="button">閉じる</button></div>
+    </div></div>
+
     <div id="statusModal"><div class="bag-card">
       <h2>📊 ステータス</h2>
       <p class="sub" id="statusHead"></p>
@@ -988,6 +1001,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>酒場に店主がやってきました。</b>アルトの酒場で店主に話しかけると、Gで食事が買えるようになりました。パンや串焼き、ポトフなどで空腹・渇きを回復でき、料理によっては移動速度や最大HP・SP・MPが一定時間アップします。アルトエールには「ほろ酔い」効果も。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ステータス画面の並び順を調整しました。</b>左の列を上から順に読むと、HP・攻撃力・防御力…と仕様どおりの順番で並ぶようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>食事での回復は空腹値を消費しなくなりました。</b>スライムゼリーなど、食事で回復したHPについては空腹値が減りません。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>回復の仕様を調整しました。</b>SPの自然回復が最大SPの5%/秒になりました。あわせて、SPが15回復するごとに渇き値が1減り、HPが最大値の10%回復するごとに空腹値が1減るようになりました。</span></li>
@@ -1448,7 +1462,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid'||$('statusModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid'||$('tavernModal').style.display==='grid'||$('statusModal').style.display==='grid';
 }
 /* ===== カーソル表示制御 =====
    マップ／メニューなどの画面を開いている間だけカーソルを使い、
@@ -1544,6 +1558,7 @@ function handleEscape(){
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
   if($('boardModal').style.display==='grid'){closeSubModal('boardModal');return true;}
   if($('innModal').style.display==='grid'){closeSubModal('innModal');return true;}
+  if($('tavernModal').style.display==='grid'){closeSubModal('tavernModal');return true;}
   if($('statusModal').style.display==='grid'){closeSubModal('statusModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
@@ -3181,7 +3196,7 @@ function beep(f,d,type,v){
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
   return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,sp:100,maxSp:100,atk:c.atk,def:c.def,
-    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,hunger:100,thirst:100,dir:1,walk:0,dead:false,inv:{},jellySlowUntil:0,oilUntil:0}; /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0). inv = {dropItemId:count} for monster drops; jellySlowUntil / oilUntil are the slime-jelly / slime-oil buff timers (session only) */
+    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,hunger:100,thirst:100,dir:1,walk:0,dead:false,inv:{},jellySlowUntil:0,oilUntil:0,fbHp:0,fbHpUntil:0,fbSp:0,fbSpUntil:0,fbMp:0,fbMpUntil:0,fbSpdUntil:0,tipsyUntil:0}; /* fb* = tavern food buffs (applied max-stat amounts + expiries), session only */ /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0). inv = {dropItemId:count} for monster drops; jellySlowUntil / oilUntil are the slime-jelly / slime-oil buff timers (session only) */
 }
 function expNeed(lv){return 80+lv*55;}
 /* ============ MOB POPULATION CONTROL (lag fix) ============
@@ -4225,7 +4240,7 @@ function progressKey(){if(!player)return '';return [player.lv,player.exp,player.
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
-    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,sp:Math.floor(player.sp),maxSp:player.maxSp,hunger:Math.floor(player.hunger),thirst:Math.floor(player.thirst),atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
+    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:Math.min(player.hp,player.maxHp-(player.fbHp||0)),maxHp:player.maxHp-(player.fbHp||0),mp:Math.floor(Math.min(player.mp,player.maxMp-(player.fbMp||0))),maxMp:player.maxMp-(player.fbMp||0),sp:Math.floor(Math.min(player.sp,player.maxSp-(player.fbSp||0))),maxSp:player.maxSp-(player.fbSp||0),hunger:Math.floor(player.hunger),thirst:Math.floor(player.thirst),atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
     quest:{idx:questIdx,count:questCount,board:boardAcceptedFor},
     explored:exploredToString(),
     settings:snapshotSettings()};
@@ -4796,6 +4811,7 @@ function update(dt,now){
     if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
     sp*=gmSpeedMul(); /* gamemaster account only: walk / dash / float-move / swim all 4x (1x for everyone else) */
     if(player.jellySlowUntil&&now<player.jellySlowUntil)sp*=0.95; /* slime jelly: the awful taste slows movement 5% for 10 seconds */
+    if(player.fbSpdUntil&&now<player.fbSpdUntil)sp*=1.08; /* tavern skewers: +8% move speed while the food buff lasts */
     if(player.sp<=0)sp*=0.5; /* exhausted (SP empty): the pace halves until stamina recovers */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     /* feetZ: every object only blocks up to its visible top (finite-top obstacles) */
@@ -4806,6 +4822,18 @@ function update(dt,now){
     player.walk+=dt*0.02*gmSpeedMul(); /* walk-cycle phase follows the actual ground speed (4x for gamemaster) */
     /* SP (stamina): moving drains it — swimming drains it faster */
     player.sp=Math.max(0,player.sp-dt*0.001*(player.swimming?SP_SWIM_PER_SEC:SP_MOVE_PER_SEC));
+  }
+  /* TIPSY (the tavern's ale): while it lasts the player sways
+     sideways on their own — a slow sine drift along the camera's
+     right axis, collision-checked like ordinary movement, applied
+     even when standing still, and it costs no SP. */
+  if(player.tipsyUntil&&now<player.tipsyUntil&&!player.swimming){
+    var tDrift=Math.sin(now*0.0022)*0.3;
+    var tRx=Math.cos(camYaw), tRy=-Math.sin(camYaw);
+    var tFeetZ=playerGroundZ()+jumpY;
+    var tNx=player.x+tRx*tDrift, tNy=player.y+tRy*tDrift;
+    if(!collide(tNx,player.y,player.r,tFeetZ))player.x=tNx;
+    if(!collide(player.x,tNy,player.r,tFeetZ))player.y=tNy;
   }
   // jump physics (Space): gravity pulls the player back down onto the terrain height;
   // horizontal movement above keeps working while airborne.
@@ -4864,6 +4892,7 @@ function update(dt,now){
   updateHoverBanner();
   // mp regen (paused while dashing or swimming); safe-zone heal below
   if(!dashingNow&&!player.swimming)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
+  foodBuffTick(); /* tavern food buffs: drop the max-stat boosts whose time is up */
   /* SP (stamina) regen: standing still on land refills 5% of max
      SP per second. Recovering stamina works up a thirst: every 15
      SP regained this way costs 1 thirst. */
@@ -5432,6 +5461,114 @@ function restAtInn(){
   requestSaveNow();
   closeSubModal('innModal');
 }
+/* ================= THE TAVERN KEEPER (Alto tavern NPC) =========
+   A stationary barkeep behind the tavern's long counter. His model
+   is built and placed by the AETHERIA SKY section (dynGroup, like
+   the innkeeper — mergeStaticMeshes() would discard him from a
+   static group); that block publishes tavernKeeperPos. Talk to him
+   with E and buy a meal for G: the food is eaten on the spot,
+   restoring hunger / thirst and granting timed buffs. Hunger and
+   thirst are 0..100, so the menu's "%" recovery is that many points.
+   ================================================================ */
+var tavernKeeperPos=null; /* {x,y,cx,cy,rot} */
+var TIPSY_MS=3*60*1000; /* the ale's tipsy sway lasts 3 minutes (the
+   menu spec names no duration for it — adjustable) */
+var TAVERN_MENU=[
+  {name:'風車焼きパン',price:3,fx:'空腹値 25% 回復',hunger:25},
+  {name:'角ウサギの串焼き',price:5,fx:'空腹値 35% 回復、移動速度 +8%（20分）',hunger:35,spdMs:20*60*1000},
+  {name:'そよ風野菜のポトフ',price:6,fx:'空腹値 30% 回復、渇き値 20% 回復',hunger:30,thirst:20},
+  {name:'スライム氷菓',price:6,fx:'空腹値 10% 回復、渇き値 30% 回復',hunger:10,thirst:30},
+  {name:'麦粥と干し肉セット',price:10,fx:'空腹値 70% 回復、最大HP +10%（40分）',hunger:70,maxHpMs:40*60*1000},
+  {name:'冷えた風見果実水',price:2,fx:'渇き値 70% 回復、最大SP +10%（40分）',thirst:70,maxSpMs:40*60*1000},
+  {name:'アルトエール',price:4,fx:'渇き値 60% 回復、ほろ酔い状態になる',thirst:60,tipsy:true},
+  {name:'朝露ハーブティー',price:5,fx:'渇き値 40% 回復、最大MP +10%（40分）',thirst:40,maxMpMs:40*60*1000}
+];
+function nearTavernKeeper(){
+  if(!player||!tavernKeeperPos)return false;
+  var dx=player.x-tavernKeeperPos.x, dy=player.y-tavernKeeperPos.y;
+  if(dx*dx+dy*dy>9025)return false;
+  var c=Math.cos(tavernKeeperPos.rot), s=Math.sin(tavernKeeperPos.rot);
+  var px=player.x-tavernKeeperPos.cx, py=player.y-tavernKeeperPos.cy;
+  var lx=px*c-py*s, lz=px*s+py*c; /* the inverse of the builders' l2w */
+  return Math.abs(lx)<108&&Math.abs(lz)<53; /* inside the tavern's walls */
+}
+/* timed max-stat food buffs (最大HP/SP/MP +10%): eating applies the
+   boost at once (re-eating the same stat replaces, never stacks);
+   foodBuffTick() removes it when its time runs out. Saves store the
+   unbuffed maxima (see buildSaveData), so a buff never persists. */
+function applyMaxBuff(st,durMs){
+  var maxK='max'+st, amtK='fb'+st;
+  var base=player[maxK]-(player[amtK]||0);
+  var amt=Math.round(base*0.10);
+  if(player[amtK])player[maxK]-=player[amtK];
+  player[maxK]+=amt; player[amtK]=amt; player[amtK+'Until']=performance.now()+durMs;
+}
+function foodBuffTick(){
+  if(!player)return;
+  var now=performance.now();
+  ['Hp','Sp','Mp'].forEach(function(st){
+    var amt=player['fb'+st]||0;
+    if(amt>0&&(player['fb'+st+'Until']||0)<=now){
+      player['max'+st]-=amt;
+      var ck=st.toLowerCase();
+      if(player[ck]>player['max'+st])player[ck]=player['max'+st];
+      player['fb'+st]=0; player['fb'+st+'Until']=0;
+    }
+  });
+}
+function tavernBuffText(){
+  var now=performance.now(), parts=[];
+  function left(u){return Math.max(1,Math.ceil((u-now)/60000));}
+  if((player.fbSpdUntil||0)>now)parts.push('移動速度+8%（あと'+left(player.fbSpdUntil)+'分）');
+  if(player.fbHp>0&&(player.fbHpUntil||0)>now)parts.push('最大HP+10%（あと'+left(player.fbHpUntil)+'分）');
+  if(player.fbSp>0&&(player.fbSpUntil||0)>now)parts.push('最大SP+10%（あと'+left(player.fbSpUntil)+'分）');
+  if(player.fbMp>0&&(player.fbMpUntil||0)>now)parts.push('最大MP+10%（あと'+left(player.fbMpUntil)+'分）');
+  if((player.tipsyUntil||0)>now)parts.push('ほろ酔い（あと'+left(player.tipsyUntil)+'分）');
+  return parts.length?('発動中：'+parts.join('、')):'';
+}
+function refreshTavernUI(){
+  $('tavernStatus').innerHTML='空腹 <b>'+Math.floor(player.hunger)+' / 100</b>　渇き <b>'+Math.floor(player.thirst)+' / 100</b>　所持金 <b>'+player.gold+' G</b>';
+  var bt=tavernBuffText(), bEl=$('tavernBuffs');
+  bEl.textContent=bt; bEl.style.display=bt?'block':'none';
+  var box=$('tavernMenu'); box.innerHTML='';
+  TAVERN_MENU.forEach(function(m,i){
+    var row=document.createElement('div'); row.className='tavern-item';
+    var lf=document.createElement('div');
+    var nm=document.createElement('div'); nm.className='t-name'; nm.textContent=m.name;
+    var fx=document.createElement('div'); fx.className='t-fx'; fx.textContent=m.fx;
+    lf.appendChild(nm); lf.appendChild(fx);
+    var btn=document.createElement('button'); btn.type='button';
+    if(player.gold<m.price){btn.disabled=true; btn.textContent='G不足（'+m.price+' G）';}
+    else btn.textContent='食べる（'+m.price+' G）';
+    btn.addEventListener('click',function(){buyTavernFood(i);});
+    row.appendChild(lf); row.appendChild(btn);
+    box.appendChild(row);
+  });
+}
+function openTavern(){
+  if(!started||!player)return;
+  refreshTavernUI();
+  $('tavernModal').style.display='grid';
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  syncCursorHide();
+}
+function buyTavernFood(i){
+  var m=TAVERN_MENU[i]; if(!m||!player)return;
+  if(player.gold<m.price){toast('Gが足りません（'+m.price+' G必要です）');beep(220,0.08,'square',0.05);return;}
+  player.gold-=m.price;
+  if(m.hunger)player.hunger=Math.min(100,player.hunger+m.hunger);
+  if(m.thirst)player.thirst=Math.min(100,player.thirst+m.thirst);
+  if(m.spdMs)player.fbSpdUntil=performance.now()+m.spdMs;
+  if(m.maxHpMs)applyMaxBuff('Hp',m.maxHpMs);
+  if(m.maxSpMs)applyMaxBuff('Sp',m.maxSpMs);
+  if(m.maxMpMs)applyMaxBuff('Mp',m.maxMpMs);
+  if(m.tipsy)player.tipsyUntil=performance.now()+TIPSY_MS;
+  beep(520,0.07,'sine',0.05); setTimeout(function(){beep(740,0.09,'sine',0.05);},60);
+  toast('🍽️ '+m.name+'を食べた！ '+m.fx,3200);
+  updateHUD();
+  requestSaveNow();
+  refreshTavernUI();
+}
 /* ================= STATUS SCREEN (Z key) =================
    A read-only panel listing the player's 24 status values. Values
    that already exist in the game are read live from the player /
@@ -5503,6 +5640,7 @@ function tryInteract(){
   var a=nearestStuckArrow(95);
   if(nearGuildBoard()){openQuestBoard();return;}
   if(nearInnkeeper()){openInn();return;}
+  if(nearTavernKeeper()){openTavern();return;}
   if(a){
     stuckArrows.splice(stuckArrows.indexOf(a),1);
     player.arrows++;
@@ -5517,6 +5655,7 @@ function refreshInteractPrompt(){
   if(!started||!player||player.dead||menuOpen||isAnyOverlayOpen()){el.style.display='none';return;}
   if(nearGuildBoard()){el.innerHTML='<b>E</b>：依頼掲示板を見る';el.style.display='block';return;}
   if(nearInnkeeper()){el.innerHTML='<b>E</b>：宿屋の主人に話す';el.style.display='block';return;}
+  if(nearTavernKeeper()){el.innerHTML='<b>E</b>：酒場の店主に話す';el.style.display='block';return;}
   if(nearestStuckArrow(95)){el.innerHTML='<b>E</b>：刺さった矢を回収する';el.style.display='block';return;}
   el.style.display='none';
 }
@@ -8403,6 +8542,24 @@ function innkeeperModel(){
   g.userData.groundOff=-10*HS;
   return g;
 }
+function tavernKeeperModel(){
+  /* the barkeep of Alto's tavern: same 52-unit authoring scale as
+     humanoid() / innkeeperModel(). A dark green vest over light
+     sleeves and a mug in his right hand. He never walks (the
+     AETHERIA SKY section places him behind the long counter). */
+  var g=new THREE.Group();
+  cyl(5,5,20,0x3a3630,-11,20,0,g,7);cyl(5,5,20,0x3a3630,11,20,0,g,7);   /* legs: dark trousers */
+  cyl(8.5,10.5,26,0x6e4a2f,0,30,0,g,10);                                /* body: leather-brown shirt */
+  box(15,18,2.6,0x2f4a3a,0,31,9.4,g);                                   /* a dark green vest, on the front (+z) */
+  cyl(4,4,20,0xd8cfc0,-15,36,0,g,7);cyl(4,4,20,0xd8cfc0,15,36,0,g,7);   /* arms: light shirt sleeves */
+  box(6,7,6,0xc8c8c8,15,25,6,g);                                        /* a mug in the right hand */
+  sph(10,0xe8b98d,0,52,0,g);                                            /* head */
+  cyl(10.6,10.6,4,0x8a2f2f,0,59.5,0,g,10);                              /* a rust-red cloth band */
+  var HS=17/52;
+  g.scale.setScalar(HS);
+  g.userData.groundOff=-10*HS;
+  return g;
+}
 /* ---- slime puddle skirt: a wavy-edged jelly pool built as a small
    custom disc (rings × segments). Every vertex's base position, angle
    and radial fraction are kept in geometry.userData so syncEntity can
@@ -9351,6 +9508,7 @@ $('menuLogoutBtn').addEventListener('click',function(){doLogout();});
 $('closeBagBtn').addEventListener('click',function(){closeSubModal('bagModal');});
 $('closeBoardBtn').addEventListener('click',function(){closeSubModal('boardModal');});
 $('closeInnBtn').addEventListener('click',function(){closeSubModal('innModal');});
+$('closeTavernBtn').addEventListener('click',function(){closeSubModal('tavernModal');});
 $('closeStatusBtn').addEventListener('click',function(){closeSubModal('statusModal');});
 $('restBtn').addEventListener('click',function(){restAtInn();});
 $('bagGrid').addEventListener('click',function(e){
@@ -9716,6 +9874,41 @@ function skyTick(){
     var isp=(idp<700)?projectToScreen(WX(innkeeperPos.x),terrainH(innkeeperPos.x,innkeeperPos.y)+25,WZ(innkeeperPos.y),skyState.pv):null;
     if(isp){skyState.innLabel.style.display='block';skyState.innLabel.style.transform='translate(-50%,-100%) translate('+isp.x.toFixed(1)+'px,'+isp.y.toFixed(1)+'px)';}
     else skyState.innLabel.style.display='none';
+  }
+  /* ---- the tavern keeper (Alto tavern): a stationary barkeep
+     behind the long counter (the counter stands at local (-40,-34);
+     he waits at local (-40,-48), on its kitchen side), built HERE
+     and parented to dynGroup for the same reason as the innkeeper.
+     His world spot is published in tavernKeeperPos so the E-key
+     talk check (nearTavernKeeper) can find him. ---- */
+  if(skyState.tavScene!==scene){
+    if(skyState.tavLabel&&skyState.tavLabel.parentNode)skyState.tavLabel.parentNode.removeChild(skyState.tavLabel);
+    skyState.tavScene=scene; skyState.tavKeeper=null; skyState.tavLabel=null; tavernKeeperPos=null;
+  }
+  if(!skyState.tavKeeper){
+    var tavF9=null;
+    for(var ft9=0;ft9<townFeatures.length;ft9++){if(townFeatures[ft9].kind==='altotavern'){tavF9=townFeatures[ft9];break;}}
+    if(tavF9&&dynGroup){
+      var tr9=tavF9.rot||0, tc9=Math.cos(tr9), ts9=Math.sin(tr9);
+      var tvx9=tavF9.x+(-40)*tc9+(-48)*ts9, tvy9=tavF9.y-(-40)*ts9+(-48)*tc9; /* local (-40,-48): just behind the counter — the builders' l2w, inlined */
+      var tkg9=tavernKeeperModel();
+      tkg9.position.set(WX(tvx9),terrainH(tvx9,tvy9)+(tkg9.userData.groundOff||0),WZ(tvy9));
+      tkg9.rotation.y=tr9; /* face the hall, across the counter */
+      dynGroup.add(tkg9);
+      skyState.tavKeeper=tkg9;
+      tavernKeeperPos={x:tvx9,y:tvy9,cx:tavF9.x,cy:tavF9.y,rot:tr9};
+      var tlb9=document.createElement('div');
+      tlb9.className='nametag'; tlb9.textContent='🍺 酒場の店主'; tlb9.style.display='none';
+      document.getElementById('labels').appendChild(tlb9);
+      skyState.tavLabel=tlb9;
+    }
+  }
+  if(skyState.tavKeeper&&skyState.tavLabel&&tavernKeeperPos&&camera3d&&player){
+    if(!skyState.pv)skyState.pv=new THREE.Vector3();
+    var tdp=Math.hypot(player.x-tavernKeeperPos.x,player.y-tavernKeeperPos.y);
+    var tsp=(tdp<700)?projectToScreen(WX(tavernKeeperPos.x),terrainH(tavernKeeperPos.x,tavernKeeperPos.y)+25,WZ(tavernKeeperPos.y),skyState.pv):null;
+    if(tsp){skyState.tavLabel.style.display='block';skyState.tavLabel.style.transform='translate(-50%,-100%) translate('+tsp.x.toFixed(1)+'px,'+tsp.y.toFixed(1)+'px)';}
+    else skyState.tavLabel.style.display='none';
   }
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
