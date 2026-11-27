@@ -160,9 +160,9 @@ body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 #questReward{font-size:11px;color:#8fd0a8;margin-top:5px}
 
 /* ===== MINIMAP + PLAYERS ===== */
-#rightPanel{position:absolute;right:12px;top:66px;width:262px;max-width:calc(100vw - 24px);z-index:19;display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-height:max(180px,calc(100% - 500px));overflow-y:auto;overflow-x:hidden;padding-bottom:2px}
+#rightPanel{position:absolute;right:12px;top:66px;width:262px;max-width:calc(100vw - 24px);z-index:19;display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-height:max(224px,calc(100% - 500px));overflow-y:auto;overflow-x:hidden;padding-bottom:2px}
 #rightPanel::-webkit-scrollbar{width:0;height:0}
-#minimapWrap{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:6px}
+#minimapWrap{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:6px;flex:0 0 auto}
 #minimap{width:182px;height:182px;border-radius:4px;background:#16241a}
 #minimapLabel{font-size:10px;letter-spacing:.12em;color:var(--muted);text-align:center;padding:4px 0 2px}
 #playerList{background:rgba(10,15,13,.88);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;width:262px;max-width:100%}
@@ -935,6 +935,9 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ミニマップが途切れて見える問題を直しました。</b>画面右上のパネルには高さの上限があり、画面の高さが低い環境（ノートPCなど）では、その上限がミニマップ本体より小さくなって、ミニマップの下の方が切り取られて表示されていました。パネルの最低の高さをミニマップが丸ごと収まる大きさに広げ、ミニマップが常に全体表示されるようにしました。クエストや近くの冒険者の表示は今まで通りパネル内でスクロールします。</span></li>
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>風見村アルトの円形広場に、段差の足場判定を追加しました。</b>風車を囲む円形広場は2段の石畳で少し高くなっていますが、これまではその上面に立つ判定がなく、足が石畳に沈み込んで（貫通して）見えていました。外側の石畳・内側の石畳それぞれの上面に立てるようになり、外側から内側への段差もそのまま上れます。広場の縁はなだらかに地面へつながっています。</span></li>
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>アルトの家の当たり判定が、家の形そのものに合うようになりました。</b>これまでは斜めを向いた家を、それを囲む四角い箱で判定していたため、家の角の周りに見た目より広い透明な壁がありました。回転した家の形そのもので判定するようにし、壁がある場所にだけ当たるようになりました。屋根の上に立てる判定は今まで通りです。同じ作りのルミナスの町の家も、あわせて同じように改善されています。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存が失敗する問題の根本原因を直しました。</b>セーブデータのうち、探索済みマップの記録が約64KBと大きくなりすぎていて、ブラウザの送信上限を超えたため、保存リクエストがサーバーに届く前に失敗していました（セーブ画面に「サーバーの応答なし」と出ていたのはこのためです）。探索マップの記録を圧縮して約11KBにし、セーブ全体も約12KBまで小さくしました。通常の自動保存は上限のない通常送信に切り替え、ログアウト時の最終保存も、失敗した場合は通常送信で自動的に再試行します。これまでのセーブデータ（キャラクター・探索マップ）はそのまま引き継がれます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>地形エディターを終了し、セーブデータが大幅に小さくなりました。</b>ゲームマスター専用だった地形・建物の編集機能を取り除きました。これまでセーブに含まれていた地形の編集データは、今後は保存されず、読み込みのときも反映されません。地形と建物は標準の状態に戻ります。編集データが無くなったぶんセーブが軽くなるため、自動保存が失敗しにくくなります。浮遊とゲームマスターの高速移動は、今まで通り使えます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存まわりを直し、失敗の理由がセーブ画面で分かるようになりました。</b>保存済みの地形編集データを読み込むとき、保存されていた編集そのものだけを再現するよう見直しました。読み込むたびにセーブデータが少しずつ膨らんでしまうことがなくなり、すでに大きくなったセーブも次回の保存で縮みます。あわせて、セーブ画面の保存状態に、直近の保存で送ったデータの大きさと、サーバーが返した応答（ステータスとエラー内容）がそのまま表示されるようになりました。保存に失敗したときは、その行を見れば理由が分かります。サーバー側で保存できるデータの上限も、すでに大きく引き上げ済みです。</span></li>
@@ -952,9 +955,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>アルトの風車の出入り口まわりを取り払いました。</b>風車塔の南面にあったドアとポーチ（柱と小さい屋根）、吊り看板とその金具を撤去しました。塔や石の土台、茅葺きの帽子、窓、回る羽根は今まで通りです。</span></li>
             <li><time>2026.11.26</time><span class="news-tag update">ワールド</span><span><b>風見村アルトの家が、さらに大きくなりました。</b>村の家6軒すべてをひと回り大きく建て替えました。間取りが広くなり、壁もさらに高く、屋根も大きくなっています（茅葺き・オレンジ・グレーなど、家ごとの屋根の色と形は今まで通り）。当たり判定と屋根の上にも新しい大きさに合わせてあります。村で一番大きな建物は、これまで通り冒険者ギルドです。ルミナスの建物に変更はありません。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>スライムは、攻撃を受けると固まらなくなりました。</b>体当たりのあと元の位置に戻っている最中や、戻って0.8秒止まっている最中にプレイヤーの攻撃を1度でも受けると、その場でサイクルの拘束が解けて、すぐに通常の追跡・攻撃に戻るようになりました。マグマスライムも同じです。攻撃を受けていないときの動き（戻って0.8秒待つサイクル）や、スライムの強さは今まで通りです。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>ゴブリンが群れで連携して攻撃してくるようになりました。</b>近接ゴブリンは一箇所に固まらず、プレイヤーを囲むように位置をずらして取り囲み、攻撃も全員同時ではなく少しずつタイミングをずらして波のように順番に仕掛けてきます。アーチャーとシャーマンは距離を保って支援に回り、シャーマンは傷ついた仲間を優先して回復します（届かない仲間には近寄って回復します）。チーフのいる群れは攻撃の間隔が短く、より手強くなっています。ゴブリンの強さ（HP・攻撃力）や出現数は今まで通りです。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>スライムの体当たりに攻撃サイクルがつきました。</b>スライムは1度体当たりすると、攻撃を始めた位置まで戻り、その場で0.8秒止まってから次の攻撃に移るようになりました。マグマスライムも同じ動きです。戻って止まっている間が反撃の狙い目です。体当たりの当たり方（着弾した時だけダメージ）や強さは今まで通りです。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>土の道の見た目を、草のない土の地面らしくしました。</b>アルトの南門から風車広場への道など、土の道が板を敷いたように見えていたのを、継ぎ目のない一色の土が地面に沿う素朴な見た目に変えました。ルミナスの土の小道も同じ見た目に揃えています。道の通り道と幅は今まで通りです。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -2722,6 +2722,21 @@ function collide(nx,ny,r,feetZ){
       if(tz>-Infinity&&feetZ>=tz-6) continue; /* step-up tolerance 6 units (0.6m): low ledges can be stepped / scrambled onto; update() lifts the feet onto them (see the step-up block) */
     }
     if(o.type==='circle'){if(Math.hypot(nx-o.x,ny-o.y)<r+o.r) return true;}
+    else if(o._rotY!==undefined&&o._cx!==undefined){
+      /* rotated footprint (the Luminas and Alto houses and their
+         annexes): the stored rect is only the footprint's
+         axis-aligned bounding box, which walled off the corners
+         around each house with invisible wall. Test the point in
+         the house's own frame instead — the same frame and half
+         extents obstacleTopZAt() already uses for the roof top —
+         so the wall stands only where the drawn wall stands. The
+         rotated footprint sits entirely inside its old bounding
+         box, so clearances to roads, plazas and neighbours can
+         only grow, never shrink. */
+      var rdx=nx-o._cx, rdy=ny-o._cy, rc=Math.cos(o._rotY), rs=Math.sin(o._rotY);
+      var rlx=rdx*rc-rdy*rs, rlz=rdx*rs+rdy*rc;
+      if(Math.abs(rlx)<o._hw+r&&Math.abs(rlz)<o._hd+r) return true;
+    }
     else if(nx+r>o.x&&nx-r<o.x+o.w&&ny+r>o.y&&ny-r<o.y+o.h) return true;
   }
   return false;
@@ -4945,6 +4960,7 @@ function drawMini(){
   // lakes
   decorations.forEach(function(d){
     if(d.kind!=='lake')return;
+    if(!(d.s>0))return; /* a lake with no usable radius must never abort the whole minimap draw halfway */
     var lx=MX(d.x),ly=MY(d.y);if(lx<-40||ly<-40||lx>S+40||ly>S+40)return;
     mctx.fillStyle='#2e5f7a';mctx.beginPath();mctx.ellipse(lx,ly,Math.max(3,d.s*s),Math.max(2,d.s*0.72*s),0,0,7);mctx.fill();
   });
@@ -5423,11 +5439,38 @@ function fountainTopAt(x,y){
    south road crosses it, blending into the banks at both ends — the
    walking top buildAlto3D draws its planks on. */
 function altoBridgeTopAt(x,y){ var dx=x-ALTO_BRIDGE.x, dy=y-ALTO_BRIDGE.y; if(Math.abs(dx)>34||Math.abs(dy)>140) return -Infinity; var bank=altoRiverFrame(ALTO_BRIDGE.x,ALTO_BRIDGE.y).bank; var u=dy; if(Math.abs(u)<=95){var c=Math.max(0,1-(u/95)*(u/95)); return bank+6.5+4*c;} var t2=bank+6.5, g2=terrainH(x,y), k=1-(Math.abs(u)-95)/45; return g2+(t2-g2)*k; }
+/* Alto's round plaza is a real two-step stone platform, not paint:
+   buildAlto3D seats both paving courses on the levelled village
+   ground (terrainH at the centre) — the outer course (r = the
+   feature's r) tops at ground + 3.0 and the inner course
+   (r = round(r*0.78), exactly the radius the builder draws) tops at
+   ground + 4.0. Those tops were never registered as standable, so
+   standH() kept the player's feet at plain terrain height and the
+   body sank through the paving by the course height. Register both
+   tops here, with a feather past the outer rim (same blend as the
+   bridge approach slabs) so stepping up from the village ground,
+   and from the outer course onto the inner one, reads as the small
+   steps they are drawn as. The windmill at the centre keeps its own
+   collision circle and top; standing on the inner course around its
+   stone base is exactly what the drawing shows. */
+function altoPlazaTopAt(x,y){
+  var f=null;
+  for(var i=0;i<townFeatures.length;i++)if(townFeatures[i].kind==='altoplaza'){f=townFeatures[i];break;}
+  if(!f)return -Infinity;
+  var d=Math.hypot(x-f.x,y-f.y);
+  if(d>f.r+18)return -Infinity;
+  var gh=terrainH(f.x,f.y);
+  if(d<=Math.round(f.r*0.78))return gh+4.0;   /* inner course top */
+  if(d<=f.r)return gh+3.0;                    /* outer course top */
+  var g2=terrainH(x,y), t2=gh+3.0, k=1-(d-f.r)/18;
+  return g2+(t2-g2)*k;                        /* rim feather into the village ground */
+}
 function platformTopAt(x,y){
   var best=-Infinity;
   var tb=townBridgeTopAt(x,y); if(tb>best)best=tb;
   var ta=altoBridgeTopAt(x,y); if(ta>best)best=ta;
   var tf=fountainTopAt(x,y); if(tf>best)best=tf;
+  var tp=altoPlazaTopAt(x,y); if(tp>best)best=tp;
   return best;
 }
 function standH(x,y){
