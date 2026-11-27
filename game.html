@@ -1978,11 +1978,12 @@ function townWallPoint(t){
 function inTown(x,y){return townNorm(x,y)<=1.0;}
 function inNoSpawn(x,y){return townNorm(x,y)<=1.15||Math.hypot(x-SPAWN_X,y-SPAWN_Y)<=SAFE_R||Math.hypot(x-ALTO.x,y-ALTO.y)<=ALTO_R+60;} /* the town's safe zone is back: the whole walled interior plus a margin of about three tiles outside the wall (and the spawn clearing) — no spawns, no damage, slow healing inside it */
 var townFeatures=[]; /* render instructions for buildTown3D(), filled by buildTownData() */
+var lampPointLights=[]; /* real PointLights carried by the lamp globes themselves (AETHERIA SKY) */
 /* Build the town's collision + render data. Called from genWorld() before
    the wild decoration scatter, so the scatter can keep out of the town and
    its water (it checks townNorm() and waterDepthAt()). */
 function buildTownData(){
-  townFeatures=[];
+  townFeatures=[]; lampPointLights=[];
   TOWN_PADS=[]; /* rebuilt below, once every house position is known */
   var seed=777001;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
   function rect(cx,cy,w,h,flags){var o={type:'rect',x:cx-w/2,y:cy-h/2,w:w,h:h,c:"#8a8172",town:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
@@ -7486,6 +7487,7 @@ function buildTown3D(){
       var lg=new THREE.Group(); lg.position.set(WX(f.x),gh,WZ(f.y)); staticGroup.add(lg);
       cyl(2.6,3.4,46,0x3a3f45,0,23,0,lg,6);
       var lb=sph(6,0xffd98a,0,50,0,lg,{emissive:0xcf9a3a}); lb.castShadow=false;
+      var lpl9=new THREE.PointLight(0xffb45e,0,430,1.55); lpl9.position.set(0,50,0); lg.add(lpl9); lampPointLights.push(lpl9); /* this lamp IS a light source; its intensity is driven by the sky system (AETHERIA SKY) */
     }else if(f.kind==='stall'){
       var tg2=new THREE.Group(); tg2.position.set(WX(f.x),gh-1,WZ(f.y)); tg2.rotation.y=(f.seed-0.5)*0.6; staticGroup.add(tg2);
       box(54,8,38,WOOD,0,4,0,tg2);                       /* the display counter's body */
@@ -9275,34 +9277,16 @@ function skyTick(){
   if(skyHemi)skyHemi.intensity=1.05*(0.3+sky.amb*0.85)*(0.75+wm.sun*0.25);
   if(renderer&&renderer.toneMappingExposure!==undefined)
     renderer.toneMappingExposure=0.72+0.52*Math.max(0,Math.min(1,sky.sun));
-  /* ---- lamp lights: the game's lamps are emissive globes only and cast
-     no light at all, so a small pool of REAL point lights rides the six
-     lamp globes nearest the player. They fade in as the sun drops
-     (dusk / night / dawn), flicker gently like flames, and switch off
-     by day. Intensity is in physical falloff units (decay 1.55):
-     4500 gives a strong warm pool under each lamp that still reaches
-     a good way down the street. ---- */
-  if(skyState.lampScene!==scene){skyState.lampScene=scene;skyState.lampLights=null;}
-  if(!skyState.lampLights){
-    skyState.lampLights=[];
-    for(var li9=0;li9<6;li9++){var pl9=new THREE.PointLight(0xffb45e,0,0,1.55);scene.add(pl9);skyState.lampLights.push(pl9);}
-  }
+  /* ---- lamp lights: every town lamp carries its OWN real PointLight
+     (attached to the lamp globe in buildTown3D's lamp branch and listed
+     in lampPointLights). Here we only drive their intensity: on from
+     dusk to dawn, gently flickering like flames, off by day. Intensity
+     is in physical falloff units (decay 1.55, reach 430): 5200 gives a
+     strong warm pool under each lamp that reaches well down the street. ---- */
   var darkF=Math.max(0,Math.min(1,1-sky.sun*1.5));
-  if(darkF>0.02){
-    var lampList=[];
-    for(var lf9=0;lf9<townFeatures.length;lf9++){var tf9=townFeatures[lf9];if(tf9.kind!=='lamp')continue;
-      var ldx=tf9.x-player.x,ldy=tf9.y-player.y;lampList.push({x:tf9.x,y:tf9.y,d:ldx*ldx+ldy*ldy});}
-    lampList.sort(function(a,b){return a.d-b.d;});
-    for(var lq9=0;lq9<skyState.lampLights.length;lq9++){
-      var L9=skyState.lampLights[lq9];
-      if(lq9<lampList.length){
-        var lp9b=lampList[lq9];
-        L9.position.set(WX(lp9b.x),terrainH(lp9b.x,lp9b.y)+50,WZ(lp9b.y));
-        L9.intensity=4500*darkF*(0.92+0.08*Math.sin(Date.now()/90+lq9*1.7));
-      }else L9.intensity=0;
-    }
-  }else{
-    for(var lz9=0;lz9<skyState.lampLights.length;lz9++)skyState.lampLights[lz9].intensity=0;
+  var lampBase=darkF>0.02?5200*darkF:0, lampNow=Date.now()/90;
+  for(var lq9=0;lq9<lampPointLights.length;lq9++){
+    lampPointLights[lq9].intensity=lampBase*(0.92+0.08*Math.sin(lampNow+lq9*1.7));
   }
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
