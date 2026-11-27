@@ -935,6 +935,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存が失敗する問題の根本原因を直しました。</b>セーブデータのうち、探索済みマップの記録が約64KBと大きくなりすぎていて、ブラウザの送信上限を超えたため、保存リクエストがサーバーに届く前に失敗していました（セーブ画面に「サーバーの応答なし」と出ていたのはこのためです）。探索マップの記録を圧縮して約11KBにし、セーブ全体も約12KBまで小さくしました。通常の自動保存は上限のない通常送信に切り替え、ログアウト時の最終保存も、失敗した場合は通常送信で自動的に再試行します。これまでのセーブデータ（キャラクター・探索マップ）はそのまま引き継がれます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>地形エディターを終了し、セーブデータが大幅に小さくなりました。</b>ゲームマスター専用だった地形・建物の編集機能を取り除きました。これまでセーブに含まれていた地形の編集データは、今後は保存されず、読み込みのときも反映されません。地形と建物は標準の状態に戻ります。編集データが無くなったぶんセーブが軽くなるため、自動保存が失敗しにくくなります。浮遊とゲームマスターの高速移動は、今まで通り使えます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>自動保存まわりを直し、失敗の理由がセーブ画面で分かるようになりました。</b>保存済みの地形編集データを読み込むとき、保存されていた編集そのものだけを再現するよう見直しました。読み込むたびにセーブデータが少しずつ膨らんでしまうことがなくなり、すでに大きくなったセーブも次回の保存で縮みます。あわせて、セーブ画面の保存状態に、直近の保存で送ったデータの大きさと、サーバーが返した応答（ステータスとエラー内容）がそのまま表示されるようになりました。保存に失敗したときは、その行を見れば理由が分かります。サーバー側で保存できるデータの上限も、すでに大きく引き上げ済みです。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ログアウトした瞬間の場所が、確実に保存されるようになりました。</b>これまでは、歩いた直後にログアウトすると自動保存が間に合わず、少し前の場所から再開してしまうことがありました。数秒待たなくても、ログアウト操作そのものでその場所が保存されます。次回はログアウトした場所からそのまま再開できます。</span></li>
@@ -954,7 +955,6 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
             <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>ゴブリンが群れで連携して攻撃してくるようになりました。</b>近接ゴブリンは一箇所に固まらず、プレイヤーを囲むように位置をずらして取り囲み、攻撃も全員同時ではなく少しずつタイミングをずらして波のように順番に仕掛けてきます。アーチャーとシャーマンは距離を保って支援に回り、シャーマンは傷ついた仲間を優先して回復します（届かない仲間には近寄って回復します）。チーフのいる群れは攻撃の間隔が短く、より手強くなっています。ゴブリンの強さ（HP・攻撃力）や出現数は今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag update">モンスター</span><span><b>スライムの体当たりに攻撃サイクルがつきました。</b>スライムは1度体当たりすると、攻撃を始めた位置まで戻り、その場で0.8秒止まってから次の攻撃に移るようになりました。マグマスライムも同じ動きです。戻って止まっている間が反撃の狙い目です。体当たりの当たり方（着弾した時だけダメージ）や強さは今まで通りです。</span></li>
             <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>土の道の見た目を、草のない土の地面らしくしました。</b>アルトの南門から風車広場への道など、土の道が板を敷いたように見えていたのを、継ぎ目のない一色の土が地面に沿う素朴な見た目に変えました。ルミナスの土の小道も同じ見た目に揃えています。道の通り道と幅は今まで通りです。</span></li>
-            <li><time>2026.11.23</time><span class="news-tag notice">修正</span><span><b>アルトの風車広場と道のめり込みを直しました。</b>風車のある円形の石畳広場に、南門からの土の道が食い込んで見えていたのを修正。重なる部分では広場の石畳が上に来るよう、広場の石畳を少し高くしました。道の通り道は今まで通りです。</span></li>
           </ul>
         </section>
         <section class="world-panel" aria-label="世界の数字">
@@ -2879,10 +2879,31 @@ function markExplored(){
     }
   }
 }
-function exploredToString(){var s='';for(var i=0;i<EXP_N*EXP_N;i++)s+=explored[i]?'1':'0';return s;}
+/* Save format for the explored map: bits packed 8-per-byte and base64'd,
+   prefixed 'b64:' (≈11KB). The old format stored one '0'/'1' character
+   per cell — 64KB for the 256x256 grid — which alone pushed the save
+   body past Chrome's 64KB keepalive-fetch limit, so autosaves died
+   inside the browser and never reached the server. The loader below
+   still accepts every old format, so existing characters keep their
+   maps. */
+function exploredToString(){
+  var total=EXP_N*EXP_N, bytes=new Uint8Array((total+7)>>3);
+  for(var i=0;i<total;i++){if(explored[i])bytes[i>>3]|=(1<<(i&7));}
+  var bin='';
+  for(var o=0;o<bytes.length;o+=8192){bin+=String.fromCharCode.apply(null,bytes.subarray(o,o+8192));}
+  return 'b64:'+btoa(bin);
+}
 function exploredFromString(s){
   resetExplored();
   if(typeof s!=='string')return;
+  if(s.indexOf('b64:')===0){
+    try{
+      var bin=atob(s.slice(4));
+      var n=Math.min(EXP_N*EXP_N,bin.length*8);
+      for(var i=0;i<n;i++){if((bin.charCodeAt(i>>3)>>(i&7))&1){explored[i]=1;exploredCount++;}}
+    }catch(e){}
+    return;
+  }
   /* Migration: saves from the 128x128-tile world stored a 64x64 grid, and
      saves from the 256x256-tile world stored a 128x128 grid — both with
      cells of the SAME world size (81.25 units) as today's 256x256 grid.
@@ -3795,7 +3816,13 @@ function flushPendingFinal(){
   if(acct.saving)return; /* the in-flight save's settle handler calls us again */
   acct.pendingFinal=null;
   acct.saving=true; acct.lastSaveStart=performance.now(); acct.lastSentBytes=saveBodyBytes(pf.data); refreshSaveUI();
-  acctApi('/api/save',{method:'POST',body:{character:pf.data},keepalive:true}).then(function(r){
+  /* keepalive so the snapshot can still land while the page idles on
+     the title screen; if the keepalive attempt itself fails (e.g. the
+     64KB body cap), retry once as a plain fetch before giving up. */
+  acctApi('/api/save',{method:'POST',body:{character:pf.data},keepalive:true}).then(handleFinalResult).catch(function(){
+    acctApi('/api/save',{method:'POST',body:{character:pf.data},keepalive:false}).then(handleFinalResult).catch(handleFinalError);
+  });
+  function handleFinalResult(r){
     acct.saving=false;
     if(r.data&&r.data.ok){
       noteSaveAttempt(r.status,'',true);
@@ -3812,14 +3839,15 @@ function flushPendingFinal(){
     }
     refreshSaveUI();
     flushPendingFinal();
-  }).catch(function(){
+  }
+  function handleFinalError(){
     acct.saving=false;
     noteSaveAttempt(0,'network',false);
     noteSaveFailure('',0,false);
     acctMsg('ログアウト時の最終保存に失敗しました。次回は前回保存できた位置から始まります。',true);
     refreshSaveUI();
     flushPendingFinal();
-  });
+  }
 }
 function serverSave(manual,snapData,snapKey){
   if(!acct.token||!player)return;
@@ -3832,7 +3860,18 @@ function serverSave(manual,snapData,snapKey){
      must stay "unsaved" so it is written by the follow-up save below. */
   var sentKey=snapKey||progressKey();
   acct.lastSentBytes=saveBodyBytes(data);
-  acctApi('/api/save',{method:'POST',body:{character:data},keepalive:true}).then(function(r){
+  /* keepalive is ONLY for the logout snapshot (snapData given): Chrome
+     caps a keepalive fetch body at 64KB, and an oversized body makes
+     the request fail inside the browser before it reaches the server
+     (the "サーバーの応答なし" autosave bug). Normal saves use a plain
+     fetch with no such cap. If a keepalive attempt still fails, it is
+     retried once as a plain fetch before giving up. */
+  var useKa=!!snapData;
+  acctApi('/api/save',{method:'POST',body:{character:data},keepalive:useKa}).then(handleSaveResult).catch(function(){
+    if(useKa){acctApi('/api/save',{method:'POST',body:{character:data},keepalive:false}).then(handleSaveResult).catch(handleSaveError);}
+    else handleSaveError();
+  });
+  function handleSaveResult(r){
     acct.saving=false;
     if(r.data&&r.data.ok){
       noteSaveAttempt(r.status,'',true);
@@ -3860,14 +3899,15 @@ function serverSave(manual,snapData,snapKey){
     }
     refreshSaveUI();
     flushPendingFinal(); /* a parked logout snapshot goes out right after this save lands */
-  }).catch(function(){
+  }
+  function handleSaveError(){
     acct.saving=false;
     noteSaveAttempt(0,'network',false);
     if(manual)toast('サーバー保存に失敗しました。接続を確認してください',3600);
     noteSaveFailure('',0,manual);
     refreshSaveUI();
     flushPendingFinal();
-  });
+  }
 }
 /* Ask for an autosave right now — used by important events (level up,
    quest completion). If a save is already in flight it is queued and
