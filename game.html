@@ -1013,6 +1013,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>川の水深が色でわかるようになりました。</b>深いところほど濃い青に、浅瀬は淡く砂色がかって見えます。泳げる深さかどうか、岸からでも見分けやすくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>画面まわりのアイコンを整理しました。</b>チャット欄の上のスキルホットバー、攻撃ボタン、AETHERIA ONLINEのロゴを非表示にしました。スキル（1〜3キー）と攻撃（Fキー）、ポーション（4キー）は今まで通り使えます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ほろ酔いの揺れ幅をさらに2倍にしました。</b>アルトエールの「ほろ酔い」状態で、左右にふらつく幅がさらに大きくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>NPCの名前表示を調整しました。</b>宿屋の主人と酒場の店主の名前は、それぞれの店の中に入った時にだけ表示されるようになりました。</span></li>
@@ -6866,14 +6867,14 @@ function riverMats(){
       uDeep:{value:new THREE.Color(0x1493dc)}, uShallow:{value:new THREE.Color(0x9df3ff)},
       uSky:{value:new THREE.Color(0xcfe8ff)}, uSunDir:{value:new THREE.Vector3(0.5,0.82,0.29).normalize()} },
     vertexShader:[
-      'attribute float aPhase; attribute float aRapid;',
-      'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp;',
-      'void main(){vUv=uv; vPh=aPhase; vRp=aRapid; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}'
+      'attribute float aPhase; attribute float aRapid; attribute float aDepth;',
+      'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp; varying float vDep;',
+      'void main(){vUv=uv; vPh=aPhase; vRp=aRapid; vDep=aDepth; vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp;}'
     ].join('\n'),
     fragmentShader:[
       'uniform float uTime;',
       'uniform vec3 uDeep; uniform vec3 uShallow; uniform vec3 uSky; uniform vec3 uSunDir;',
-      'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp;',
+      'varying vec3 vW; varying vec2 vUv; varying float vPh; varying float vRp; varying float vDep;',
       'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
       'float noise(vec2 p){vec2 i=floor(p); vec2 f=fract(p); f=f*f*(3.0-2.0*f);',
       ' return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),f.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),f.x),f.y);}',
@@ -6888,7 +6889,9 @@ function riverMats(){
       ' vec3 N=normalize(vec3((n1-0.5)*0.5+(n2-0.5)*0.3, 1.0, (n2-0.5)*0.45+(n3-0.5)*0.25));',
       ' vec3 V=normalize(cameraPosition-vW);',
       ' float fres=pow(1.0-max(dot(N,V),0.0),3.0);',
-      ' vec3 col=mix(uShallow,uDeep,smoothstep(0.15,0.95,1.0-abs(across)));',
+      ' float df=smoothstep(2.0,95.0,vDep); /* REAL depth: vDep is the gameplay waterDepthAt() sampled per-vertex into aDepth (0 at the shore, ~120 at a disc centre, 11 = the wading limit). The colour follows the actual depth along the whole river — deep reaches and pond middles go dark, shallows stay pale — instead of the old fixed centre-dark profile that made every stretch read the same flat blue */',
+      ' vec3 col=mix(uShallow,uDeep,df);',
+      ' col=mix(vec3(0.72,0.68,0.52),col,smoothstep(0.0,13.0,vDep)); /* ankle-deep water tints sandy, so the shallows read at a glance */',
       ' col=mix(col,uSky,0.10+0.34*fres);',
       ' vec3 R=reflect(-V,N);',
       ' float sd=max(dot(R,uSunDir),0.0);',
@@ -6902,7 +6905,7 @@ function riverMats(){
       ' col=mix(col,vec3(0.97,0.99,1.0),clamp(foam,0.0,1.0)*0.94);',
       ' float fogF=smoothstep(700.0,1650.0,distance(cameraPosition,vW));', /* matched to the shortened scene fog / draw distance (was 1500→3400) */
       ' col=mix(col,vec3(0.85,0.93,0.97),fogF*0.6);',
-      ' gl_FragColor=vec4(col,0.96);',
+      ' gl_FragColor=vec4(col,mix(0.80,0.97,df)); /* shallow water is clearer (the bed shows through); deep water is opaque */',
       '}'
     ].join('\n')
   });
@@ -6912,7 +6915,7 @@ function buildRiver3D(){
   var g=ensureWaterGroup(); if(!g)return;
   var pts=RIVER.map(function(p){return new THREE.Vector3(WX(p[0]),0,WZ(p[1]));});
   var curve=new THREE.CatmullRomCurve3(pts,false,'catmullrom',0.35);
-  var N=200, pos=[],uv=[],ph=[],rp=[],idx=[];
+  var N=200, pos=[],uv=[],ph=[],rp=[],dep=[],idx=[];
   var phase=0, prev=null;
   function inPond(x,y){
     if(Math.hypot(x-POND_C.x,y-POND_C.y)<POND_C.r+24)return true;
@@ -6972,16 +6975,18 @@ function buildRiver3D(){
     var chanW=128+26*Math.sin(phase*1.7)+18*Math.sin(phase*0.63+2.0);
     chanW=Math.max(108,Math.min(168,chanW));
     var hw=Math.max(chanW,pondHW(gx,gy,nx,nz));
-    pos.push(p.x+nx*hw,1.2,p.z+nz*hw, p.x-nx*hw,1.2,p.z-nz*hw);
-    uv.push(0,t*40, 1,t*40);
-    ph.push(phase,phase); rp.push(rapid,rapid);
-    if(i<N){var a=i*2;idx.push(a,a+1,a+2, a+1,a+3,a+2);}
+    pos.push(p.x+nx*hw,1.2,p.z+nz*hw, p.x,1.2,p.z, p.x-nx*hw,1.2,p.z-nz*hw); /* three across (rim / centre / rim) so the depth can peak mid-channel */
+    uv.push(0,t*40, 0.5,t*40, 1,t*40);
+    ph.push(phase,phase,phase); rp.push(rapid,rapid,rapid);
+    dep.push(waterDepthAt(gx+nx*hw,gy+nz*hw),waterDepthAt(gx,gy),waterDepthAt(gx-nx*hw,gy-nz*hw)); /* the game's own depth at each vertex — the shader colours by it */
+    if(i<N){var a=i*3;idx.push(a,a+3,a+1, a+1,a+3,a+4, a+1,a+4,a+2, a+2,a+4,a+5);}
   }
   var geo=new THREE.BufferGeometry();
   geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
   geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
   geo.setAttribute('aPhase',new THREE.Float32BufferAttribute(ph,1));
   geo.setAttribute('aRapid',new THREE.Float32BufferAttribute(rp,1));
+  geo.setAttribute('aDepth',new THREE.Float32BufferAttribute(dep,1));
   geo.setIndex(idx);
   var mesh=new THREE.Mesh(geo,riverMats());
   mesh.renderOrder=2; mesh.frustumCulled=false;
@@ -7587,7 +7592,7 @@ function buildAltoRiver3D(){
   var g=ensureWaterGroup(); if(!g)return;
   var pts=ALTO_RIVER.map(function(p){return new THREE.Vector3(WX(p[0]),0,WZ(p[1]));});
   var curve=new THREE.CatmullRomCurve3(pts,false,'catmullrom',0.35);
-  var N=170, pos=[],uv=[],ph=[],rp=[],idx=[];
+  var N=170, pos=[],uv=[],ph=[],rp=[],dep=[],idx=[];
   var phase=0, prev=null;
   for(var i=0;i<=N;i++){
     var t=i/N, p=curve.getPoint(t), tan=curve.getTangent(t);
@@ -7597,16 +7602,18 @@ function buildAltoRiver3D(){
     var wz=altoRiverFrame(gx,gy).bank-5.5;
     var hw=62+10*Math.sin(phase*1.3); hw=Math.max(52,Math.min(72,hw));
     var nx=-tan.z, nz=tan.x;
-    pos.push(p.x+nx*hw,wz,p.z+nz*hw, p.x-nx*hw,wz,p.z-nz*hw);
-    uv.push(0,t*40, 1,t*40);
-    ph.push(phase,phase); rp.push(0.15,0.15);
-    if(i<N){var a=i*2;idx.push(a,a+1,a+2, a+1,a+3,a+2);}
+    pos.push(p.x+nx*hw,wz,p.z+nz*hw, p.x,wz,p.z, p.x-nx*hw,wz,p.z-nz*hw); /* three across, like Luminas's ribbon */
+    uv.push(0,t*40, 0.5,t*40, 1,t*40);
+    ph.push(phase,phase,phase); rp.push(0.15,0.15,0.15);
+    dep.push(waterDepthAt(gx+nx*hw,gy+nz*hw),waterDepthAt(gx,gy),waterDepthAt(gx-nx*hw,gy-nz*hw));
+    if(i<N){var a=i*3;idx.push(a,a+3,a+1, a+1,a+3,a+4, a+1,a+4,a+2, a+2,a+4,a+5);}
   }
   var geo=new THREE.BufferGeometry();
   geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
   geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
   geo.setAttribute('aPhase',new THREE.Float32BufferAttribute(ph,1));
   geo.setAttribute('aRapid',new THREE.Float32BufferAttribute(rp,1));
+  geo.setAttribute('aDepth',new THREE.Float32BufferAttribute(dep,1));
   geo.setIndex(idx);
   var mesh=new THREE.Mesh(geo,riverMats());
   mesh.renderOrder=2; mesh.frustumCulled=false;
