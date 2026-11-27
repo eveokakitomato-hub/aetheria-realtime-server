@@ -400,12 +400,18 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 @media (max-width:560px){.status-grid{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 #abilityModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .abi-card{max-width:980px}
-.abi-stage-wrap{position:relative;overflow:hidden;margin-top:6px}
+.abi-stage-wrap{position:relative;overflow:hidden;margin-top:6px;height:min(60vh,520px);touch-action:none;border-radius:10px}
 .abi-stage{position:relative;width:920px;height:600px;transform-origin:0 0;background:radial-gradient(ellipse at 50% 42%,rgba(216,169,64,.08),rgba(0,0,0,.25) 72%);border:1px solid var(--line2);border-radius:10px}
 .abi-line{stroke:#44534a;stroke-width:2}
 .abi-line.mid{stroke:#8a9a8f}
 .abi-line.on{stroke:var(--gold2);stroke-width:2.5}
-.abi-node{position:absolute;transform:translate(-50%,-50%);min-width:56px;padding:7px 8px;border-radius:9px;border:1px solid #44534a;background:#232d27;color:#7d8b81;font-weight:900;font-size:13px;cursor:pointer;z-index:2}
+.abi-nodewrap{position:absolute;transform:translate(-50%,-50%);z-index:2}
+.abi-node{min-width:56px;padding:7px 8px;border-radius:9px;border:1px solid #44534a;background:#232d27;color:#7d8b81;font-weight:900;font-size:13px;cursor:pointer}
+.abi-cnt{position:absolute;top:-9px;right:-12px;background:var(--gold2);color:#241a04;border-radius:999px;font-size:10px;font-weight:900;padding:1px 6px;z-index:3;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.abi-node.stacked{background:#6b5518;color:#ffe9a8;border-color:var(--gold2)}
+.abi-node.max{background:linear-gradient(180deg,#e8c766,#c49a35);color:#241a04;border-color:#8a6d1f}
+.abi-zoom{position:absolute;top:8px;right:8px;z-index:5;display:flex;gap:6px}
+.abi-zoom button{background:rgba(20,26,22,.85);color:var(--paper);border:1px solid var(--line2);border-radius:8px;min-width:38px;height:34px;font-weight:900;cursor:pointer;padding:0 10px}
 .abi-node.core{width:68px;height:68px;min-width:68px;padding:0;border-radius:0;clip-path:polygon(50% 0,100% 38%,81% 100%,19% 100%,0 38%);display:grid;place-items:center;font-size:15px}
 .abi-node.avail{background:#1d2b23;color:var(--paper);border-color:var(--gold2);box-shadow:0 0 10px rgba(216,169,64,.45)}
 .abi-node.nopoint{background:#1d2b23;color:var(--paper)}
@@ -785,7 +791,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>アイテムホットバー</td><td>画面右下の4マス。バッグのアイテムを登録しておけば、<kbd>5</kbd>〜<kbd>8</kbd> キーかクリックで即座に使えます。登録は、バッグを開いてアイテムをマスへドラッグ＆ドロップするか、バッグの「ホットバー登録モード」でアイテムを選んでからマスをクリック。マスの右クリックでも変更できます</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>4</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
-        <tr><td>アビリティ</td><td><kbd>C</kbd> キーでアビリティツリーを開きます。レベルアップで得るアビリティポイント（AP）を使い、5系統・全30種のアビリティを習得できます。前提のアビリティから順にしか取れません</td></tr>
+        <tr><td>アビリティ</td><td><kbd>C</kbd> キーでアビリティツリーを開きます。レベルアップで得るアビリティポイント（AP）を使い、5系統・全30種のアビリティを解放できます。前提のアビリティから順にしか取れません。同じアビリティは重ねて解放でき（1段階目 最大8回／2段階目 最大5回／3段階目 最大3回）、効果も回数分かかります。ツリーはドラッグで移動、ホイールやピンチで拡大・縮小できます</td></tr>
         <tr><td>パリィ</td><td><kbd>Q</kbd> キーを<b>敵の攻撃が当たる瞬間</b>に押すとパリィが発動し、ダメージを受けずに敵をノックバックして<b>2秒間スタン</b>させます。遠距離攻撃の場合は、敵はスタンせず、その弾だけを消します（Qはしゃがみと同じキーです。パリィが成功するとしゃがみは解除されます）</td></tr>
         <tr><td>バッグ</td><td><kbd>R</kbd> キーでバッグ（所持品）を直接開閉できます。アイテム欄は最大26種類まで入るスクロール式で、ポーションや矢などが種類ごとに個数付きで並び、クリックで使用・装備できます</td></tr>
         <tr><td>設定</td><td>Escメニューの「設定」から、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
@@ -896,7 +902,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
     <div id="abilityModal"><div class="bag-card abi-card">
       <h2>🌟 アビリティ</h2>
       <p class="sub" id="abiHead"></p>
-      <div class="abi-stage-wrap" id="abiStageWrap"><div class="abi-stage" id="abiStage">
+      <div class="abi-stage-wrap" id="abiStageWrap"><div class="abi-zoom"><button type="button" id="abiZoomOut">−</button><button type="button" id="abiZoomFit">全体</button><button type="button" id="abiZoomIn">＋</button></div><div class="abi-stage" id="abiStage">
         <svg id="abiLines" width="920" height="600" style="position:absolute;left:0;top:0"></svg>
         <div id="abiNodes"></div>
       </div></div>
@@ -1042,6 +1048,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アビリティツリーが進化しました。</b>ツリーをドラッグで動かしたり、ホイールやピンチで拡大・縮小できるようになりました。また、同じアビリティを重ねて解放できるようになり（1段階目 最大8回／2段階目 最大5回／3段階目 最大3回）、効果も回数分かかります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アビリティツリーが追加されました。</b>Cキー（またはメニュー）で開き、レベルアップで得るアビリティポイントを使って5系統・全30種のアビリティを習得できます。攻撃・防御・俊敏・魔力・技巧を伸ばして、自分だけのビルドを作りましょう。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ゴブリンの攻撃モーションを変更しました。</b>2.4m手前で立ち止まって拳を溜め、2m踏み込みながら振り下ろす攻撃になりました。踏み込む瞬間に離れれば避けることもできます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>パリィの仕様を調整しました。</b>遠距離攻撃をパリィした場合は、敵をノックバック・スタンさせず、その攻撃（弾）だけを消すようになりました。</span></li>
@@ -4002,48 +4009,51 @@ function closeItemPicker(){var pk=$('itemPicker');if(pk)pk.style.display='none';
    hunger/thirst (survival maxima), search (identify range), and the
    resistances (status display; no player ailment systems yet). */
 var ABILITIES={
-  gouki:{tree:'pow',name:'強撃',req:null,fx:'物理基礎攻撃力+15・重量+10',b:{patk:15,weight:10}},
-  moukou:{tree:'pow',name:'猛攻',req:'gouki',fx:'物理基礎攻撃力+20・攻撃速度+4%',b:{patk:20,aspd:4}},
-  hunsai:{tree:'pow',name:'粉砕',req:'moukou',fx:'パリィ補正+6%・貫通補正+8%',b:{parry:6,pen:8}},
-  juugeki:{tree:'pow',name:'重撃',req:'moukou',fx:'物理基礎攻撃力+25・貫通補正+12%',b:{patk:25,pen:12}},
-  gouriki:{tree:'pow',name:'剛力',req:'juugeki',fx:'攻撃速度+4%・SP+20・重量+20',b:{aspd:4,sp:20,weight:20}},
-  hakai:{tree:'pow',name:'破壊',req:'juugeki',fx:'会心威力+30%・貫通補正+15%',b:{critd:30,pen:15}},
-  shugo:{tree:'def',name:'守護',req:null,fx:'基礎HP+20・重量+20',b:{hp:20,weight:20}},
-  gankyou:{tree:'def',name:'頑強',req:'shugo',fx:'物理基礎防御力+20・魔法基礎防御力+20',b:{pdef:20,mdef:20}},
-  kenrou:{tree:'def',name:'堅牢',req:'gankyou',fx:'パリィ補正+6%・重量+30',b:{parry:6,weight:30}},
-  teppeki:{tree:'def',name:'鉄壁',req:'gankyou',fx:'物理基礎防御力+30・魔法基礎防御力+30',b:{pdef:30,mdef:30}},
-  shiketsu:{tree:'def',name:'止血',req:'teppeki',fx:'基礎HP+40・毒耐性+25%・出血耐性+25%',b:{hp:40,rpois:25,rbleed:25}},
-  fukutsu:{tree:'def',name:'不屈',req:'teppeki',fx:'基礎HP+40・麻痺耐性+25%・気絶耐性+25%',b:{hp:40,rpara:25,rstun:25}},
-  shunbin:{tree:'agi',name:'俊敏',req:null,fx:'SP+20・移動速度+5%',b:{sp:20,mspd:5}},
-  rengeki:{tree:'agi',name:'連撃',req:'shunbin',fx:'攻撃速度+6%・SP効率（攻撃）+20%',b:{aspd:6,speffA:20}},
-  binshou:{tree:'agi',name:'敏捷',req:'rengeki',fx:'SP+30・移動速度+8%',b:{sp:30,mspd:8}},
-  jinrai:{tree:'agi',name:'迅雷',req:'rengeki',fx:'会心率+4%・会心威力+20%',b:{crit:4,critd:20}},
-  keigyou:{tree:'agi',name:'軽業',req:'jinrai',fx:'移動速度+10%・SP効率（移動）+30%',b:{mspd:10,speffM:30}},
-  fudan:{tree:'agi',name:'不断',req:'jinrai',fx:'SP+40・攻撃速度+10%',b:{sp:40,aspd:10}},
-  eichi:{tree:'int',name:'叡智',req:null,fx:'魔法基礎攻撃力+10・MP+30',b:{matk:10,mp:30}},
-  meiseki:{tree:'int',name:'明晰',req:'eichi',fx:'MP効率+25%・MP+30',b:{mpeff:25,mp:30}},
-  jiai:{tree:'int',name:'慈愛',req:'meiseki',fx:'全耐性+5%・治癒補正+12%・MP+30',b:{rall:5,heal:12,mp:30}},
-  kenja:{tree:'int',name:'賢者',req:'meiseki',fx:'魔法基礎攻撃力+25・MP効率+15%・MP+50',b:{matk:25,mpeff:15,mp:50}},
-  tankyuu:{tree:'int',name:'探求',req:'kenja',fx:'魔法基礎攻撃力+35・詠唱効率+8%・MP+40',b:{matk:35,cast:8,mp:40}},
-  seisui:{tree:'int',name:'聖水',req:'kenja',fx:'HP+50・治癒補正+24%・MP+40',b:{hp:50,heal:24,mp:40}},
-  gikou:{tree:'tec',name:'技巧',req:null,fx:'重量+10・空腹値+15・渇き値+15',b:{weight:10,hunger:15,thirst:15}},
-  sakuteki:{tree:'tec',name:'索敵',req:'gikou',fx:'SP+15・移動速度+4%・探索範囲+25%',b:{sp:15,mspd:4,search:25}},
-  kanpa:{tree:'tec',name:'看破',req:'sakuteki',fx:'会心率+4%',b:{crit:4}},
-  katsuryoku:{tree:'tec',name:'活力',req:'sakuteki',fx:'会心率+6%・会心威力+20%',b:{crit:6,critd:20}},
-  shinsoku:{tree:'tec',name:'神速',req:'katsuryoku',fx:'SP+20・移動速度+5%・攻撃速度+8%',b:{sp:20,mspd:5,aspd:8}},
-  chimei:{tree:'tec',name:'致命',req:'katsuryoku',fx:'会心威力+45%',b:{critd:45}}
+  gouki:{tier:1,tree:'pow',name:'強撃',req:null,fx:'物理基礎攻撃力+15・重量+10',b:{patk:15,weight:10}},
+  moukou:{tier:2,tree:'pow',name:'猛攻',req:'gouki',fx:'物理基礎攻撃力+20・攻撃速度+4%',b:{patk:20,aspd:4}},
+  hunsai:{tier:2,tree:'pow',name:'粉砕',req:'moukou',fx:'パリィ補正+6%・貫通補正+8%',b:{parry:6,pen:8}},
+  juugeki:{tier:3,tree:'pow',name:'重撃',req:'moukou',fx:'物理基礎攻撃力+25・貫通補正+12%',b:{patk:25,pen:12}},
+  gouriki:{tier:3,tree:'pow',name:'剛力',req:'juugeki',fx:'攻撃速度+4%・SP+20・重量+20',b:{aspd:4,sp:20,weight:20}},
+  hakai:{tier:3,tree:'pow',name:'破壊',req:'juugeki',fx:'会心威力+30%・貫通補正+15%',b:{critd:30,pen:15}},
+  shugo:{tier:1,tree:'def',name:'守護',req:null,fx:'基礎HP+20・重量+20',b:{hp:20,weight:20}},
+  gankyou:{tier:2,tree:'def',name:'頑強',req:'shugo',fx:'物理基礎防御力+20・魔法基礎防御力+20',b:{pdef:20,mdef:20}},
+  kenrou:{tier:2,tree:'def',name:'堅牢',req:'gankyou',fx:'パリィ補正+6%・重量+30',b:{parry:6,weight:30}},
+  teppeki:{tier:3,tree:'def',name:'鉄壁',req:'gankyou',fx:'物理基礎防御力+30・魔法基礎防御力+30',b:{pdef:30,mdef:30}},
+  shiketsu:{tier:3,tree:'def',name:'止血',req:'teppeki',fx:'基礎HP+40・毒耐性+25%・出血耐性+25%',b:{hp:40,rpois:25,rbleed:25}},
+  fukutsu:{tier:3,tree:'def',name:'不屈',req:'teppeki',fx:'基礎HP+40・麻痺耐性+25%・気絶耐性+25%',b:{hp:40,rpara:25,rstun:25}},
+  shunbin:{tier:1,tree:'agi',name:'俊敏',req:null,fx:'SP+20・移動速度+5%',b:{sp:20,mspd:5}},
+  rengeki:{tier:2,tree:'agi',name:'連撃',req:'shunbin',fx:'攻撃速度+6%・SP効率（攻撃）+20%',b:{aspd:6,speffA:20}},
+  binshou:{tier:2,tree:'agi',name:'敏捷',req:'rengeki',fx:'SP+30・移動速度+8%',b:{sp:30,mspd:8}},
+  jinrai:{tier:3,tree:'agi',name:'迅雷',req:'rengeki',fx:'会心率+4%・会心威力+20%',b:{crit:4,critd:20}},
+  keigyou:{tier:3,tree:'agi',name:'軽業',req:'jinrai',fx:'移動速度+10%・SP効率（移動）+30%',b:{mspd:10,speffM:30}},
+  fudan:{tier:3,tree:'agi',name:'不断',req:'jinrai',fx:'SP+40・攻撃速度+10%',b:{sp:40,aspd:10}},
+  eichi:{tier:1,tree:'int',name:'叡智',req:null,fx:'魔法基礎攻撃力+10・MP+30',b:{matk:10,mp:30}},
+  meiseki:{tier:2,tree:'int',name:'明晰',req:'eichi',fx:'MP効率+25%・MP+30',b:{mpeff:25,mp:30}},
+  jiai:{tier:2,tree:'int',name:'慈愛',req:'meiseki',fx:'全耐性+5%・治癒補正+12%・MP+30',b:{rall:5,heal:12,mp:30}},
+  kenja:{tier:3,tree:'int',name:'賢者',req:'meiseki',fx:'魔法基礎攻撃力+25・MP効率+15%・MP+50',b:{matk:25,mpeff:15,mp:50}},
+  tankyuu:{tier:3,tree:'int',name:'探求',req:'kenja',fx:'魔法基礎攻撃力+35・詠唱効率+8%・MP+40',b:{matk:35,cast:8,mp:40}},
+  seisui:{tier:3,tree:'int',name:'聖水',req:'kenja',fx:'HP+50・治癒補正+24%・MP+40',b:{hp:50,heal:24,mp:40}},
+  gikou:{tier:1,tree:'tec',name:'技巧',req:null,fx:'重量+10・空腹値+15・渇き値+15',b:{weight:10,hunger:15,thirst:15}},
+  sakuteki:{tier:2,tree:'tec',name:'索敵',req:'gikou',fx:'SP+15・移動速度+4%・探索範囲+25%',b:{sp:15,mspd:4,search:25}},
+  kanpa:{tier:2,tree:'tec',name:'看破',req:'sakuteki',fx:'会心率+4%',b:{crit:4}},
+  katsuryoku:{tier:3,tree:'tec',name:'活力',req:'sakuteki',fx:'会心率+6%・会心威力+20%',b:{crit:6,critd:20}},
+  shinsoku:{tier:3,tree:'tec',name:'神速',req:'katsuryoku',fx:'SP+20・移動速度+5%・攻撃速度+8%',b:{sp:20,mspd:5,aspd:8}},
+  chimei:{tier:3,tree:'tec',name:'致命',req:'katsuryoku',fx:'会心威力+45%',b:{critd:45}}
 };
 var ABILITY_IDS=Object.keys(ABILITIES);
 var ABI_KEYS=['patk','matk','pdef','mdef','weight','aspd','mspd','crit','critd','parry','pen','speffA','speffM','mpeff','heal','cast','rpois','rpara','rbleed','rstun','rall','hunger','thirst','search'];
 function abiBonusFor(abi){
   var out={}; for(var i=0;i<ABI_KEYS.length;i++)out[ABI_KEYS[i]]=0;
-  if(abi)for(var id in abi){var n=ABILITIES[id]; if(!n)continue; for(var j=0;j<ABI_KEYS.length;j++){var k=ABI_KEYS[j]; if(n.b[k])out[k]+=n.b[k];}}
+  if(abi)for(var id in abi){var n=ABILITIES[id], cnt=abi[id]|0; if(!n||!cnt)continue; for(var j=0;j<ABI_KEYS.length;j++){var k=ABI_KEYS[j]; if(n.b[k])out[k]+=n.b[k]*cnt;}} /* 重複解放: effects stack per stack */
   return out;
 }
 function abiBonus(){return abiBonusFor(player?player.abi:null);}
-function abiLearnedCount(){if(!player||!player.abi)return 0;var n=0;for(var id in player.abi)if(ABILITIES[id])n++;return n;}
+function abiLearnedCount(){if(!player||!player.abi)return 0;var n=0;for(var id in player.abi)if(ABILITIES[id])n+=player.abi[id]|0;return n;} /* total stacks taken */
 function abiPoints(){if(!player)return 0;return Math.max(0,(player.lv-1)-abiLearnedCount());}
-function abiKey(){if(!player||!player.abi)return'';return ABILITY_IDS.map(function(id){return player.abi[id]?1:0;}).join('');}
+function abiCap(n){return n.tier===1?8:n.tier===2?5:3;} /* 重複解放の上限: tier 1 ×8, tier 2 ×5, tier 3 ×3 (user spec) */
+function abiCount(id){return (player&&player.abi&&(player.abi[id]|0))||0;}
+var ABI_TOTAL=ABILITY_IDS.reduce(function(s,id){return s+abiCap(ABILITIES[id]);},0); /* 5×8 + 10×5 + 15×3 = 135 */
+function abiKey(){if(!player||!player.abi)return'';return ABILITY_IDS.map(function(id){return player.abi[id]|0;}).join(',');}
 function hungerMax(){return 100+abiBonus().hunger;}
 function thirstMax(){return 100+abiBonus().thirst;}
 function WEIGHT_CAP(){return WEIGHT_CAPACITY+abiBonus().weight;}
@@ -4055,14 +4065,16 @@ function atkBase(){var b=abiBonus();return player.cls==='mage'?((player.matk!=nu
 function abiSearchMul(){return 1+abiBonus().search/100;}
 function learnAbility(id){
   if(!player||!player.abi)return;
-  var n=ABILITIES[id]; if(!n||player.abi[id])return;
-  if(n.req&&!player.abi[n.req]){toast('先に「'+ABILITIES[n.req].name+'」が必要です');beep(160,0.1,'square',0.04);return;}
+  var n=ABILITIES[id]; if(!n)return;
+  var c=abiCount(id), cap=abiCap(n);
+  if(c>=cap){toast('「'+n.name+'」は最大まで解放済みです（'+cap+'回）');beep(160,0.1,'square',0.04);return;}
+  if(n.req&&abiCount(n.req)<=0){toast('先に「'+ABILITIES[n.req].name+'」が必要です');beep(160,0.1,'square',0.04);return;}
   if(abiPoints()<=0){toast('アビリティポイントが足りません（レベルアップで増えます）');beep(160,0.1,'square',0.04);return;}
-  player.abi[id]=1;
-  if(n.b.hp){player.maxHp+=n.b.hp;player.hp+=n.b.hp;} /* flat maxima are baked in at learn time */
+  player.abi[id]=c+1;
+  if(n.b.hp){player.maxHp+=n.b.hp;player.hp+=n.b.hp;} /* flat maxima are baked in per stack */
   if(n.b.mp){player.maxMp+=n.b.mp;player.mp+=n.b.mp;}
   if(n.b.sp){player.maxSp+=n.b.sp;player.sp+=n.b.sp;}
-  toast('✨ アビリティ「'+n.name+'」を習得！ '+n.fx,3000);
+  toast('✨ アビリティ「'+n.name+'」を習得！（'+(c+1)+'/'+cap+'） '+n.fx,3000);
   beep(880,0.1,'triangle',0.05); setTimeout(function(){beep(1320,0.14,'triangle',0.05);},90);
   refreshAbilityUI(); updateHUD(); requestSaveNow();
 }
@@ -4581,7 +4593,7 @@ function applySaveData(data){
   var p=data.player;
   function num(v,fallback,min,max){var n=Number(v);if(!isFinite(n))n=fallback;return Math.max(min,Math.min(max,n));}
   var np=makePlayer(String(p.name||'冒険者').slice(0,12),p.cls);
-  np.abi={};if(p.abi&&typeof p.abi==='object'){ABILITY_IDS.forEach(function(id){if(p.abi[id])np.abi[id]=1;});} /* learned ability nodes, validated against the catalogue */
+  np.abi={};if(p.abi&&typeof p.abi==='object'){ABILITY_IDS.forEach(function(id){var pc=Math.floor(Number(p.abi[id])||0); if(pc>0)np.abi[id]=Math.min(pc,abiCap(ABILITIES[id]));});} /* learned ability stacks, validated and clamped to each tier cap */
   np.maxHp=num(p.maxHp,np.maxHp,10,9999);np.maxMp=num(p.maxMp,np.maxMp,10,9999);
   np.hp=num(p.hp,np.maxHp,1,np.maxHp);np.mp=num(p.mp,np.maxMp,0,np.maxMp);
   np.maxSp=num(p.maxSp,np.maxSp,1,9999);np.sp=num(p.sp,np.maxSp,0,np.maxSp);
@@ -5927,17 +5939,15 @@ var ABI_POS={gouki:[460,170],moukou:[400,100],hunsai:[518,100],juugeki:[322,38],
   gikou:[578,368],sakuteki:[506,448],kanpa:[656,448],katsuryoku:[578,540],shinsoku:[716,540],chimei:[842,540]};
 var abiSel=null;
 function abiState(id){
-  if(player&&player.abi&&player.abi[id])return 'learned';
-  var n=ABILITIES[id];
-  if(n.req&&!(player&&player.abi&&player.abi[n.req]))return 'locked';
+  var n=ABILITIES[id], c=abiCount(id);
+  if(c>=abiCap(n))return 'max';
+  if(n.req&&abiCount(n.req)<=0)return 'locked';
+  if(c>0)return 'stacked';
   return abiPoints()>0?'avail':'nopoint';
 }
 function refreshAbilityUI(){
   var stage=$('abiStage'); if(!stage||!player)return;
-  $('abiHead').textContent=player.name+'（Lv.'+player.lv+'） — アビリティポイント: '+abiPoints()+'｜習得 '+abiLearnedCount()+' / 30';
-  var sc=Math.min(1,(Math.min(window.innerWidth*0.94,940))/920);
-  stage.style.transform='scale('+sc+')';
-  $('abiStageWrap').style.height=(600*sc)+'px';
+  $('abiHead').textContent=player.name+'（Lv.'+player.lv+'） — アビリティポイント: '+abiPoints()+'｜解放 '+abiLearnedCount()+' / '+ABI_TOTAL+'（ドラッグで移動・ホイール/ピンチで拡大縮小）';
   var svg='';
   ABILITY_IDS.forEach(function(id){var n=ABILITIES[id]; if(!n.req)return;
     var a=ABI_POS[n.req], b2=ABI_POS[id];
@@ -5946,8 +5956,8 @@ function refreshAbilityUI(){
   });
   $('abiLines').innerHTML=svg;
   var html='';
-  ABILITY_IDS.forEach(function(id){var n=ABILITIES[id], pos=ABI_POS[id], st=abiState(id);
-    html+='<button type="button" class="abi-node'+(n.req===null?' core':'')+' '+st+(abiSel===id?' sel':'')+'" data-abi="'+id+'" style="left:'+pos[0]+'px;top:'+pos[1]+'px">'+n.name+'</button>';
+  ABILITY_IDS.forEach(function(id){var n=ABILITIES[id], pos=ABI_POS[id], st=abiState(id), c=abiCount(id), cap=abiCap(n);
+    html+='<div class="abi-nodewrap" style="left:'+pos[0]+'px;top:'+pos[1]+'px"><button type="button" class="abi-node'+(n.req===null?' core':'')+' '+st+(abiSel===id?' sel':'')+'" data-abi="'+id+'">'+n.name+'</button>'+(c>0?'<span class="abi-cnt">'+c+'/'+cap+'</span>':'')+'</div>';
   });
   $('abiNodes').innerHTML=html;
   Array.prototype.forEach.call(stage.querySelectorAll('.abi-node'),function(el){
@@ -5957,14 +5967,57 @@ function refreshAbilityUI(){
 }
 function refreshAbilityDetail(){
   var det=$('abiDetail'); if(!det)return;
-  if(!abiSel||!ABILITIES[abiSel]){det.innerHTML='ノードを選ぶと、効果と条件がここに表示されます。';return;}
-  var n=ABILITIES[abiSel], st=abiState(abiSel);
-  var reqTxt=n.req?('前提：'+ABILITIES[n.req].name+(player.abi[n.req]?'（習得済み）':'（未習得）')):'前提：なし（系統の起点）';
-  var stTxt=st==='learned'?'取得済み':st==='avail'?'アビリティポイント 1 で習得できます':st==='nopoint'?'アビリティポイントが足りません':'前提アビリティが必要です';
-  det.innerHTML='<b>'+n.name+'</b> <span class="bd-cat">'+escHtml(n.fx)+'</span><br>'+reqTxt+' — '+stTxt+(st==='avail'?' <button type="button" id="abiLearnBtn">習得する（AP 1）</button>':'');
+  if(!abiSel||!ABILITIES[abiSel]){det.innerHTML='ノードを選ぶと、効果と条件がここに表示されます。同じアビリティは段階ごとに重ねて解放でき、効果も回数分かかります。';return;}
+  var n=ABILITIES[abiSel], st=abiState(abiSel), c=abiCount(abiSel), cap=abiCap(n);
+  var reqTxt=n.req?('前提：'+ABILITIES[n.req].name+(abiCount(n.req)>0?'（解放済み）':'（未解放）')):'前提：なし（系統の起点）';
+  var canLearn=st!=='max'&&st!=='locked'&&abiPoints()>0;
+  var stTxt=st==='max'?'最大まで解放済みです':canLearn?'アビリティポイント 1 で解放できます':st==='locked'?'前提アビリティが必要です':'アビリティポイントが足りません';
+  det.innerHTML='<b>'+n.name+'</b>（'+n.tier+'段階目） <span class="bd-cat">'+escHtml(n.fx)+'（1回分）</span> — 解放 '+c+' / '+cap+'回'+(c>0?'（効果は'+c+'回分 適用中）':'')+'<br>'+reqTxt+' — '+stTxt+(canLearn?' <button type="button" id="abiLearnBtn">解放する（AP 1）</button>':'');
   var lb=$('abiLearnBtn'); if(lb)lb.addEventListener('click',function(){learnAbility(abiSel);});
 }
-function openAbility(){refreshAbilityUI();$('abilityModal').style.display='grid';}
+/* ---- ability tree pan & zoom (map-style) ---- */
+var abiView=null, abiSuppressClick=false;
+function abiApplyView(){if(!abiView)return;$('abiStage').style.transform='translate('+abiView.tx+'px,'+abiView.ty+'px) scale('+abiView.s+')';}
+function abiFitView(){
+  var wrap=$('abiStageWrap'); if(!wrap)return;
+  var w=wrap.clientWidth||Math.min(window.innerWidth*0.94,940), h=wrap.clientHeight||440;
+  var s=Math.min(w/920,h/600)*0.98;
+  abiView={s:s,tx:(w-920*s)/2,ty:(h-600*s)/2};
+  abiApplyView();
+}
+function abiZoomAt(cx,cy,f){
+  if(!abiView)return;
+  var ns=Math.max(0.25,Math.min(2.6,abiView.s*f)), k=ns/abiView.s;
+  abiView.tx=cx-(cx-abiView.tx)*k; abiView.ty=cy-(cy-abiView.ty)*k; abiView.s=ns;
+  abiApplyView();
+}
+function abiInitPanZoom(){
+  var wrap=$('abiStageWrap'); if(!wrap||wrap._pz)return; wrap._pz=1;
+  var pts={}, lastDist=0, moved=0;
+  wrap.addEventListener('pointerdown',function(e){try{wrap.setPointerCapture(e.pointerId);}catch(_){} pts[e.pointerId]={x:e.clientX,y:e.clientY}; moved=0;});
+  wrap.addEventListener('pointermove',function(e){
+    if(!pts[e.pointerId]||!abiView)return;
+    var prev=pts[e.pointerId]; pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    var ids=Object.keys(pts);
+    if(ids.length===1){
+      var dx=e.clientX-prev.x, dy=e.clientY-prev.y;
+      moved+=Math.abs(dx)+Math.abs(dy);
+      abiView.tx+=dx; abiView.ty+=dy; abiApplyView();
+    }else if(ids.length===2){
+      var a=pts[ids[0]], b=pts[ids[1]], d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(lastDist>0&&d>0){var r=wrap.getBoundingClientRect(); abiZoomAt((a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top,d/lastDist);}
+      lastDist=d; moved=99;
+    }
+  });
+  function up(e){delete pts[e.pointerId]; if(Object.keys(pts).length<2)lastDist=0; if(moved>8){abiSuppressClick=true; setTimeout(function(){abiSuppressClick=false;},60);}}
+  wrap.addEventListener('pointerup',up); wrap.addEventListener('pointercancel',up);
+  wrap.addEventListener('wheel',function(e){e.preventDefault(); if(!abiView)return; var r=wrap.getBoundingClientRect(); abiZoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:0.89);},{passive:false});
+  wrap.addEventListener('click',function(e){if(abiSuppressClick){e.stopPropagation();e.preventDefault();}},true); /* a drag must not select the node it ends on */
+  $('abiZoomIn').addEventListener('click',function(){abiZoomAt(wrap.clientWidth/2,wrap.clientHeight/2,1.3);});
+  $('abiZoomOut').addEventListener('click',function(){abiZoomAt(wrap.clientWidth/2,wrap.clientHeight/2,1/1.3);});
+  $('abiZoomFit').addEventListener('click',function(){abiFitView();});
+}
+function openAbility(){refreshAbilityUI();$('abilityModal').style.display='grid';abiInitPanZoom();abiFitView();}
 function toggleAbility(){
   if($('abilityModal').style.display==='grid'){closeSubModal('abilityModal');return;}
   openAbility();
