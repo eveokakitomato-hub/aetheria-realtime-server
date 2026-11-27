@@ -1004,6 +1004,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>NPCの名前表示を調整しました。</b>宿屋の主人と酒場の店主の名前は、それぞれの店の中に入った時にだけ表示されるようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ほろ酔いの揺れを大きくしました。</b>アルトエールの「ほろ酔い」状態で、左右にふらつく動きがこれまでの2倍になりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>クールダウン表示の位置を変更しました。</b>スキルのクールダウン表示（残り秒数とゲージ）が、画面左上から右下のアイテムホットバーの上へ移動しました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ダッシュのSP消費を減らしました。</b>ダッシュ中のSP消費が5/秒から4/秒になりました。</span></li>
@@ -9882,8 +9883,9 @@ function skyTick(){
   }
   if(skyState.innkeeper&&skyState.innLabel&&innkeeperPos&&camera3d&&player){
     if(!skyState.pv)skyState.pv=new THREE.Vector3();
-    var idp=Math.hypot(player.x-innkeeperPos.x,player.y-innkeeperPos.y);
-    var isp=(idp<700)?projectToScreen(WX(innkeeperPos.x),terrainH(innkeeperPos.x,innkeeperPos.y)+25,WZ(innkeeperPos.y),skyState.pv):null;
+    var icx=player.x-innkeeperPos.cx, icy=player.y-innkeeperPos.cy, icc=Math.cos(innkeeperPos.rot), ics=Math.sin(innkeeperPos.rot);
+    var ilx=icx*icc-icy*ics, ilz=icx*ics+icy*icc;
+    var isp=(Math.abs(ilx)<54&&Math.abs(ilz)<44)?projectToScreen(WX(innkeeperPos.x),terrainH(innkeeperPos.x,innkeeperPos.y)+25,WZ(innkeeperPos.y),skyState.pv):null; /* his name shows only while the player is INSIDE the inn (the user's word): the label is a DOM overlay with no occlusion, so the old 700-unit range shone through walls and roofs from far away */
     if(isp){skyState.innLabel.style.display='block';skyState.innLabel.style.transform='translate(-50%,-100%) translate('+isp.x.toFixed(1)+'px,'+isp.y.toFixed(1)+'px)';}
     else skyState.innLabel.style.display='none';
   }
@@ -9917,8 +9919,9 @@ function skyTick(){
   }
   if(skyState.tavKeeper&&skyState.tavLabel&&tavernKeeperPos&&camera3d&&player){
     if(!skyState.pv)skyState.pv=new THREE.Vector3();
-    var tdp=Math.hypot(player.x-tavernKeeperPos.x,player.y-tavernKeeperPos.y);
-    var tsp=(tdp<700)?projectToScreen(WX(tavernKeeperPos.x),terrainH(tavernKeeperPos.x,tavernKeeperPos.y)+25,WZ(tavernKeeperPos.y),skyState.pv):null;
+    var tcx=player.x-tavernKeeperPos.cx, tcy=player.y-tavernKeeperPos.cy, tcc=Math.cos(tavernKeeperPos.rot), tcs=Math.sin(tavernKeeperPos.rot);
+    var tlx=tcx*tcc-tcy*tcs, tlz=tcx*tcs+tcy*tcc;
+    var tsp=(Math.abs(tlx)<108&&Math.abs(tlz)<53)?projectToScreen(WX(tavernKeeperPos.x),terrainH(tavernKeeperPos.x,tavernKeeperPos.y)+25,WZ(tavernKeeperPos.y),skyState.pv):null; /* same as the innkeeper: his name shows only while the player is INSIDE the tavern */
     if(tsp){skyState.tavLabel.style.display='block';skyState.tavLabel.style.transform='translate(-50%,-100%) translate('+tsp.x.toFixed(1)+'px,'+tsp.y.toFixed(1)+'px)';}
     else skyState.tavLabel.style.display='none';
   }
