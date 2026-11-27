@@ -360,6 +360,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .menu-item.danger b{color:#f0a3a8}
 .menu-note{font-size:11px;color:var(--dim);line-height:1.6;margin:12px 0 0}
 #bagModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+#boardModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #playersModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
 .bag-card h2{margin:0 0 4px;font-size:18px}
@@ -797,6 +798,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="bag-actions"><button id="closeBagBtn" type="button">閉じる</button></div>
     </div></div>
 
+    <div id="boardModal"><div class="bag-card">
+      <h2>📜 依頼掲示板</h2>
+      <p class="sub">冒険者ギルドの依頼一覧。今の依頼はここで受けることができます。</p>
+      <div id="boardList"></div>
+      <div class="bag-actions"><button id="closeBoardBtn" type="button">閉じる</button></div>
+    </div></div>
+
     <div id="playersModal"><div class="bag-card">
       <h2>◆ オンラインプレイヤー</h2>
       <p class="sub" id="playersSub">接続中のプレイヤー</p>
@@ -935,6 +943,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドに依頼掲示板ができました。</b>受付カウンターを低くして見通しを良くし、入って左側の壁に依頼掲示板を用意しました。掲示板の前に立ってEキーを押すと依頼一覧が開き、その場で今の依頼を受けることができます。これまでの依頼の達成状況や報酬も一覧で確認できます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンがもっと明るくなりました。</b>ギルド・宿屋・酒場の吊りランタンの明かりを強くし、光の届く範囲も広げました。夜の室内がこれまでより明るく、過ごしやすくなっています。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルド・宿屋・酒場のランタンが、本当に周りを照らすようになりました。</b>これまで光って見えるだけだった吊りランタンに、本物の明かりが灯りました。夕方から夜にかけて自動で点灯し、床やテーブル、壁を暖かい光で照らします。明かりは炎のように小さく揺れるので、夜のホールや客室がいっそう落ち着いた雰囲気になりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ルミナスの街灯ランプを消灯しました。</b>噴水広場や礼拝堂前、大階段まわりの街灯は明かりを落としました。夜の町はより深く静かな暗さになり、空の色の移ろいが際立つようになっています。</span></li>
@@ -1150,6 +1159,7 @@ var viewW=960, viewH=640;
 var camYaw=0, camPitch=0.02, camDist=560, camFov=70, atkAnimT=-9999;
 var player=null, enemies=[], projectiles=[], particles=[], dmgTexts=[], drops=[];
 var questIdx=0, questCount=0, target=null, lastAttack=0, potionCd=0;
+var boardAcceptedFor=-1; /* quest index accepted at the guild request board (-1 = none yet) */
 var skillCd={s1:0,s2:0,s3:0};
 var cdPrev={}, cdPanelCls=null; /* top-left cooldown panel state */
 /* item hotbar state: the bottom-right bar's 4 slots and the bottom-left
@@ -1374,7 +1384,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid';
 }
 /* ===== カーソル表示制御 =====
    マップ／メニューなどの画面を開いている間だけカーソルを使い、
@@ -1467,6 +1477,7 @@ function handleEscape(){
   if(menuOpen){closeGameMenu();return true;}
   if($('worldMapModal').style.display==='grid'){closeWorldMap();return true;}
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
+  if($('boardModal').style.display==='grid'){closeSubModal('boardModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
   if($('saveModal').style.display==='grid'){closeSubModal('saveModal');return true;}
@@ -2518,7 +2529,7 @@ function buildAltoData(){
   gwall(GCX+(GDH+(GHW-GDH)/2),GCY+GHD-GWT/2,GHW-GDH,GWT);            /* south wall, east of the door */
   gwall(GCX-GHW+GWT/2,GCY,GWT,GD-2*GWT);                             /* west wall */
   gwall(GCX+GHW-GWT/2,GCY,GWT,GD-2*GWT);                             /* east wall */
-  rect(GCX,GCY-49,156,18,{topKind:'prop',topH:18});                  /* the reception counter (1.3x, on the drawn counter) */
+  rect(GCX,GCY-49,156,18,{topKind:'prop',topH:13});                  /* the reception counter (1.3x, on the drawn counter; topH 18 -> 13 with the lowered counter) */
   rect(GCX-62,GCY+23,73,21,{topKind:'prop',topH:13});                /* hall table, west (1.3x) */
   rect(GCX+62,GCY+23,73,21,{topKind:'prop',topH:13});                /* hall table, east (1.3x) */
   [[-94,-10],[94,-10],[-94,44],[94,44]].forEach(function(pp){circ(GCX+pp[0],GCY+pp[1],9,{topKind:'prop',topH:86});}); /* the hall pillars (1.3x: offsets, radius and topH follow the drawn pillars) */
@@ -4125,12 +4136,12 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),questIdx,questCount,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),questIdx,questCount,boardAcceptedFor,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
     player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
-    quest:{idx:questIdx,count:questCount},
+    quest:{idx:questIdx,count:questCount,board:boardAcceptedFor},
     explored:exploredToString(),
     settings:snapshotSettings()};
 }
@@ -4213,7 +4224,7 @@ function applySaveData(data){
   if(collide(np.x,np.y,np.r)){var fs0=nearestFreeSpot(np.x,np.y,np.r);if(fs0){np.x=fs0.x;np.y=fs0.y;}else{np.x=SPAWN_X;np.y=SPAWN_Y;}} /* a saved spot that now sits inside a building resumes on the nearest open ground beside it; the initial spawn is only the last resort when nothing nearby is free */
   player=np;selectedClass=np.cls;
   var q=data.quest||{};
-  questIdx=Math.floor(num(q.idx,0,0,QUESTS.length-1));questCount=Math.floor(num(q.count,0,0,99));
+  questIdx=Math.floor(num(q.idx,0,0,QUESTS.length-1));questCount=Math.floor(num(q.count,0,0,99));boardAcceptedFor=Math.floor(num(q.board,-1,-1,QUESTS.length-1));
   skillCd={s1:0,s2:0,s3:0};target=null;projectiles=[];particles=[];dmgTexts=[];potionCd=0;
   if(data.savedAt){var d=new Date(data.savedAt);if(!isNaN(d.getTime()))lastSaveAt=d;}
   lastSavedKey=progressKey();
@@ -5189,9 +5200,56 @@ function nearestStuckArrow(maxD){
   stuckArrows.forEach(function(a){var d=Math.hypot(a.x-player.x,a.y-player.y);if(d<bd){bd=d;best=a;}});
   return best;
 }
+/* ================= GUILD REQUEST BOARD =================
+   The board hangs on the guild hall's WEST wall (the left-hand wall
+   from the door): its world position is the guild centre (13700,14945)
+   shifted west by the wall offset (local -105.8 x 1.3 scale). Stand
+   in front of it and press E (or tap the prompt) for the request
+   list; the current quest can be accepted right there. Accepting is
+   board bookkeeping — the hunt itself is tracked as before — and the
+   accepted index rides along in the save's quest block. */
+function nearGuildBoard(){
+  if(!player)return false;
+  var dx=player.x-13580, dy=player.y-14945;
+  return player.x<13650 && dx*dx+dy*dy<7225;
+}
+function refreshBoardUI(){
+  var html='';
+  for(var i=0;i<QUESTS.length;i++){
+    var it=QUESTS[i], st, btn='';
+    if(it.done){ st='<span class="bag-tag">全依頼達成</span>'; }
+    else if(i<questIdx){ st='<span class="bag-tag">達成済み</span>'; }
+    else if(i===questIdx){
+      if(boardAcceptedFor===i){ st='<span class="bag-tag">受注中</span>'; }
+      else { st='<span class="bag-tag">受注できます</span>'; btn='<button type="button" class="bag-use" data-accept="'+i+'">受ける</button>'; }
+    }
+    else { st='<span class="bag-tag">まだ受けられません</span>'; }
+    html+='<div class="bag-row"><div class="bag-ico">'+(it.done?'👑':(i<questIdx?'✅':(i===questIdx?'📜':'🔒')))+'</div><div class="bag-info"><b>'+it.title+'</b><small>'+it.desc+'</small><small>報酬: '+it.exp+' EXP / '+it.gold+' G'+((i===questIdx&&!it.done)?'　進捗 '+questCount+' / '+it.need:'')+'</small></div>'+st+btn+'</div>';
+  }
+  $('boardList').innerHTML=html;
+  var bs=$('boardList').querySelectorAll('[data-accept]');
+  for(var j=0;j<bs.length;j++){ (function(b){ b.addEventListener('click',function(){ acceptBoardQuest(parseInt(b.getAttribute('data-accept'),10)); }); })(bs[j]); }
+}
+function acceptBoardQuest(i){
+  if(i!==questIdx||boardAcceptedFor===i)return;
+  boardAcceptedFor=i;
+  beep(660,0.08,'triangle',0.05); setTimeout(function(){beep(880,0.1,'triangle',0.05);},70);
+  toast('📜 依頼「'+QUESTS[i].title+'」を受けた！');
+  chat('📜 <b>'+escHtml(player.name)+'</b> がギルドの掲示板で依頼「'+QUESTS[i].title+'」を受注した','sys');
+  refreshBoardUI();
+  requestSaveNow();
+}
+function openQuestBoard(){
+  if(!started||!player)return;
+  refreshBoardUI();
+  $('boardModal').style.display='grid';
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  syncCursorHide();
+}
 function tryInteract(){
   if(!started||!player||player.dead)return;
   var a=nearestStuckArrow(95);
+  if(nearGuildBoard()){openQuestBoard();return;}
   if(a){
     stuckArrows.splice(stuckArrows.indexOf(a),1);
     player.arrows++;
@@ -5204,6 +5262,7 @@ function tryInteract(){
 function refreshInteractPrompt(){
   var el=$('interactPrompt'); if(!el)return;
   if(!started||!player||player.dead||menuOpen||isAnyOverlayOpen()){el.style.display='none';return;}
+  if(nearGuildBoard()){el.innerHTML='<b>E</b>：依頼掲示板を見る';el.style.display='block';return;}
   if(nearestStuckArrow(95)){el.innerHTML='<b>E</b>：刺さった矢を回収する';el.style.display='block';return;}
   el.style.display='none';
 }
@@ -6843,9 +6902,16 @@ function buildAlto3D(){
       box(13,10,1.6,0xc9a86a,48,38,hd+18,gg9);
       /* ---- the hall interior ---- */
       [[-72,-8],[72,-8],[-72,34],[72,34]].forEach(function(pp){cyl(5,6.5,64,WOOD_D,pp[0],34,pp[1],gg9,8);}); /* pillars, floor to ceiling (on their collision circles) */
-      box(120,12,14,WOOD,0,8,-38,gg9);                                 /* the reception counter across the north end */
-      box(126,3,18,0xc9a86a,0,15.5,-38,gg9);                           /* counter top slab */
+      box(120,6,14,WOOD,0,5,-38,gg9);                                  /* the reception counter across the north end — LOWERED (top at local 8, was 14) so the receptionist's side and the hall read over it */
+      box(126,2,18,0xc9a86a,0,9,-38,gg9);                              /* counter top slab (lowered with the counter: top at local 10) */
       box(96,28,2.5,0x74522f,0,32,-hd+wt+1.5,gg9);                     /* the quest board on the north wall, behind the counter */
+      /* the REQUEST BOARD on the WEST wall — the left-hand wall as you
+         come in through the door. A framed board with paper notices
+         pinned on it; stand in front of it and press E to open the
+         request list (nearGuildBoard / openQuestBoard). */
+      box(2,34,112,WOOD_D,-hw+wt+0.6,32,0,gg9);
+      box(2.5,30,104,0x8a6a44,-hw+wt+1.6,32,0,gg9);
+      [[-38,39,10,8,0xf2ead8],[-16,28,9,7,0xe8d9a8],[6,40,10,8,0xf2ead8],[30,29,9,7,0xf2ead8],[-4,33,8,6,0xe8d9a8],[20,36,8,6,0xf2ead8],[-28,36,8,6,0xf2ead8],[40,40,8,6,0xe8d9a8]].forEach(function(pp){ box(1,pp[2],pp[3],pp[4],-hw+wt+3.1,pp[1],pp[0],gg9,false); });
       [-32,-11,11,32].forEach(function(px9,pi9){box(10,12,1,0xf2ead8,px9,32+(pi9%2?4:-3),-hd+wt+3.4,gg9,false);}); /* posted notices on the board */
       box(10,22,1.6,0xb03a30,-70,44,-hd+wt+1,gg9); box(10,22,1.6,0x3a6bd5,70,44,-hd+wt+1,gg9); /* banners inside, flanking the board */
       [-48,48].forEach(function(tx9){ /* two long hall tables with benches (on their collision rects) */
@@ -8992,6 +9058,7 @@ $('menuSaveBtn').addEventListener('click',function(){openFromMenu('saveModal');}
 $('menuHelpBtn').addEventListener('click',function(){openFromMenu('helpModal');});
 $('menuLogoutBtn').addEventListener('click',function(){doLogout();});
 $('closeBagBtn').addEventListener('click',function(){closeSubModal('bagModal');});
+$('closeBoardBtn').addEventListener('click',function(){closeSubModal('boardModal');});
 $('bagGrid').addEventListener('click',function(e){
   var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
   if(!slot||!player)return;
@@ -9073,7 +9140,7 @@ $('startBtn').addEventListener('click',function(){
   }
   var name=$('nameInput').value.trim()||'冒険者';
   player=makePlayer(name,selectedClass);
-  questIdx=0;questCount=0;lastSaveAt=null;lastSavedKey='';
+  questIdx=0;questCount=0;boardAcceptedFor=-1;lastSaveAt=null;lastSavedKey='';
   resetExplored(); stuckArrows=[]; aimTarget=null; cancelBowDraw(); markExplored();
   hovering=false; hoverTapT=0; clearHoverPress(); jumpY=0; jumpVY=0; topLift=0; /* a fresh character starts on a fresh world */
   setupSkillUI(selectedClass);
