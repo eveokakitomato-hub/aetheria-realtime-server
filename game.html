@@ -943,6 +943,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドのランタンを2つにしました。</b>ホールの吊りランタンを7つから2つに減らし、中央を挟んで左右対称に配置しました。夜のホールは、2つの明かりが作る落ち着いた雰囲気になっています。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンの明るさを調整しました。</b>ギルド・宿屋・酒場のランタンの光量を半分に落とし、夜の室内が落ち着いた明るさになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ランタンの明かりが正しく灯るようになりました。</b>光源の付け方の不具合で、ランタンが光って見えるだけで周りを照らせていなかったのを修正しました。夕方から夜にかけて、ギルド・宿屋・酒場の室内がランタンの明かりで本当に明るくなります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンの明かりを5倍にしました。</b>ギルド・宿屋・酒場の吊りランタンの光量を、これまでの5倍に引き上げました。夜の室内がぐっと明るくなっています。</span></li>
@@ -6811,7 +6812,7 @@ function buildAlto3D(){
          what you see and what blocks you stay in agreement. The
          window COUNT is cut from eighteen glowing fake panes to TEN
          real openings, picked so the hall keeps its daylight on top
-         of the seven lanterns: a low + high pair on the south face
+         of the two lanterns: a low + high pair on the south face
          and on the north face, and one low window in each side
          wall. */
       function gspan(cx,cz,w,d,y0,y1){ /* wall fabric between heights y0..y1, keeping the stone / plaster split at 36 */
@@ -6924,13 +6925,13 @@ function buildAlto3D(){
         box(44,2.5,6,WOOD_D,tx9,6,5,gg9); box(44,2.5,6,WOOD_D,tx9,6,31,gg9);
       });
       var rug9=box(96,1.2,64,0x9a4636,0,2.8,8,gg9,false); rug9.receiveShadow=true; /* the hall rug — a brighter weave than the old deep red */
-      /* hanging lanterns: SEVEN now (was three), a size bigger, and
+      /* hanging lanterns: TWO now (was seven), a size bigger, and
          each wrapped in a soft halo shell — the hall reads lamplit
          and welcoming instead of gloomy. Each lantern also
          registers a light spot (AETHERIA SKY): the sky system
          keeps a real PointLight on every spot from dusk to dawn,
          so the hall is truly lit at night. */
-      [[-72,8],[-36,8],[0,8],[36,8],[72,8],[-36,-26],[36,-26]].forEach(function(lp9){
+      [[-36,8],[36,8]].forEach(function(lp9){ /* TWO lanterns (was seven), a symmetric pair over the hall */
         cyl(0.8,0.8,10,0x3a3128,lp9[0],61,lp9[1],gg9,5);
         var ltn=sph(6,0xffd98a,lp9[0],54,lp9[1],gg9,{emissive:0xcf9a3a}); ltn.castShadow=false;
         var halo=sph(13,0xffd98a,lp9[0],54,lp9[1],gg9,{transparent:true,opacity:0.14,emissive:0xcf9a3a}); halo.castShadow=false;
