@@ -1001,6 +1001,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SPの仕様を微調整しました。</b>水泳中はSPが減るようになり、ダッシュ中のSP消費をこれまでの半分に減らしました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SPの仕様を変更しました。</b>SPは通常の移動や水泳では減らなくなり、ダッシュ中と攻撃の発動時に消費されるようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>酒場に店主がやってきました。</b>アルトの酒場で店主に話しかけると、Gで食事が買えるようになりました。パンや串焼き、ポトフなどで空腹・渇きを回復でき、料理によっては移動速度や最大HP・SP・MPが一定時間アップします。アルトエールには「ほろ酔い」効果も。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>ステータス画面の並び順を調整しました。</b>左の列を上から順に読むと、HP・攻撃力・防御力…と仕様どおりの順番で並ぶようになりました。</span></li>
@@ -4475,12 +4476,13 @@ function updateSkillUI(now){
    banner above the status panel shows which state you are in. */
 var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
 /* ---- survival stats: SP (stamina), hunger, thirst ----
-   SP is spent by DASHING and by warrior/archer attack activations;
-   ordinary movement and swimming cost nothing (the user's revision,
-   2026-11-27). It refills while standing still on land. Hunger and
+   SP is spent by DASHING, by SWIMMING and by warrior/archer
+   attack activations; ordinary movement on land costs nothing (the
+   user's revision, 2026-11-27). It refills while standing still on
+   land. Hunger and
    thirst drain with time; at zero, each empty gauge eats 1% of max
    HP per second (STARVE_HP_PER_SEC) until the player eats/drinks. */
-var SP_ATTACK_COST=5, SP_DASH_PER_SEC=10, SP_REGEN_PCT=5; /* SP regen: 5% of max SP per second while standing still (the user's rate) */
+var SP_ATTACK_COST=5, SP_DASH_PER_SEC=5, SP_SWIM_PER_SEC=4, SP_REGEN_PCT=5; /* SP regen: 5% of max SP per second while standing still (the user's rate) */
 var HUNGER_PER_SEC=100/2700, THIRST_PER_SEC=100/1800, STARVE_HP_PER_SEC=1; /* hunger empties in 45 min, thirst in 30 min (the user's rates) */
 var starveTickT=0, spWarnT=0, spThirstAcc=0, hpHealAcc=0, hpSampleV=-1, foodHealCredit=0;
 function spendSP(n){
@@ -4823,6 +4825,8 @@ function update(dt,now){
     if(!collide(player.x,ny,player.r,feetZ)) player.y=ny;
     if(mx)player.dir=mx>0?1:-1;
     player.walk+=dt*0.02*gmSpeedMul(); /* walk-cycle phase follows the actual ground speed (4x for gamemaster) */
+    /* SP (stamina): swimming drains it — ordinary movement is free */
+    if(player.swimming)player.sp=Math.max(0,player.sp-dt*0.001*SP_SWIM_PER_SEC);
   }
   /* TIPSY (the tavern's ale): while it lasts the player sways
      sideways on their own — a slow sine drift along the camera's
