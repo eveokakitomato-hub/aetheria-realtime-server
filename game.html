@@ -6033,8 +6033,8 @@ function init3D(){
   camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,1750);
   scene.add(camera3d);
   buildViewModel();
-  var hemi=new THREE.HemisphereLight(0xcfe5ff,0x7d8f66,1.05);scene.add(hemi); skyHemi=hemi; /* bright daytime sky fill: shadows stay soft and colours stay vivid */
-  sunLight=new THREE.DirectionalLight(0xfff6e6,1.55); /* high midday sun: bright near-white light, shorter shadows */
+  var hemi=new THREE.HemisphereLight(0xcfe5ff,0x7d8f66,1.9);scene.add(hemi); skyHemi=hemi; /* bright daytime sky fill: shadows stay soft and colours stay vivid */
+  sunLight=new THREE.DirectionalLight(0xfff6e6,3.1); /* high midday sun: bright near-white light, shorter shadows */
   sunLight.castShadow=true;
   if(sunLight.shadow.normalBias!==undefined)sunLight.shadow.normalBias=1.5; /* softens texture acne without peter-panning */
   sunLight.shadow.mapSize.set(1024,1024); /* 1536 -> 1024: the shadow map re-renders the near scene every frame, so its texel count is a constant cost; at the 520-unit shadow box the softer resolution is barely visible */
@@ -9212,15 +9212,17 @@ function skyBuildDom(){
   st.textContent='#aetheria-sky{position:fixed;inset:0;pointer-events:none;z-index:35;overflow:hidden}'+
     '#aetheria-sky canvas{position:absolute;inset:0;width:100%;height:100%}'+
     '#aetheria-sky .flash{position:absolute;inset:0;background:#fff;opacity:0}'+
-    '#aetheria-sky-hud{position:fixed;top:10px;left:10px;z-index:36;pointer-events:none;'+
-    'font-family:"Noto Sans JP",sans-serif;color:#f5efdf;background:rgba(10,14,29,.62);'+
-    'border:1px solid rgba(201,162,78,.5);border-radius:10px;padding:6px 12px;font-size:14px;line-height:1.5}';
+    '#aetheria-sky-hud{position:fixed;top:10px;right:12px;z-index:36;pointer-events:none;'+
+    'font-family:"Noto Sans JP",sans-serif;color:#f5efdf;background:rgba(10,14,12,.82);'+
+    'border:1px solid rgba(201,162,78,.5);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;line-height:1.5;white-space:nowrap}';
   document.head.appendChild(st);
   var root=document.createElement('div');root.id='aetheria-sky';
   root.innerHTML='<canvas></canvas><div class="flash"></div>';
   document.body.appendChild(root);
   var hud=document.createElement('div');hud.id='aetheria-sky-hud';hud.style.display='none';
-  document.body.appendChild(hud);
+  var pill=document.querySelector('.online-pill');
+  if(pill&&pill.parentNode){pill.parentNode.insertBefore(hud,pill);hud.style.position='static';}
+  else document.body.appendChild(hud);
   skyState.dom={root:root,canvas:root.querySelector('canvas'),flash:root.querySelector('.flash'),hud:hud};
   return skyState.dom;
 }
@@ -9268,11 +9270,11 @@ function skyTick(){
     if(scene.fog)scene.fog.color.set(sky.bottom);
   }
   if(scene.fog){var f=wm.fogMul;scene.fog.near=600*f;scene.fog.far=1650*(0.45+0.55*f);}
-  sunLight.intensity=1.55*sky.sun*wm.sun;
+  sunLight.intensity=3.1*sky.sun*wm.sun;
   sunLight.color.set(sky.sun<0.4?'#ffb37a':'#fff6e6');
-  if(skyHemi)skyHemi.intensity=1.05*(0.3+sky.amb*0.85)*(0.75+wm.sun*0.25);
+  if(skyHemi)skyHemi.intensity=1.9*(0.3+sky.amb*0.85)*(0.75+wm.sun*0.25);
   if(renderer&&renderer.toneMappingExposure!==undefined)
-    renderer.toneMappingExposure=0.72+0.52*Math.max(0,Math.min(1,sky.sun));
+    renderer.toneMappingExposure=0.78+0.82*Math.max(0,Math.min(1,sky.sun));
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
   var ctx=cvs.getContext('2d');ctx.clearRect(0,0,wpx,hpx);
