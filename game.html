@@ -398,6 +398,21 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 .st-row span{color:var(--muted)}
 .st-row b{color:var(--paper);font-weight:900}
 @media (max-width:560px){.status-grid{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
+#abilityModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+.abi-card{max-width:980px}
+.abi-stage-wrap{position:relative;overflow:hidden;margin-top:6px}
+.abi-stage{position:relative;width:920px;height:600px;transform-origin:0 0;background:radial-gradient(ellipse at 50% 42%,rgba(216,169,64,.08),rgba(0,0,0,.25) 72%);border:1px solid var(--line2);border-radius:10px}
+.abi-line{stroke:#44534a;stroke-width:2}
+.abi-line.mid{stroke:#8a9a8f}
+.abi-line.on{stroke:var(--gold2);stroke-width:2.5}
+.abi-node{position:absolute;transform:translate(-50%,-50%);min-width:56px;padding:7px 8px;border-radius:9px;border:1px solid #44534a;background:#232d27;color:#7d8b81;font-weight:900;font-size:13px;cursor:pointer;z-index:2}
+.abi-node.core{width:68px;height:68px;min-width:68px;padding:0;border-radius:0;clip-path:polygon(50% 0,100% 38%,81% 100%,19% 100%,0 38%);display:grid;place-items:center;font-size:15px}
+.abi-node.avail{background:#1d2b23;color:var(--paper);border-color:var(--gold2);box-shadow:0 0 10px rgba(216,169,64,.45)}
+.abi-node.nopoint{background:#1d2b23;color:var(--paper)}
+.abi-node.learned{background:linear-gradient(180deg,#e8c766,#c49a35);color:#241a04;border-color:#8a6d1f}
+.abi-node.sel{outline:2px solid #fff;outline-offset:1px}
+.abi-detail{margin-top:10px;min-height:44px;font-size:13px}
+#abiLearnBtn{background:var(--gold2);color:#241a04;border:0;border-radius:7px;padding:5px 14px;font-weight:900;cursor:pointer;margin-left:8px}
 #innStatus{font-size:14px;margin:10px 0 4px;color:var(--paper)}
 #playersModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
@@ -770,6 +785,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <tr><td>アイテムホットバー</td><td>画面右下の4マス。バッグのアイテムを登録しておけば、<kbd>5</kbd>〜<kbd>8</kbd> キーかクリックで即座に使えます。登録は、バッグを開いてアイテムをマスへドラッグ＆ドロップするか、バッグの「ホットバー登録モード」でアイテムを選んでからマスをクリック。マスの右クリックでも変更できます</td></tr>
         <tr><td>ポーション</td><td>初期設定は <kbd>4</kbd> キー。HPを45回復。敵を倒すとたまにドロップ</td></tr>
         <tr><td>メニュー</td><td><kbd>Esc</kbd> キーでメニューを開きます。設定・サウンド設定・バッグ・セーブ・遊び方・ログアウトはすべてこのメニューから開けます（ゲーム画面上に専用ボタンはありません）</td></tr>
+        <tr><td>アビリティ</td><td><kbd>C</kbd> キーでアビリティツリーを開きます。レベルアップで得るアビリティポイント（AP）を使い、5系統・全30種のアビリティを習得できます。前提のアビリティから順にしか取れません</td></tr>
         <tr><td>パリィ</td><td><kbd>Q</kbd> キーを<b>敵の攻撃が当たる瞬間</b>に押すとパリィが発動し、ダメージを受けずに敵をノックバックして<b>2秒間スタン</b>させます。遠距離攻撃の場合は、敵はスタンせず、その弾だけを消します（Qはしゃがみと同じキーです。パリィが成功するとしゃがみは解除されます）</td></tr>
         <tr><td>バッグ</td><td><kbd>R</kbd> キーでバッグ（所持品）を直接開閉できます。アイテム欄は最大26種類まで入るスクロール式で、ポーションや矢などが種類ごとに個数付きで並び、クリックで使用・装備できます</td></tr>
         <tr><td>設定</td><td>Escメニューの「設定」から、攻撃・スキル・ポーションのキー割り当てと、マウス／ドラッグ／カーソルキーの視点感度を変更できます</td></tr>
@@ -817,6 +833,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span><span class="mi-key">R</span></button>
         <button type="button" class="menu-item" id="menuStatusBtn"><span class="mi-ico">📊</span><span class="mi-body"><b>ステータス</b><small>能力値を確認する</small></span><span class="mi-key">Z</span></button>
+        <button type="button" class="menu-item" id="menuAbilityBtn"><span class="mi-ico">🌟</span><span class="mi-body"><b>アビリティ</b><small>アビリティツリーで能力を伸ばす</small></span><span class="mi-key">C</span></button>
         <button type="button" class="menu-item" id="menuPlayersBtn"><span class="mi-ico">◆</span><span class="mi-body"><b>オンラインプレイヤー</b><small>今つながっている実プレイヤーの一覧を見る</small></span></button>
         <button type="button" class="menu-item" id="menuMapBtn"><span class="mi-ico">🗺️</span><span class="mi-body"><b>全体マップ</b><small>探索済みエリアの地図を見る（歩いた場所だけが描かれる）</small></span><span class="mi-key">M</span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
@@ -874,6 +891,17 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <p class="sub" id="statusHead"></p>
       <div class="status-grid" id="statusGrid"></div>
       <div class="bag-actions"><button id="closeStatusBtn" type="button">閉じる</button></div>
+    </div></div>
+
+    <div id="abilityModal"><div class="bag-card abi-card">
+      <h2>🌟 アビリティ</h2>
+      <p class="sub" id="abiHead"></p>
+      <div class="abi-stage-wrap" id="abiStageWrap"><div class="abi-stage" id="abiStage">
+        <svg id="abiLines" width="920" height="600" style="position:absolute;left:0;top:0"></svg>
+        <div id="abiNodes"></div>
+      </div></div>
+      <div class="abi-detail" id="abiDetail"></div>
+      <div class="bag-actions"><button id="closeAbilityBtn" type="button">閉じる</button></div>
     </div></div>
 
     <div id="playersModal"><div class="bag-card">
@@ -1014,6 +1042,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アビリティツリーが追加されました。</b>Cキー（またはメニュー）で開き、レベルアップで得るアビリティポイントを使って5系統・全30種のアビリティを習得できます。攻撃・防御・俊敏・魔力・技巧を伸ばして、自分だけのビルドを作りましょう。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ゴブリンの攻撃モーションを変更しました。</b>2.4m手前で立ち止まって拳を溜め、2m踏み込みながら振り下ろす攻撃になりました。踏み込む瞬間に離れれば避けることもできます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>パリィの仕様を調整しました。</b>遠距離攻撃をパリィした場合は、敵をノックバック・スタンさせず、その攻撃（弾）だけを消すようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>パリィが追加されました。</b>敵の攻撃が当たる瞬間にQキーを押すと、ダメージを受けずに敵をノックバックし、2秒間スタンさせます。</span></li>
@@ -1489,7 +1518,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid'||$('tavernModal').style.display==='grid'||$('statusModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid'||$('tavernModal').style.display==='grid'||$('statusModal').style.display==='grid'||$('abilityModal').style.display==='grid';
 }
 /* ===== カーソル表示制御 =====
    マップ／メニューなどの画面を開いている間だけカーソルを使い、
@@ -1541,6 +1570,7 @@ function openFromMenu(id,anchor){
   if(id==='bagModal'){refreshBagUI();document.body.classList.add('bag-open');}
   if(id==='playersModal')refreshPlayersUI();
   if(id==='statusModal')refreshStatusUI();
+  if(id==='abilityModal')refreshAbilityUI();
   if(id==='worldMapModal')drawWorldMap();
   $(id).style.display='grid';
   if(id==='settingsModal'&&anchor==='sound'){
@@ -1587,6 +1617,7 @@ function handleEscape(){
   if($('innModal').style.display==='grid'){closeSubModal('innModal');return true;}
   if($('tavernModal').style.display==='grid'){closeSubModal('tavernModal');return true;}
   if($('statusModal').style.display==='grid'){closeSubModal('statusModal');return true;}
+  if($('abilityModal').style.display==='grid'){closeSubModal('abilityModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
   if($('saveModal').style.display==='grid'){closeSubModal('saveModal');return true;}
@@ -1617,7 +1648,7 @@ function refreshBagUI(){
     var d=DROP_ITEMS[id];
     items.push({ico:d.ico,name:d.name,cnt:'×'+n,act:id,drop:d});
   });
-  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類｜重量 '+(Math.round(carryWeight()*10)/10)+' / '+WEIGHT_CAPACITY+(isOverweight()?' ⚠オーバー（移動速度低下中）':'')+'（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
+  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類｜重量 '+(Math.round(carryWeight()*10)/10)+' / '+WEIGHT_CAP()+(isOverweight()?' ⚠オーバー（移動速度低下中）':'')+'（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
   var html='';
   items.forEach(function(it){
     var title=it.drop?(' title="'+escHtml(it.drop.cat+'｜'+it.drop.desc)+'"'):'';
@@ -3279,7 +3310,7 @@ function beep(f,d,type,v){
 /* ================= ENTITIES ================= */
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
-  return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,sp:100,maxSp:100,atk:c.atk,def:c.def,
+  return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,sp:100,maxSp:100,atk:c.atk,def:c.def,matk:c.atk,mdef:c.def,abi:{},
     lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,hunger:100,thirst:100,dir:1,walk:0,dead:false,inv:{},jellySlowUntil:0,oilUntil:0,fbHp:0,fbHpUntil:0,fbSp:0,fbSpUntil:0,fbMp:0,fbMpUntil:0,fbSpdUntil:0,tipsyUntil:0}; /* fb* = tavern food buffs (applied max-stat amounts + expiries), session only */ /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0). inv = {dropItemId:count} for monster drops; jellySlowUntil / oilUntil are the slime-jelly / slime-oil buff timers (session only) */
 }
 function expNeed(lv){return 80+lv*55;}
@@ -3538,6 +3569,7 @@ function nearestEnemy(maxDist){
 }
 function damageEnemy(e,dmg,crit){
   if(!e||e.dead)return;
+  dmg=Math.round(dmg*(1+abiBonus().pen/100)); /* 貫通補正: ability penetration scales all player damage */
   e.hp-=dmg;e.hitFlash=6;e.aggro=player;e.state='chase';
   /* SLIME CYCLE INTERRUPT: a slime (or magma slime) that takes even
      one hit while it is returning to its pre-attack spot, or resting
@@ -3606,8 +3638,9 @@ function gainExp(n){
   while(player.exp>=expNeed(player.lv)){
     player.exp-=expNeed(player.lv);player.lv++;leveled=true;
     var c=CLASSES[player.cls];
-    player.maxHp+=14;player.maxMp+=6;player.atk+=3;player.hp=player.maxHp;player.mp=player.maxMp;
+    player.maxHp+=14;player.maxMp+=6;player.atk+=3;player.matk+=3;player.hp=player.maxHp;player.mp=player.maxMp;
     $('levelUpText').textContent=player.name+' は Lv.'+player.lv+' になった！ HP/MP全回復';
+    chat('✨ アビリティポイント +1！ Cキー（またはメニュー）でアビリティツリーを開けます','sys');
     var lu=$('levelUp');lu.classList.add('show');setTimeout(function(){lu.classList.remove('show');},2400);
     beep(660,0.12,'square',0.05);setTimeout(function(){beep(880,0.18,'square',0.05);},110);
     burst(player.x,player.y,'#e8c268',30);
@@ -3667,19 +3700,19 @@ function releaseBow(){
   cancelBowDraw();
   if(!started||!player||player.dead||player.cls!=='archer')return;
   var now=performance.now();
-  if(now-lastAttack<380)return;
+  if(now-lastAttack<atkCdMs())return;
   lastAttack=now;
   fireArrow(p,1,full);
 }
 function fireArrow(power,mult,full){
   if(!bowEquipped()){noBowNotice();return;}
   if(player.arrows<=0){noArrows();return;}
-  if(!spendSP(SP_ATTACK_COST))return; /* an archer's shot is an attack activation: it costs SP */
+  if(!spendSP(spAtkCost()))return; /* an archer's shot is an attack activation: it costs SP */
   player.arrows--; atkAnimT=performance.now();
   var spd=6+power*24, cp2=Math.cos(camPitch);   // ≈11.3 (tap) → 30 (full draw): range grows with draw; with the lighter arrow gravity below (0.24/frame²) a level full-draw shot carries ≈30m and a tap shot ≈11m
   projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
     z:playerGroundZ()+15+jumpY,vz:Math.sin(camPitch)*spd, /* arrows leave at shoulder height (1.5m) */
-    dmg:Math.round(player.atk*(mult||1)*(full?1.15:1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:Math.round(100+power*180),grav:0.24}); /* grav is player-arrow only (enemy shots are not arrow projectiles); life is long enough that even a high full-draw arc lands before the arrow expires */
+    dmg:Math.round(atkBase()*(mult||1)*(full?1.15:1)*(0.9+Math.random()*0.25)),from:'player',emoji:'➤',color:'#d8c9a3',life:Math.round(100+power*180),grav:0.24}); /* grav is player-arrow only (enemy shots are not arrow projectiles); life is long enough that even a high full-draw arc lands before the arrow expires */
   beep(full?980:640+power*260,0.07,'sawtooth',0.03);
   if(full)flashCrosshair(null);
   updateHUD();
@@ -3687,8 +3720,8 @@ function fireArrow(power,mult,full){
 function playerAttack(mult,skillKey){
   if(!started||player.dead)return;
   var now=performance.now(),c=CLASSES[player.cls];
-  if(player.cls==='warrior'&&!spendSP(SP_ATTACK_COST))return; /* a warrior's attack activation costs SP (mage attacks do not) */
-  if(!skillKey){if(now-lastAttack<380)return;lastAttack=now;}
+  if(player.cls==='warrior'&&!spendSP(spAtkCost()))return; /* a warrior's attack activation costs SP (mage attacks do not) */
+  if(!skillKey){if(now-lastAttack<atkCdMs())return;lastAttack=now;}
   /* ARCHER skills fire instantly at a solid draw; the BASIC attack goes
      through the draw-and-release system above (see startBowDraw). */
   if(player.cls==='archer'){
@@ -3705,13 +3738,13 @@ function playerAttack(mult,skillKey){
     if(!tgt){if(!skillKey)toast('近くに敵がいません');return;}
     target=tgt;
     var ang=Math.atan2(tgt.y-player.y,tgt.x-player.x);
-    projectiles.push({x:player.x,y:player.y-6,vx:Math.cos(ang)*8.5,vy:Math.sin(ang)*8.5,dmg:Math.round(player.atk*(mult||1)*(0.9+Math.random()*0.25)),from:'player',emoji:c.proj,color:c.color,life:44});
+    projectiles.push({x:player.x,y:player.y-6,vx:Math.cos(ang)*8.5,vy:Math.sin(ang)*8.5,dmg:Math.round(atkBase()*(mult||1)*(0.9+Math.random()*0.25)),from:'player',emoji:c.proj,color:c.color,life:44});
     beep(c.cls==='mage'?300:700,0.07,'sawtooth',0.03);
   }else{
     if(!e){if(!skillKey){swingFx();}return;}
     target=e;player.dir=e.x>=player.x?1:-1;swingFx();
-    var crit=Math.random()<0.15;
-    var dmg=Math.round(player.atk*(mult||1)*(0.9+Math.random()*0.25)*(crit?1.7:1));
+    var crit=Math.random()<critRate();
+    var dmg=Math.round(atkBase()*(mult||1)*(0.9+Math.random()*0.25)*(crit?critMult():1));
     damageEnemy(e,dmg,crit);
     beep(190,0.07,'square',0.045);
   }
@@ -3725,18 +3758,19 @@ function useSkill(n){
   var c=CLASSES[player.cls],key='s'+n,sk=c[key],now=performance.now();
   if(now<skillCd[key])return;
   if(player.cls==='archer'&&!bowEquipped()){noBowNotice();return;} /* every archer skill is a bow skill: no bow in hand, no skill (and no MP / cooldown spent) */
-  if(player.mp<sk.mp){toast('MPが足りません');beep(140,0.1,'square',0.04);return;}
-  if((player.cls==='warrior'||player.cls==='archer')&&player.sp<SP_ATTACK_COST){toast('SPが足りません');beep(140,0.1,'square',0.04);return;} /* checked before MP is spent, so a stamina-blocked skill costs nothing */
+  var mpCost=Math.max(1,Math.round(sk.mp*(1-abiBonus().mpeff/100))); /* MP効率: ability efficiency discounts skill MP */
+  if(player.mp<mpCost){toast('MPが足りません');beep(140,0.1,'square',0.04);return;}
+  if((player.cls==='warrior'||player.cls==='archer')&&player.sp<spAtkCost()){toast('SPが足りません');beep(140,0.1,'square',0.04);return;} /* checked before MP is spent, so a stamina-blocked skill costs nothing */
   if(player.cls==='archer'&&!sk.aoe&&player.arrows<=0){noArrows();return;}
   if(player.cls==='archer'&&sk.aoe){ /* アローレインは矢を3本消費する */
     if(player.arrows<3){noArrows();return;}
     player.arrows-=3; updateHUD();
   }
-  player.mp-=sk.mp;skillCd[key]=now+sk.cd;
+  player.mp-=mpCost;skillCd[key]=now+sk.cd*(player.cls==='mage'?(1-abiBonus().cast/100):1); /* 詠唱効率 (mage): chanting efficiency shortens skill cooldowns */
   if(sk.aoe){
-    if(player.cls==='warrior'||player.cls==='archer')player.sp-=SP_ATTACK_COST; /* AoE skills fire from here, not via playerAttack/fireArrow: charge their SP here */
+    if(player.cls==='warrior'||player.cls==='archer')player.sp-=spAtkCost(); /* AoE skills fire from here, not via playerAttack/fireArrow: charge their SP here */
     var hit=0;
-    enemies.slice().forEach(function(e){if(Math.hypot(e.x-player.x,e.y-player.y)<sk.aoe+e.r){damageEnemy(e,Math.round(player.atk*sk.mult*(0.9+Math.random()*0.2)),Math.random()<0.15);hit++;}});
+    enemies.slice().forEach(function(e){if(Math.hypot(e.x-player.x,e.y-player.y)<sk.aoe+e.r){damageEnemy(e,Math.round(atkBase()*sk.mult*(0.9+Math.random()*0.2)),Math.random()<critRate());hit++;}});
     burst(player.x,player.y,c.color,26);
     for(var i=0;i<22;i++){var a=i/22*Math.PI*2;particles.push({x:player.x+Math.cos(a)*sk.aoe*0.7,y:player.y+Math.sin(a)*sk.aoe*0.7,vx:Math.cos(a)*1.5,vy:Math.sin(a)*1.5,t:0,life:16,color:c.color,r:3});}
     beep(240,0.18,'sawtooth',0.05);
@@ -3752,9 +3786,10 @@ function usePotion(){
   if(player.potions<=0){toast('ポーションがありません（敵がたまにドロップします）');return;}
   if(player.hp>=player.maxHp){toast('HPは満タンです');return;}
   player.potions--;potionCd=now+900;
-  player.hp=Math.min(player.maxHp,player.hp+45);
-  player.thirst=Math.min(100,player.thirst+25); /* a potion is a drink: it also wets the throat (thirst +25) */
-  addDmg(player.x,player.y,'+45','#7de08d',true);burst(player.x,player.y,'#7de08d',14);
+  var potHeal=Math.round(45*(1+abiBonus().heal/100)); /* 治癒補正 */
+  player.hp=Math.min(player.maxHp,player.hp+potHeal);
+  player.thirst=Math.min(thirstMax(),player.thirst+25); /* a potion is a drink: it also wets the throat (thirst +25) */
+  addDmg(player.x,player.y,'+'+potHeal,'#7de08d',true);burst(player.x,player.y,'#7de08d',14);
   beep(520,0.1,'sine',0.05);updateHUD();
 }
 /* ================= ITEMS & ITEM HOTBAR =================
@@ -3812,10 +3847,10 @@ function carryWeight(){
   if(player.inv)for(var id in player.inv){var d=DROP_ITEMS[id];if(d&&d.w)w+=d.w*player.inv[id];}
   return w;
 }
-function isOverweight(){return carryWeight()>WEIGHT_CAPACITY;}
+function isOverweight(){return carryWeight()>WEIGHT_CAP();}
 function weightSpeedMul(){
-  var w=carryWeight(); if(w<=WEIGHT_CAPACITY)return 1;
-  return Math.max(0.3,0.6-0.3*(w-WEIGHT_CAPACITY)/WEIGHT_CAPACITY);
+  var w=carryWeight(), cap=WEIGHT_CAP(); if(w<=cap)return 1;
+  return Math.max(0.3,0.6-0.3*(w-cap)/cap);
 }
 var weightOverPrev=false;
 function rollSlimeDrop(){
@@ -3838,9 +3873,9 @@ function useDropItem(act){
   if(d.use==='jelly'){
     if(invCount(act)<=0){toast('「'+d.name+'」を持っていません');return;}
     invAdd(act,-1);
-    var hpBefJ=player.hp;player.hp=Math.min(player.maxHp,player.hp+10);foodHealCredit+=player.hp-hpBefJ; /* HP healed by eating is credited: it must not cost hunger (sampler below) */
+    var hpBefJ=player.hp;player.hp=Math.min(player.maxHp,player.hp+Math.round(10*(1+abiBonus().heal/100)));foodHealCredit+=player.hp-hpBefJ; /* 治癒補正 applies to food too */ /* HP healed by eating is credited: it must not cost hunger (sampler below) */
     player.mp=Math.min(player.maxMp,player.mp+5);
-    player.hunger=Math.min(100,player.hunger+40); /* jelly is food: it fills the belly (hunger +40) */
+    player.hunger=Math.min(hungerMax(),player.hunger+40); /* jelly is food: it fills the belly (hunger +40) */
     player.jellySlowUntil=now+10000;
     addDmg(player.x,player.y,'+10 HP / +5 MP','#7de08d',true);
     burst(player.x,player.y,'#a8e6a1',12);
@@ -3949,6 +3984,89 @@ function openItemPicker(target,anchorEl){
   pk.style.top=Math.max(6,r.top-pk.offsetHeight-8)+'px';
 }
 function closeItemPicker(){var pk=$('itemPicker');if(pk)pk.style.display='none';pickerTarget=null;}
+/* ================= ABILITY TREE =================
+   Five trees (強撃/守護/俊敏/叡智/技巧), six nodes each, laid out like
+   the user's constellation sketch: a pentagon core, a tier-2 main
+   node with one branch, a tier-3 main node with two branches.
+   Learning costs 1 AP; AP = level − 1 (one per level-up, granted
+   retroactively). Prerequisites: tier-2 main ← core, tier-2 branch
+   ← tier-2 main, tier-3 main ← tier-2 main, tier-3 branches ←
+   tier-3 main. Flat HP/MP/SP bonuses are BAKED into the maxima at
+   learn time (they persist through the normal save fields); every
+   other bonus is COMPUTED live by abiBonus() and applied at its
+   system: patk/matk (damage), pdef/mdef (hurtPlayer — magic sources
+   meet mdef), weight (carry capacity), aspd (attack cooldown), mspd
+   (speed chain), crit/critd (crit rolls), parry (window width), pen
+   (damageEnemy multiplier), speffA/speffM (SP costs/drains), mpeff
+   (skill MP), heal (potion/jelly), cast (mage skill cooldowns),
+   hunger/thirst (survival maxima), search (identify range), and the
+   resistances (status display; no player ailment systems yet). */
+var ABILITIES={
+  gouki:{tree:'pow',name:'強撃',req:null,fx:'物理基礎攻撃力+15・重量+10',b:{patk:15,weight:10}},
+  moukou:{tree:'pow',name:'猛攻',req:'gouki',fx:'物理基礎攻撃力+20・攻撃速度+4%',b:{patk:20,aspd:4}},
+  hunsai:{tree:'pow',name:'粉砕',req:'moukou',fx:'パリィ補正+6%・貫通補正+8%',b:{parry:6,pen:8}},
+  juugeki:{tree:'pow',name:'重撃',req:'moukou',fx:'物理基礎攻撃力+25・貫通補正+12%',b:{patk:25,pen:12}},
+  gouriki:{tree:'pow',name:'剛力',req:'juugeki',fx:'攻撃速度+4%・SP+20・重量+20',b:{aspd:4,sp:20,weight:20}},
+  hakai:{tree:'pow',name:'破壊',req:'juugeki',fx:'会心威力+30%・貫通補正+15%',b:{critd:30,pen:15}},
+  shugo:{tree:'def',name:'守護',req:null,fx:'基礎HP+20・重量+20',b:{hp:20,weight:20}},
+  gankyou:{tree:'def',name:'頑強',req:'shugo',fx:'物理基礎防御力+20・魔法基礎防御力+20',b:{pdef:20,mdef:20}},
+  kenrou:{tree:'def',name:'堅牢',req:'gankyou',fx:'パリィ補正+6%・重量+30',b:{parry:6,weight:30}},
+  teppeki:{tree:'def',name:'鉄壁',req:'gankyou',fx:'物理基礎防御力+30・魔法基礎防御力+30',b:{pdef:30,mdef:30}},
+  shiketsu:{tree:'def',name:'止血',req:'teppeki',fx:'基礎HP+40・毒耐性+25%・出血耐性+25%',b:{hp:40,rpois:25,rbleed:25}},
+  fukutsu:{tree:'def',name:'不屈',req:'teppeki',fx:'基礎HP+40・麻痺耐性+25%・気絶耐性+25%',b:{hp:40,rpara:25,rstun:25}},
+  shunbin:{tree:'agi',name:'俊敏',req:null,fx:'SP+20・移動速度+5%',b:{sp:20,mspd:5}},
+  rengeki:{tree:'agi',name:'連撃',req:'shunbin',fx:'攻撃速度+6%・SP効率（攻撃）+20%',b:{aspd:6,speffA:20}},
+  binshou:{tree:'agi',name:'敏捷',req:'rengeki',fx:'SP+30・移動速度+8%',b:{sp:30,mspd:8}},
+  jinrai:{tree:'agi',name:'迅雷',req:'rengeki',fx:'会心率+4%・会心威力+20%',b:{crit:4,critd:20}},
+  keigyou:{tree:'agi',name:'軽業',req:'jinrai',fx:'移動速度+10%・SP効率（移動）+30%',b:{mspd:10,speffM:30}},
+  fudan:{tree:'agi',name:'不断',req:'jinrai',fx:'SP+40・攻撃速度+10%',b:{sp:40,aspd:10}},
+  eichi:{tree:'int',name:'叡智',req:null,fx:'魔法基礎攻撃力+10・MP+30',b:{matk:10,mp:30}},
+  meiseki:{tree:'int',name:'明晰',req:'eichi',fx:'MP効率+25%・MP+30',b:{mpeff:25,mp:30}},
+  jiai:{tree:'int',name:'慈愛',req:'meiseki',fx:'全耐性+5%・治癒補正+12%・MP+30',b:{rall:5,heal:12,mp:30}},
+  kenja:{tree:'int',name:'賢者',req:'meiseki',fx:'魔法基礎攻撃力+25・MP効率+15%・MP+50',b:{matk:25,mpeff:15,mp:50}},
+  tankyuu:{tree:'int',name:'探求',req:'kenja',fx:'魔法基礎攻撃力+35・詠唱効率+8%・MP+40',b:{matk:35,cast:8,mp:40}},
+  seisui:{tree:'int',name:'聖水',req:'kenja',fx:'HP+50・治癒補正+24%・MP+40',b:{hp:50,heal:24,mp:40}},
+  gikou:{tree:'tec',name:'技巧',req:null,fx:'重量+10・空腹値+15・渇き値+15',b:{weight:10,hunger:15,thirst:15}},
+  sakuteki:{tree:'tec',name:'索敵',req:'gikou',fx:'SP+15・移動速度+4%・探索範囲+25%',b:{sp:15,mspd:4,search:25}},
+  kanpa:{tree:'tec',name:'看破',req:'sakuteki',fx:'会心率+4%',b:{crit:4}},
+  katsuryoku:{tree:'tec',name:'活力',req:'sakuteki',fx:'会心率+6%・会心威力+20%',b:{crit:6,critd:20}},
+  shinsoku:{tree:'tec',name:'神速',req:'katsuryoku',fx:'SP+20・移動速度+5%・攻撃速度+8%',b:{sp:20,mspd:5,aspd:8}},
+  chimei:{tree:'tec',name:'致命',req:'katsuryoku',fx:'会心威力+45%',b:{critd:45}}
+};
+var ABILITY_IDS=Object.keys(ABILITIES);
+var ABI_KEYS=['patk','matk','pdef','mdef','weight','aspd','mspd','crit','critd','parry','pen','speffA','speffM','mpeff','heal','cast','rpois','rpara','rbleed','rstun','rall','hunger','thirst','search'];
+function abiBonusFor(abi){
+  var out={}; for(var i=0;i<ABI_KEYS.length;i++)out[ABI_KEYS[i]]=0;
+  if(abi)for(var id in abi){var n=ABILITIES[id]; if(!n)continue; for(var j=0;j<ABI_KEYS.length;j++){var k=ABI_KEYS[j]; if(n.b[k])out[k]+=n.b[k];}}
+  return out;
+}
+function abiBonus(){return abiBonusFor(player?player.abi:null);}
+function abiLearnedCount(){if(!player||!player.abi)return 0;var n=0;for(var id in player.abi)if(ABILITIES[id])n++;return n;}
+function abiPoints(){if(!player)return 0;return Math.max(0,(player.lv-1)-abiLearnedCount());}
+function abiKey(){if(!player||!player.abi)return'';return ABILITY_IDS.map(function(id){return player.abi[id]?1:0;}).join('');}
+function hungerMax(){return 100+abiBonus().hunger;}
+function thirstMax(){return 100+abiBonus().thirst;}
+function WEIGHT_CAP(){return WEIGHT_CAPACITY+abiBonus().weight;}
+function atkCdMs(){return Math.round(380/(1+abiBonus().aspd/100));}
+function critRate(){return 0.15+abiBonus().crit/100;}
+function critMult(){return 1.7+abiBonus().critd/100;}
+function spAtkCost(){return Math.max(1,Math.round(SP_ATTACK_COST*(1-abiBonus().speffA/100)));}
+function atkBase(){var b=abiBonus();return player.cls==='mage'?((player.matk!=null?player.matk:player.atk)+b.matk):(player.atk+b.patk);}
+function abiSearchMul(){return 1+abiBonus().search/100;}
+function learnAbility(id){
+  if(!player||!player.abi)return;
+  var n=ABILITIES[id]; if(!n||player.abi[id])return;
+  if(n.req&&!player.abi[n.req]){toast('先に「'+ABILITIES[n.req].name+'」が必要です');beep(160,0.1,'square',0.04);return;}
+  if(abiPoints()<=0){toast('アビリティポイントが足りません（レベルアップで増えます）');beep(160,0.1,'square',0.04);return;}
+  player.abi[id]=1;
+  if(n.b.hp){player.maxHp+=n.b.hp;player.hp+=n.b.hp;} /* flat maxima are baked in at learn time */
+  if(n.b.mp){player.maxMp+=n.b.mp;player.mp+=n.b.mp;}
+  if(n.b.sp){player.maxSp+=n.b.sp;player.sp+=n.b.sp;}
+  toast('✨ アビリティ「'+n.name+'」を習得！ '+n.fx,3000);
+  beep(880,0.1,'triangle',0.05); setTimeout(function(){beep(1320,0.14,'triangle',0.05);},90);
+  refreshAbilityUI(); updateHUD(); requestSaveNow();
+}
+
 /* ================= PARRY (Q) =================
    Pressing Q in time with an enemy's attack parries it (the user's
    spec): the blow deals no damage, and the attacker is knocked back
@@ -3967,7 +4085,7 @@ function tryParry(){
   if(!started||!player||player.dead||hovering)return; /* while floating, Q is the descend key */
   var now=performance.now();
   if(now<parryCdUntil)return;
-  parryUntil=now+PARRY_WINDOW_MS;
+  parryUntil=now+PARRY_WINDOW_MS*(1+abiBonus().parry/100); /* パリィ補正: widens the timing window */
   parryCdUntil=now+PARRY_CD_MS;
 }
 function parrySpark(x,y){ /* the shared parry flash: floater, sparks and the metallic ring */
@@ -3998,7 +4116,8 @@ function hurtPlayer(dmg,src){
   if(src&&performance.now()<parryUntil){doParry(src);return;} /* PARRY: timed Q — no damage, attacker knocked back + stunned */
   if(isSafe(player.x,player.y))return;
   if(src&&hovering)return; /* HOVER ONLY: while floating, enemy attacks cannot reach — jumping / falling players are seen and hit normally — see the HOVER SAFETY note in update() */
-  var real=Math.max(1,dmg-player.def);
+  var abD=abiBonus(), magicSrc=src&&(src.type==='goblinShaman'||src.type==='ifrit'); /* magic attacks (shaman bolts, ifrit) meet magic defense; everything else meets physical defense */
+  var real=Math.max(1,dmg-(magicSrc?((player.mdef!=null?player.mdef:player.def)+abD.mdef):(player.def+abD.pdef)));
   player.hp-=real;addDmg(player.x,player.y,'-'+real,'#ff8a8a');
   burst(player.x,player.y,'#e5484d',5);
   if(player.hp<=0){player.hp=0;player.dead=true;$('deathScreen').style.display='grid';chat('☠ <b>'+player.name+'</b> は '+(src?src.name:'敵')+' に倒れた…','sys');}
@@ -4388,11 +4507,11 @@ refreshAcctUI();
 
 /* ================= SAVE ================= */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),questIdx,questCount,boardAcceptedFor,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
+function progressKey(){if(!player)return '';return [player.lv,player.exp,player.gold,player.kills,player.potions,player.arrows,invKey(),abiKey(),questIdx,questCount,boardAcceptedFor,Math.round(player.x),Math.round(player.y),exploredCount,settingsKey()].join('|');}
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
-    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:Math.min(player.hp,player.maxHp-(player.fbHp||0)),maxHp:player.maxHp-(player.fbHp||0),mp:Math.floor(Math.min(player.mp,player.maxMp-(player.fbMp||0))),maxMp:player.maxMp-(player.fbMp||0),sp:Math.floor(Math.min(player.sp,player.maxSp-(player.fbSp||0))),maxSp:player.maxSp-(player.fbSp||0),hunger:Math.floor(player.hunger),thirst:Math.floor(player.thirst),atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
+    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:Math.min(player.hp,player.maxHp-(player.fbHp||0)),maxHp:player.maxHp-(player.fbHp||0),mp:Math.floor(Math.min(player.mp,player.maxMp-(player.fbMp||0))),maxMp:player.maxMp-(player.fbMp||0),sp:Math.floor(Math.min(player.sp,player.maxSp-(player.fbSp||0))),maxSp:player.maxSp-(player.fbSp||0),hunger:Math.floor(player.hunger),thirst:Math.floor(player.thirst),atk:player.atk,def:player.def,matk:(player.matk!=null?player.matk:player.atk),mdef:(player.mdef!=null?player.mdef:player.def),abi:player.abi||{},lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
     quest:{idx:questIdx,count:questCount,board:boardAcceptedFor},
     explored:exploredToString(),
     settings:snapshotSettings()};
@@ -4462,11 +4581,13 @@ function applySaveData(data){
   var p=data.player;
   function num(v,fallback,min,max){var n=Number(v);if(!isFinite(n))n=fallback;return Math.max(min,Math.min(max,n));}
   var np=makePlayer(String(p.name||'冒険者').slice(0,12),p.cls);
+  np.abi={};if(p.abi&&typeof p.abi==='object'){ABILITY_IDS.forEach(function(id){if(p.abi[id])np.abi[id]=1;});} /* learned ability nodes, validated against the catalogue */
   np.maxHp=num(p.maxHp,np.maxHp,10,9999);np.maxMp=num(p.maxMp,np.maxMp,10,9999);
   np.hp=num(p.hp,np.maxHp,1,np.maxHp);np.mp=num(p.mp,np.maxMp,0,np.maxMp);
   np.maxSp=num(p.maxSp,np.maxSp,1,9999);np.sp=num(p.sp,np.maxSp,0,np.maxSp);
-  np.hunger=num(p.hunger,100,0,100);np.thirst=num(p.thirst,100,0,100);
+  np.hunger=num(p.hunger,100,0,100+abiBonusFor(np.abi).hunger);np.thirst=num(p.thirst,100,0,100+abiBonusFor(np.abi).thirst);
   np.atk=num(p.atk,np.atk,1,999);np.def=num(p.def,np.def,0,999);
+  np.matk=num(p.matk,np.matk,1,999);np.mdef=num(p.mdef,np.mdef,0,999);
   np.lv=Math.floor(num(p.lv,1,1,99));np.exp=num(p.exp,0,0,99999);
   np.gold=Math.floor(num(p.gold,0,0,999999));np.potions=Math.floor(num(p.potions,0,0,999));np.kills=Math.floor(num(p.kills,0,0,999999));
   np.arrows=Math.floor(num(p.arrows,(p.cls==='archer'?30:0),0,9999));
@@ -4536,7 +4657,7 @@ function updateHUD(){
   $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
   $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
   $('spBar').style.width=(player.sp/player.maxSp*100)+'%';$('spText').textContent=Math.floor(player.sp)+' / '+player.maxSp;
-  setGauge('hunger',player.hunger); setGauge('thirst',player.thirst);
+  setGauge('hunger',player.hunger/hungerMax()*100); setGauge('thirst',player.thirst/thirstMax()*100);
   var pct=Math.floor(player.exp/expNeed(player.lv)*100);
   $('xpBar').style.width=pct+'%';$('xpText').textContent=pct+'%';
   /* 矢の所持数はステータス右側に常時表示（アーチャーの射撃で消費される） */
@@ -4993,7 +5114,7 @@ function update(dt,now){
     if((keys['ShiftLeft']||keys['ShiftRight'])&&player.mp>0&&player.sp>0&&!player.swimming&&crouchAmt<0.5){
       dashingNow=true;
       player.mp=Math.max(0,player.mp-dt*0.001);
-      player.sp=Math.max(0,player.sp-dt*0.001*SP_DASH_PER_SEC); /* dashing burns stamina (SP); ordinary movement is free */
+      player.sp=Math.max(0,player.sp-dt*0.001*SP_DASH_PER_SEC*(1-abiBonus().speffM/100)); /* SP効率（移動） */ /* dashing burns stamina (SP); ordinary movement is free */
     }
     var sp=CLASSES[player.cls].speed*(dashingNow?2:1);
     if(crouchAmt>0)sp*=1-0.4*crouchAmt; /* crouching: up to 40% slower, easing in with the lowered eyes */
@@ -5002,6 +5123,7 @@ function update(dt,now){
     if(player.jellySlowUntil&&now<player.jellySlowUntil)sp*=0.95; /* slime jelly: the awful taste slows movement 5% for 10 seconds */
     if(player.fbSpdUntil&&now<player.fbSpdUntil)sp*=1.08; /* tavern skewers: +8% move speed while the food buff lasts */
     sp*=weightSpeedMul(); /* overweight: a too-heavy pack drags the pace down hard */
+    sp*=1+abiBonus().mspd/100; /* ability 移動速度 */
     if(player.sp<=0)sp*=0.5; /* exhausted (SP empty): the pace halves until stamina recovers */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     /* feetZ: every object only blocks up to its visible top (finite-top obstacles) */
@@ -5011,7 +5133,7 @@ function update(dt,now){
     if(mx)player.dir=mx>0?1:-1;
     player.walk+=dt*0.02*gmSpeedMul(); /* walk-cycle phase follows the actual ground speed (4x for gamemaster) */
     /* SP (stamina): swimming drains it — ordinary movement is free */
-    if(player.swimming)player.sp=Math.max(0,player.sp-dt*0.001*SP_SWIM_PER_SEC);
+    if(player.swimming)player.sp=Math.max(0,player.sp-dt*0.001*SP_SWIM_PER_SEC*(1-abiBonus().speffM/100)); /* SP効率（移動） */
   }
   /* TIPSY (the tavern's ale): while it lasts the player sways
      sideways on their own — a slow sine drift along the camera's
@@ -5109,8 +5231,8 @@ function update(dt,now){
   /* hunger & thirst drain with time; at zero, each empty gauge eats
      STARVE_HP_PER_SEC % of max HP per second until the player eats
      or drinks (the drowning code above is the pattern for the death) */
-  player.hunger=Math.max(0,player.hunger-dt*0.001*HUNGER_PER_SEC);
-  player.thirst=Math.max(0,player.thirst-dt*0.001*THIRST_PER_SEC);
+  player.hunger=Math.max(0,player.hunger-dt*0.001*(hungerMax()/2700)); /* empties in 45 min at any max (ability 技巧 raises the max) */
+  player.thirst=Math.max(0,player.thirst-dt*0.001*(thirstMax()/1800)); /* empties in 30 min at any max */
   if(player.hunger<=0||player.thirst<=0){
     var starveN=(player.hunger<=0?1:0)+(player.thirst<=0?1:0);
     player.hp-=player.maxHp*0.01*STARVE_HP_PER_SEC*starveN*dt*0.001;
@@ -5130,8 +5252,8 @@ function update(dt,now){
     if(d<1)return;
     var dot=(dx*fvx+dy*fvy)/d;
     var ang=Math.acos(Math.max(-1,Math.min(1,dot)));
-    if(!e.seen&&d<640&&(d<150||ang<1.0)&&losClear(player.x,player.y,e.x,e.y))e.seen=true;
-    if(d<760){
+    if(!e.seen&&d<640*abiSearchMul()&&(d<150||ang<1.0)&&losClear(player.x,player.y,e.x,e.y))e.seen=true; /* 探索範囲 (ability 索敵) widens detection */
+    if(d<760*abiSearchMul()){
       var thresh=0.13+Math.atan2(e.r+12,d);
       var cap=(ang<thresh);
       if(!cap&&(jumpY>0||jumpVY!==0||hovering)){
@@ -5301,7 +5423,7 @@ function update(dt,now){
       }
       for(var ai=0;ai<enemies.length;ai++){var ae=enemies[ai];
         if(!ae.dead&&Math.hypot(ae.x-p.x,ae.y-p.y)<ae.r+8&&p.z<groundZ+ae.r*2+52&&p.z>groundZ-6){
-          var acrit=Math.random()<0.15;damageEnemy(ae,Math.round(p.dmg*(acrit?1.7:1)),acrit);beep(300,0.06,'square',0.04);return false;}}
+          var acrit=Math.random()<critRate();damageEnemy(ae,Math.round(p.dmg*(acrit?critMult():1)),acrit);beep(300,0.06,'square',0.04);return false;}}
       return true;
     }
     var bx0=p.x, by0=p.y;
@@ -5310,7 +5432,7 @@ function update(dt,now){
     if(projSweep(bx0,by0,0,p.x,p.y,0,p,true)){burst(p.x,p.y,p.color||'#c9b98a',3);return false;} /* walls stop bolts and enemy shots too: they burst on the masonry instead of passing through */
     if(p.from==='player'){
       for(var i=0;i<enemies.length;i++){var e=enemies[i];
-        if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<e.r+9){var crit=Math.random()<0.15;damageEnemy(e,Math.round(p.dmg*(crit?1.7:1)),crit);beep(300,0.06,'square',0.04);return false;}}
+        if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<e.r+9){var crit=Math.random()<critRate();damageEnemy(e,Math.round(p.dmg*(crit?critMult():1)),crit);beep(300,0.06,'square',0.04);return false;}}
     }else if(p.from==='enemy'){
       /* enemy shots (goblin archer / shaman): they connect only with a
          grounded player — a floating (hovering) player is untouchable,
@@ -5759,8 +5881,8 @@ function buyTavernFood(i){
   var m=TAVERN_MENU[i]; if(!m||!player)return;
   if(player.gold<m.price){toast('Gが足りません（'+m.price+' G必要です）');beep(220,0.08,'square',0.05);return;}
   player.gold-=m.price;
-  if(m.hunger)player.hunger=Math.min(100,player.hunger+m.hunger);
-  if(m.thirst)player.thirst=Math.min(100,player.thirst+m.thirst);
+  if(m.hunger)player.hunger=Math.min(hungerMax(),player.hunger+m.hunger);
+  if(m.thirst)player.thirst=Math.min(thirstMax(),player.thirst+m.thirst);
   if(m.spdMs)player.fbSpdUntil=performance.now()+m.spdMs;
   if(m.maxHpMs)applyMaxBuff('Hp',m.maxHpMs);
   if(m.maxSpMs)applyMaxBuff('Sp',m.maxSpMs);
@@ -5793,27 +5915,81 @@ var STATUS_DEFS=[
   {k:'power',label:'威力補正'},{k:'pen',label:'貫通補正'},
   {k:'rpois',label:'毒耐性'},{k:'rpara',label:'麻痺耐性'},{k:'rbleed',label:'出血耐性'},{k:'rstun',label:'気絶耐性'}
 ];
+/* ================= ABILITY TREE UI =================
+   The constellation from the user's sketch: pentagon cores with
+   their branches around them and prerequisite lines between. Tap a
+   node to select it; the detail bar below explains it and offers
+   the learn button (1 AP). */
+var ABI_POS={gouki:[460,170],moukou:[400,100],hunsai:[518,100],juugeki:[322,38],gouriki:[448,26],hakai:[566,38],
+  shugo:[606,238],gankyou:[548,162],kenrou:[706,238],teppeki:[636,92],shiketsu:[742,152],fukutsu:[820,238],
+  shunbin:[282,238],rengeki:[330,162],keigyou:[186,162],jinrai:[252,92],binshou:[164,238],fudan:[52,238],
+  eichi:[356,368],meiseki:[282,448],jiai:[424,448],kenja:[206,540],tankyuu:[356,540],seisui:[492,540],
+  gikou:[578,368],sakuteki:[506,448],kanpa:[656,448],katsuryoku:[578,540],shinsoku:[716,540],chimei:[842,540]};
+var abiSel=null;
+function abiState(id){
+  if(player&&player.abi&&player.abi[id])return 'learned';
+  var n=ABILITIES[id];
+  if(n.req&&!(player&&player.abi&&player.abi[n.req]))return 'locked';
+  return abiPoints()>0?'avail':'nopoint';
+}
+function refreshAbilityUI(){
+  var stage=$('abiStage'); if(!stage||!player)return;
+  $('abiHead').textContent=player.name+'（Lv.'+player.lv+'） — アビリティポイント: '+abiPoints()+'｜習得 '+abiLearnedCount()+' / 30';
+  var sc=Math.min(1,(Math.min(window.innerWidth*0.94,940))/920);
+  stage.style.transform='scale('+sc+')';
+  $('abiStageWrap').style.height=(600*sc)+'px';
+  var svg='';
+  ABILITY_IDS.forEach(function(id){var n=ABILITIES[id]; if(!n.req)return;
+    var a=ABI_POS[n.req], b2=ABI_POS[id];
+    var cls=(player.abi[id]&&player.abi[n.req])?'on':(player.abi[n.req]?'mid':'off');
+    svg+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b2[0]+'" y2="'+b2[1]+'" class="abi-line '+cls+'"/>';
+  });
+  $('abiLines').innerHTML=svg;
+  var html='';
+  ABILITY_IDS.forEach(function(id){var n=ABILITIES[id], pos=ABI_POS[id], st=abiState(id);
+    html+='<button type="button" class="abi-node'+(n.req===null?' core':'')+' '+st+(abiSel===id?' sel':'')+'" data-abi="'+id+'" style="left:'+pos[0]+'px;top:'+pos[1]+'px">'+n.name+'</button>';
+  });
+  $('abiNodes').innerHTML=html;
+  Array.prototype.forEach.call(stage.querySelectorAll('.abi-node'),function(el){
+    el.addEventListener('click',function(){abiSel=el.getAttribute('data-abi');refreshAbilityUI();});
+  });
+  refreshAbilityDetail();
+}
+function refreshAbilityDetail(){
+  var det=$('abiDetail'); if(!det)return;
+  if(!abiSel||!ABILITIES[abiSel]){det.innerHTML='ノードを選ぶと、効果と条件がここに表示されます。';return;}
+  var n=ABILITIES[abiSel], st=abiState(abiSel);
+  var reqTxt=n.req?('前提：'+ABILITIES[n.req].name+(player.abi[n.req]?'（習得済み）':'（未習得）')):'前提：なし（系統の起点）';
+  var stTxt=st==='learned'?'取得済み':st==='avail'?'アビリティポイント 1 で習得できます':st==='nopoint'?'アビリティポイントが足りません':'前提アビリティが必要です';
+  det.innerHTML='<b>'+n.name+'</b> <span class="bd-cat">'+escHtml(n.fx)+'</span><br>'+reqTxt+' — '+stTxt+(st==='avail'?' <button type="button" id="abiLearnBtn">習得する（AP 1）</button>':'');
+  var lb=$('abiLearnBtn'); if(lb)lb.addEventListener('click',function(){learnAbility(abiSel);});
+}
+function openAbility(){refreshAbilityUI();$('abilityModal').style.display='grid';}
+function toggleAbility(){
+  if($('abilityModal').style.display==='grid'){closeSubModal('abilityModal');return;}
+  openAbility();
+}
 function statusValues(){
-  var c=CLASSES[player.cls];
+  var c=CLASSES[player.cls], b=abiBonus();
   return {
     hp:Math.ceil(player.hp)+' / '+player.maxHp,
-    patk:player.atk,
-    matk:player.atk, /* PROVISIONAL: spells currently scale off atk too */
-    pdef:player.def,
-    mdef:player.def, /* PROVISIONAL: a single def stat today */
+    patk:player.atk+b.patk,
+    matk:(player.matk!=null?player.matk:player.atk)+b.matk, /* the mage's own base attack (split from physical) */
+    pdef:player.def+b.pdef,
+    mdef:(player.mdef!=null?player.mdef:player.def)+b.mdef, /* magic defense: shaman bolts and ifrit meet this */
     sp:Math.floor(player.sp)+' / '+player.maxSp,
-    speff:'100%', /* PROVISIONAL */
+    speff:(100+b.speffA)+'%', /* SP効率（攻撃）; the movement efficiency drives the dash/swim drains */
     mp:Math.floor(player.mp)+' / '+player.maxMp,
-    mpeff:'100%', /* PROVISIONAL */
-    crit:'15%', /* playerAttack: crit roll is Math.random()<0.15 */
-    critd:'170%', /* playerAttack: a crit multiplies damage by 1.7 */
-    aspd:(1000/380).toFixed(1)+' 回/秒', /* playerAttack: the basic-attack cooldown is 380ms */
-    mspd:Math.round(c.speed*100)+'%', /* the class speed multiplier, as % of the base pace */
-    parry:'100%', heal:'100%', /* PROVISIONAL */
-    hunger:''+Math.floor(player.hunger), thirst:''+Math.floor(player.thirst),
-    weight:(Math.round(carryWeight()*10)/10)+' / '+WEIGHT_CAPACITY+(isOverweight()?'（オーバー）':''), /* the carry-weight system: total carried / capacity */
-    power:'100%', pen:'100%', /* PROVISIONAL */
-    rpois:'0%', rpara:'0%', rbleed:'0%', rstun:'0%' /* PROVISIONAL: no status-ailment resistances yet */
+    mpeff:(100+b.mpeff)+'%',
+    crit:(15+b.crit)+'%', /* base 15% + ability 会心率 */
+    critd:(170+b.critd)+'%', /* base 170% + ability 会心威力 */
+    aspd:(1000/atkCdMs()).toFixed(1)+' 回/秒', /* the basic-attack cooldown (380ms base, shortened by ability 攻撃速度) */
+    mspd:Math.round(c.speed*(1+b.mspd/100)*100)+'%', /* the class speed multiplier × ability 移動速度 */
+    parry:(100+b.parry)+'%', heal:(100+b.heal)+'%', /* パリィ補正 widens the parry window; 治癒補正 scales potion/food healing */
+    hunger:Math.floor(player.hunger)+' / '+hungerMax(), thirst:Math.floor(player.thirst)+' / '+thirstMax(),
+    weight:(Math.round(carryWeight()*10)/10)+' / '+WEIGHT_CAP()+(isOverweight()?'（オーバー）':''), /* the carry-weight system: total carried / capacity (base 50 + ability 重量) */
+    power:'100%', pen:(100+b.pen)+'%', /* PROVISIONAL: 威力補正 only; 貫通補正 scales player damage in damageEnemy */
+    rpois:(b.rpois+b.rall)+'%', rpara:(b.rpara+b.rall)+'%', rbleed:(b.rbleed+b.rall)+'%', rstun:(b.rstun+b.rall)+'%' /* ability resistances (incl. 全耐性); no player ailment systems exist yet for them to resist */
   };
 }
 function refreshStatusUI(){
@@ -9491,7 +9667,7 @@ function loop(now){
     $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
     $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
     $('spBar').style.width=(player.sp/player.maxSp*100)+'%';$('spText').textContent=Math.floor(player.sp)+' / '+player.maxSp;
-    setGauge('hunger',player.hunger); setGauge('thirst',player.thirst);
+    setGauge('hunger',player.hunger/hungerMax()*100); setGauge('thirst',player.thirst/thirstMax()*100);
   }
   requestAnimationFrame(loop);
 }
@@ -9520,7 +9696,11 @@ document.addEventListener('keydown',function(e){
        below so Z can also CLOSE it, exactly like R and the bag */
     if($('statusModal').style.display==='grid'||menuOpen||!isAnyOverlayOpen()){e.preventDefault();toggleStatus();return;}
   }
-  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('statusModal').style.display==='grid')return;
+  if(started&&player&&e.code==='KeyC'&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput')){
+    /* C toggles the ability tree — the same arrangement as Z */
+    if($('abilityModal').style.display==='grid'||menuOpen||!isAnyOverlayOpen()){e.preventDefault();toggleAbility();return;}
+  }
+  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('statusModal').style.display==='grid'||$('abilityModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&player&&e.code==='KeyM'&&document.activeElement!==$('chatInput')){e.preventDefault();openWorldMap();return;}
   if(started&&player&&e.code==='KeyE'&&document.activeElement!==$('chatInput')){e.preventDefault();tryInteract();return;}
@@ -9689,6 +9869,7 @@ $('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');})
 $('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
 $('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
 $('menuStatusBtn').addEventListener('click',function(){openFromMenu('statusModal');});
+$('menuAbilityBtn').addEventListener('click',function(){openFromMenu('abilityModal');});
 $('menuPlayersBtn').addEventListener('click',function(){openFromMenu('playersModal');});
 $('menuMapBtn').addEventListener('click',function(){openFromMenu('worldMapModal');});
 $('closeWorldMapBtn').addEventListener('click',function(){closeWorldMap();});
@@ -9725,6 +9906,7 @@ $('closeBoardBtn').addEventListener('click',function(){closeSubModal('boardModal
 $('closeInnBtn').addEventListener('click',function(){closeSubModal('innModal');});
 $('closeTavernBtn').addEventListener('click',function(){closeSubModal('tavernModal');});
 $('closeStatusBtn').addEventListener('click',function(){closeSubModal('statusModal');});
+$('closeAbilityBtn').addEventListener('click',function(){closeSubModal('abilityModal');});
 $('restBtn').addEventListener('click',function(){restAtInn();});
 $('bagGrid').addEventListener('click',function(e){
   var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
