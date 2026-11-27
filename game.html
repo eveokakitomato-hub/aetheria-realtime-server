@@ -1013,6 +1013,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>アイテムに重量が追加されました。</b>持ち物の総重量が上限の50を超えると、移動速度が大きく低下します。現在の重量はステータス画面（Zキー）とバッグで確認でき、アイテムごとの重さはバッグの詳細に表示されます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>川の水深が色でわかるようになりました。</b>深いところほど濃い青に、浅瀬は淡く砂色がかって見えます。泳げる深さかどうか、岸からでも見分けやすくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>画面まわりのアイコンを整理しました。</b>チャット欄の上のスキルホットバー、攻撃ボタン、AETHERIA ONLINEのロゴを非表示にしました。スキル（1〜3キー）と攻撃（Fキー）、ポーション（4キー）は今まで通り使えます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ほろ酔いの揺れ幅をさらに2倍にしました。</b>アルトエールの「ほろ酔い」状態で、左右にふらつく幅がさらに大きくなりました。</span></li>
@@ -1611,7 +1612,7 @@ function refreshBagUI(){
     var d=DROP_ITEMS[id];
     items.push({ico:d.ico,name:d.name,cnt:'×'+n,act:id,drop:d});
   });
-  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
+  if(sub)sub.textContent=player.name+'（'+c.name+' Lv.'+player.lv+'）の持ち物 — アイテム '+items.length+' / '+BAG_CAPACITY+' 種類｜重量 '+(Math.round(carryWeight()*10)/10)+' / '+WEIGHT_CAPACITY+(isOverweight()?' ⚠オーバー（移動速度低下中）':'')+'（クリックで使用・装備／ホットバー登録は上のマスへドラッグ）';
   var html='';
   items.forEach(function(it){
     var title=it.drop?(' title="'+escHtml(it.drop.cat+'｜'+it.drop.desc)+'"'):'';
@@ -1629,7 +1630,7 @@ function renderBagDetail(){
   var det=$('bagDetail'); if(!det)return;
   var d=bagDetailAct?DROP_ITEMS[bagDetailAct]:null;
   if(d&&player&&invCount(bagDetailAct)>0){
-    det.innerHTML='<b>'+d.ico+' '+escHtml(d.name)+'</b> <span class="bd-cat">'+escHtml(d.cat)+'</span> <span class="bd-price">売値 '+d.price+' G</span> <span class="bd-cnt">所持 ×'+invCount(bagDetailAct)+'</span><br>'+escHtml(d.desc)+(d.use?'<br><span class="bd-use">クリック（またはホットバー）で使用できます</span>':'');
+    det.innerHTML='<b>'+d.ico+' '+escHtml(d.name)+'</b> <span class="bd-cat">'+escHtml(d.cat)+'</span> <span class="bd-price">売値 '+d.price+' G</span> <span class="bd-price">重量 '+(d.w||0)+'</span> <span class="bd-cnt">所持 ×'+invCount(bagDetailAct)+'</span><br>'+escHtml(d.desc)+(d.use?'<br><span class="bd-use">クリック（またはホットバー）で使用できます</span>':'');
   }else{
     det.textContent='アイテムにカーソルを合わせるかクリックすると、説明と売値がここに表示されます。';
   }
@@ -3718,21 +3719,43 @@ var ARROW_ICON='<svg viewBox="0 0 24 24" width="1.25em" height="1.25em" style="v
    you simply own, with category, description and sell price readable
    in the bag's detail panel. */
 var DROP_ITEMS={
-  mucus:{name:'濁った粘液',ico:'🫧',rate:50,price:0,cat:'素材',desc:'スライムの体表から削ぎ落とした、不純物まみれの粘液。'},
-  jelly:{name:'スライムゼリー',ico:'🍮',rate:25,price:1,cat:'食用、素材',desc:'プルプルとした半透明のゼリー。そのまま食べるとHPとMPがわずかに回復するが、あまりの不味さに10秒間移動速度が5%低下する。',use:'jelly'},
-  core:{name:'スライムの核',ico:'🔮',rate:10,price:1,cat:'素材',desc:'スライムの体内でクッションの役割を果たしていた高弾力の結晶。'},
-  oil:{name:'スライムオイル',ico:'🧴',rate:7,price:1,cat:'素材',desc:'粘り気と微弱な毒素を含んだ特殊な油。武器に塗り込むことで、15分間、攻撃した相手に「鈍足（移動速度低下）」と「微量の毒ダメージ」を与える。',use:'oil'},
-  rustDagger:{name:'錆びた短剣',ico:'🗡️',rate:2.5,price:0,cat:'武器、素材',desc:'かつてスライムに挑み、敗れ去った冒険者の遺品。酸でボロボロに錆びついている。'},
-  brokenArrow:{name:'折れた矢',ico:ARROW_ICON,rate:2.5,price:0,cat:'武器、素材',desc:'スライムの体内で消化されずに残っていた矢の残骸。矢じりが欠けており飛距離が落ちる。'},
-  glassBottle:{name:'溶け残ったガラス瓶',ico:'🫙',rate:2,price:1,cat:'素材',desc:'スライムの消化液にも耐え抜いた頑丈な空き瓶。'},
-  ring:{name:'誰かの指輪',ico:'💍',rate:0.35,price:30,cat:'装備、素材',desc:'スライムの体内で鈍く光っていた銀の指輪。内側には古びたイニシャルが刻まれている。'},
-  silverCoin:{name:'欠けた銀貨',ico:'🪙',rate:0.35,price:30,cat:'素材',desc:'酸で縁が溶け、少し軽くなってしまった銀貨。'},
-  oldText:{name:'未鑑定の古文書',ico:'📜',rate:0.3,price:1,cat:'素材',desc:'特殊な魔法コーティングにより、スライムの胃酸を免れた古い羊皮紙。古代文字で書かれており、そのままでは読むことができない。'}
+  mucus:{name:'濁った粘液',ico:'🫧',rate:50,price:0,w:0.2,cat:'素材',desc:'スライムの体表から削ぎ落とした、不純物まみれの粘液。'},
+  jelly:{name:'スライムゼリー',ico:'🍮',rate:25,price:1,w:0.3,cat:'食用、素材',desc:'プルプルとした半透明のゼリー。そのまま食べるとHPとMPがわずかに回復するが、あまりの不味さに10秒間移動速度が5%低下する。',use:'jelly'},
+  core:{name:'スライムの核',ico:'🔮',rate:10,price:1,w:0.8,cat:'素材',desc:'スライムの体内でクッションの役割を果たしていた高弾力の結晶。'},
+  oil:{name:'スライムオイル',ico:'🧴',rate:7,price:1,w:0.4,cat:'素材',desc:'粘り気と微弱な毒素を含んだ特殊な油。武器に塗り込むことで、15分間、攻撃した相手に「鈍足（移動速度低下）」と「微量の毒ダメージ」を与える。',use:'oil'},
+  rustDagger:{name:'錆びた短剣',ico:'🗡️',rate:2.5,price:0,w:1.2,cat:'武器、素材',desc:'かつてスライムに挑み、敗れ去った冒険者の遺品。酸でボロボロに錆びついている。'},
+  brokenArrow:{name:'折れた矢',ico:ARROW_ICON,rate:2.5,price:0,w:0.1,cat:'武器、素材',desc:'スライムの体内で消化されずに残っていた矢の残骸。矢じりが欠けており飛距離が落ちる。'},
+  glassBottle:{name:'溶け残ったガラス瓶',ico:'🫙',rate:2,price:1,w:0.5,cat:'素材',desc:'スライムの消化液にも耐え抜いた頑丈な空き瓶。'},
+  ring:{name:'誰かの指輪',ico:'💍',rate:0.35,price:30,w:0.1,cat:'装備、素材',desc:'スライムの体内で鈍く光っていた銀の指輪。内側には古びたイニシャルが刻まれている。'},
+  silverCoin:{name:'欠けた銀貨',ico:'🪙',rate:0.35,price:30,w:0.1,cat:'素材',desc:'酸で縁が溶け、少し軽くなってしまった銀貨。'},
+  oldText:{name:'未鑑定の古文書',ico:'📜',rate:0.3,price:1,w:0.6,cat:'素材',desc:'特殊な魔法コーティングにより、スライムの胃酸を免れた古い羊皮紙。古代文字で書かれており、そのままでは読むことができない。'}
 };
 var DROP_IDS=Object.keys(DROP_ITEMS);
 function invCount(id){return (player&&player.inv&&player.inv[id])||0;}
 function invAdd(id,n){if(!player)return;if(!player.inv)player.inv={};player.inv[id]=Math.max(0,(player.inv[id]||0)+n);if(player.inv[id]<=0)delete player.inv[id];}
 function invKey(){if(!player||!player.inv)return'';return DROP_IDS.map(function(id){return player.inv[id]||0;}).join(',');}
+/* ================= CARRY WEIGHT =================
+   Every item has a weight: the drop items carry theirs in DROP_ITEMS
+   (w), potions / arrows / the class weapon use the constants below.
+   Gold is money, not luggage — it weighs nothing. Carrying more
+   than WEIGHT_CAPACITY slows movement HEAVILY (the user's spec):
+   the pace drops to 60% the moment the limit is crossed and keeps
+   sinking toward a 30% floor as the excess grows. The total shows
+   in the status screen (重量) and at the top of the bag. */
+var WEIGHT_CAPACITY=50, POTION_WEIGHT=0.5, ARROW_WEIGHT=0.1;
+var WEAPON_WEIGHT={warrior:3,mage:2,archer:1.5};
+function carryWeight(){
+  if(!player)return 0;
+  var w=(player.potions||0)*POTION_WEIGHT+(player.arrows||0)*ARROW_WEIGHT+(WEAPON_WEIGHT[player.cls]||2);
+  if(player.inv)for(var id in player.inv){var d=DROP_ITEMS[id];if(d&&d.w)w+=d.w*player.inv[id];}
+  return w;
+}
+function isOverweight(){return carryWeight()>WEIGHT_CAPACITY;}
+function weightSpeedMul(){
+  var w=carryWeight(); if(w<=WEIGHT_CAPACITY)return 1;
+  return Math.max(0.3,0.6-0.3*(w-WEIGHT_CAPACITY)/WEIGHT_CAPACITY);
+}
+var weightOverPrev=false;
 function rollSlimeDrop(){
   var r=Math.random()*100,acc=0,pick=DROP_IDS[DROP_IDS.length-1];
   for(var i=0;i<DROP_IDS.length;i++){acc+=DROP_ITEMS[DROP_IDS[i]].rate;if(r<acc){pick=DROP_IDS[i];break;}}
@@ -4837,6 +4860,7 @@ function update(dt,now){
     sp*=gmSpeedMul(); /* gamemaster account only: walk / dash / float-move / swim all 4x (1x for everyone else) */
     if(player.jellySlowUntil&&now<player.jellySlowUntil)sp*=0.95; /* slime jelly: the awful taste slows movement 5% for 10 seconds */
     if(player.fbSpdUntil&&now<player.fbSpdUntil)sp*=1.08; /* tavern skewers: +8% move speed while the food buff lasts */
+    sp*=weightSpeedMul(); /* overweight: a too-heavy pack drags the pace down hard */
     if(player.sp<=0)sp*=0.5; /* exhausted (SP empty): the pace halves until stamina recovers */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     /* feetZ: every object only blocks up to its visible top (finite-top obstacles) */
@@ -4918,6 +4942,8 @@ function update(dt,now){
   // mp regen (paused while dashing or swimming); safe-zone heal below
   if(!dashingNow&&!player.swimming)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
   foodBuffTick(); /* tavern food buffs: drop the max-stat boosts whose time is up */
+  var owNow=isOverweight(); /* carry weight: warn as the limit is crossed either way */
+  if(owNow!==weightOverPrev){weightOverPrev=owNow;if(owNow){toast('⚖️ 重量オーバー！持ち物が重すぎて移動速度が大きく低下しています',3400);beep(180,0.12,'square',0.05);}else toast('⚖️ 重量オーバーが解消されました');}
   /* SP (stamina) regen: standing still on land refills 5% of max
      SP per second. Recovering stamina works up a thirst: every 15
      SP regained this way costs 1 thirst. */
@@ -5633,7 +5659,7 @@ function statusValues(){
     mspd:Math.round(c.speed*100)+'%', /* the class speed multiplier, as % of the base pace */
     parry:'100%', heal:'100%', /* PROVISIONAL */
     hunger:''+Math.floor(player.hunger), thirst:''+Math.floor(player.thirst),
-    weight:'0', /* PROVISIONAL: no carry-weight system yet */
+    weight:(Math.round(carryWeight()*10)/10)+' / '+WEIGHT_CAPACITY+(isOverweight()?'（オーバー）':''), /* the carry-weight system: total carried / capacity */
     power:'100%', pen:'100%', /* PROVISIONAL */
     rpois:'0%', rpara:'0%', rbleed:'0%', rstun:'0%' /* PROVISIONAL: no status-ailment resistances yet */
   };
