@@ -943,6 +943,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>建物内のランタンが一日中灯るようになりました。</b>冒険者ギルド・宿屋・酒場のランタンは、これまで夕方から夜の点灯でしたが、昼間も含めて常に灯り続けます。村の街灯は今まで通り、夕方から夜の点灯です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>畑前の街灯を撤去しました。</b>村の南西、畑の前にあった街灯を取り払いました。村の街灯は残り7基です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルド前の街灯を撤去しました。</b>冒険者ギルドの前にあった街灯2基（ギルド前・西、ギルド前・東）を取り払いました。村の街灯は残り8基です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンの明るさを調整しました。</b>光量をこれまでの半分に落としました。冒険者ギルド・宿屋・酒場のランタンと、村の街灯が対象です。</span></li>
@@ -9387,10 +9388,10 @@ function skyTick(){
      live HERE, parented to the scene, because mergeStaticMeshes()
      discards every non-mesh child of the static groups — a light hung
      on a building group is deleted at build time and never shines.
-     They burn from dusk to dawn with a gentle flame flicker, and only
-     while the camera is within 700 units, so distant interiors cost
-     nothing. Intensity 10000 in physical falloff units (decay 1.45,
-     reach 380). ---- */
+     They burn around the clock — day and night alike, at the user's
+     word — with a gentle flame flicker, and only while the camera is
+     within 700 units, so distant interiors cost nothing. Intensity
+     10000 in physical falloff units (decay 1.45, reach 380). ---- */
   var darkF2=Math.max(0,Math.min(1,1-sky.sun*1.5));
   if(skyState.lanternScene!==scene){skyState.lanternScene=scene;skyState.lanternLights=null;}
   if(!skyState.lanternLights||skyState.lanternLights.length!==lanternSpots.length){
@@ -9402,7 +9403,7 @@ function skyTick(){
     var NL9=skyState.lanternLights[nq9], SP9=lanternSpots[nq9];
     if(darkF2<=0.02){NL9.intensity=0;continue;}
     var ndx9=SP9[0]-camera3d.position.x, ndz9=SP9[2]-camera3d.position.z;
-    NL9.intensity=(ndx9*ndx9+ndz9*ndz9<490000)?10000*darkF2*(0.92+0.08*Math.sin(Date.now()/90+nq9*1.7)):0;
+    NL9.intensity=(ndx9*ndx9+ndz9*ndz9<490000)?10000*(0.92+0.08*Math.sin(Date.now()/90+nq9*1.7)):0;
   }
   /* ---- street lamp lights (Alto village): a pool of eight scene-owned
      PointLights rides the street lamp spots nearest the player, so the
