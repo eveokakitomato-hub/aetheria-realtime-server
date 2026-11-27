@@ -362,6 +362,12 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
 #bagModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #boardModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 #innModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+#statusModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;margin-top:8px}
+.st-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line2);padding:5px 2px;font-size:13px}
+.st-row span{color:var(--muted)}
+.st-row b{color:var(--paper);font-weight:900}
+@media (max-width:560px){.status-grid{grid-template-columns:1fr}}
 #innStatus{font-size:14px;margin:10px 0 4px;color:var(--paper)}
 #playersModal{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.65);display:none;place-items:center;padding:18px}
 .bag-card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;max-width:480px;width:100%;padding:22px;max-height:86vh;overflow-y:auto}
@@ -771,6 +777,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <div class="menu-list">
         <button type="button" class="menu-item" id="menuResumeBtn"><span class="mi-ico">▶</span><span class="mi-body"><b>ゲームに戻る</b><small>メニューを閉じて冒険を続ける</small></span><span class="mi-key">Esc</span></button>
         <button type="button" class="menu-item" id="menuBagBtn"><span class="mi-ico">🎒</span><span class="mi-body"><b>バッグ</b><small>持ち物・装備・所持金を確認する</small></span><span class="mi-key">R</span></button>
+        <button type="button" class="menu-item" id="menuStatusBtn"><span class="mi-ico">📊</span><span class="mi-body"><b>ステータス</b><small>能力値を確認する</small></span><span class="mi-key">Z</span></button>
         <button type="button" class="menu-item" id="menuPlayersBtn"><span class="mi-ico">◆</span><span class="mi-body"><b>オンラインプレイヤー</b><small>今つながっている実プレイヤーの一覧を見る</small></span></button>
         <button type="button" class="menu-item" id="menuMapBtn"><span class="mi-ico">🗺️</span><span class="mi-body"><b>全体マップ</b><small>探索済みエリアの地図を見る（歩いた場所だけが描かれる）</small></span><span class="mi-key">M</span></button>
         <button type="button" class="menu-item" id="menuSettingsBtn"><span class="mi-ico">⚙</span><span class="mi-body"><b>設定</b><small>キー割り当てと視点の感度を変更する</small></span></button>
@@ -812,6 +819,13 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
       <p class="sub">「いらっしゃい、冒険者さん。旅の疲れを癒していきなさい。」</p>
       <div id="innStatus"></div>
       <div class="bag-actions"><button id="restBtn" type="button">宿で休憩する（30 G）</button><button id="closeInnBtn" type="button">閉じる</button></div>
+    </div></div>
+
+    <div id="statusModal"><div class="bag-card">
+      <h2>📊 ステータス</h2>
+      <p class="sub" id="statusHead"></p>
+      <div class="status-grid" id="statusGrid"></div>
+      <div class="bag-actions"><button id="closeStatusBtn" type="button">閉じる</button></div>
     </div></div>
 
     <div id="playersModal"><div class="bag-card">
@@ -952,6 +966,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ステータス画面を追加しました。</b>Zキーを押すとステータス画面が開き、HP・MPや物理攻撃力、防御力、会心率など24項目の能力値を確認できます。ゲームメニューからも開けます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>宿屋に主人がやってきました。</b>風見村アルトの宿屋に主人が常駐するようになりました。カウンター越しに近づいてEキーで話しかけると、30 Gで「宿で休憩する」ことができ、HPとMPが全回復します。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルドへの道のベンチを撤去しました。</b>風見村アルトの広場から冒険者ギルドへ続く小道にあったベンチを取り払い、道が通りやすくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>建物内のランタンが一日中灯るようになりました。</b>冒険者ギルド・宿屋・酒場のランタンは、これまで夕方から夜の点灯でしたが、昼間も含めて常に灯り続けます。村の街灯は今まで通り、夕方から夜の点灯です。</span></li>
@@ -1406,7 +1421,7 @@ function handleBindCapture(e){
 /* ================= GAME MENU (Esc) / BAG / LOGOUT ================= */
 var menuOpen=false, returnToMenu=false;
 function isAnyOverlayOpen(){
-  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid';
+  return $('settingsModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('boardModal').style.display==='grid'||$('innModal').style.display==='grid'||$('statusModal').style.display==='grid';
 }
 /* ===== カーソル表示制御 =====
    マップ／メニューなどの画面を開いている間だけカーソルを使い、
@@ -1457,6 +1472,7 @@ function openFromMenu(id,anchor){
   if(id==='saveModal')refreshSaveUI();
   if(id==='bagModal'){refreshBagUI();document.body.classList.add('bag-open');}
   if(id==='playersModal')refreshPlayersUI();
+  if(id==='statusModal')refreshStatusUI();
   if(id==='worldMapModal')drawWorldMap();
   $(id).style.display='grid';
   if(id==='settingsModal'&&anchor==='sound'){
@@ -1501,6 +1517,7 @@ function handleEscape(){
   if($('bagModal').style.display==='grid'){closeSubModal('bagModal');return true;}
   if($('boardModal').style.display==='grid'){closeSubModal('boardModal');return true;}
   if($('innModal').style.display==='grid'){closeSubModal('innModal');return true;}
+  if($('statusModal').style.display==='grid'){closeSubModal('statusModal');return true;}
   if($('playersModal').style.display==='grid'){closeSubModal('playersModal');return true;}
   if($('settingsModal').style.display==='grid'){captureBind=null;refreshKeyLabels();closeSubModal('settingsModal');return true;}
   if($('saveModal').style.display==='grid'){closeSubModal('saveModal');return true;}
@@ -5322,6 +5339,72 @@ function restAtInn(){
   requestSaveNow();
   closeSubModal('innModal');
 }
+/* ================= STATUS SCREEN (Z key) =================
+   A read-only panel listing the player's 24 status values. Values
+   that already exist in the game are read live from the player /
+   combat code (HP, MP, atk, def, crit 15% x1.7, the 380ms basic
+   attack cooldown, the class speed multiplier). The rest are
+   PROVISIONAL base values — their systems (SP, magic atk/def split,
+   resistances, hunger/thirst, weight, the various modifiers) are
+   not in the game yet; when they land, statusValues() is the single
+   place to wire them in. */
+var STATUS_DEFS=[
+  {k:'hp',label:'HP'},{k:'patk',label:'物理攻撃力'},{k:'matk',label:'魔法攻撃力'},
+  {k:'pdef',label:'物理防御力'},{k:'mdef',label:'魔法防御力'},
+  {k:'sp',label:'SP'},{k:'speff',label:'SP効率'},
+  {k:'mp',label:'MP'},{k:'mpeff',label:'MP効率'},
+  {k:'crit',label:'会心率'},{k:'critd',label:'会心威力'},
+  {k:'aspd',label:'攻撃速度'},{k:'mspd',label:'移動速度'},
+  {k:'parry',label:'パリィ補正'},{k:'heal',label:'治癒補正'},
+  {k:'hunger',label:'空腹値'},{k:'thirst',label:'渇き値'},{k:'weight',label:'重量'},
+  {k:'power',label:'威力補正'},{k:'pen',label:'貫通補正'},
+  {k:'rpois',label:'毒耐性'},{k:'rpara',label:'麻痺耐性'},{k:'rbleed',label:'出血耐性'},{k:'rstun',label:'気絶耐性'}
+];
+function statusValues(){
+  var c=CLASSES[player.cls];
+  return {
+    hp:Math.ceil(player.hp)+' / '+player.maxHp,
+    patk:player.atk,
+    matk:player.atk, /* PROVISIONAL: spells currently scale off atk too */
+    pdef:player.def,
+    mdef:player.def, /* PROVISIONAL: a single def stat today */
+    sp:'100 / 100', /* PROVISIONAL: no SP system yet */
+    speff:'100%', /* PROVISIONAL */
+    mp:Math.floor(player.mp)+' / '+player.maxMp,
+    mpeff:'100%', /* PROVISIONAL */
+    crit:'15%', /* playerAttack: crit roll is Math.random()<0.15 */
+    critd:'170%', /* playerAttack: a crit multiplies damage by 1.7 */
+    aspd:(1000/380).toFixed(1)+' 回/秒', /* playerAttack: the basic-attack cooldown is 380ms */
+    mspd:Math.round(c.speed*100)+'%', /* the class speed multiplier, as % of the base pace */
+    parry:'100%', heal:'100%', /* PROVISIONAL */
+    hunger:'100', thirst:'100', /* PROVISIONAL: no hunger/thirst systems yet */
+    weight:'0', /* PROVISIONAL: no carry-weight system yet */
+    power:'100%', pen:'100%', /* PROVISIONAL */
+    rpois:'0%', rpara:'0%', rbleed:'0%', rstun:'0%' /* PROVISIONAL: no status-ailment resistances yet */
+  };
+}
+function refreshStatusUI(){
+  if(!player)return;
+  var c=CLASSES[player.cls];
+  $('statusHead').innerHTML='<b>'+escHtml(player.name)+'</b>（'+c.name+'） Lv.'+player.lv;
+  var v=statusValues(), html='';
+  for(var i=0;i<STATUS_DEFS.length;i++){var d=STATUS_DEFS[i];html+='<div class="st-row"><span>'+d.label+'</span><b>'+v[d.k]+'</b></div>';}
+  $('statusGrid').innerHTML=html;
+}
+function openStatus(){
+  if(!started||!player)return;
+  refreshStatusUI();
+  $('statusModal').style.display='grid';
+  if(document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}
+  syncCursorHide();
+}
+function toggleStatus(){
+  if(!started||!player)return;
+  if($('statusModal').style.display==='grid'){closeSubModal('statusModal');return;}
+  if(menuOpen)closeGameMenu(true);
+  returnToMenu=false;
+  openStatus();
+}
 function tryInteract(){
   if(!started||!player||player.dead)return;
   var a=nearestStuckArrow(95);
@@ -8965,7 +9048,12 @@ document.addEventListener('keydown',function(e){
        up */
     if($('bagModal').style.display==='grid'||menuOpen||!isAnyOverlayOpen()){e.preventDefault();toggleBag();return;}
   }
-  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid')return;
+  if(started&&player&&e.code==='KeyZ'&&document.activeElement!==$('chatInput')&&document.activeElement!==$('nameInput')){
+    /* Z toggles the status screen — handled before the modal early-return
+       below so Z can also CLOSE it, exactly like R and the bag */
+    if($('statusModal').style.display==='grid'||menuOpen||!isAnyOverlayOpen()){e.preventDefault();toggleStatus();return;}
+  }
+  if(menuOpen||$('bagModal').style.display==='grid'||$('playersModal').style.display==='grid'||$('saveModal').style.display==='grid'||$('helpModal').style.display==='grid'||$('worldMapModal').style.display==='grid'||$('statusModal').style.display==='grid')return;
   keys[e.code]=true;
   if(started&&player&&e.code==='KeyM'&&document.activeElement!==$('chatInput')){e.preventDefault();openWorldMap();return;}
   if(started&&player&&e.code==='KeyE'&&document.activeElement!==$('chatInput')){e.preventDefault();tryInteract();return;}
@@ -9133,6 +9221,7 @@ $('closeHelp').addEventListener('click',function(){closeSubModal('helpModal');})
 /* game menu (Esc) wiring — the ONLY way to open settings / sound / save / help in game */
 $('menuResumeBtn').addEventListener('click',function(){closeGameMenu();});
 $('menuBagBtn').addEventListener('click',function(){openFromMenu('bagModal');});
+$('menuStatusBtn').addEventListener('click',function(){openFromMenu('statusModal');});
 $('menuPlayersBtn').addEventListener('click',function(){openFromMenu('playersModal');});
 $('menuMapBtn').addEventListener('click',function(){openFromMenu('worldMapModal');});
 $('closeWorldMapBtn').addEventListener('click',function(){closeWorldMap();});
@@ -9167,6 +9256,7 @@ $('menuLogoutBtn').addEventListener('click',function(){doLogout();});
 $('closeBagBtn').addEventListener('click',function(){closeSubModal('bagModal');});
 $('closeBoardBtn').addEventListener('click',function(){closeSubModal('boardModal');});
 $('closeInnBtn').addEventListener('click',function(){closeSubModal('innModal');});
+$('closeStatusBtn').addEventListener('click',function(){closeSubModal('statusModal');});
 $('restBtn').addEventListener('click',function(){restAtInn();});
 $('bagGrid').addEventListener('click',function(e){
   var slot=e.target&&e.target.closest?e.target.closest('[data-act]'):null;
