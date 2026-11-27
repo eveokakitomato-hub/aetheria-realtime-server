@@ -6033,8 +6033,8 @@ function init3D(){
   camera3d=new THREE.PerspectiveCamera(camFov,viewW/Math.max(1,viewH),0.3,1750);
   scene.add(camera3d);
   buildViewModel();
-  var hemi=new THREE.HemisphereLight(0xcfe5ff,0x7d8f66,1.9);scene.add(hemi); skyHemi=hemi; /* bright daytime sky fill: shadows stay soft and colours stay vivid */
-  sunLight=new THREE.DirectionalLight(0xfff6e6,3.1); /* high midday sun: bright near-white light, shorter shadows */
+  var hemi=new THREE.HemisphereLight(0xcfe5ff,0x7d8f66,1.05);scene.add(hemi); skyHemi=hemi; /* bright daytime sky fill: shadows stay soft and colours stay vivid */
+  sunLight=new THREE.DirectionalLight(0xfff6e6,1.55); /* high midday sun: bright near-white light, shorter shadows */
   sunLight.castShadow=true;
   if(sunLight.shadow.normalBias!==undefined)sunLight.shadow.normalBias=1.5; /* softens texture acne without peter-panning */
   sunLight.shadow.mapSize.set(1024,1024); /* 1536 -> 1024: the shadow map re-renders the near scene every frame, so its texel count is a constant cost; at the 520-unit shadow box the softer resolution is barely visible */
@@ -9270,11 +9270,40 @@ function skyTick(){
     if(scene.fog)scene.fog.color.set(sky.bottom);
   }
   if(scene.fog){var f=wm.fogMul;scene.fog.near=600*f;scene.fog.far=1650*(0.45+0.55*f);}
-  sunLight.intensity=3.1*sky.sun*wm.sun;
+  sunLight.intensity=1.55*sky.sun*wm.sun;
   sunLight.color.set(sky.sun<0.4?'#ffb37a':'#fff6e6');
-  if(skyHemi)skyHemi.intensity=1.9*(0.3+sky.amb*0.85)*(0.75+wm.sun*0.25);
+  if(skyHemi)skyHemi.intensity=1.05*(0.3+sky.amb*0.85)*(0.75+wm.sun*0.25);
   if(renderer&&renderer.toneMappingExposure!==undefined)
-    renderer.toneMappingExposure=0.78+0.82*Math.max(0,Math.min(1,sky.sun));
+    renderer.toneMappingExposure=0.72+0.52*Math.max(0,Math.min(1,sky.sun));
+  /* ---- lamp lights: the game's lamps are emissive globes only and cast
+     no light at all, so a small pool of REAL point lights rides the six
+     lamp globes nearest the player. They fade in as the sun drops
+     (dusk / night / dawn), flicker gently like flames, and switch off
+     by day. Intensity is in physical falloff units (decay 1.55):
+     4500 gives a strong warm pool under each lamp that still reaches
+     a good way down the street. ---- */
+  if(skyState.lampScene!==scene){skyState.lampScene=scene;skyState.lampLights=null;}
+  if(!skyState.lampLights){
+    skyState.lampLights=[];
+    for(var li9=0;li9<6;li9++){var pl9=new THREE.PointLight(0xffb45e,0,0,1.55);scene.add(pl9);skyState.lampLights.push(pl9);}
+  }
+  var darkF=Math.max(0,Math.min(1,1-sky.sun*1.5));
+  if(darkF>0.02){
+    var lampList=[];
+    for(var lf9=0;lf9<townFeatures.length;lf9++){var tf9=townFeatures[lf9];if(tf9.kind!=='lamp')continue;
+      var ldx=tf9.x-player.x,ldy=tf9.y-player.y;lampList.push({x:tf9.x,y:tf9.y,d:ldx*ldx+ldy*ldy});}
+    lampList.sort(function(a,b){return a.d-b.d;});
+    for(var lq9=0;lq9<skyState.lampLights.length;lq9++){
+      var L9=skyState.lampLights[lq9];
+      if(lq9<lampList.length){
+        var lp9b=lampList[lq9];
+        L9.position.set(WX(lp9b.x),terrainH(lp9b.x,lp9b.y)+50,WZ(lp9b.y));
+        L9.intensity=4500*darkF*(0.92+0.08*Math.sin(Date.now()/90+lq9*1.7));
+      }else L9.intensity=0;
+    }
+  }else{
+    for(var lz9=0;lz9<skyState.lampLights.length;lz9++)skyState.lampLights[lz9].intensity=0;
+  }
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
   var ctx=cvs.getContext('2d');ctx.clearRect(0,0,wpx,hpx);
