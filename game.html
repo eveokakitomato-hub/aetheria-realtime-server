@@ -1004,6 +1004,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ほろ酔いの揺れ幅をさらに2倍にしました。</b>アルトエールの「ほろ酔い」状態で、左右にふらつく幅がさらに大きくなりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag notice">修正</span><span><b>NPCの名前表示を調整しました。</b>宿屋の主人と酒場の店主の名前は、それぞれの店の中に入った時にだけ表示されるようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ほろ酔いの揺れを大きくしました。</b>アルトエールの「ほろ酔い」状態で、左右にふらつく動きがこれまでの2倍になりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>クールダウン表示の位置を変更しました。</b>スキルのクールダウン表示（残り秒数とゲージ）が、画面左上から右下のアイテムホットバーの上へ移動しました。</span></li>
@@ -4841,7 +4842,7 @@ function update(dt,now){
      right axis, collision-checked like ordinary movement, applied
      even when standing still, and it costs no SP. */
   if(player.tipsyUntil&&now<player.tipsyUntil&&!player.swimming){
-    var tDrift=Math.sin(now*0.0022)*0.6; /* sway amplitude doubled at the user's word (2026-11-27): a proper tipsy wobble */
+    var tDrift=Math.sin(now*0.0022)*1.2; /* tipsy sway amplitude: 0.3 at first, doubled twice at the user's word (2026-11-27) to 1.2 — a full drunken stagger */
     var tRx=Math.cos(camYaw), tRy=-Math.sin(camYaw);
     var tFeetZ=playerGroundZ()+jumpY;
     var tNx=player.x+tRx*tDrift, tNy=player.y+tRy*tDrift;
