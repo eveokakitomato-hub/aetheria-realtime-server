@@ -1979,11 +1979,12 @@ function inTown(x,y){return townNorm(x,y)<=1.0;}
 function inNoSpawn(x,y){return townNorm(x,y)<=1.15||Math.hypot(x-SPAWN_X,y-SPAWN_Y)<=SAFE_R||Math.hypot(x-ALTO.x,y-ALTO.y)<=ALTO_R+60;} /* the town's safe zone is back: the whole walled interior plus a margin of about three tiles outside the wall (and the spawn clearing) — no spawns, no damage, slow healing inside it */
 var townFeatures=[]; /* render instructions for buildTown3D(), filled by buildTownData() */
 var lampPointLights=[]; /* real PointLights carried by the lamp globes themselves (AETHERIA SKY) */
+var lanternPointLights=[]; /* real PointLights carried by the hanging lanterns of Alto's guild hall, inn and tavern (AETHERIA SKY) */
 /* Build the town's collision + render data. Called from genWorld() before
    the wild decoration scatter, so the scatter can keep out of the town and
    its water (it checks townNorm() and waterDepthAt()). */
 function buildTownData(){
-  townFeatures=[]; lampPointLights=[];
+  townFeatures=[]; lampPointLights=[]; lanternPointLights=[];
   TOWN_PADS=[]; /* rebuilt below, once every house position is known */
   var seed=777001;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
   function rect(cx,cy,w,h,flags){var o={type:'rect',x:cx-w/2,y:cy-h/2,w:w,h:h,c:"#8a8172",town:true};for(var k in flags)o[k]=flags[k];obstacles.push(o);return o;}
@@ -6851,14 +6852,14 @@ function buildAlto3D(){
       var rug9=box(96,1.2,64,0x9a4636,0,2.8,8,gg9,false); rug9.receiveShadow=true; /* the hall rug — a brighter weave than the old deep red */
       /* hanging lanterns: SEVEN now (was three), a size bigger, and
          each wrapped in a soft halo shell — the hall reads lamplit
-         and welcoming instead of gloomy. The glow is faked with
-         emissive + halo, the same trick as the clock tower's
-         crystal: no new light sources are added, so the daylight
-         and the exterior are exactly as bright as before. */
+         and welcoming instead of gloomy. Each lantern ALSO carries
+         a real PointLight (AETHERIA SKY): the sky system drives
+         them from dusk to dawn, so the hall is truly lit at night. */
       [[-72,8],[-36,8],[0,8],[36,8],[72,8],[-36,-26],[36,-26]].forEach(function(lp9){
         cyl(0.8,0.8,10,0x3a3128,lp9[0],61,lp9[1],gg9,5);
         var ltn=sph(6,0xffd98a,lp9[0],54,lp9[1],gg9,{emissive:0xcf9a3a}); ltn.castShadow=false;
         var halo=sph(13,0xffd98a,lp9[0],54,lp9[1],gg9,{transparent:true,opacity:0.14,emissive:0xcf9a3a}); halo.castShadow=false;
+        var gl9=new THREE.PointLight(0xffb45e,0,300,1.55); gl9.position.set(lp9[0],54,lp9[1]); gg9.add(gl9); lanternPointLights.push(gl9); /* a real light source in this lantern (AETHERIA SKY) */
       });
       cyl(5,5.6,12,0x8a6a44,-hw+18,8,hd-20,gg9,8); cyl(5,5.6,12,0x74522f,-hw+30,8,hd-17,gg9,8); /* barrels in the entrance corner */
       box(12,12,12,0xc9a86a,hw-18,8,hd-20,gg9);                         /* a crate by the east wall */
@@ -6909,7 +6910,7 @@ function buildAlto3D(){
       var itb=cyl(11,11,2.2,WOOD,-18,11,14,ig,12); cyl(2.2,2.6,10,WOOD_D,-18,5,14,ig,8); /* the round table (on its collision circle) */
       [[-29,8],[-7,8],[-18,25]].forEach(function(ch){box(7,9,7,WOOD_D,ch[0],4.5,ch[1],ig);}); /* stools around it */
       var irug=box(44,1.2,32,0x9a4636,-2,2.6,6,ig,false); irug.receiveShadow=true; /* the entrance rug */
-      [[0,0],[-30,-14]].forEach(function(lp){ cyl(0.7,0.7,8,0x3a3128,lp[0],40,lp[1],ig,5); var lt=sph(5,0xffd98a,lp[0],35,lp[1],ig,{emissive:0xcf9a3a}); lt.castShadow=false; }); /* two hanging lanterns under the second floor */
+      [[0,0],[-30,-14]].forEach(function(lp){ cyl(0.7,0.7,8,0x3a3128,lp[0],40,lp[1],ig,5); var lt=sph(5,0xffd98a,lp[0],35,lp[1],ig,{emissive:0xcf9a3a}); lt.castShadow=false; var il9=new THREE.PointLight(0xffb45e,0,300,1.55); il9.position.set(lp[0],35,lp[1]); ig.add(il9); lanternPointLights.push(il9); }); /* two hanging lanterns under the second floor, each with a real light source (AETHERIA SKY) */
       /* ---- the staircase, up the north wall (treads on their 'floor' collision) ---- */
       for(var si2=0;si2<8;si2++){ var stp=5.5*(si2+1); box(10,stp,24,si2%2?0x8a6a44:0x74522f,-38+si2*9.5,stp/2,-28,ig); }
       var srl=rbox(84,3,3,WOOD_D,-2,32,-16.2,ig,0,0,0.52); srl.castShadow=false; /* the stair handrail, sloping with the treads */
@@ -6921,7 +6922,7 @@ function buildAlto3D(){
       box(3,40,18,0xe8dcc6,-2,64,5,ig); box(3,40,14,0xe8dcc6,-2,64,33,ig); /* the guest-room partition (a doorway gap between the two stretches) */
       [[-30,24],[28,26]].forEach(function(bd){ box(26,5,15,WOOD_D,bd[0],46.5,bd[1],ig); box(24,3,13,0xf2ead8,bd[0],50,bd[1],ig); box(8,2.5,10,0xffffff,bd[0]-8,51,bd[1],ig); }); /* two guest beds (on their floorSlab collision) */
       cyl(6,6,2,WOOD,45,49,18,ig,10); cyl(1.6,1.6,5,WOOD_D,45,46.5,18,ig,6); /* a small second-floor table */
-      cyl(0.7,0.7,9,0x3a3128,0,79,10,ig,5); var lt2=sph(5.5,0xffd98a,0,73,10,ig,{emissive:0xcf9a3a}); lt2.castShadow=false; /* the second-floor lantern */
+      cyl(0.7,0.7,9,0x3a3128,0,79,10,ig,5); var lt2=sph(5.5,0xffd98a,0,73,10,ig,{emissive:0xcf9a3a}); lt2.castShadow=false; var il10=new THREE.PointLight(0xffb45e,0,300,1.55); il10.position.set(0,73,10); ig.add(il10); lanternPointLights.push(il10); /* the second-floor lantern, with a real light source (AETHERIA SKY) */
     }else if(f.kind==='altotavern'){
       /* the TAVERN (ALTO_REBUILD_20261127): the two east houses
          merged into ONE big hall (230x120) on their combined ground,
@@ -6967,7 +6968,7 @@ function buildAlto3D(){
       });
       cyl(8,9,15,0x8a6a44,-100,7.5,-42,tg,9); cyl(8,9,15,0x74522f,-88,7.5,-44,tg,9); cyl(8,9,15,0x8a6a44,100,7.5,42,tg,9); /* barrels (on their collision circles) */
       box(14,14,14,0xc9a86a,95,7,-40,tg);                              /* a crate by the east wall (on its collision circle) */
-      [[-40,-4],[25,6],[80,-6]].forEach(function(lp){ cyl(0.7,0.7,12,0x3a3128,lp[0],80,lp[1],tg,5); var lt=sph(6,0xffd98a,lp[0],72,lp[1],tg,{emissive:0xcf9a3a}); lt.castShadow=false; var halo=sph(12,0xffd98a,lp[0],72,lp[1],tg,{transparent:true,opacity:0.13,emissive:0xcf9a3a}); halo.castShadow=false; }); /* three hanging lanterns with halos */
+      [[-40,-4],[25,6],[80,-6]].forEach(function(lp){ cyl(0.7,0.7,12,0x3a3128,lp[0],80,lp[1],tg,5); var lt=sph(6,0xffd98a,lp[0],72,lp[1],tg,{emissive:0xcf9a3a}); lt.castShadow=false; var halo=sph(12,0xffd98a,lp[0],72,lp[1],tg,{transparent:true,opacity:0.13,emissive:0xcf9a3a}); halo.castShadow=false; var tl9=new THREE.PointLight(0xffb45e,0,300,1.55); tl9.position.set(lp[0],72,lp[1]); tg.add(tl9); lanternPointLights.push(tl9); }); /* three hanging lanterns with halos, each with a real light source (AETHERIA SKY) */
       var trug=box(70,1.2,44,0x9a4636,20,2.6,8,tg,false); trug.receiveShadow=true; /* the hall rug */
     }else if(f.kind==='windmill'){
       if(BUILD_MODE!=='always'){ /* the static tower belongs to the windmill's own chunk */
@@ -9277,7 +9278,21 @@ function skyTick(){
   if(renderer&&renderer.toneMappingExposure!==undefined)
     renderer.toneMappingExposure=0.72+0.52*Math.max(0,Math.min(1,sky.sun));
   /* ---- lamp lights: none. The lamps of Luminas stay OFF at the user's
-     word — their globes are unlit and they carry no light source. ---- */
+     word — their globes are unlit and they carry no light source. ----
+     ---- lantern lights: the hanging lanterns of Alto's guild hall, inn
+     and tavern each carry a real PointLight (lanternPointLights). They
+     burn from dusk to dawn with a gentle flame flicker, and only while
+     the camera is within 700 units, so distant interiors cost nothing.
+     Intensity 3000 in physical falloff units (decay 1.55, reach 300). ---- */
+  var darkF2=Math.max(0,Math.min(1,1-sky.sun*1.5));
+  if(!skyState.ltmp)skyState.ltmp=new THREE.Vector3();
+  for(var nq9=0;nq9<lanternPointLights.length;nq9++){
+    var NL9=lanternPointLights[nq9];
+    if(darkF2<=0.02){NL9.intensity=0;continue;}
+    NL9.getWorldPosition(skyState.ltmp);
+    var ndx9=skyState.ltmp.x-camera3d.position.x, ndz9=skyState.ltmp.z-camera3d.position.z;
+    NL9.intensity=(ndx9*ndx9+ndz9*ndz9<490000)?3000*darkF2*(0.92+0.08*Math.sin(Date.now()/90+nq9*1.7)):0;
+  }
   /* rain / snow / lightning overlay */
   var cvs=dom.canvas,wpx=cvs.width=dom.root.clientWidth,hpx=cvs.height=dom.root.clientHeight;
   var ctx=cvs.getContext('2d');ctx.clearRect(0,0,wpx,hpx);
