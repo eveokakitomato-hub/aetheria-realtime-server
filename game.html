@@ -943,6 +943,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>宿屋前の露店を撤去しました。</b>風見村アルトの宿屋前にあった露店を取り払い、宿屋の前がすっきりと開けました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>風見村アルトに街灯が灯りました。</b>広場の周りや冒険者ギルドの前、南門、村の通りに、合わせて15基の街灯を設置しました。夕方から夜にかけて自動で点灯し、村の中全体が明るくなります。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>冒険者ギルドのランタンを2つにしました。</b>ホールの吊りランタンを7つから2つに減らし、中央を挟んで左右対称に配置しました。夜のホールは、2つの明かりが作る落ち着いた雰囲気になっています。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンの明るさを調整しました。</b>ギルド・宿屋・酒場のランタンの光量を半分に落とし、夜の室内が落ち着いた明るさになりました。</span></li>
@@ -2391,8 +2392,8 @@ function buildAltoData(){
   townFeatures.push({kind:'windmill',x:ALTO.x,y:ALTO.y});
   circ(ALTO.x,ALTO.y,49,{topKind:'prop',topH:166}); /* the windmill grew 1.3x with the rest of Alto: r 38 -> 49, topH 128 -> 166, matching the 1.3-scaled tower in buildAlto3D */
   townFeatures.push({kind:'altoplaza',x:ALTO.x,y:ALTO.y,r:150});
-  townFeatures.push({kind:'stall',x:13850,y:15190,seed:0.42});
-  rect(13850,15190,56,42,{stall:true,topKind:'prop',topH:58});
+  /* the market stall that stood before the inn is gone — removed
+     at the user's word (2026-11-27); the inn front stands open now */
   townFeatures.push({kind:'altobench',x:13865,y:15330,rot:Math.atan2(-165,30)});
   townFeatures.push({kind:'altobench',x:13540,y:15260,rot:Math.atan2(160,40)});
   townFeatures.push({kind:'altobench',x:13700,y:15135,rot:Math.PI});
