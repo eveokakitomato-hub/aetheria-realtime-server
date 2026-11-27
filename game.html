@@ -5998,8 +5998,8 @@ function abiZoomAt(cx,cy,f){
 function abiInitPanZoom(){
   var wrap=$('abiStageWrap'); if(!wrap||wrap._pz)return; wrap._pz=1;
   var pts={}, lastDist=0, moved=0;
-  wrap.addEventListener('pointerdown',function(e){try{wrap.setPointerCapture(e.pointerId);}catch(_){} pts[e.pointerId]={x:e.clientX,y:e.clientY}; moved=0;});
-  wrap.addEventListener('pointermove',function(e){
+  wrap.addEventListener('pointerdown',function(e){pts[e.pointerId]={x:e.clientX,y:e.clientY}; moved=0;}); /* NO setPointerCapture here: capturing retargets the click to the wrap and the node buttons would never be clicked */
+  window.addEventListener('pointermove',function(e){
     if(!pts[e.pointerId]||!abiView)return;
     var prev=pts[e.pointerId]; pts[e.pointerId]={x:e.clientX,y:e.clientY};
     var ids=Object.keys(pts);
@@ -6013,8 +6013,8 @@ function abiInitPanZoom(){
       lastDist=d; moved=99;
     }
   });
-  function up(e){delete pts[e.pointerId]; if(Object.keys(pts).length<2)lastDist=0; if(moved>8){abiSuppressClick=true; setTimeout(function(){abiSuppressClick=false;},60);}}
-  wrap.addEventListener('pointerup',up); wrap.addEventListener('pointercancel',up);
+  function up(e){if(!pts[e.pointerId])return; delete pts[e.pointerId]; if(Object.keys(pts).length<2)lastDist=0; if(moved>8){abiSuppressClick=true; setTimeout(function(){abiSuppressClick=false;},60);}}
+  window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
   wrap.addEventListener('wheel',function(e){e.preventDefault(); if(!abiView)return; var r=wrap.getBoundingClientRect(); abiZoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:0.89);},{passive:false});
   wrap.addEventListener('click',function(e){if(abiSuppressClick){e.stopPropagation();e.preventDefault();}},true); /* a drag must not select the node it ends on */
   $('abiZoomIn').addEventListener('click',function(){abiZoomAt(wrap.clientWidth/2,wrap.clientHeight/2,1.3);});
