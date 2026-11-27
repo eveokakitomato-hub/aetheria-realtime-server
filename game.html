@@ -943,6 +943,8 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>畑前の街灯を撤去しました。</b>村の南西、畑の前にあった街灯を取り払いました。村の街灯は残り7基です。</span></li>
+            <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルド前の街灯を撤去しました。</b>冒険者ギルドの前にあった街灯2基（ギルド前・西、ギルド前・東）を取り払いました。村の街灯は残り8基です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ランタンの明るさを調整しました。</b>光量をこれまでの半分に落としました。冒険者ギルド・宿屋・酒場のランタンと、村の街灯が対象です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>村の街灯を5基撤去しました。</b>南通り・西、南通り・東、宿屋前、東通り、北東の小道の街灯を取り払いました。村の街灯は残り10基です。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>宿屋前の露店を撤去しました。</b>風見村アルトの宿屋前にあった露店を取り払い、宿屋の前がすっきりと開けました。</span></li>
@@ -2550,15 +2552,15 @@ function buildAltoData(){
   gf.smoke={dx:68,dy:-18,z:159}; /* the main chimney's mouth, x 1.3 with the hall */
   townFeatures.push(gf);
   street(13700,15150,13700,15045,40); /* the lane: plaza north rim -> the guild's front step (the step moved south with the enlarged hall) */
-  /* street lamps for the village (AETHERIA): ten posts with lit
-     globes — four on the plaza rim, two before the guild door, one on
-     the west lane, one by the south-west field and two flanking the
-     south gate. (Five more — the two south-street lamps, the inn-front
-     lamp, the east-lane lamp and the north-east-lane lamp — were
+  /* street lamps for the village (AETHERIA): seven posts with lit
+     globes — four on the plaza rim, one on the west lane and two
+     flanking the south gate. (Eight more — the guild-door pair, the
+     two south-street lamps, the inn-front lamp, the east-lane lamp,
+     the north-east-lane lamp and the south-west field lamp — were
      removed at the user's word, 2026-11-27.) buildTown3D's 'altolamp'
      branch draws them and registers their light spots; the sky system
      lights them at night so the whole village glows. */
-  [[13597,15197],[13803,15197],[13597,15403],[13803,15403],[13635,15075],[13765,15075],[13470,15290],[13520,15520],[13630,15830],[13770,15830]].forEach(function(p){circ(p[0],p[1],6,{pillar:true,topKind:'prop',topH:56});townFeatures.push({kind:'altolamp',x:p[0],y:p[1]});});
+  [[13597,15197],[13803,15197],[13597,15403],[13803,15403],[13470,15290],[13630,15830],[13770,15830]].forEach(function(p){circ(p[0],p[1],6,{pillar:true,topKind:'prop',topH:56});townFeatures.push({kind:'altolamp',x:p[0],y:p[1]});});
   /* --- well, cart, fields, village trees, lanes --- */
   townFeatures.push({kind:'well',x:13430,y:15240});
   circ(13430,15240,16,{well:true,topKind:'prop',topH:40});
@@ -9404,7 +9406,7 @@ function skyTick(){
   }
   /* ---- street lamp lights (Alto village): a pool of eight scene-owned
      PointLights rides the street lamp spots nearest the player, so the
-     village streets are lit at night without paying for all ten
+     village streets are lit at night without paying for all seven
      lamps in every shader. Same colour / reach / flicker as lanterns. ---- */
   if(skyState.streetScene!==scene){skyState.streetScene=scene;skyState.streetLights=null;}
   if(!skyState.streetLights){skyState.streetLights=[];for(var sl9=0;sl9<8;sl9++){var spl9=new THREE.PointLight(0xffb45e,0,380,1.45);scene.add(spl9);skyState.streetLights.push(spl9);}}
