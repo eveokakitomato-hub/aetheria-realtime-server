@@ -144,6 +144,20 @@ body.hide-cursor #gameWrap,body.hide-cursor #gameWrap *{cursor:none!important}
 .bar i{display:block;height:100%;transition:width .25s}
 .bar em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:10px;color:#fff;text-shadow:0 1px 2px #000}
 .bar.hp i{background:linear-gradient(180deg,#f0666a,#c1272d)}
+.bar.sp i{background:linear-gradient(180deg,#dce884,#93a832)}
+.bars-flex{display:flex;align-items:center;gap:10px}
+.bars-main{flex:1;min-width:0}
+.vital-gauges{display:flex;gap:8px;padding-top:2px}
+.gauge{position:relative;width:44px;height:44px;flex-shrink:0}
+.gauge svg{width:44px;height:44px;transform:rotate(-90deg);display:block}
+.gauge circle{fill:none;stroke-width:4}
+.gauge .g-bg{stroke:rgba(255,255,255,.14)}
+.gauge .g-val{stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:0;transition:stroke-dashoffset .3s}
+.gauge .g-hunger{stroke:#e8a34c}
+.gauge .g-thirst{stroke:#4db2e8}
+.gauge.low .g-val{stroke:#e5484d}
+.gauge .g-ico{position:absolute;inset:0;display:grid;place-items:center;font-size:16px}
+.gauge .g-num{position:absolute;left:0;right:0;bottom:-13px;text-align:center;font-size:9px;color:var(--muted);font-weight:700}
 .bar.mp i{background:linear-gradient(180deg,#62b6f5,#256fb3)}
 .bar.xp{height:9px}.bar.xp i{background:var(--gold)}
 
@@ -631,9 +645,17 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
           </div>
           <div class="hud-arrows" id="hudArrows"><b><svg viewBox="0 0 24 24" width="1.25em" height="1.25em" style="vertical-align:-0.25em" aria-hidden="true"><line x1="5.5" y1="18.5" x2="16.8" y2="7.2" stroke="#a5713d" stroke-width="2.3" stroke-linecap="round"/><polygon points="21,3 19.1,8.9 15.1,4.9" fill="#cfd6de" stroke="#79828d" stroke-width="0.8" stroke-linejoin="round"/><polygon points="7.2,16.8 3.2,12.6 10.2,14.4" fill="#d84a3a"/><polygon points="7.2,16.8 11.4,21 9.6,14" fill="#efe8d8"/></svg> × <span id="hudArrowCount">0</span></b><span>矢の所持数</span></div>
         </div>
+        <div class="bars-flex"><div class="bars-main">
         <div class="bar-row"><label>HP</label><div class="bar hp"><i id="hpBar" style="width:100%"></i><em id="hpText">100 / 100</em></div></div>
+        <div class="bar-row"><label>SP</label><div class="bar sp"><i id="spBar" style="width:100%"></i><em id="spText">100 / 100</em></div></div>
         <div class="bar-row"><label>MP</label><div class="bar mp"><i id="mpBar" style="width:100%"></i><em id="mpText">50 / 50</em></div></div>
         <div class="bar-row"><label>EXP</label><div class="bar xp"><i id="xpBar" style="width:0%"></i></div><span id="xpText" style="color:var(--muted)">0%</span></div>
+        </div>
+        <div class="vital-gauges">
+          <div class="gauge" id="hungerGauge" title="空腹値"><svg viewBox="0 0 44 44"><circle class="g-bg" cx="22" cy="22" r="19"></circle><circle class="g-val g-hunger" id="hungerRing" cx="22" cy="22" r="19"></circle></svg><span class="g-ico">🍖</span><span class="g-num" id="hungerNum">100</span></div>
+          <div class="gauge" id="thirstGauge" title="渇き値"><svg viewBox="0 0 44 44"><circle class="g-bg" cx="22" cy="22" r="19"></circle><circle class="g-val g-thirst" id="thirstRing" cx="22" cy="22" r="19"></circle></svg><span class="g-ico">💧</span><span class="g-num" id="thirstNum">100</span></div>
+        </div>
+        </div>
       </div>
     </div>
 
@@ -966,6 +988,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SP（スタミナ）と空腹・渇きを追加しました。</b>移動や水泳、ウォーリアーとアーチャーの攻撃でSPを消費するようになりました。SPはHPバーの下に常時表示され、止まっていると回復します。また時間とともに減る空腹値と渇き値を追加。どちらもHPバーの右に円形ゲージで常時表示され、ゼロになるとHPに割合ダメージを受けます。スライムゼリーで空腹、ポーションで渇きを回復できます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>ステータス画面を追加しました。</b>Zキーを押すとステータス画面が開き、HP・MPや物理攻撃力、防御力、会心率など24項目の能力値を確認できます。ゲームメニューからも開けます。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>宿屋に主人がやってきました。</b>風見村アルトの宿屋に主人が常駐するようになりました。カウンター越しに近づいてEキーで話しかけると、30 Gで「宿で休憩する」ことができ、HPとMPが全回復します。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">ワールド</span><span><b>ギルドへの道のベンチを撤去しました。</b>風見村アルトの広場から冒険者ギルドへ続く小道にあったベンチを取り払い、道が通りやすくなりました。</span></li>
@@ -3153,8 +3176,8 @@ function beep(f,d,type,v){
 /* ================= ENTITIES ================= */
 function makePlayer(name,clsKey){
   var c=CLASSES[clsKey];
-  return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,atk:c.atk,def:c.def,
-    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,dir:1,walk:0,dead:false,inv:{},jellySlowUntil:0,oilUntil:0}; /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0). inv = {dropItemId:count} for monster drops; jellySlowUntil / oilUntil are the slime-jelly / slime-oil buff timers (session only) */
+  return {name:name,cls:clsKey,x:SPAWN_X,y:SPAWN_Y,r:3.5,hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,sp:100,maxSp:100,atk:c.atk,def:c.def,
+    lv:1,exp:0,gold:120,potions:3,arrows:((typeof isGameMaster==='function'&&isGameMaster())?1000:(clsKey==='archer'?30:0)),kills:0,hunger:100,thirst:100,dir:1,walk:0,dead:false,inv:{},jellySlowUntil:0,oilUntil:0}; /* gamemaster account starts with 1000 arrows; everyone else is unchanged (archer 30 / others 0). inv = {dropItemId:count} for monster drops; jellySlowUntil / oilUntil are the slime-jelly / slime-oil buff timers (session only) */
 }
 function expNeed(lv){return 80+lv*55;}
 /* ============ MOB POPULATION CONTROL (lag fix) ============
@@ -3548,6 +3571,7 @@ function releaseBow(){
 function fireArrow(power,mult,full){
   if(!bowEquipped()){noBowNotice();return;}
   if(player.arrows<=0){noArrows();return;}
+  if(!spendSP(SP_ATTACK_COST))return; /* an archer's shot is an attack activation: it costs SP */
   player.arrows--; atkAnimT=performance.now();
   var spd=6+power*24, cp2=Math.cos(camPitch);   // ≈11.3 (tap) → 30 (full draw): range grows with draw; with the lighter arrow gravity below (0.24/frame²) a level full-draw shot carries ≈30m and a tap shot ≈11m
   projectiles.push({arrow:true,x:player.x,y:player.y,vx:-Math.sin(camYaw)*cp2*spd,vy:-Math.cos(camYaw)*cp2*spd,
@@ -3560,6 +3584,7 @@ function fireArrow(power,mult,full){
 function playerAttack(mult,skillKey){
   if(!started||player.dead)return;
   var now=performance.now(),c=CLASSES[player.cls];
+  if(player.cls==='warrior'&&!spendSP(SP_ATTACK_COST))return; /* a warrior's attack activation costs SP (mage attacks do not) */
   if(!skillKey){if(now-lastAttack<380)return;lastAttack=now;}
   /* ARCHER skills fire instantly at a solid draw; the BASIC attack goes
      through the draw-and-release system above (see startBowDraw). */
@@ -3598,6 +3623,7 @@ function useSkill(n){
   if(now<skillCd[key])return;
   if(player.cls==='archer'&&!bowEquipped()){noBowNotice();return;} /* every archer skill is a bow skill: no bow in hand, no skill (and no MP / cooldown spent) */
   if(player.mp<sk.mp){toast('MPが足りません');beep(140,0.1,'square',0.04);return;}
+  if((player.cls==='warrior'||player.cls==='archer')&&player.sp<SP_ATTACK_COST){toast('SPが足りません');beep(140,0.1,'square',0.04);return;} /* checked before MP is spent, so a stamina-blocked skill costs nothing */
   if(player.cls==='archer'&&!sk.aoe&&player.arrows<=0){noArrows();return;}
   if(player.cls==='archer'&&sk.aoe){ /* アローレインは矢を3本消費する */
     if(player.arrows<3){noArrows();return;}
@@ -3605,6 +3631,7 @@ function useSkill(n){
   }
   player.mp-=sk.mp;skillCd[key]=now+sk.cd;
   if(sk.aoe){
+    if(player.cls==='warrior'||player.cls==='archer')player.sp-=SP_ATTACK_COST; /* AoE skills fire from here, not via playerAttack/fireArrow: charge their SP here */
     var hit=0;
     enemies.slice().forEach(function(e){if(Math.hypot(e.x-player.x,e.y-player.y)<sk.aoe+e.r){damageEnemy(e,Math.round(player.atk*sk.mult*(0.9+Math.random()*0.2)),Math.random()<0.15);hit++;}});
     burst(player.x,player.y,c.color,26);
@@ -3623,6 +3650,7 @@ function usePotion(){
   if(player.hp>=player.maxHp){toast('HPは満タンです');return;}
   player.potions--;potionCd=now+900;
   player.hp=Math.min(player.maxHp,player.hp+45);
+  player.thirst=Math.min(100,player.thirst+25); /* a potion is a drink: it also wets the throat (thirst +25) */
   addDmg(player.x,player.y,'+45','#7de08d',true);burst(player.x,player.y,'#7de08d',14);
   beep(520,0.1,'sine',0.05);updateHUD();
 }
@@ -3687,10 +3715,11 @@ function useDropItem(act){
     invAdd(act,-1);
     player.hp=Math.min(player.maxHp,player.hp+10);
     player.mp=Math.min(player.maxMp,player.mp+5);
+    player.hunger=Math.min(100,player.hunger+40); /* jelly is food: it fills the belly (hunger +40) */
     player.jellySlowUntil=now+10000;
     addDmg(player.x,player.y,'+10 HP / +5 MP','#7de08d',true);
     burst(player.x,player.y,'#a8e6a1',12);
-    toast('🍮 スライムゼリーを食べた…まずい！ HP+10 / MP+5回復、10秒間 移動速度-5%',3600);
+    toast('🍮 スライムゼリーを食べた…まずい！ HP+10 / MP+5 / 空腹+40 回復、10秒間 移動速度-5%',3600);
     beep(420,0.12,'sine',0.05);
   }else if(d.use==='oil'){
     if(invCount(act)<=0){toast('「'+d.name+'」を持っていません');return;}
@@ -4192,7 +4221,7 @@ function progressKey(){if(!player)return '';return [player.lv,player.exp,player.
 function buildSaveData(){
   if(!player)return null;
   return {app:'AETHERIA ONLINE',version:1,savedAt:new Date().toISOString(),
-    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
+    player:{name:player.name,cls:player.cls,x:Math.round(player.x),y:Math.round(player.y),hp:player.hp,maxHp:player.maxHp,mp:Math.floor(player.mp),maxMp:player.maxMp,sp:Math.floor(player.sp),maxSp:player.maxSp,hunger:Math.floor(player.hunger),thirst:Math.floor(player.thirst),atk:player.atk,def:player.def,lv:player.lv,exp:player.exp,gold:player.gold,potions:player.potions,arrows:player.arrows,kills:player.kills,inv:player.inv||{}},
     quest:{idx:questIdx,count:questCount,board:boardAcceptedFor},
     explored:exploredToString(),
     settings:snapshotSettings()};
@@ -4264,6 +4293,8 @@ function applySaveData(data){
   var np=makePlayer(String(p.name||'冒険者').slice(0,12),p.cls);
   np.maxHp=num(p.maxHp,np.maxHp,10,9999);np.maxMp=num(p.maxMp,np.maxMp,10,9999);
   np.hp=num(p.hp,np.maxHp,1,np.maxHp);np.mp=num(p.mp,np.maxMp,0,np.maxMp);
+  np.maxSp=num(p.maxSp,np.maxSp,1,9999);np.sp=num(p.sp,np.maxSp,0,np.maxSp);
+  np.hunger=num(p.hunger,100,0,100);np.thirst=num(p.thirst,100,0,100);
   np.atk=num(p.atk,np.atk,1,999);np.def=num(p.def,np.def,0,999);
   np.lv=Math.floor(num(p.lv,1,1,99));np.exp=num(p.exp,0,0,99999);
   np.gold=Math.floor(num(p.gold,0,0,999999));np.potions=Math.floor(num(p.potions,0,0,999));np.kills=Math.floor(num(p.kills,0,0,999999));
@@ -4318,6 +4349,13 @@ function startFromSave(source){
 function openSavePicker(ctx){saveLoadContext=ctx||'title';var inp=$('saveFileInput');inp.value='';inp.click();}
 
 /* ================= HUD ================= */
+function setGauge(kind,val){
+  var ring=$(kind+'Ring'); if(!ring)return;
+  var v=Math.max(0,Math.min(100,val));
+  ring.style.strokeDashoffset=(119.4*(1-v/100)).toFixed(1);
+  var num=$(kind+'Num'); if(num)num.textContent=Math.floor(v);
+  var g=$(kind+'Gauge'); if(g)g.classList.toggle('low',v<=25);
+}
 function updateHUD(){
   if(!player)return;
   var c=CLASSES[player.cls];
@@ -4326,6 +4364,8 @@ function updateHUD(){
   $('hudZone').textContent=zoneAt(player.x,player.y);
   $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
   $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
+  $('spBar').style.width=(player.sp/player.maxSp*100)+'%';$('spText').textContent=Math.floor(player.sp)+' / '+player.maxSp;
+  setGauge('hunger',player.hunger); setGauge('thirst',player.thirst);
   var pct=Math.floor(player.exp/expNeed(player.lv)*100);
   $('xpBar').style.width=pct+'%';$('xpText').textContent=pct+'%';
   /* 矢の所持数はステータス右側に常時表示（アーチャーの射撃で消費される） */
@@ -4413,7 +4453,21 @@ function updateSkillUI(now){
    paddle, MP drains the whole time, and at 0 MP the player starts
    drowning (HP drains) until they get back to shallow water. The swim
    banner above the status panel shows which state you are in. */
-var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5; /* 11 units = 1.1m: chest height on the 1.7m body — deeper than that and the feet can no longer wade */
+var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
+/* ---- survival stats: SP (stamina), hunger, thirst ----
+   SP is spent by moving, by swimming, and by warrior/archer attack
+   activations; it refills while standing still on land. Hunger and
+   thirst drain with time; at zero, each empty gauge eats 1% of max
+   HP per second (STARVE_HP_PER_SEC) until the player eats/drinks. */
+var SP_ATTACK_COST=5, SP_MOVE_PER_SEC=2, SP_SWIM_PER_SEC=4, SP_REGEN_PER_SEC=8;
+var HUNGER_PER_SEC=100/900, THIRST_PER_SEC=100/600, STARVE_HP_PER_SEC=1;
+var starveTickT=0, spWarnT=0;
+function spendSP(n){
+  if(player.sp>=n){player.sp-=n;return true;}
+  var now=performance.now();
+  if(now-spWarnT>1500){spWarnT=now;toast('SPが足りません');beep(140,0.1,'square',0.04);}
+  return false;
+} /* 11 units = 1.1m: chest height on the 1.7m body — deeper than that and the feet can no longer wade */
 function waterDepthAt(x,y){
   var d=0;
   for(var i=0;i<decorations.length;i++){var o=decorations[i];
@@ -4738,6 +4792,7 @@ function update(dt,now){
     if(player.swimming)sp*=0.55; else if(player.swimDepth>0)sp*=0.85; /* swimming is slow; wading drags a little */
     sp*=gmSpeedMul(); /* gamemaster account only: walk / dash / float-move / swim all 4x (1x for everyone else) */
     if(player.jellySlowUntil&&now<player.jellySlowUntil)sp*=0.95; /* slime jelly: the awful taste slows movement 5% for 10 seconds */
+    if(player.sp<=0)sp*=0.5; /* exhausted (SP empty): the pace halves until stamina recovers */
     var nx=player.x+mx*sp,nx2=player.x,ny=player.y+my*sp;
     /* feetZ: every object only blocks up to its visible top (finite-top obstacles) */
     var feetZ=playerGroundZ()+jumpY;
@@ -4745,6 +4800,8 @@ function update(dt,now){
     if(!collide(player.x,ny,player.r,feetZ)) player.y=ny;
     if(mx)player.dir=mx>0?1:-1;
     player.walk+=dt*0.02*gmSpeedMul(); /* walk-cycle phase follows the actual ground speed (4x for gamemaster) */
+    /* SP (stamina): moving drains it — swimming drains it faster */
+    player.sp=Math.max(0,player.sp-dt*0.001*(player.swimming?SP_SWIM_PER_SEC:SP_MOVE_PER_SEC));
   }
   // jump physics (Space): gravity pulls the player back down onto the terrain height;
   // horizontal movement above keeps working while airborne.
@@ -4803,6 +4860,19 @@ function update(dt,now){
   updateHoverBanner();
   // mp regen (paused while dashing or swimming); safe-zone heal below
   if(!dashingNow&&!player.swimming)player.mp=Math.min(player.maxMp,player.mp+dt*0.006);
+  /* SP (stamina) regen: standing still on land refills it */
+  if(!player.swimming&&!(keys['KeyW']||keys['KeyS']||keys['KeyA']||keys['KeyD']||joyVec.x||joyVec.y))player.sp=Math.min(player.maxSp,player.sp+dt*0.001*SP_REGEN_PER_SEC);
+  /* hunger & thirst drain with time; at zero, each empty gauge eats
+     STARVE_HP_PER_SEC % of max HP per second until the player eats
+     or drinks (the drowning code above is the pattern for the death) */
+  player.hunger=Math.max(0,player.hunger-dt*0.001*HUNGER_PER_SEC);
+  player.thirst=Math.max(0,player.thirst-dt*0.001*THIRST_PER_SEC);
+  if(player.hunger<=0||player.thirst<=0){
+    var starveN=(player.hunger<=0?1:0)+(player.thirst<=0?1:0);
+    player.hp-=player.maxHp*0.01*STARVE_HP_PER_SEC*starveN*dt*0.001;
+    if(now-starveTickT>600){starveTickT=now;addDmg(player.x,player.y,'-'+Math.max(1,Math.round(player.maxHp*0.01*STARVE_HP_PER_SEC*starveN*0.6)),'#ff8a8a');beep(90,0.09,'sawtooth',0.03);}
+    if(player.hp<=0){player.hp=0;player.dead=true;$('deathScreen').style.display='grid';chat('☠ <b>'+player.name+'</b> は'+(player.hunger<=0&&player.thirst<=0?'空腹と渇き':(player.hunger<=0?'空腹':'渇き'))+'で倒れた…','sys');updateHUD();return;}
+  }
   // crosshair identification + eyesight: the enemy captured by the center
   // crosshair is the only one whose name/level/HP are revealed; any enemy
   // that enters the player's field of view counts as "seen" for the minimap.
@@ -5332,7 +5402,7 @@ function restAtInn(){
   if(player.hp>=player.maxHp&&player.mp>=player.maxMp){toast('HP/MPは満タンです');return;}
   if(player.gold<INN_REST_COST){toast('Gが足りません（'+INN_REST_COST+' G必要です）');return;}
   player.gold-=INN_REST_COST;
-  player.hp=player.maxHp; player.mp=player.maxMp;
+  player.hp=player.maxHp; player.mp=player.maxMp; player.sp=player.maxSp;
   beep(660,0.08,'triangle',0.05); setTimeout(function(){beep(880,0.1,'triangle',0.05);},70);
   toast('🛏️ 宿で休憩した。HP/MPが全回復！');
   updateHUD();
@@ -5342,12 +5412,12 @@ function restAtInn(){
 /* ================= STATUS SCREEN (Z key) =================
    A read-only panel listing the player's 24 status values. Values
    that already exist in the game are read live from the player /
-   combat code (HP, MP, atk, def, crit 15% x1.7, the 380ms basic
-   attack cooldown, the class speed multiplier). The rest are
-   PROVISIONAL base values — their systems (SP, magic atk/def split,
-   resistances, hunger/thirst, weight, the various modifiers) are
-   not in the game yet; when they land, statusValues() is the single
-   place to wire them in. */
+   combat code (HP, MP, SP, hunger, thirst, atk, def, crit 15%
+   x1.7, the 380ms basic attack cooldown, the class speed
+   multiplier). The rest are PROVISIONAL base values — their
+   systems (the magic atk/def split, resistances, weight, the
+   various modifiers) are not in the game yet; when they land,
+   statusValues() is the single place to wire them in. */
 var STATUS_DEFS=[
   {k:'hp',label:'HP'},{k:'patk',label:'物理攻撃力'},{k:'matk',label:'魔法攻撃力'},
   {k:'pdef',label:'物理防御力'},{k:'mdef',label:'魔法防御力'},
@@ -5368,7 +5438,7 @@ function statusValues(){
     matk:player.atk, /* PROVISIONAL: spells currently scale off atk too */
     pdef:player.def,
     mdef:player.def, /* PROVISIONAL: a single def stat today */
-    sp:'100 / 100', /* PROVISIONAL: no SP system yet */
+    sp:Math.floor(player.sp)+' / '+player.maxSp,
     speff:'100%', /* PROVISIONAL */
     mp:Math.floor(player.mp)+' / '+player.maxMp,
     mpeff:'100%', /* PROVISIONAL */
@@ -5377,7 +5447,7 @@ function statusValues(){
     aspd:(1000/380).toFixed(1)+' 回/秒', /* playerAttack: the basic-attack cooldown is 380ms */
     mspd:Math.round(c.speed*100)+'%', /* the class speed multiplier, as % of the base pace */
     parry:'100%', heal:'100%', /* PROVISIONAL */
-    hunger:'100', thirst:'100', /* PROVISIONAL: no hunger/thirst systems yet */
+    hunger:''+Math.floor(player.hunger), thirst:''+Math.floor(player.thirst),
     weight:'0', /* PROVISIONAL: no carry-weight system yet */
     power:'100%', pen:'100%', /* PROVISIONAL */
     rpois:'0%', rpara:'0%', rbleed:'0%', rstun:'0%' /* PROVISIONAL: no status-ailment resistances yet */
@@ -9025,6 +9095,8 @@ function loop(now){
     // mp/hp bars smooth
     $('hpBar').style.width=(player.hp/player.maxHp*100)+'%';$('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
     $('mpBar').style.width=(player.mp/player.maxMp*100)+'%';$('mpText').textContent=Math.floor(player.mp)+' / '+player.maxMp;
+    $('spBar').style.width=(player.sp/player.maxSp*100)+'%';$('spText').textContent=Math.floor(player.sp)+' / '+player.maxSp;
+    setGauge('hunger',player.hunger); setGauge('thirst',player.thirst);
   }
   requestAnimationFrame(loop);
 }
