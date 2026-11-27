@@ -988,6 +988,7 @@ kbd{background:#222d28;border:1px solid #3d5247;border-bottom-width:2px;border-r
         <section class="news-panel" id="secNews" aria-label="お知らせ">
           <h2>NEWS <span>— お知らせ</span></h2>
           <ul class="news-list">
+            <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>食事での回復は空腹値を消費しなくなりました。</b>スライムゼリーなど、食事で回復したHPについては空腹値が減りません。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>回復の仕様を調整しました。</b>SPの自然回復が最大SPの5%/秒になりました。あわせて、SPが15回復するごとに渇き値が1減り、HPが最大値の10%回復するごとに空腹値が1減るようになりました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>空腹と渇きの減り方を緩やかにしました。</b>空腹値は45分、渇き値は30分でゼロになるペースに調整しました。</span></li>
             <li><time>2026.11.27</time><span class="news-tag update">システム</span><span><b>SP（スタミナ）と空腹・渇きを追加しました。</b>移動や水泳、ウォーリアーとアーチャーの攻撃でSPを消費するようになりました。SPはHPバーの下に常時表示され、止まっていると回復します。また時間とともに減る空腹値と渇き値を追加。どちらもHPバーの右に円形ゲージで常時表示され、ゼロになるとHPに割合ダメージを受けます。スライムゼリーで空腹、ポーションで渇きを回復できます。</span></li>
@@ -3715,7 +3716,7 @@ function useDropItem(act){
   if(d.use==='jelly'){
     if(invCount(act)<=0){toast('「'+d.name+'」を持っていません');return;}
     invAdd(act,-1);
-    player.hp=Math.min(player.maxHp,player.hp+10);
+    var hpBefJ=player.hp;player.hp=Math.min(player.maxHp,player.hp+10);foodHealCredit+=player.hp-hpBefJ; /* HP healed by eating is credited: it must not cost hunger (sampler below) */
     player.mp=Math.min(player.maxMp,player.mp+5);
     player.hunger=Math.min(100,player.hunger+40); /* jelly is food: it fills the belly (hunger +40) */
     player.jellySlowUntil=now+10000;
@@ -4463,7 +4464,7 @@ var SWIM_DEPTH=11, SWIM_MP_PER_SEC=2, DROWN_HP_PER_SEC=5;
    HP per second (STARVE_HP_PER_SEC) until the player eats/drinks. */
 var SP_ATTACK_COST=5, SP_MOVE_PER_SEC=2, SP_SWIM_PER_SEC=4, SP_REGEN_PCT=5; /* SP regen: 5% of max SP per second while standing still (the user's rate) */
 var HUNGER_PER_SEC=100/2700, THIRST_PER_SEC=100/1800, STARVE_HP_PER_SEC=1; /* hunger empties in 45 min, thirst in 30 min (the user's rates) */
-var starveTickT=0, spWarnT=0, spThirstAcc=0, hpHealAcc=0, hpSampleV=-1;
+var starveTickT=0, spWarnT=0, spThirstAcc=0, hpHealAcc=0, hpSampleV=-1, foodHealCredit=0;
 function spendSP(n){
   if(player.sp>=n){player.sp-=n;return true;}
   var now=performance.now();
@@ -4876,7 +4877,11 @@ function update(dt,now){
      source is covered by this one hook; respawns only re-baseline. */
   if(hpSampleV<=0){hpSampleV=player.hp;}
   else{
-    if(player.hp>hpSampleV){hpHealAcc+=player.hp-hpSampleV;var hCost=player.maxHp*0.1;while(hpHealAcc>=hCost){hpHealAcc-=hCost;player.hunger=Math.max(0,player.hunger-1);}}
+    if(player.hp>hpSampleV){
+      var hpGain=player.hp-hpSampleV;
+      if(foodHealCredit>0){var fEx=Math.min(hpGain,foodHealCredit);hpGain-=fEx;foodHealCredit-=fEx;} /* food heals are exempt */
+      if(hpGain>0){hpHealAcc+=hpGain;var hCost=player.maxHp*0.1;while(hpHealAcc>=hCost){hpHealAcc-=hCost;player.hunger=Math.max(0,player.hunger-1);}}
+    }
     hpSampleV=player.hp;
   }
   /* hunger & thirst drain with time; at zero, each empty gauge eats
